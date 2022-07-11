@@ -1,0 +1,6 @@
+Solution/.vs/
+Solution/x64/
+Solution/DirectXTex/Bin/
+*.pdb
+Solution/imgui/.vs/
+Solution/imgui/x64/
