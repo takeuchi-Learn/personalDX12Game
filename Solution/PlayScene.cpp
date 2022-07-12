@@ -18,102 +18,6 @@
 
 using namespace DirectX;
 
-#pragma region 角度系関数
-
-float PlayScene::angleRoundRad(float rad) {
-	float angle = rad;
-
-	if (angle >= 0.f && angle < XM_2PI) return angle;
-
-	while (angle >= XM_2PI) {
-		angle -= XM_2PI;
-	}
-	while (angle < 0) {
-		angle += XM_2PI;
-	}
-	return angle;
-}
-
-float PlayScene::nearSin(float rad) {
-	constexpr float a = +0.005859483f;
-	constexpr float b = +0.005587939f;
-	constexpr float c = -0.171570726f;
-	constexpr float d = +0.0018185485f;
-	constexpr float e = +0.9997773594f;
-
-	float x = angleRoundRad(rad);
-
-	// 0 ~ PI/2がわかれば求められる
-	if (x < XM_PIDIV2) {
-		// そのまま
-	} else if (x >= XM_PIDIV2 && x < XM_PI) {
-		x = XM_PI - x;
-	} else if (x < XM_PI * 1.5f) {
-		x = -(x - XM_PI);
-	} else if (x < XM_2PI) {
-		x = -(XM_2PI - x);
-	}
-
-	return x * (x * (x * (x * (a * x + b) + c) + d) + e);
-}
-
-float PlayScene::nearCos(float rad) {
-	return nearSin(rad + XM_PIDIV2);
-}
-
-float PlayScene::nearTan(float rad) {
-	return nearSin(rad) / nearCos(rad);
-}
-
-double PlayScene::near_atan2(double _y, double _x) {
-
-	const double x = abs(_x);
-	const double y = abs(_y);
-
-	const bool bigX = y < x;
-
-	double slope{};
-	if (bigX) slope = (double)y / x;
-	else  slope = (double)x / y;
-
-	constexpr double a = -0.05026472;
-	constexpr double b = +0.26603324;
-	constexpr double c = -0.45255286;
-	constexpr double d = +0.02385002;
-	constexpr double e = +0.99836359;
-
-	double ret = slope * (slope * (slope * (slope * (a * slope + b) + c) + d) + e); //5次曲線近似
-
-	constexpr float plane = XM_PI;
-	constexpr float rightAngle = plane / 2.f;	// 直角
-
-	if (bigX) {
-		if (_x > 0) {
-			if (_y < 0) ret = -ret;
-		} else {
-			if (_y > 0) ret = plane - ret;
-			if (_y < 0) ret = ret - plane;
-		}
-	} else {
-		if (_x > 0) {
-			if (_y > 0) ret = rightAngle - ret;
-			if (_y < 0) ret = ret - rightAngle;
-		}
-		if (_x < 0) {
-			if (_y > 0) ret = ret + rightAngle;
-			if (_y < 0) ret = -ret - rightAngle;
-		}
-	}
-
-	return ret;
-}
-
-float PlayScene::near_atan2(float y, float x) {
-	return (float)near_atan2((double)y, (double)x);
-}
-
-#pragma endregion 角度系関数
-
 #pragma region 初期化関数
 
 void PlayScene::cameraInit() {
@@ -185,7 +89,7 @@ void PlayScene::obj3dInit() {
 	backModel.reset(new ObjModel("Resources/back/", "back", 1u, true));
 
 	backObj.reset(new Object3d(DX12Base::getInstance()->getDev(), camera.get(), backModel.get(), 1u));
-	constexpr float backScale = 10.f;
+	const float backScale = camera->getFarZ() * 0.9f;
 	backObj->scale = { backScale, backScale, backScale };
 
 	/*model.reset(new ObjModel(DX12Base::getInstance()->getDev(),
@@ -331,9 +235,9 @@ void PlayScene::updateCamera() {
 	}
 
 	if (input->hitKey(DIK_UP)) {
-		if (angle.x + rotaVal < PIDIV3) angle.x += rotaVal;
+		if (angle.x + rotaVal < XM_PIDIV2) angle.x += rotaVal;
 	} else if (input->hitKey(DIK_DOWN)) {
-		if (angle.x - rotaVal > -PIDIV3) angle.x -= rotaVal;
+		if (angle.x - rotaVal > -XM_PIDIV2) angle.x -= rotaVal;
 	}
 
 	// angleラジアンだけY軸まわりに回転。半径は25
@@ -374,13 +278,13 @@ void PlayScene::updateLight() {
 						   XMFLOAT4(1, 1, 0, 1),
 						   "light angle : %f PI [rad]\n\t\t\t->%f PI [rad]",
 						   timeAngle / XM_PI,
-						   angleRoundRad(timeAngle) / XM_PI);
+						   dxBase->angleRoundRad(timeAngle) / XM_PI);
 
 	constexpr float lightR = 20.f;
 	lightObj->position = obj3d[0].position;
-	lightObj->position.x += nearSin(timeAngle) * lightR;
-	lightObj->position.y += nearSin(timeAngle) * lightR;
-	lightObj->position.z += nearCos(timeAngle) * lightR;
+	lightObj->position.x += dxBase->nearSin(timeAngle) * lightR;
+	lightObj->position.y += dxBase->nearSin(timeAngle) * lightR;
+	lightObj->position.z += dxBase->nearCos(timeAngle) * lightR;
 
 	light->setLightPos(lightObj->position);
 }
@@ -659,9 +563,9 @@ void PlayScene::createParticle(const DirectX::XMFLOAT3 &pos,
 		XMFLOAT3 generatePos = pos;
 
 		const XMFLOAT3 vel{
-			r * nearSin(theata) * nearCos(phi),
-			r * nearCos(theata),
-			r * nearSin(theata) * nearSin(phi)
+			r * dxBase->nearSin(theata) * dxBase->nearCos(phi),
+			r * dxBase->nearCos(theata),
+			r * dxBase->nearSin(theata) * dxBase->nearSin(phi)
 		};
 
 		XMFLOAT3 acc{};

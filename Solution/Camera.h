@@ -2,6 +2,8 @@
 
 #include <DirectXMath.h>
 
+#include "DX12Base.h"
+
 class Camera {
 private:
 	// エイリアス
@@ -11,6 +13,8 @@ private:
 	using XMFLOAT4 = DirectX::XMFLOAT4;
 	using XMVECTOR = DirectX::XMVECTOR;
 	using XMMATRIX = DirectX::XMMATRIX;
+
+	static DX12Base *dxBase;
 
 private:
 	// ビュー行列

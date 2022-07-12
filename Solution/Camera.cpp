@@ -2,6 +2,8 @@
 
 using namespace DirectX;
 
+DX12Base *Camera::dxBase = DX12Base::getInstance();
+
 namespace {
 	XMFLOAT3 operator-(const XMFLOAT3& left, const XMFLOAT3& right) {
 		return XMFLOAT3(
@@ -226,25 +228,25 @@ const XMFLOAT3 &Camera::getLook() const {
 
 void Camera::rotation(const float targetlength, const float angleX, const float angleY) {
 	// 視線ベクトル
-	const auto look = getLook();
+	const XMFLOAT3 &look = getLook();
 
 	constexpr float lookLen = 50.f;
-	auto newTarget = eye;
-	newTarget.x += targetlength * sinf(angleY) + look.x * lookLen;
-	newTarget.y += targetlength * sinf(angleX) + look.y * lookLen;
-	newTarget.z += targetlength * cosf(angleY) * cosf(angleX) + look.z * lookLen;
+	XMFLOAT3 newTarget = eye;
+	newTarget.x += targetlength * dxBase->nearSin(angleY) * dxBase->nearCos(angleX) + look.x * lookLen;
+	newTarget.y += targetlength * dxBase->nearSin(angleX) + look.y * lookLen;
+	newTarget.z += targetlength * dxBase->nearCos(angleY) * dxBase->nearCos(angleX) + look.z * lookLen;
 
 	setTarget(newTarget);
 }
 
 void Camera::moveForward(const float speed) {
-	const auto moveVal = getLook() * speed;
+	const XMFLOAT3 moveVal = getLook() * speed;
 
 	moveCamera(moveVal);
 }
 
 void Camera::moveRight(const float speed) {
-	const auto moveVal = getLook() * speed;
+	const XMFLOAT3 moveVal = getLook() * speed;
 
 	const XMFLOAT3 val{ moveVal.z, /*moveVal.y*/0, -moveVal.x };
 

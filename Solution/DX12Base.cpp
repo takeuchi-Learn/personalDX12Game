@@ -14,6 +14,10 @@ using namespace Microsoft::WRL;
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx12.h>
 
+#include <DirectXMath.h>
+
+using namespace DirectX;
+
 namespace {
 	constexpr ImWchar glyphRangesJapanese[] = {
 	0x0020, 0x007E, 0x00A2, 0x00A3, 0x00A7, 0x00A8, 0x00AC, 0x00AC, 0x00B0, 0x00B1, 0x00B4, 0x00B4, 0x00B6, 0x00B6, 0x00D7, 0x00D7,
@@ -533,8 +537,103 @@ namespace {
 	0x9F76, 0x9F77, 0x9F8D, 0x9F8D, 0x9F95, 0x9F95, 0x9F9C, 0x9F9D, 0x9FA0, 0x9FA0, 0xFF01, 0xFF01, 0xFF03, 0xFF06, 0xFF08, 0xFF0C,
 	0xFF0E, 0xFF3B, 0xFF3D, 0xFF5D, 0xFF61, 0xFF9F, 0xFFE3, 0xFFE3, 0xFFE5, 0xFFE5, 0xFFFF, 0xFFFF, 0,
 	};
-
 }
+
+#pragma region 角度系関数
+
+float DX12Base::angleRoundRad(float rad) {
+	float angle = rad;
+
+	if (angle >= 0.f && angle < XM_2PI) return angle;
+
+	while (angle >= XM_2PI) {
+		angle -= XM_2PI;
+	}
+	while (angle < 0) {
+		angle += XM_2PI;
+	}
+	return angle;
+}
+
+float DX12Base::nearSin(float rad) {
+	constexpr float a = +0.005859483f;
+	constexpr float b = +0.005587939f;
+	constexpr float c = -0.171570726f;
+	constexpr float d = +0.0018185485f;
+	constexpr float e = +0.9997773594f;
+
+	float x = angleRoundRad(rad);
+
+	// 0 ~ PI/2がわかれば求められる
+	if (x < XM_PIDIV2) {
+		// そのまま
+	} else if (x >= XM_PIDIV2 && x < XM_PI) {
+		x = XM_PI - x;
+	} else if (x < XM_PI * 1.5f) {
+		x = -(x - XM_PI);
+	} else if (x < XM_2PI) {
+		x = -(XM_2PI - x);
+	}
+
+	return x * (x * (x * (x * (a * x + b) + c) + d) + e);
+}
+
+float DX12Base::nearCos(float rad) {
+	return nearSin(rad + XM_PIDIV2);
+}
+
+float DX12Base::nearTan(float rad) {
+	return nearSin(rad) / nearCos(rad);
+}
+
+double DX12Base::near_atan2(double _y, double _x) {
+
+	const double x = abs(_x);
+	const double y = abs(_y);
+
+	const bool bigX = y < x;
+
+	double slope{};
+	if (bigX) slope = (double)y / x;
+	else  slope = (double)x / y;
+
+	constexpr double a = -0.05026472;
+	constexpr double b = +0.26603324;
+	constexpr double c = -0.45255286;
+	constexpr double d = +0.02385002;
+	constexpr double e = +0.99836359;
+
+	double ret = slope * (slope * (slope * (slope * (a * slope + b) + c) + d) + e); //5次曲線近似
+
+	constexpr float plane = XM_PI;
+	constexpr float rightAngle = plane / 2.f;	// 直角
+
+	if (bigX) {
+		if (_x > 0) {
+			if (_y < 0) ret = -ret;
+		} else {
+			if (_y > 0) ret = plane - ret;
+			if (_y < 0) ret = ret - plane;
+		}
+	} else {
+		if (_x > 0) {
+			if (_y > 0) ret = rightAngle - ret;
+			if (_y < 0) ret = ret - rightAngle;
+		}
+		if (_x < 0) {
+			if (_y > 0) ret = ret + rightAngle;
+			if (_y < 0) ret = -ret - rightAngle;
+		}
+	}
+
+	return ret;
+}
+
+float DX12Base::near_atan2(float y, float x) {
+	return (float)near_atan2((double)y, (double)x);
+}
+
+#pragma endregion 角度系関数
 
 DX12Base *DX12Base::getInstance() {
 	static DX12Base dxBase{};

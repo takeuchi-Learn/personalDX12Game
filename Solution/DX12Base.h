@@ -57,6 +57,7 @@ private:
 #pragma endregion
 
 
+
 	void initDevice();
 	void initCommand();
 	void initSwapchain();
@@ -77,6 +78,23 @@ private:
 
 public:
 	static DX12Base* getInstance();
+
+#pragma region 角度系
+
+	// @return 0 <= ret[rad] < 2PI
+	float angleRoundRad(float rad);
+
+	float nearSin(float rad);
+
+	float nearCos(float rad);
+
+	float nearTan(float rad);
+
+	double near_atan2(double _y, double _x);
+
+	float near_atan2(float y, float x);
+
+#pragma endregion
 
 	// @param clearColor 何もない場所の描画色。既定引数は暗い黄色っぽい色
 	void startDraw(const DirectX::XMFLOAT3& clearColor = DirectX::XMFLOAT3(0.5f, 0.5f, 0.f));

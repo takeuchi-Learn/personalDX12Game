@@ -167,19 +167,6 @@ private:
 
 public:
 
-#pragma region 角度系関数
-	// @return 0 <= ret[rad] < 2PI
-	float angleRoundRad(float rad);
-
-	float nearSin(float rad);
-	float nearCos(float rad);
-	float nearTan(float rad);
-
-	double near_atan2(double _y, double _x);
-	float near_atan2(float _y, float _x);
-#pragma endregion 角度系関数
-
-
 	PlayScene();
 	void init() override;
 	void update() override;
