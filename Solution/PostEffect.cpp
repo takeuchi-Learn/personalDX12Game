@@ -216,7 +216,7 @@ void PostEffect::createGraphicsPipelineState(const wchar_t *vsPath, const wchar_
 
 	// ルートシグネチャの生成
 	// ルートシグネチャの設定
-	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc;
+	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc{};
 	rootSignatureDesc.Init_1_0(_countof(rootparams), rootparams, 1, &samplerDesc, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	ComPtr<ID3DBlob> rootSigBlob;
@@ -284,7 +284,7 @@ void PostEffect::init() {
 			// 画像全体のデータサイズ
 			const UINT depthPitch = rowPitch * WinAPI::window_height;
 			// 画像イメージ
-			UINT *img = new UINT[pixelCount];
+			UINT *img = new UINT[pixelCount]{};
 			// 0xrrggbbaaの色にする
 			for (UINT j = 0; j < pixelCount; j++) {
 				img[j] = 0xff0000ff;
