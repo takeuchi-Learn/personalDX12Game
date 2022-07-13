@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <xaudio2.h>
 #include <cstdint>
 #include <wrl.h>
@@ -6,19 +6,19 @@ class SoundBase {
 
 	class XAudio2VoiceCallback : public IXAudio2VoiceCallback {
 	public:
-		// ƒ{ƒCƒXˆ—ƒpƒX‚ÌŠJŽnŽž
+		// ãƒœã‚¤ã‚¹å‡¦ç†ãƒ‘ã‚¹ã®é–‹å§‹æ™‚
 		STDMETHOD_(void, OnVoiceProcessingPassStart) (THIS_ UINT32 BytesRequired) {};
-		// ƒ{ƒCƒXˆ—ƒpƒX‚ÌI—¹Žž
+		// ãƒœã‚¤ã‚¹å‡¦ç†ãƒ‘ã‚¹ã®çµ‚äº†æ™‚
 		STDMETHOD_(void, OnVoiceProcessingPassEnd) (THIS) {};
-		// ƒoƒbƒtƒ@ƒXƒgƒŠ[ƒ€‚ÌÄ¶‚ªI—¹‚µ‚½Žž
+		// ãƒãƒƒãƒ•ã‚¡ã‚¹ãƒˆãƒªãƒ¼ãƒ ã®å†ç”ŸãŒçµ‚äº†ã—ãŸæ™‚
 		STDMETHOD_(void, OnStreamEnd) (THIS) {};
-		// ƒoƒbƒtƒ@‚ÌŽg—pŠJŽnŽž
+		// ãƒãƒƒãƒ•ã‚¡ã®ä½¿ç”¨é–‹å§‹æ™‚
 		STDMETHOD_(void, OnBufferStart) (THIS_ void *pBufferContext) {};
-		// ƒoƒbƒtƒ@‚Ì––”ö‚É’B‚µ‚½Žž
+		// ãƒãƒƒãƒ•ã‚¡ã®æœ«å°¾ã«é”ã—ãŸæ™‚
 		STDMETHOD_(void, OnBufferEnd) (THIS_ void *pBufferContext) {};
-		// Ä¶‚ªƒ‹[ƒvˆÊ’u‚É’B‚µ‚½Žž
+		// å†ç”ŸãŒãƒ«ãƒ¼ãƒ—ä½ç½®ã«é”ã—ãŸæ™‚
 		STDMETHOD_(void, OnLoopEnd) (THIS_ void *pBufferContext) {};
-		// ƒ{ƒCƒX‚ÌŽÀsƒGƒ‰[Žž
+		// ãƒœã‚¤ã‚¹ã®å®Ÿè¡Œã‚¨ãƒ©ãƒ¼æ™‚
 		STDMETHOD_(void, OnVoiceError) (THIS_ void *pBufferContext, HRESULT Error) {};
 	};
 public:
