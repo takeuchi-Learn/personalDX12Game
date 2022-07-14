@@ -26,8 +26,16 @@
 
 #include <functional>
 
+#include "Player.h"
+
 class PlayScene :
 	public GameScene {
+
+#pragma region カメラ
+
+	std::unique_ptr<Camera> camera;
+
+#pragma endregion カメラ
 
 #pragma region 音
 
@@ -94,23 +102,43 @@ class PlayScene :
 
 #pragma endregion FBXオブジェクト
 
+#pragma region パーティクル
+
+	std::unique_ptr<ParticleMgr> particleMgr;
+
+#pragma endregion パーティクル
+
+#pragma region 時間
+
+	std::unique_ptr<Time> timer;
+
+#pragma endregion 時間
+
+#pragma region GUI
+
+	bool guiWinAlive = true;
+
+#pragma endregion GUI
+
+#pragma region ポストエフェクトの設定
 	float drawAlpha = 0.f;
 	Time::timeType sceneTransTime = Time::oneSec;
 
 	UINT postEff2Num = 0u;
 
+#pragma endregion ポストエフェクトの設定
+
+#pragma region シングルトンインスタンス
 
 	Input *input = nullptr;
 
-	std::unique_ptr<Time> timer;
-
-	std::unique_ptr<Camera> camera;
-
-	std::unique_ptr<ParticleMgr> particleMgr;
-
 	DX12Base *dxBase = nullptr;
 
-	bool guiWinAlive = true;
+#pragma endregion シングルトンインスタンス
+
+	
+	// 自機データ
+	std::unique_ptr<Player> player;
 
 private:
 	void createParticle(const DirectX::XMFLOAT3 &pos, const UINT particleNum = 10U, const float startScale = 1.f);
@@ -161,6 +189,10 @@ private:
 	void updateLight();
 
 	void updateSprite();
+
+
+
+	void updatePlayer();
 
 #pragma endregion 更新関数
 

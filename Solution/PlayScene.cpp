@@ -22,7 +22,7 @@ using namespace DirectX;
 
 void PlayScene::cameraInit() {
 	camera.reset(new Camera(WinAPI::window_width, WinAPI::window_height));
-	camera->setFarZ(10000.f);
+	camera->setFarZ(5000.f);
 	camera->setEye(XMFLOAT3(0, 0, -175));	// 視点座標
 	camera->setTarget(XMFLOAT3(0, 0, 0));	// 注視点座標
 	camera->setUp(XMFLOAT3(0, 1, 0));		// 上方向
@@ -139,7 +139,8 @@ void PlayScene::timerInit() {
 #pragma endregion 初期化関数
 
 PlayScene::PlayScene()
-	: update_proc(std::bind(&PlayScene::update_start, this)) {
+	: update_proc(std::bind(&PlayScene::update_start, this)),
+	player(std::make_unique<Player>()) {
 	WinAPI::getInstance()->setWindowText("Press SPACE to change scene - now : Play (SE : OtoLogic)");
 
 	dxBase = DX12Base::getInstance();
@@ -221,52 +222,40 @@ void PlayScene::updateMouse() {
 }
 
 void PlayScene::updateCamera() {
-	constexpr float PIDIV3 = XM_PI / 3.f;
+	// カメラの距離
+	constexpr float camLen = 64.f;
+	// カメラの高さ
+	constexpr float camHeight = camLen * 0.5f;
 
-	// 毎秒1/4周
-	const float rotaVal = XM_PIDIV2 / DX12Base::getInstance()->getFPS();
+	// 自機からカメラ注視点までの距離
+	constexpr float player2targetLen = camLen * 2.f;
 
-	if (input->hitKey(DIK_RIGHT)) {
-		angle.y += rotaVal;
-		if (angle.y > XM_PI * 2) { angle.y = 0; }
-	} else if (input->hitKey(DIK_LEFT)) {
-		angle.y -= rotaVal;
-		if (angle.y < 0) { angle.y = XM_PI * 2; }
+	// 自機の視線ベクトル
+	const XMVECTOR look = XMVector3Normalize(player->getLookVec());
+
+	// 自機->カメラのベクトル
+	const XMVECTOR player2cam = XMVectorAdd(XMVectorScale(look, -camLen),
+											XMVectorSet(0, camHeight, 0, 1));
+
+	// カメラの位置
+	{
+		const XMVECTOR pos = XMVectorAdd(player->getPosVec(), player2cam);
+
+		XMFLOAT3 camPos{};
+		XMStoreFloat3(&camPos, pos);
+
+		camera->setEye(camPos);
 	}
 
-	if (input->hitKey(DIK_UP)) {
-		if (angle.x + rotaVal < XM_PIDIV2) angle.x += rotaVal;
-	} else if (input->hitKey(DIK_DOWN)) {
-		if (angle.x - rotaVal > -XM_PIDIV2) angle.x -= rotaVal;
+	// 注視点設定
+	{
+		const XMVECTOR targetPos = XMVectorAdd(XMVectorScale(look, player2targetLen),
+											   player->getPosVec());
+		XMFLOAT3 targetF3{};
+		XMStoreFloat3(&targetF3, targetPos);
+
+		camera->setTarget(targetF3);
 	}
-
-	// angleラジアンだけY軸まわりに回転。半径は25
-	constexpr float camRange = 25.f;	// targetLength
-	camera->rotation(camRange, angle.x, angle.y);
-
-
-	// 移動量
-	const float moveSpeed = 75.f / dxBase->getFPS();
-	// 視点移動
-	if (input->hitKey(DIK_W)) {
-		camera->moveForward(moveSpeed);
-	} else if (input->hitKey(DIK_S)) {
-		camera->moveForward(-moveSpeed);
-	}
-	if (input->hitKey(DIK_A)) {
-		camera->moveRight(-moveSpeed);
-	} else if (input->hitKey(DIK_D)) {
-		camera->moveRight(moveSpeed);
-	}
-
-	XMFLOAT3 playerPos = camera->getTarget();
-	/*playerPos.x -= camRange / 2.f;
-	playerPos.y -= camRange / 2.f;*/
-
-	obj3d[0].position = playerPos;
-
-	obj3d[0].rotation.x = XMConvertToDegrees(-angle.x);
-	obj3d[0].rotation.y = XMConvertToDegrees(angle.y);
 }
 
 void PlayScene::updateLight() {
@@ -310,6 +299,32 @@ void PlayScene::updateSprite() {
 	}
 }
 
+void PlayScene::updatePlayer() {
+
+	const bool hitW = input->hitKey(DIK_W);
+	const bool hitA = input->hitKey(DIK_A);
+	const bool hitS = input->hitKey(DIK_S);
+	const bool hitD = input->hitKey(DIK_D);
+
+	if (hitW || hitA || hitS || hitD) {
+		constexpr float moveVel = 1.f;
+
+		if (hitW) {
+			player->moveForward(moveVel);
+		} else if (hitS) {
+			player->moveForward(-moveVel);
+		}
+
+		if (hitA) {
+			player->moveRight(-moveVel);
+		} else if (hitD) {
+			player->moveRight(moveVel);
+		}
+	}
+
+	obj3d[0].position = player->getPosF3();
+}
+
 void PlayScene::update_play() {
 
 	// SPACEでENDシーンへ
@@ -334,6 +349,9 @@ void PlayScene::update_play() {
 
 	// マウス情報の更新
 	updateMouse();
+
+	// 自機更新
+	updatePlayer();
 
 	// カメラの更新
 	updateCamera();

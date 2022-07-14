@@ -79,6 +79,9 @@
     <Filter Include="Scene">
       <UniqueIdentifier>{86a5f2ac-cda4-4b54-abf6-e62b548c4b43}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Player">
+      <UniqueIdentifier>{e1ab2d86-50f5-4726-a540-1ac81d9cb783}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="System.cpp">
@@ -174,6 +177,9 @@
     <ClCompile Include="SoundBase.cpp">
       <Filter>Sound</Filter>
     </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Player</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -265,6 +271,9 @@
     </ClInclude>
     <ClInclude Include="SoundBase.h">
       <Filter>Sound</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Player</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
