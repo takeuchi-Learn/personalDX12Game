@@ -41,3 +41,16 @@ struct Ray {
 	// 方向
 	DirectX::XMVECTOR dir = { 1,0,0,0 };
 };
+
+// 直方体(AABB)
+struct AABB {
+	DirectX::XMVECTOR minPos{};
+	DirectX::XMVECTOR maxPos{ 1,1,1,1 };
+};
+
+// カプセル
+struct Capsule {
+	DirectX::XMVECTOR startPos{};
+	DirectX::XMVECTOR endPos{ 1,1,1,1 };
+	float radius = 1.f;
+};
