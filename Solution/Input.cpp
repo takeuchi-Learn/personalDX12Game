@@ -31,17 +31,23 @@ void Input::init() {
 
 	result = devkeyboard->SetCooperativeLevel(
 		WinAPI::getInstance()->getHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+
+	result = dinput->CreateDevice(GUID_SysMouse, &devmouse, NULL);
+
+	result = devmouse->SetDataFormat(&c_dfDIMouse2); // 標準形式
+
+	result = devmouse->SetCooperativeLevel(WinAPI::getInstance()->getHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
 }
 
 void Input::update() {
-	HRESULT result;
-	result = devkeyboard->Acquire();
+	HRESULT result = devkeyboard->Acquire();
 
 	memcpy(preKey, key, sizeof(key));
 	result = devkeyboard->GetDeviceState(sizeof(key), key);
 
-	memcpy(preMouseState, mouseState, sizeof(mouseState));
-	GetKeyboardState(mouseState);
+	result = devmouse->Acquire();	// マウス動作開始
+	preMouseState = mouseState;
+	result = devmouse->GetDeviceState(sizeof(mouseState), &mouseState);
 
 	GetCursorPos(&mousePos);
 	ScreenToClient(WinAPI::getInstance()->getHwnd(), &mousePos);
@@ -57,22 +63,30 @@ void Input::resetState() {
 		key[i] = 0;
 		preKey[i] = 0;
 
-		mouseState[i] = 0;
-		preMouseState[i] = 0;
+		mouseState = DIMOUSESTATE2();
+		preMouseState = DIMOUSESTATE2();
 	}
 }
 
 bool Input::hitMouseBotton(BYTE keyCode) {
-	return (bool)(mouseState[keyCode] & 0x80);
+	return (bool)mouseState.rgbButtons[keyCode];
 }
 
 
 bool Input::hitPreMouseBotton(BYTE keyCode) {
-	return (bool)(preMouseState[keyCode] & 0x80);
+	return (bool)preMouseState.rgbButtons[keyCode];
 }
 
 bool Input::triggerMouseBotton(BYTE keyCode) {
 	return hitMouseBotton(keyCode) && !hitPreMouseBotton(keyCode);
+}
+
+Input::MouseMove Input::getMouseMove() {
+	MouseMove ret{};
+	ret.x = mouseState.lX;
+	ret.y = mouseState.lY;
+	ret.wheel = mouseState.lZ;
+	return ret;
 }
 
 POINT Input::getMousePos() {

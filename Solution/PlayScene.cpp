@@ -204,9 +204,6 @@ void PlayScene::updateMouse() {
 						 mousePos.x,
 						 mousePos.y + DebugText::fontHeight * 2, 0.75f);
 	}
-	if (input->hitMouseBotton(VK_LSHIFT)) {
-		debugText->Print(spriteBase.get(), "LSHIFT(WinAPI)", 0, 0, 2);
-	}
 
 	// Rを押すたびマウスカーソルの表示非表示を切り替え
 	if (input->triggerKey(DIK_R)) {
@@ -523,6 +520,7 @@ void PlayScene::drawImGui() {
 					Sound::checkPlaySound(soundData1.get())
 					? "再生|>"
 					: "停止[]");
+		ImGui::Text("ホイール%d", input->getInstance()->getMouseWheelScroll());
 		// 次のウインドウは今のウインドウのすぐ下
 		ImGui::SetNextWindowPos(getWindowLBPos());
 		ImGui::End();
