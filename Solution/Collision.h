@@ -13,7 +13,7 @@ private:
 	inline static float vec3Dot(const DirectX::XMVECTOR &v1,
 								const DirectX::XMVECTOR &v2) {
 		float ret{};
-		XMStoreFloat(&ret, XMVector3Dot(v1, v2));
+		DirectX::XMStoreFloat(&ret, DirectX::XMVector3Dot(v1, v2));
 		return ret;
 	}
 
@@ -24,8 +24,8 @@ private:
 	}
 
 	// 線分同士の距離の2乗
-	static float sqDistanceSegmentSegment(const XMVECTOR &p1, const XMVECTOR &q1,
-										  const XMVECTOR &p2, const XMVECTOR &q2);
+	static float sqDistanceSegmentSegment(const DirectX::XMVECTOR &p1, const DirectX::XMVECTOR &q1,
+										  const DirectX::XMVECTOR &p2, const DirectX::XMVECTOR &q2);
 
 public:
 	/// <summary>
