@@ -10,6 +10,13 @@
 class Input {
 public:
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
+
+	struct MouseMove {
+		LONG x;
+		LONG y;
+		LONG wheel;
+	};
+
 private:
 	Input(const Input& ip) = delete;
 	Input& operator=(const Input& ip) = delete;
@@ -20,8 +27,8 @@ private:
 	BYTE key[256];
 	BYTE preKey[256];
 
-	BYTE mouseState[256]{};
-	BYTE preMouseState[256]{};
+	DIMOUSESTATE2 mouseState{};
+	DIMOUSESTATE2 preMouseState{};
 
 	POINT mousePos{};
 
@@ -43,15 +50,19 @@ public:
 	void resetState();
 
 	enum MOUSE : UINT {
-		LEFT = VK_LBUTTON,
-		RIGHT = VK_RBUTTON,
-		WHEEL = VK_MBUTTON
+		LEFT = 0,
+		RIGHT = 1,
+		WHEEL = 2
 	};
 
-	// @param Input::MOUSE::なんとか
+	// @param Input::MOUSE::なんとか、rgbButtons配列の添え字
 	bool hitMouseBotton(_In_ BYTE keyCode);
 	bool hitPreMouseBotton(_In_ BYTE keyCode);
 	bool triggerMouseBotton(_In_ BYTE keyCode);
+
+	MouseMove getMouseMove();
+
+	inline LONG getMouseWheelScroll() { return mouseState.lZ; }
 
 	// @return POINT型(LONG x とLONG y のみの構造体)
 	POINT getMousePos();
