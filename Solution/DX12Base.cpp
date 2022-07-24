@@ -768,10 +768,16 @@ void DX12Base::initRTV() {
 		// スワップチェーンからバッファを取得
 		result = swapchain->GetBuffer(i, IID_PPV_ARGS(&backBuffers[i]));
 
+		// RTVの設定
+		D3D12_RENDER_TARGET_VIEW_DESC rtvDesc{};
+		// シェーダーの計算結果はSRGBにする
+		rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+
 		// レンダーターゲットビューの生成
 		dev->CreateRenderTargetView(
 			backBuffers[i].Get(),
-			nullptr,
+			&rtvDesc,
 			CD3DX12_CPU_DESCRIPTOR_HANDLE(
 				rtvHeaps->GetCPUDescriptorHandleForHeapStart(),
 				i,
@@ -869,6 +875,16 @@ bool DX12Base::InitImgui() {
 								 12.f,
 								 nullptr,
 								 glyphRangesJapanese);
+
+	// ガンマ補正
+	ImGuiStyle& style = ImGui::GetStyle();
+	for (auto &i : style.Colors) {
+		i.x = powf(i.x, 2.2f);
+		i.y = powf(i.y, 2.2f);
+		i.z = powf(i.z, 2.2f);
+		i.w = powf(i.w, 2.2f);
+	}
+
 
 	return true;
 }

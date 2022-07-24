@@ -37,7 +37,7 @@ void Material::loadTexture(const std::string& directoryPath, UINT texNum,
 	std::string filepath = directoryPath + texFileName;
 
 	constexpr size_t wfilePathSize = 128;
-	wchar_t wfilepath[wfilePathSize];
+	wchar_t wfilepath[wfilePathSize]{};
 	MultiByteToWideChar(CP_ACP, 0, filepath.c_str(), -1, wfilepath, wfilePathSize);
 
 	result = LoadFromWICFile(

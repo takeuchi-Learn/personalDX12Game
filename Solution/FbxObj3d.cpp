@@ -146,7 +146,7 @@ void FbxObj3d::createGraphicsPipeline(const wchar_t *vsPath, const wchar_t *psPa
 	for (UINT i = 0, maxSize = _countof(gpipeline.BlendState.RenderTarget);
 		 i < PostEffect::renderTargetNum && i < maxSize;
 		 i++) {
-		gpipeline.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM; // 0～255指定のRGBA
+		gpipeline.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // 0～255指定のRGBA
 	}
 
 	gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング

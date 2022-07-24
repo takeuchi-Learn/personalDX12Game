@@ -385,7 +385,7 @@ void ParticleMgr::InitializeGraphicsPipeline() {
 
 	gpipeline.NumRenderTargets = renderTargetNum;	// 描画対象の数
 	for (UINT i = 0u; i < renderTargetNum; ++i) {
-		gpipeline.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM; // 0～255指定のRGBA
+		gpipeline.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // 0～255指定のRGBA
 	}
 	gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 

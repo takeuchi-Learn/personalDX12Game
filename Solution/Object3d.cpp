@@ -255,11 +255,6 @@ Object3d::PipelineSet Object3d::createGraphicsPipeline(ID3D12Device* dev,
 		blenddesc.DestBlend = D3D12_BLEND_ZERO;
 		break;
 	case Object3d::BLEND_MODE::ALPHA:
-		//--半透明合成
-		blenddesc.BlendOp = D3D12_BLEND_OP_ADD;				// 加算
-		blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;			// ソースのアルファ値
-		blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;	// デストの値を100%使う
-		break;
 	default:
 		//--半透明合成
 		blenddesc.BlendOp = D3D12_BLEND_OP_ADD;				// 加算
@@ -288,7 +283,7 @@ Object3d::PipelineSet Object3d::createGraphicsPipeline(ID3D12Device* dev,
 	for (UINT i = 0, maxSize = _countof(gpipeline.BlendState.RenderTarget);
 		 i < PostEffect::renderTargetNum && i < maxSize;
 		 i++) {
-		gpipeline.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM; // 0～255指定のRGBA
+		gpipeline.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // 0～255指定のRGBA
 	}
 
 	gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング

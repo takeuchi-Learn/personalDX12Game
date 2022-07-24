@@ -422,4 +422,8 @@ void FbxLoader::loadTexture(FbxModel* model, const std::string& fullpath) {
 	if (FAILED(result)) {
 		assert(0);
 	}
+
+	if (!IsSRGB(metadata.format)) {
+		MakeSRGB(metadata.format);
+	}
 }
