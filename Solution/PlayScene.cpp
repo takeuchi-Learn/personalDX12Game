@@ -92,10 +92,7 @@ void PlayScene::obj3dInit() {
 	const float backScale = camera->getFarZ() * 0.9f;
 	backObj->scale = { backScale, backScale, backScale };
 
-	/*model.reset(new ObjModel(DX12Base::getInstance()->getDev(),
-						  L"Resources/model/model.obj", L"Resources/model/tex.png",
-						  WinAPI::window_width, WinAPI::window_height,
-						  Object3d::constantBufferNum, obj3dTexNum));*/
+	
 	model.reset(new ObjModel("Resources/model/", "model", obj3dTexNum, true));
 
 	constexpr UINT obj3dNum = 1;
