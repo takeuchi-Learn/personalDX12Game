@@ -16,6 +16,8 @@ using namespace Microsoft::WRL;
 
 #include <DirectXMath.h>
 
+#include "Time.h"
+
 using namespace DirectX;
 
 namespace {
@@ -648,9 +650,10 @@ void DX12Base::initDevice() {
 
 #ifdef _DEBUG
 	//デバッグレイヤーをオンに
-	ComPtr<ID3D12Debug> debugController;
+	ComPtr<ID3D12Debug1> debugController;
 	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
 		debugController->EnableDebugLayer();
+		debugController->SetEnableGPUBasedValidation(TRUE);
 	}
 #endif
 
@@ -703,6 +706,15 @@ void DX12Base::initDevice() {
 			break;
 		}
 	}
+
+#ifdef _DEBUG
+	ComPtr<ID3D12InfoQueue> infoQueue;
+	if (SUCCEEDED(dev->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
+		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
+		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
+		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
+	}
+#endif // _DEBUG
 }
 
 void DX12Base::initCommand() {
@@ -1001,29 +1013,24 @@ ID3D12GraphicsCommandList *DX12Base::getCmdList() { return cmdList.Get(); }
 // FPS
 // --------------------
 
-namespace {
-	using myTimeUnit = std::chrono::microseconds;
-	constexpr auto oneSec = std::chrono::duration_cast<myTimeUnit>(std::chrono::seconds(1)).count();
-}
-
 void DX12Base::flipTimeFPS() {
 	for (UINT i = divNum - 1; i > 0; i--) {
 		fpsTime[i] = fpsTime[i - 1];
 	}
-	fpsTime[0] = std::chrono::duration_cast<myTimeUnit>(
+	fpsTime[0] = std::chrono::duration_cast<Time::timeUnit>(
 		std::chrono::steady_clock::now() - std::chrono::steady_clock::time_point()
 		).count();
 }
 
 void DX12Base::updateFPS() {
-	float avgDiffTime = 0.f;
+	LONGLONG avgDiffTime = 0ll;
 	for (UINT i = 0; i < divNum - 1; ++i) {
 		avgDiffTime += fpsTime[i] - fpsTime[i + 1];
 	}
 	avgDiffTime /= divNum - 1;
 
 	fps = -1.f;
-	if (avgDiffTime != 0) fps = oneSec / avgDiffTime;
+	if (avgDiffTime != 0ll) fps = Time::oneSecF / avgDiffTime;
 }
 
 float DX12Base::getFPS() { return fps; }

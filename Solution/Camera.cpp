@@ -215,7 +215,7 @@ void Camera::update() {
 }
 
 
-const XMFLOAT3 &Camera::getLook() const {
+XMFLOAT3 Camera::getLook() const {
 	// 視線ベクトル
 	XMFLOAT3 look = target - eye;
 	// XMVECTORを経由して正規化

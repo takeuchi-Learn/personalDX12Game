@@ -12,6 +12,7 @@ public:
 	using timeType = long long;
 
 	static constexpr timeType oneSec = std::chrono::duration_cast<timeUnit>(std::chrono::seconds(1)).count();
+	static constexpr float oneSecF = static_cast<float>(oneSec);
 
 	~Time();
 

@@ -375,7 +375,7 @@ void FbxLoader::parseSkin(FbxModel* model,
 	}
 	// 頂点配列書き換え用参照
 	auto& vertices = model->vertices;
-	for (UINT i = 0, loopLen = vertices.size(); i < loopLen; i++) {
+	for (UINT i = 0, loopLen = (UINT)vertices.size(); i < loopLen; i++) {
 		// 最も大きい4つを選択
 		auto& weightList = weightLists[i];
 		// 降順ソート
