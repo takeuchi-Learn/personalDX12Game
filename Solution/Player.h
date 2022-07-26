@@ -15,6 +15,7 @@ public:
 		pos(DirectX::XMVectorSet(0, 0, 0, 1)) {
 	}
 	inline const XMVECTOR &getLookVec() { return lookVec; }
+	inline void setLookVec(const XMVECTOR &lookVec) { this->lookVec = lookVec; }
 
 	inline XMVECTOR getPosVec() { return pos; }
 	inline XMFLOAT3 getPosF3() {

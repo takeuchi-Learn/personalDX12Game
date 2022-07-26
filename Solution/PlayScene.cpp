@@ -315,39 +315,91 @@ void PlayScene::updateSprite() {
 
 void PlayScene::updatePlayer() {
 
-	const bool hitW = input->hitKey(DIK_W);
-	const bool hitA = input->hitKey(DIK_A);
-	const bool hitS = input->hitKey(DIK_S);
-	const bool hitD = input->hitKey(DIK_D);
+	// 回転
+	{
+		const bool hitUP = input->hitKey(DIK_UP);
+		const bool hitDOWN = input->hitKey(DIK_DOWN);
+		const bool hitLEFT = input->hitKey(DIK_LEFT);
+		const bool hitRIGHT = input->hitKey(DIK_RIGHT);
 
-	if (hitW || hitA || hitS || hitD) {
-		const float moveVel = 60.f / dxBase->getFPS();
+		if (hitUP || hitDOWN || hitRIGHT || hitLEFT) {
 
-		if (hitW) {
-			player->moveForward(moveVel);
-		} else if (hitS) {
-			player->moveForward(-moveVel);
-		}
+			// 現在の回転(ピッチ)を取得
+			const float nowRotaP = player->getLookVec().m128_f32[1];
 
-		if (hitA) {
-			player->moveRight(-moveVel);
-		} else if (hitD) {
-			player->moveRight(moveVel);
+			// 回転速度
+			const float rotaSpeed = XM_PIDIV2 / dxBase->getFPS();
+
+			// ----------
+			// 入力
+			// ----------
+
+			if (hitUP && playerRota.x + rotaSpeed < XM_PIDIV2) {
+				playerRota.x += rotaSpeed;
+			} else if (hitDOWN && playerRota.x - rotaSpeed > -XM_PIDIV2) {
+				playerRota.x -= rotaSpeed;
+			}
+
+			if (hitRIGHT) {
+				playerRota.y += rotaSpeed;
+			} else if (hitLEFT) {
+				playerRota.y -= rotaSpeed;
+			}
+
+			// ----------
+			// 視線を回転
+			// ----------
+
+			XMFLOAT3 rotaVec{};
+			rotaVec.x += 175.f * dxBase->nearSin(playerRota.y) * dxBase->nearCos(playerRota.x);
+			rotaVec.y += 175.f * dxBase->nearSin(playerRota.x);
+			rotaVec.z += 175.f * dxBase->nearCos(playerRota.y) * dxBase->nearCos(playerRota.x);
+
+			player->setLookVec(XMLoadFloat3(&rotaVec));
 		}
 	}
 
-	fbxObj3d->setPosition(player->getPosF3());
+	// 移動
+	{
+		const bool hitW = input->hitKey(DIK_W);
+		const bool hitA = input->hitKey(DIK_A);
+		const bool hitS = input->hitKey(DIK_S);
+		const bool hitD = input->hitKey(DIK_D);
 
+		if (hitW || hitA || hitS || hitD) {
+			// 移動速度は毎秒60
+			const float moveVel = 60.f / dxBase->getFPS();
 
+			if (hitW) {
+				player->moveForward(moveVel);
+			} else if (hitS) {
+				player->moveForward(-moveVel);
+			}
 
-	const bool triggerSpace = input->triggerKey(DIK_SPACE);
-	if (triggerSpace && !playerBul.second) {
-		playerBul.second = true;
-		playerBul.first->setPos(camera->getEye());
+			if (hitA) {
+				player->moveRight(-moveVel);
+			} else if (hitD) {
+				player->moveRight(moveVel);
+			}
+		}
 
-		playerBulVel = camera->getLook();
+		fbxObj3d->setPosition(player->getPosF3());
+	}
 
-		playerBulTimer->reset();
+	// 弾発射
+	{
+		const bool triggerSpace = input->triggerKey(DIK_SPACE);
+
+		// playerBul.secondは生存フラグ
+
+		if (triggerSpace && !playerBul.second) {
+			playerBul.second = true;
+			playerBul.first->setPos(camera->getEye());
+
+			playerBulVel = camera->getLook();
+
+			playerBulTimer->reset();
+		}
 	}
 }
 
@@ -385,6 +437,11 @@ void PlayScene::updatePlayerBullet() {
 
 			if (hitBoss || hitGround || lifeEnd) {
 				playerBul.second = false;
+
+				// ボスに当たったら終了
+				if (hitBoss) {
+					changeEndScene();
+				}
 			}
 		}
 	}

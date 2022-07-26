@@ -97,6 +97,7 @@ class PlayScene :
 	std::pair<std::unique_ptr<ObjSet>, bool> playerBul;
 	DirectX::XMFLOAT3 playerBulVel{};
 	std::unique_ptr<Time> playerBulTimer;
+	DirectX::XMFLOAT2 playerRota{};
 
 #pragma endregion 3Dオブジェクト
 

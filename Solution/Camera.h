@@ -58,37 +58,37 @@ private:
 public:
 	// ビュー行列の取得
 	// @return matView
-	inline const XMMATRIX& getViewMatrix() { return matView; }
+	inline const XMMATRIX &getViewMatrix() { return matView; }
 
 	// 射影行列の取得
 	// @return matProjection
-	inline const XMMATRIX& getProjectionMatrix() { return matProjection; }
+	inline const XMMATRIX &getProjectionMatrix() { return matProjection; }
 
 	// ビュー射影行列の取得
-	inline const XMMATRIX& getViewProjectionMatrix() { return matViewProjection; }
+	inline const XMMATRIX &getViewProjectionMatrix() { return matViewProjection; }
 
 	// ビルボード行列の取得
-	inline const XMMATRIX& getBillboardMatrix() { return matBillboard; }
+	inline const XMMATRIX &getBillboardMatrix() { return matBillboard; }
 
 	// Y軸固定ビルボード行列の取得
-	inline const XMMATRIX& getBillboardMatrixY() { return matBillboardY; }
+	inline const XMMATRIX &getBillboardMatrixY() { return matBillboardY; }
 
 	// 視点座標の取得
-	inline const XMFLOAT3& getEye() { return eye; }
+	inline const XMFLOAT3 &getEye() { return eye; }
 
 	// 視点座標の設定
-	inline void setEye(const XMFLOAT3& eye) { this->eye = eye; viewDirty = true; }
+	inline void setEye(const XMFLOAT3 &eye) { this->eye = eye; viewDirty = true; }
 
 	// 注視点座標の取得
-	inline const XMFLOAT3& getTarget() { return target; }
+	inline const XMFLOAT3 &getTarget() { return target; }
 
 	// 注視点座標の設定
-	inline void setTarget(const XMFLOAT3& target) { this->target = target; viewDirty = true; }
+	inline void setTarget(const XMFLOAT3 &target) { this->target = target; viewDirty = true; }
 
 	// 上方向ベクトルの取得
-	inline const XMFLOAT3& getUp() { return up; }
+	inline const XMFLOAT3 &getUp() { return up; }
 	// 上方向ベクトルの設定
-	inline void setUp(const XMFLOAT3& up) { this->up = up; viewDirty = true; }
+	inline void setUp(const XMFLOAT3 &up) { this->up = up; viewDirty = true; }
 
 	inline void setNearZ(const float nearZ) { this->nearZ = nearZ; projectionDirty = true; }
 	inline void setFarZ(const float farZ) { this->farZ = farZ; projectionDirty = true; }
@@ -109,7 +109,7 @@ public:
 	/// <param name="angleX">X軸周りの回転角(-PI/2 ~ PI/2の範囲で送る)</param>
 	/// <param name="angleY">Y軸周りの回転角(0 ~ 2PIの範囲で送る)</param>
 	void rotation(const float targetlength,
-						const float angleX, const float angleY);
+				  const float angleX, const float angleY);
 
 	void moveForward(const float speed);
 
@@ -120,15 +120,15 @@ public:
 	/// ベクトルによる視点移動(eyeのみの移動、targetは変わらない)
 	/// </summary>
 	/// <param name="move">移動量</param>
-	void moveEye(const XMFLOAT3& move);
-	void moveEye(const XMVECTOR& move);
+	void moveEye(const XMFLOAT3 &move);
+	void moveEye(const XMVECTOR &move);
 
 	/// <summary>
 	/// ベクトルによる移動(eyeとtargetを移動)
 	/// </summary>
 	/// <param name="move">移動量</param>
-	void moveCamera(const XMFLOAT3& move);
-	void moveCamera(const XMVECTOR& move);
+	void moveCamera(const XMFLOAT3 &move);
+	void moveCamera(const XMVECTOR &move);
 
 	Camera(const float window_width, const float window_height);
 
