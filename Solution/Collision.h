@@ -3,13 +3,19 @@
 #include "CollisionShape.h"
 
 class Collision {
-private:
+public:
+	/// <summary>
+	/// ベクトルの長さを取得
+	/// </summary>
+	/// <param name="vec">対象のベクトル</param>
+	/// <returns>長さ</returns>
 	inline static float vecLength(DirectX::XMVECTOR vec) {
 		float len{};
 		DirectX::XMStoreFloat(&len, vec);
 		return len;
 	}
 
+private:
 	inline static float vec3Dot(const DirectX::XMVECTOR &v1,
 								const DirectX::XMVECTOR &v2) {
 		float ret{};

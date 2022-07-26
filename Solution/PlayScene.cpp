@@ -16,6 +16,8 @@
 
 #include "PostEffect.h"
 
+#include "Collision.h"
+
 using namespace DirectX;
 
 #pragma region 初期化関数
@@ -49,23 +51,23 @@ void PlayScene::spriteInit() {
 	spriteBase.reset(new SpriteBase());
 
 	// スプライト共通テクスチャ読み込み
-	texNum = spriteBase->loadTexture(L"Resources/texture.png");
+	//texNum = spriteBase->loadTexture(L"Resources/texture.png");
 
-	// スプライトの生成
-	sprites.resize(SPRITES_NUM);
-	for (UINT i = 0; i < SPRITES_NUM; ++i) {
-		sprites[i] = Sprite(texNum, spriteBase.get(), { 0, 0 });
-		// スプライトの座標変更
-		sprites[i].position.x = 1280.f / 10;
-		sprites[i].position.y = 720.f / 10;
-		//sprites[i].isInvisible = true;
-		//sprites[i].position.x = (float)(rand() % 1280);
-		//sprites[i].position.y = (float)(rand() % 720);
-		//sprites[i].rotation = (float)(rand() % 360);
-		//sprites[i].rotation = 0;
-		//sprites[i].size.x = 400.0f;
-		//sprites[i].size.y = 100.0f;
-	}
+	//// スプライトの生成
+	//sprites.resize(SPRITES_NUM);
+	//for (UINT i = 0; i < SPRITES_NUM; ++i) {
+	//	sprites[i] = Sprite(texNum, spriteBase.get(), { 0, 0 });
+	//	// スプライトの座標変更
+	//	sprites[i].position.x = 1280.f / 10;
+	//	sprites[i].position.y = 720.f / 10;
+	//	//sprites[i].isInvisible = true;
+	//	//sprites[i].position.x = (float)(rand() % 1280);
+	//	//sprites[i].position.y = (float)(rand() % 720);
+	//	//sprites[i].rotation = (float)(rand() % 360);
+	//	//sprites[i].rotation = 0;
+	//	//sprites[i].size.x = 400.0f;
+	//	//sprites[i].size.y = 100.0f;
+	//}
 
 	// デバッグテキスト用のテクスチャ読み込み
 	debugTextTexNumber = spriteBase->loadTexture(L"Resources/debugfont.png");
@@ -112,20 +114,23 @@ void PlayScene::obj3dInit() {
 	{
 		bossTimer = std::make_unique<Time>();
 
-		constexpr UINT bossTexNum = 0u;
+		boss = std::make_unique<ObjSet>(camera.get(), "Resources/sphere", "sphere", true);
 
-		std::unique_ptr<ObjModel> bossModel = std::make_unique<ObjModel>("Resources/sphere", "sphere", bossTexNum, true);
-		std::unique_ptr<CollisionShape> sphere(new Sphere);
-
-		boss = std::make_unique<GameObject>(std::move(sphere),
-											std::move(std::make_unique<Object3d>(dxBase->getDev(),
-																				 camera.get(),
-																				 bossModel.get(),
-																				 bossTexNum)),
-											std::move(bossModel));
 		constexpr float bossScale = 100.f;
 		boss->setScale(XMFLOAT3(bossScale, bossScale, bossScale));
 		boss->setPos(XMFLOAT3(0, bossScale, 0));
+	}
+
+	// ----------
+	// 自機弾
+	// ----------
+	{
+		playerBul.first = std::make_unique<ObjSet>(camera.get(), "Resources/sphere", "sphere", true);
+		playerBul.second = false;
+		constexpr float pBulScale = 10.f;
+		playerBul.first->setScale(XMFLOAT3(pBulScale, pBulScale, pBulScale));
+
+		playerBulTimer = std::make_unique<Time>();
 	}
 
 }
@@ -143,8 +148,9 @@ void PlayScene::fbxInit() {
 	fbxModel->setSpecular(XMFLOAT3(0.8f, 0.8f, 0.8f));*/
 
 	fbxObj3d.reset(new FbxObj3d(fbxModel.get()/*, false*/));
-	const float fbxObjScale = player->getPosF3().y;
+	const float fbxObjScale = 0.125f;
 	fbxObj3d->setScale(XMFLOAT3(fbxObjScale, fbxObjScale, fbxObjScale));
+	fbxObj3d->setPosition(player->getPosF3());
 }
 
 void PlayScene::particleInit() {
@@ -152,7 +158,7 @@ void PlayScene::particleInit() {
 }
 void PlayScene::playerInit() {
 	player = std::make_unique<Player>();
-	player->setPos(XMFLOAT3(0, 0.125, -300));
+	player->setPos(XMFLOAT3(0, 10, -300.f));
 }
 
 void PlayScene::timerInit() {
@@ -287,8 +293,8 @@ void PlayScene::updateLight() {
 }
 
 void PlayScene::updateSprite() {
-	if (input->hitKey(DIK_I)) sprites[0].position.y -= 10; else if (input->hitKey(DIK_K)) sprites[0].position.y += 10;
-	if (input->hitKey(DIK_J)) sprites[0].position.x -= 10; else if (input->hitKey(DIK_L)) sprites[0].position.x += 10;
+	/*if (input->hitKey(DIK_I)) sprites[0].position.y -= 10; else if (input->hitKey(DIK_K)) sprites[0].position.y += 10;
+	if (input->hitKey(DIK_J)) sprites[0].position.x -= 10; else if (input->hitKey(DIK_L)) sprites[0].position.x += 10;*/
 
 	// Pを押すたびパーティクル50粒追加
 	if (input->triggerKey(DIK_P)) {
@@ -334,20 +340,60 @@ void PlayScene::updatePlayer() {
 
 
 
-	/*const bool triggerSpace = input->triggerKey(DIK_SPACE);
-	if (triggerSpace && !playerBul[0].alive) {
-		playerBul[0].alive = true;
-	}*/
+	const bool triggerSpace = input->triggerKey(DIK_SPACE);
+	if (triggerSpace && !playerBul.second) {
+		playerBul.second = true;
+		playerBul.first->setPos(camera->getEye());
+
+		playerBulVel = camera->getLook();
+
+		playerBulTimer->reset();
+	}
 }
 
 void PlayScene::updatePlayerBullet() {
+	if (playerBul.second) {
+		XMFLOAT3 pos = playerBul.first->getPos();
 
+		constexpr float speed = 10.f;
+
+		pos.x += playerBulVel.x * speed;
+		pos.y += playerBulVel.y * speed;
+		pos.z += playerBulVel.z * speed;
+
+		playerBul.first->setPos(pos);
+
+		{
+			Sphere pBul{};
+			pBul.center = XMLoadFloat3(&pos);
+			pBul.radius = playerBul.first->getScale().x;
+
+
+			Sphere bossCol{};
+			bossCol.center = XMLoadFloat3(&boss->getPos());
+			bossCol.radius = boss->getScale().x;
+
+			Plane gr{};
+			gr.normal = XMVectorSet(0, 1, 0, 1);
+			gr.distance = Collision::vecLength(XMLoadFloat3(&ground->getPos()));
+
+			const bool hitBoss = Collision::CheckSphere2Sphere(pBul, bossCol);
+
+			const bool hitGround = Collision::CheckSphere2Plane(pBul, gr);
+
+			const bool lifeEnd = playerBulTimer->getNowTime() > Time::oneSec;
+
+			if (hitBoss || hitGround || lifeEnd) {
+				playerBul.second = false;
+			}
+		}
+	}
 }
 
 void PlayScene::updateBoss() {
 	const float moveRange = boss->getScale().x * 5.f;
 	XMFLOAT3 bossPos = boss->getPos();
-	bossPos.x = dxBase->nearSin(bossTimer->getNowTime() / Time::oneSecF * XM_PI) * moveRange;
+	bossPos.x = dxBase->nearSin(bossTimer->getNowTime() / Time::oneSecF * XM_PIDIV2) * moveRange;
 	boss->setPos(bossPos);
 }
 
@@ -381,6 +427,9 @@ void PlayScene::update_play() {
 
 	// ボス更新
 	updateBoss();
+
+	// 自機弾更新
+	updatePlayerBullet();
 
 	// カメラの更新
 	updateCamera();
@@ -492,9 +541,9 @@ void PlayScene::changeEndScene() {
 		Sound::SoundStopWave(soundData1.get());
 	}
 
-	for (Sprite &i : sprites) {
+	/*for (Sprite &i : sprites) {
 		i.isInvisible = true;
-	}
+	}*/
 
 	// fbxのアニメーションを停止する
 	fbxObj3d->stopAnimation(false);
@@ -517,7 +566,7 @@ void PlayScene::drawObj3d() {
 	Object3d::startDraw(dxBase->getCmdList(), object3dPipelineSet);
 	ground->drawWithUpdate(light.get());
 	boss->drawWithUpdate(light.get());
-	//playerBul[0].drawWithUpdate(light.get());
+	if (playerBul.second) playerBul.first->drawWithUpdate(light.get());
 
 	fbxObj3d->drawWithUpdate(dxBase->getCmdList(), light.get());
 }
@@ -527,9 +576,9 @@ void PlayScene::drawFrontSprite() {
 
 	spriteBase->drawStart(dxBase->getCmdList());
 	// スプライト描画
-	for (UINT i = 0, len = (UINT)sprites.size(); i < len; ++i) {
+	/*for (UINT i = 0, len = (UINT)sprites.size(); i < len; ++i) {
 		sprites[i].drawWithUpdate(dxBase, spriteBase.get());
-	}
+	}*/
 
 	// デバッグテキスト描画
 	debugText->DrawAll(dxBase, spriteBase.get());
@@ -553,7 +602,6 @@ void PlayScene::drawImGui() {
 		ImGui::Begin("情報表示", &guiWinAlive, winFlags);
 		//ImGui::SetWindowPos(ImVec2(20, 20));
 		//ImGui::SetWindowSize(ImVec2(300, 300));
-		ImGui::Text("x = %.1f, y = %.1f", ImGui::GetWindowSize().x, ImGui::GetWindowSize().y);
 		ImGui::Text("FPS <- %.3f", dxBase->getFPS());
 		ImGui::Text("時間 <- %.6f秒",
 					float(timer->getNowTime()) / float(Time::oneSec));
@@ -579,33 +627,33 @@ void PlayScene::drawImGui() {
 	ImGui::SetNextWindowPos(getWindowLBPos());
 	ImGui::End();
 
-	ImGui::Begin("てすと", nullptr, winFlags);
-	//ImGui::SetWindowPos(ImVec2(20, 400));
-	ImGui::SetWindowSize(ImVec2(200, 300));
-	ImGui::Separator();
-	if (ImGui::CollapsingHeader("にゅうりょくへっだぁ")) {
-		static bool selected = true;
-		ImGui::Selectable("選べる文字だよ！", &selected);
-		static bool checked = true;
-		ImGui::Checkbox("ちぇっくぼっくす", &checked);
-		ImGui::Separator();
-		ImGui::Text("ラジオボタン");
-		static int radioBotton = 0;
-		ImGui::RadioButton("ラジオ0", &radioBotton, 0);
-		ImGui::RadioButton("ラジオ1", &radioBotton, 1);
-		ImGui::RadioButton("ラジオ2", &radioBotton, 2);
-		ImGui::Separator();
-		static float fNum = 0.f;
-		ImGui::DragFloat("どらっぐ", &fNum, 0.001f, -0.1f, 0.1f);
-		static float fNum2 = 0.f;
-		ImGui::SliderFloat("すらいだぁ", &fNum2,
-						   -0.1f, 0.1f, "%.5f",
-						   ImGuiSliderFlags_::ImGuiSliderFlags_AlwaysClamp);
-	}
-	if (ImGui::CollapsingHeader("そのたのへっだぁ")) {
-		ImGui::TextColored(ImVec4(1.f, 0.5f, 1.f, 1.f), "マゼンタ");
-	}
-	ImGui::End();
+	//ImGui::Begin("てすと", nullptr, winFlags);
+	////ImGui::SetWindowPos(ImVec2(20, 400));
+	//ImGui::SetWindowSize(ImVec2(200, 300));
+	//ImGui::Separator();
+	//if (ImGui::CollapsingHeader("にゅうりょくへっだぁ")) {
+	//	static bool selected = true;
+	//	ImGui::Selectable("選べる文字だよ！", &selected);
+	//	static bool checked = true;
+	//	ImGui::Checkbox("ちぇっくぼっくす", &checked);
+	//	ImGui::Separator();
+	//	ImGui::Text("ラジオボタン");
+	//	static int radioBotton = 0;
+	//	ImGui::RadioButton("ラジオ0", &radioBotton, 0);
+	//	ImGui::RadioButton("ラジオ1", &radioBotton, 1);
+	//	ImGui::RadioButton("ラジオ2", &radioBotton, 2);
+	//	ImGui::Separator();
+	//	static float fNum = 0.f;
+	//	ImGui::DragFloat("どらっぐ", &fNum, 0.001f, -0.1f, 0.1f);
+	//	static float fNum2 = 0.f;
+	//	ImGui::SliderFloat("すらいだぁ", &fNum2,
+	//					   -0.1f, 0.1f, "%.5f",
+	//					   ImGuiSliderFlags_::ImGuiSliderFlags_AlwaysClamp);
+	//}
+	//if (ImGui::CollapsingHeader("そのたのへっだぁ")) {
+	//	ImGui::TextColored(ImVec4(1.f, 0.5f, 1.f, 1.f), "マゼンタ");
+	//}
+	//ImGui::End();
 }
 
 void PlayScene::createParticle(const DirectX::XMFLOAT3 &pos,

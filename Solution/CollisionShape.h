@@ -4,13 +4,8 @@
 
 #include <DirectXMath.h>
 
-struct CollisionShape {
-
-};
-
 // 球
-struct Sphere
-	: public CollisionShape {
+struct Sphere {
 	// 中心座標
 	DirectX::XMVECTOR center = { 0, 0, 0, 1 };
 	// 半径
@@ -18,8 +13,7 @@ struct Sphere
 };
 
 // 平面
-struct Plane
-	: public CollisionShape {
+struct Plane {
 	// 法線ベクトル
 	DirectX::XMVECTOR normal = { 0, 1, 0, 0 };
 	// 原点(0, 0, 0)からの距離
@@ -27,8 +21,7 @@ struct Plane
 };
 
 // 法線付き三角形(時計回りが表)
-class Triangle
-	: public CollisionShape {
+class Triangle {
 public:
 	//頂点情報3つ
 	DirectX::XMVECTOR p0;
@@ -42,8 +35,7 @@ public:
 };
 
 // レイ(半直線)
-struct Ray
-	: public CollisionShape {
+struct Ray {
 	// 始点
 	DirectX::XMVECTOR start = { 0, 0, 0, 1 };
 	// 方向
@@ -51,15 +43,13 @@ struct Ray
 };
 
 // 直方体(AABB)
-struct AABB
-	: public CollisionShape {
+struct AABB {
 	DirectX::XMVECTOR minPos{};
 	DirectX::XMVECTOR maxPos{ 1, 1, 1, 1 };
 };
 
 // カプセル
-struct Capsule
-	: public CollisionShape {
+struct Capsule {
 	DirectX::XMVECTOR startPos{};
 	DirectX::XMVECTOR endPos{ 0, 1, 0, 1 };
 	float radius = 1.f;

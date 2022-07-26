@@ -28,9 +28,8 @@
 
 #include "Player.h"
 
-#include "GameObject.h"
-
 #include "ObjSet.h"
+#include <utility>
 
 class PlayScene :
 	public GameScene {
@@ -61,8 +60,8 @@ class PlayScene :
 	// --------------------
 	// スプライト個別
 	// --------------------
-	static const UINT SPRITES_NUM = 1;
-	std::vector<Sprite> sprites;
+	/*static const UINT SPRITES_NUM = 1;
+	std::vector<Sprite> sprites;*/
 
 	// --------------------
 	// デバッグテキスト
@@ -91,8 +90,13 @@ class PlayScene :
 
 	std::unique_ptr<ObjSet> ground;
 
-	std::unique_ptr<GameObject> boss;
+	std::unique_ptr<ObjSet> boss;
 	std::unique_ptr<Time> bossTimer;
+
+	// bool <- alive
+	std::pair<std::unique_ptr<ObjSet>, bool> playerBul;
+	DirectX::XMFLOAT3 playerBulVel{};
+	std::unique_ptr<Time> playerBulTimer;
 
 #pragma endregion 3Dオブジェクト
 
