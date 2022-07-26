@@ -79,7 +79,10 @@
     <Filter Include="Scene">
       <UniqueIdentifier>{86a5f2ac-cda4-4b54-abf6-e62b548c4b43}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Player">
+    <Filter Include="GameObject">
+      <UniqueIdentifier>{22e742b3-42c3-45c9-ab05-758a68eee87e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameObject\Player">
       <UniqueIdentifier>{e1ab2d86-50f5-4726-a540-1ac81d9cb783}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -178,7 +181,13 @@
       <Filter>Sound</Filter>
     </ClCompile>
     <ClCompile Include="Player.cpp">
-      <Filter>Player</Filter>
+      <Filter>GameObject\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjSet.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -273,7 +282,13 @@
       <Filter>Sound</Filter>
     </ClInclude>
     <ClInclude Include="Player.h">
-      <Filter>Player</Filter>
+      <Filter>GameObject\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjSet.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -318,6 +333,9 @@
     </FxCompile>
     <FxCompile Include="Resources\Shaders\PostEffectPS_2.hlsl">
       <Filter>シェーダーファイル\PostEffect</Filter>
+    </FxCompile>
+    <FxCompile Include="Resources\Shaders\FBXLambertPS.hlsl">
+      <Filter>シェーダーファイル\FBX</Filter>
     </FxCompile>
   </ItemGroup>
   <ItemGroup>

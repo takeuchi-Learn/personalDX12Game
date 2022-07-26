@@ -33,10 +33,10 @@ private:
 		float oneSec;
 		float nowTime;
 		DirectX::XMFLOAT2 winSize;
-		float noiseIntensity = 0.f;
+		float noiseIntensity;
 		DirectX::XMFLOAT2 mosaicNum;
-		float vignIntensity = 0.9f;
-		float alpha = 1.f;	// 不透明度(通常は1)
+		float vignIntensity;
+		float alpha;	// 不透明度(通常は1)
 	};
 
 	// パイプラインセット
@@ -79,10 +79,10 @@ private:
 
 	std::unique_ptr<Time> timer;
 
-	float noiseIntensity = 0.f;
+	float noiseIntensity;
 	DirectX::XMFLOAT2 mosaicNum;
-	float vignIntensity = 0.9f;
-	float alpha = 1.f;
+	float vignIntensity;
+	float alpha;
 
 	ID3D12Device *dev;
 	ID3D12GraphicsCommandList *cmdList;

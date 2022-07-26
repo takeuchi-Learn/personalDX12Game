@@ -63,8 +63,10 @@ public:
 
 	inline void setModel(FbxModel* model) { this->model = model; }
 
+	inline const DirectX::XMFLOAT3 &getScale() { return scale; }
 	inline void setScale(const XMFLOAT3& scale) { this->scale = scale; }
 
+	inline const DirectX::XMFLOAT3 &getPosition() { return position; }
 	inline void setPosition(const XMFLOAT3& position) { this->position = position; }
 
 	inline void setRotation(const XMFLOAT3& rotation) { this->rotation = rotation; }

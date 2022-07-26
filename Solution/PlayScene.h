@@ -28,6 +28,10 @@
 
 #include "Player.h"
 
+#include "GameObject.h"
+
+#include "ObjSet.h"
+
 class PlayScene :
 	public GameScene {
 
@@ -81,17 +85,14 @@ class PlayScene :
 	Object3d::PipelineSet object3dPipelineSet;
 	Object3d::PipelineSet backPipelineSet;
 
-	const UINT obj3dTexNum = 0U;
-	std::unique_ptr<ObjModel> model;
-	std::vector<Object3d> obj3d;
-	const float obj3dScale = 10.f;
-
 	DirectX::XMFLOAT2 angle{};	// 各軸周りの回転角
 
-	std::unique_ptr<Object3d> lightObj;
+	std::unique_ptr<ObjSet> back;
 
-	std::unique_ptr<ObjModel> backModel;
-	std::unique_ptr<Object3d> backObj;
+	std::unique_ptr<ObjSet> ground;
+
+	std::unique_ptr<GameObject> boss;
+	std::unique_ptr<Time> bossTimer;
 
 #pragma endregion 3Dオブジェクト
 
@@ -136,7 +137,7 @@ class PlayScene :
 
 #pragma endregion シングルトンインスタンス
 
-	
+
 	// 自機データ
 	std::unique_ptr<Player> player;
 
@@ -174,6 +175,8 @@ private:
 
 	void particleInit();
 
+	void playerInit();
+
 	void timerInit();
 
 #pragma endregion 初期化関数
@@ -193,6 +196,10 @@ private:
 
 
 	void updatePlayer();
+
+	void updatePlayerBullet();
+
+	void updateBoss();
 
 #pragma endregion 更新関数
 

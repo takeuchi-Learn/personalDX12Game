@@ -85,48 +85,74 @@ void PlayScene::obj3dInit() {
 													   L"Resources/Shaders/BackPS.hlsl");
 
 
-
-	backModel.reset(new ObjModel("Resources/back/", "back", 1u, true));
-
-	backObj.reset(new Object3d(DX12Base::getInstance()->getDev(), camera.get(), backModel.get(), 1u));
-	const float backScale = camera->getFarZ() * 0.9f;
-	backObj->scale = { backScale, backScale, backScale };
-
-	
-	model.reset(new ObjModel("Resources/model/", "model", obj3dTexNum, true));
-
-	constexpr UINT obj3dNum = 1;
-	for (UINT i = 0; i < obj3dNum; ++i) {
-		obj3d.emplace_back(Object3d(DX12Base::getInstance()->getDev(), camera.get(), model.get(), obj3dTexNum));
-		obj3d[i].scale = { obj3dScale, obj3dScale, obj3dScale };
-		obj3d[i].position = { i * obj3dScale, 0, 0 };
-		//obj3d[i].rotation.y = 180.f;
+	// ----------
+	// 天球
+	// ----------
+	{
+		back = std::make_unique<ObjSet>(camera.get(), "Resources/back/", "back", true);
+		const float backScale = camera->getFarZ() * 0.9f;
+		back->setScale({ backScale, backScale, backScale });
 	}
 
-	lightObj.reset(new Object3d(Object3d(DX12Base::getInstance()->getDev(), camera.get(), model.get(), obj3dTexNum)));
-	const float lightObjScale = obj3dScale * 0.5f;
-	lightObj->scale = XMFLOAT3(lightObjScale, lightObjScale, lightObjScale);
-	lightObj->position = obj3d[0].position;
+
+
+	// ----------
+	// 地面
+	// ----------
+	{
+		ground = std::make_unique<ObjSet>(camera.get(), "Resources/ground", "ground");
+		ground->setPos(XMFLOAT3(0, 0, 0));
+		const float groundScale = camera->getFarZ();
+		ground->setScale(XMFLOAT3(groundScale, groundScale, groundScale));
+	}
+
+	// ----------
+	// ボス
+	// ----------
+	{
+		bossTimer = std::make_unique<Time>();
+
+		constexpr UINT bossTexNum = 0u;
+
+		std::unique_ptr<ObjModel> bossModel = std::make_unique<ObjModel>("Resources/sphere", "sphere", bossTexNum, true);
+		std::unique_ptr<CollisionShape> sphere(new Sphere);
+
+		boss = std::make_unique<GameObject>(std::move(sphere),
+											std::move(std::make_unique<Object3d>(dxBase->getDev(),
+																				 camera.get(),
+																				 bossModel.get(),
+																				 bossTexNum)),
+											std::move(bossModel));
+		constexpr float bossScale = 100.f;
+		boss->setScale(XMFLOAT3(bossScale, bossScale, bossScale));
+		boss->setPos(XMFLOAT3(0, bossScale, 0));
+	}
+
 }
 
 void PlayScene::fbxInit() {
 	FbxObj3d::setDevice(dxBase->getDev());
 	FbxObj3d::setCamera(camera.get());
-	FbxObj3d::createGraphicsPipeline();
+	FbxObj3d::createGraphicsPipeline(L"Resources/Shaders/FBXVS.hlsl",
+									 L"Resources/Shaders/FBXPS.hlsl");
 
-	constexpr char fbxName[] = "boneTest";
+	constexpr char fbxName[] = "player";
 	fbxModel.reset(FbxLoader::GetInstance()->loadModelFromFile(fbxName));
 
 	/*fbxModel->setAmbient(XMFLOAT3(0.5f, 0.5f, 0.5f));
 	fbxModel->setSpecular(XMFLOAT3(0.8f, 0.8f, 0.8f));*/
 
 	fbxObj3d.reset(new FbxObj3d(fbxModel.get()/*, false*/));
-	constexpr float fbxObjScale = 0.0725f;
+	const float fbxObjScale = player->getPosF3().y;
 	fbxObj3d->setScale(XMFLOAT3(fbxObjScale, fbxObjScale, fbxObjScale));
 }
 
 void PlayScene::particleInit() {
 	particleMgr.reset(new ParticleMgr(L"Resources/effect1.png", camera.get()));
+}
+void PlayScene::playerInit() {
+	player = std::make_unique<Player>();
+	player->setPos(XMFLOAT3(0, 0.125, -300));
 }
 
 void PlayScene::timerInit() {
@@ -136,8 +162,7 @@ void PlayScene::timerInit() {
 #pragma endregion 初期化関数
 
 PlayScene::PlayScene()
-	: update_proc(std::bind(&PlayScene::update_start, this)),
-	player(std::make_unique<Player>()) {
+	: update_proc(std::bind(&PlayScene::update_start, this)) {
 	WinAPI::getInstance()->setWindowText("Press SPACE to change scene - now : Play (SE : OtoLogic)");
 
 	dxBase = DX12Base::getInstance();
@@ -154,6 +179,8 @@ PlayScene::PlayScene()
 	soundInit();
 
 	spriteInit();
+
+	playerInit();
 
 	obj3dInit();
 
@@ -253,23 +280,10 @@ void PlayScene::updateCamera() {
 }
 
 void PlayScene::updateLight() {
-	// 一秒で一周(2PI[rad])
-	const float timeAngle = float(timer->getNowTime()) / Time::oneSec * XM_2PI;
+	XMFLOAT3 pos = camera->getEye();
+	//pos.y += fbxObj3d->getScale().y * 3.f;
 
-	debugText->formatPrint(spriteBase.get(),
-						   WinAPI::window_width / 2.f, DebugText::fontHeight * 16.f, 1.f,
-						   XMFLOAT4(1, 1, 0, 1),
-						   "light angle : %f PI [rad]\n\t\t\t->%f PI [rad]",
-						   timeAngle / XM_PI,
-						   dxBase->angleRoundRad(timeAngle) / XM_PI);
-
-	constexpr float lightR = 20.f;
-	lightObj->position = obj3d[0].position;
-	lightObj->position.x += dxBase->nearSin(timeAngle) * lightR;
-	lightObj->position.y += dxBase->nearSin(timeAngle) * lightR;
-	lightObj->position.z += dxBase->nearCos(timeAngle) * lightR;
-
-	light->setLightPos(lightObj->position);
+	light->setLightPos(pos);
 }
 
 void PlayScene::updateSprite() {
@@ -287,7 +301,7 @@ void PlayScene::updateSprite() {
 			particleNum = particleNumMax;
 			startScale = 10.f;
 		}
-		createParticle(obj3d[0].position, particleNum, startScale);
+		createParticle(fbxObj3d->getPosition(), particleNum, startScale);
 
 		Sound::SoundPlayWave(soundBase.get(), particleSE.get());
 	}
@@ -301,7 +315,7 @@ void PlayScene::updatePlayer() {
 	const bool hitD = input->hitKey(DIK_D);
 
 	if (hitW || hitA || hitS || hitD) {
-		constexpr float moveVel = 1.f;
+		const float moveVel = 60.f / dxBase->getFPS();
 
 		if (hitW) {
 			player->moveForward(moveVel);
@@ -316,13 +330,31 @@ void PlayScene::updatePlayer() {
 		}
 	}
 
-	obj3d[0].position = player->getPosF3();
+	fbxObj3d->setPosition(player->getPosF3());
+
+
+
+	/*const bool triggerSpace = input->triggerKey(DIK_SPACE);
+	if (triggerSpace && !playerBul[0].alive) {
+		playerBul[0].alive = true;
+	}*/
+}
+
+void PlayScene::updatePlayerBullet() {
+
+}
+
+void PlayScene::updateBoss() {
+	const float moveRange = boss->getScale().x * 5.f;
+	XMFLOAT3 bossPos = boss->getPos();
+	bossPos.x = dxBase->nearSin(bossTimer->getNowTime() / Time::oneSecF * XM_PI) * moveRange;
+	boss->setPos(bossPos);
 }
 
 void PlayScene::update_play() {
 
-	// SPACEでENDシーンへ
-	if (input->triggerKey(DIK_SPACE)) {
+	// SPACE + 左シフトでENDシーンへ
+	if (input->triggerKey(DIK_SPACE) && input->hitKey(DIK_LSHIFT)) {
 		changeEndScene();
 	}
 
@@ -346,6 +378,9 @@ void PlayScene::update_play() {
 
 	// 自機更新
 	updatePlayer();
+
+	// ボス更新
+	updateBoss();
 
 	// カメラの更新
 	updateCamera();
@@ -376,14 +411,24 @@ void PlayScene::update_play() {
 #pragma endregion 更新関数
 
 void PlayScene::update() {
-	// シーン遷移中も背景は回す
-	backObj->rotation.y += 0.1f;
+	{
+		// シーン遷移中も背景は回す
+		XMFLOAT3 backRota = back->getRotation();
+		backRota.y += 6.f / dxBase->getFPS();
+		back->setRotation(backRota);
+	}
 
 	// 主な処理
 	update_proc();
 
 	// 背景オブジェクトの中心をカメラにする
-	backObj->position = camera->getEye();
+	back->setPos(camera->getEye());
+	{
+		XMFLOAT3 gPos = ground->getPos();
+		gPos.x = back->getPos().x;
+		gPos.z = back->getPos().z;
+		ground->setPos(gPos);
+	}
 
 	// ライトとカメラの更新
 	light->update();
@@ -464,16 +509,15 @@ void PlayScene::changeEndScene() {
 void PlayScene::drawObj3d() {
 
 	Object3d::startDraw(dxBase->getCmdList(), backPipelineSet);
-	backObj->drawWithUpdate(dxBase, light.get());
+	back->drawWithUpdate(light.get());
 
 	ParticleMgr::startDraw(dxBase->getCmdList(), object3dPipelineSet);
 	particleMgr->drawWithUpdate(dxBase->getCmdList());
 
 	Object3d::startDraw(dxBase->getCmdList(), object3dPipelineSet);
-	lightObj->drawWithUpdate(dxBase, light.get());
-	for (UINT i = 0; i < obj3d.size(); ++i) {
-		obj3d[i].drawWithUpdate(dxBase, light.get());
-	}
+	ground->drawWithUpdate(light.get());
+	boss->drawWithUpdate(light.get());
+	//playerBul[0].drawWithUpdate(light.get());
 
 	fbxObj3d->drawWithUpdate(dxBase->getCmdList(), light.get());
 }
@@ -492,7 +536,7 @@ void PlayScene::drawFrontSprite() {
 }
 
 void PlayScene::drawImGui() {
-	constexpr auto winFlags =
+	constexpr ImGuiWindowFlags winFlags =
 		// リサイズ不可
 		ImGuiWindowFlags_::ImGuiWindowFlags_NoResize
 		// タイトルバー無し

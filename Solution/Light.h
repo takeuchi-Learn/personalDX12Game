@@ -29,6 +29,8 @@ private:
 	bool dirty = false;
 
 public:
+	inline const DirectX::XMFLOAT3 &getPos() { return pos; }
+
 	// 内部でinit関数を呼び出している
 	Light();
 

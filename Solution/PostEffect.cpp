@@ -13,6 +13,9 @@ const wchar_t *PostEffect::vsPathDef = L"Resources/Shaders/PostEffectVS.hlsl";
 PostEffect::PostEffect()
 	: mosaicNum({ WinAPI::window_width, WinAPI::window_height }),
 	nowPPSet(0u),
+	vignIntensity(0.5f),
+	noiseIntensity(0.f),
+	alpha(1.f),
 	timer(new Time()),
 	dev(DX12Base::getInstance()->getDev()),
 	cmdList(DX12Base::getInstance()->getCmdList()) {
