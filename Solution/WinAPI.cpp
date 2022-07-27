@@ -5,7 +5,7 @@
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 WinAPI::WinAPI() {
-	constexpr wchar_t winTitleDef[] = L"DX12Game";
+	constexpr wchar_t winTitleDef[] = L"DX12Game (SE : OtoLogic)";
 
 	w.cbSize = sizeof(WNDCLASSEX);
 	w.lpfnWndProc = (WNDPROC)WindowProc; // ウィンドウプロシージャを設定

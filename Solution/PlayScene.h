@@ -44,7 +44,7 @@ class PlayScene :
 
 	std::unique_ptr<SoundBase> soundBase;
 
-	std::unique_ptr<Sound> soundData1;
+	std::unique_ptr<Sound> bgm;
 
 	std::unique_ptr<Sound> particleSE;
 
@@ -60,15 +60,16 @@ class PlayScene :
 	// --------------------
 	// スプライト個別
 	// --------------------
-	/*static const UINT SPRITES_NUM = 1;
-	std::vector<Sprite> sprites;*/
+
 
 	// --------------------
 	// デバッグテキスト
 	// --------------------
 	std::unique_ptr<DebugText> debugText;
+
 	// デバッグテキスト用のテクスチャ番号
 	UINT debugTextTexNumber;
+
 #pragma endregion スプライト
 
 #pragma region ライト
@@ -80,56 +81,65 @@ class PlayScene :
 
 #pragma region 3Dオブジェクト
 
-	// 3Dオブジェクト用パイプライン生成
+	// 3Dオブジェクト用パイプライン
 	Object3d::PipelineSet object3dPipelineSet;
 	Object3d::PipelineSet backPipelineSet;
 
-	DirectX::XMFLOAT2 angle{};	// 各軸周りの回転角
-
+	/// <summary>
+	///  天球
+	/// </summary>
 	std::unique_ptr<ObjSet> back;
 
+	/// <summary>
+	///  地面(背景)
+	/// </summary>
 	std::unique_ptr<ObjSet> ground;
 
+	/// <summary>
+	/// ボス
+	/// </summary>
 	std::unique_ptr<ObjSet> boss;
 	std::unique_ptr<Time> bossTimer;
+	bool bossAlive = true;
 
-	// bool <- alive
-	std::pair<std::unique_ptr<ObjSet>, bool> playerBul;
+	/// <summary>
+	/// 自機
+	/// </summary>
+	std::unique_ptr<Player> player;
+	std::pair<std::unique_ptr<ObjSet>, bool> playerBul;	// second : 生存フラグ
 	DirectX::XMFLOAT3 playerBulVel{};
 	std::unique_ptr<Time> playerBulTimer;
 	DirectX::XMFLOAT2 playerRota{};
 
+	std::unique_ptr<FbxModel> playerFbxModel;
+	std::unique_ptr<FbxObj3d> playerFbxObj3d;
+
 #pragma endregion 3Dオブジェクト
 
-#pragma region FBXオブジェクト
-
-	std::unique_ptr<FbxModel> fbxModel;
-	std::unique_ptr<FbxObj3d> fbxObj3d;
-
-#pragma endregion FBXオブジェクト
-
-#pragma region パーティクル
-
+	/// <summary>
+	/// パーティクル
+	/// </summary>
 	std::unique_ptr<ParticleMgr> particleMgr;
+	std::unique_ptr<Time> particleTimer;
 
-#pragma endregion パーティクル
-
-#pragma region 時間
-
+	/// <summary>
+	/// 時間
+	/// </summary>
 	std::unique_ptr<Time> timer;
 
-#pragma endregion 時間
-
-#pragma region GUI
-
+	/// <summary>
+	/// GUI
+	/// </summary>
 	bool guiWinAlive = true;
 
-#pragma endregion GUI
-
 #pragma region ポストエフェクトの設定
+	// 透明度
 	float drawAlpha = 0.f;
+
+	// シーン遷移にかける時間
 	Time::timeType sceneTransTime = Time::oneSec;
 
+	// 現在のポストエフェクトの管理番号格納変数
 	UINT postEff2Num = 0u;
 
 #pragma endregion ポストエフェクトの設定
@@ -143,11 +153,8 @@ class PlayScene :
 #pragma endregion シングルトンインスタンス
 
 
-	// 自機データ
-	std::unique_ptr<Player> player;
-
 private:
-	void createParticle(const DirectX::XMFLOAT3 &pos, const UINT particleNum = 10U, const float startScale = 1.f);
+	void createParticle(const DirectX::XMFLOAT3 &pos, const UINT particleNum = 10U, const float startScale = 1.f, const float vel = 5.f);
 	inline ImVec2 getWindowLBPos() { return ImVec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y + ImGui::GetWindowSize().y); }
 
 	// update_何とか関数を格納する

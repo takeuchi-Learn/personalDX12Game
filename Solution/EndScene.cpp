@@ -12,8 +12,6 @@ EndScene::EndScene() {
 	PostEffect::getInstance()->setAlpha(1.f);
 	PostEffect::getInstance()->setMosaicNum(DirectX::XMFLOAT2(WinAPI::window_width, WinAPI::window_height));
 
-	//WinAPI::getInstance()->setWindowText("Press SPACE to change scene - now : End");
-
 	input = Input::getInstance();
 
 	spCom.reset(new SpriteBase());
@@ -30,6 +28,7 @@ void EndScene::update() {
 	}
 
 	debugText->Print(spCom.get(), "END", 0, 0, 10.f);
+	debugText->Print(spCom.get(), "Press SPACE...", 0.f, WinAPI::window_height / 2.f, 1.f);
 }
 
 void EndScene::drawFrontSprite() {

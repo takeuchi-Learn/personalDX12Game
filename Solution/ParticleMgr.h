@@ -75,7 +75,7 @@ public:
 		// 終了時間
 		Time::timeType life = 0;
 
-		Time* timer = nullptr;
+		std::unique_ptr<Time> timer = nullptr;
 	};
 
 	// 定数
@@ -138,7 +138,8 @@ public:
 	/// <param name="accel">加速度</param>
 	/// <param name="start_scale">開始時スケール</param>
 	/// <param name="end_scale">終了時スケール</param>
-	void add(Time* timer, int life,
+	void add(std::unique_ptr<Time> timer,
+			 int life,
 			 XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel,
 			 float start_scale, float end_scale,
 			 float start_rotation, float end_rotation,

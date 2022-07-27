@@ -27,7 +27,7 @@ struct VSOutput {
 };
 
 // レンダーターゲットの数は2つ
-// undone PostEffectクラスのRenderTargetNumは此処の個数(2つ)に合わせる
+// PostEffectクラスのRenderTargetNumは此処の個数(2つ)に合わせる
 // 配列にすればいけるのでは?
 struct PSOutput {
 	float4 target0 : SV_TARGET0;

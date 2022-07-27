@@ -186,7 +186,8 @@ void ParticleMgr::drawWithUpdate(ID3D12GraphicsCommandList *cmdList) {
 	draw(cmdList);
 }
 
-void ParticleMgr::add(Time *timer, int life,
+void ParticleMgr::add(std::unique_ptr<Time> timer,
+					  int life,
 					  XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel,
 					  float start_scale, float end_scale,
 					  float start_rotation, float end_rotation,
@@ -203,7 +204,7 @@ void ParticleMgr::add(Time *timer, int life,
 	p.e_scale = end_scale;
 
 	p.life = life;
-	p.timer = timer;
+	p.timer = std::move(timer);
 
 	p.s_rotation = start_rotation;
 	p.e_rotation = end_rotation;
@@ -211,7 +212,7 @@ void ParticleMgr::add(Time *timer, int life,
 	p.s_color = start_color;
 	p.e_color = end_color;
 
-	p.startTime = timer->getNowTime();
+	p.startTime = p.timer->getNowTime();
 }
 
 void ParticleMgr::InitializeDescriptorHeap() {

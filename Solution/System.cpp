@@ -13,8 +13,6 @@
 #include "Light.h"
 
 System::System() {
-	constexpr LPCSTR window_title = "DirectX_Engine";
-	WinAPI::getInstance()->setWindowText(window_title);
 }
 
 void System::update() {

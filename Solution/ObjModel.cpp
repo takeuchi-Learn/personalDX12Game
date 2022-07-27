@@ -148,7 +148,7 @@ void ObjModel::loadMaterial(const std::string& directoryPath, const std::string&
 			line_stream >> material->specular.z;
 		}
 		// 先頭文字列がmap_Kdならテクスチャファイル名
-		// todo テクスチャ画像パス指定を此処の値とbaseDirで行うようにする
+		// テクスチャ画像パス指定を此処の値とbaseDirで行うようにする
 		if (key == "map_Kd") {
 			// テクスチャのファイル名読み込み
 			line_stream >> material->texFileName;

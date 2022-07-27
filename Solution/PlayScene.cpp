@@ -37,7 +37,7 @@ void PlayScene::lightInit() {
 
 void PlayScene::soundInit() {
 	soundBase.reset(new SoundBase());
-	soundData1.reset(new Sound("Resources/BGM.wav", soundBase.get()));
+	bgm.reset(new Sound("Resources/BGM.wav", soundBase.get()));
 
 	particleSE.reset(new Sound("Resources/SE/Sys_Set03-click.wav", soundBase.get()));
 }
@@ -99,16 +99,6 @@ void PlayScene::obj3dInit() {
 
 
 	// ----------
-	// 地面
-	// ----------
-	{
-		ground = std::make_unique<ObjSet>(camera.get(), "Resources/ground", "ground");
-		ground->setPos(XMFLOAT3(0, 0, 0));
-		const float groundScale = camera->getFarZ();
-		ground->setScale(XMFLOAT3(groundScale, groundScale, groundScale));
-	}
-
-	// ----------
 	// ボス
 	// ----------
 	{
@@ -133,6 +123,15 @@ void PlayScene::obj3dInit() {
 		playerBulTimer = std::make_unique<Time>();
 	}
 
+	// ----------
+	// 地面
+	// ----------
+	{
+		ground = std::make_unique<ObjSet>(camera.get(), "Resources/ground", "ground");
+		ground->setPos(XMFLOAT3(0, -playerBul.first->getScale().y, 0));
+		const float groundScale = camera->getFarZ();
+		ground->setScale(XMFLOAT3(groundScale, groundScale, groundScale));
+	}
 }
 
 void PlayScene::fbxInit() {
@@ -142,15 +141,15 @@ void PlayScene::fbxInit() {
 									 L"Resources/Shaders/FBXPS.hlsl");
 
 	constexpr char fbxName[] = "player";
-	fbxModel.reset(FbxLoader::GetInstance()->loadModelFromFile(fbxName));
+	playerFbxModel.reset(FbxLoader::GetInstance()->loadModelFromFile(fbxName));
 
-	/*fbxModel->setAmbient(XMFLOAT3(0.5f, 0.5f, 0.5f));
-	fbxModel->setSpecular(XMFLOAT3(0.8f, 0.8f, 0.8f));*/
+	/*playerFbxModel->setAmbient(XMFLOAT3(0.5f, 0.5f, 0.5f));
+	playerFbxModel->setSpecular(XMFLOAT3(0.8f, 0.8f, 0.8f));*/
 
-	fbxObj3d.reset(new FbxObj3d(fbxModel.get()/*, false*/));
+	playerFbxObj3d.reset(new FbxObj3d(playerFbxModel.get()/*, false*/));
 	const float fbxObjScale = 0.125f;
-	fbxObj3d->setScale(XMFLOAT3(fbxObjScale, fbxObjScale, fbxObjScale));
-	fbxObj3d->setPosition(player->getPosF3());
+	playerFbxObj3d->setScale(XMFLOAT3(fbxObjScale, fbxObjScale, fbxObjScale));
+	playerFbxObj3d->setPosition(player->getPosF3());
 }
 
 void PlayScene::particleInit() {
@@ -169,7 +168,6 @@ void PlayScene::timerInit() {
 
 PlayScene::PlayScene()
 	: update_proc(std::bind(&PlayScene::update_start, this)) {
-	//WinAPI::getInstance()->setWindowText("Press SPACE to change scene - now : Play (SE : OtoLogic)");
 
 	dxBase = DX12Base::getInstance();
 
@@ -198,6 +196,8 @@ PlayScene::PlayScene()
 }
 
 void PlayScene::init() {
+	// BGM再生
+	Sound::SoundPlayWave(soundBase.get(), bgm.get(), XAUDIO2_LOOP_INFINITE);
 	// タイマー開始
 	timer->reset();
 }
@@ -207,33 +207,18 @@ void PlayScene::init() {
 void PlayScene::updateSound() {
 	// 数字の0キーが押された瞬間音を再生しなおす
 	if (input->triggerKey(DIK_0)) {
-		//Sound::SoundStopWave(soundData1);
+		//Sound::SoundStopWave(bgm);
 
-		if (Sound::checkPlaySound(soundData1.get())) {
-			Sound::SoundStopWave(soundData1.get());
+		if (Sound::checkPlaySound(bgm.get())) {
+			Sound::SoundStopWave(bgm.get());
 		} else {
-			Sound::SoundPlayWave(soundBase.get(), soundData1.get(), XAUDIO2_LOOP_INFINITE);
+			Sound::SoundPlayWave(soundBase.get(), bgm.get(), XAUDIO2_LOOP_INFINITE);
 		}
 	}
 }
 
 void PlayScene::updateMouse() {
 	const XMFLOAT2 mousePos(float(input->getMousePos().x), float(input->getMousePos().y));
-
-	/*if (input->hitMouseBotton(Input::MOUSE::LEFT)) {
-		debugText->Print(spriteBase.get(), "input mouse left",
-						 mousePos.x, mousePos.y, 0.75f);
-	}
-	if (input->hitMouseBotton(Input::MOUSE::RIGHT)) {
-		debugText->Print(spriteBase.get(), "input mouse right",
-						 mousePos.x,
-						 mousePos.y + DebugText::fontHeight, 0.75f);
-	}
-	if (input->hitMouseBotton(Input::MOUSE::WHEEL)) {
-		debugText->Print(spriteBase.get(), "input mouse wheel",
-						 mousePos.x,
-						 mousePos.y + DebugText::fontHeight * 2, 0.75f);
-	}*/
 
 	// Rを押すたびマウスカーソルの表示非表示を切り替え
 	if (input->triggerKey(DIK_R)) {
@@ -287,31 +272,13 @@ void PlayScene::updateCamera() {
 
 void PlayScene::updateLight() {
 	XMFLOAT3 pos = camera->getEye();
-	//pos.y += fbxObj3d->getScale().y * 3.f;
+	//pos.y += playerFbxObj3d->getScale().y * 3.f;
 
 	light->setLightPos(pos);
 }
 
 void PlayScene::updateSprite() {
-	/*if (input->hitKey(DIK_I)) sprites[0].position.y -= 10; else if (input->hitKey(DIK_K)) sprites[0].position.y += 10;
-	if (input->hitKey(DIK_J)) sprites[0].position.x -= 10; else if (input->hitKey(DIK_L)) sprites[0].position.x += 10;*/
 
-	// Pを押すたびパーティクル50粒追加
-	if (input->triggerKey(DIK_P)) {
-		constexpr UINT particleNumMax = 50U, particleNumMin = 20U;
-		UINT particleNum = particleNumMin;
-
-		float startScale = 5.f;
-
-		if (input->hitKey(DIK_U)) {
-			particleNum = particleNumMax;
-			startScale = 10.f;
-		}
-		createParticle(fbxObj3d->getPosition(), particleNum, startScale);
-		createParticle(fbxObj3d->getPosition(), particleNum, startScale);
-
-		Sound::SoundPlayWave(soundBase.get(), particleSE.get());
-	}
 }
 
 void PlayScene::updatePlayer() {
@@ -384,7 +351,7 @@ void PlayScene::updatePlayer() {
 			}
 		}
 
-		fbxObj3d->setPosition(player->getPosF3());
+		playerFbxObj3d->setPosition(player->getPosF3());
 	}
 
 	// 弾発射
@@ -396,6 +363,7 @@ void PlayScene::updatePlayer() {
 		if (triggerSpace && !playerBul.second) {
 			playerBul.second = true;
 			playerBul.first->setPos(camera->getEye());
+			// todo 自機から出るようにする
 			//playerBul.first->setPos(player->getPosF3());
 
 			playerBulVel = camera->getLook();
@@ -413,10 +381,11 @@ void PlayScene::updatePlayer() {
 
 		Sphere playerSphere{};
 		playerSphere.center = XMLoadFloat3(&camera->getEye());
-		playerSphere.radius = fbxObj3d->getScale().x;
+		playerSphere.radius = playerFbxObj3d->getScale().x;
 
 		const bool hitBoss = Collision::CheckSphere2Sphere(playerSphere, bossSphere);
 
+		// 自機がボスに当たったら終了
 		if (hitBoss) {
 			changeEndScene();
 		}
@@ -458,8 +427,18 @@ void PlayScene::updatePlayerBullet() {
 			if (hitBoss || hitGround || lifeEnd) {
 				playerBul.second = false;
 
-				// ボスに当たったら終了
+				// 弾がボスに当たったら終了
 				if (hitBoss) {
+					// ボスの描画をやめる
+					bossAlive = false;
+
+					// パーティクル発生
+					createParticle(boss->getPos(), 256U, 64.f, 32.f);
+
+					// SE鳴らす
+					Sound::SoundPlayWave(soundBase.get(), particleSE.get());
+
+					// 次のシーンへ
 					changeEndScene();
 				}
 			}
@@ -471,6 +450,7 @@ void PlayScene::updateBoss() {
 	const float moveRange = boss->getScale().x * 5.f;
 	XMFLOAT3 bossPos = boss->getPos();
 	bossPos.x = dxBase->nearSin(bossTimer->getNowTime() / Time::oneSecF * XM_PIDIV2) * moveRange;
+	bossPos.z = dxBase->nearCos(bossTimer->getNowTime() / Time::oneSecF * XM_1DIVPI) * moveRange;
 	boss->setPos(bossPos);
 }
 
@@ -568,7 +548,7 @@ void PlayScene::update_start() {
 	if (drawAlpha > 1.f) {
 		drawAlpha = 1.f;
 
-		fbxObj3d->playAnimation();
+		playerFbxObj3d->playAnimation();
 		timer->reset();
 
 		update_proc = std::bind(&PlayScene::update_play, this);
@@ -614,8 +594,8 @@ void PlayScene::update_end() {
 
 void PlayScene::changeEndScene() {
 	// BGMが鳴っていたら停止する
-	if (Sound::checkPlaySound(soundData1.get())) {
-		Sound::SoundStopWave(soundData1.get());
+	if (Sound::checkPlaySound(bgm.get())) {
+		Sound::SoundStopWave(bgm.get());
 	}
 
 	/*for (Sprite &i : sprites) {
@@ -623,7 +603,7 @@ void PlayScene::changeEndScene() {
 	}*/
 
 	// fbxのアニメーションを停止する
-	fbxObj3d->stopAnimation(false);
+	playerFbxObj3d->stopAnimation(false);
 
 	drawAlpha = 1.f;
 	PostEffect::getInstance()->setAlpha(drawAlpha);
@@ -642,11 +622,11 @@ void PlayScene::drawObj3d() {
 
 	Object3d::startDraw(dxBase->getCmdList(), object3dPipelineSet);
 	ground->drawWithUpdate(light.get());
-	boss->drawWithUpdate(light.get());
+	if (bossAlive) boss->drawWithUpdate(light.get());
 	if (playerBul.second) playerBul.first->drawWithUpdate(light.get());
 
 	// 自機描画
-	//fbxObj3d->drawWithUpdate(dxBase->getCmdList(), light.get());
+	//playerFbxObj3d->drawWithUpdate(dxBase->getCmdList(), light.get());
 }
 
 void PlayScene::drawFrontSprite() {
@@ -676,6 +656,14 @@ void PlayScene::drawImGui() {
 	// 最初のウインドウの位置を指定
 	ImGui::SetNextWindowPos(ImVec2(20, 20));
 
+
+	ImGui::Begin("内容説明", nullptr, winFlags);
+	ImGui::Text("弾をでかい球体に当てたらクリア");
+	ImGui::Text("でかい球と自分が当たったら失敗");
+	ImGui::Text("弾は地面に当たるか時間経過で消滅！！");
+	ImGui::SetNextWindowPos(getWindowLBPos());
+	ImGui::End();
+
 	if (guiWinAlive) {
 		ImGui::Begin("情報表示", &guiWinAlive, winFlags);
 		//ImGui::SetWindowPos(ImVec2(20, 20));
@@ -684,7 +672,7 @@ void PlayScene::drawImGui() {
 		ImGui::Text("時間 <- %.6f秒",
 					float(timer->getNowTime()) / float(Time::oneSec));
 		ImGui::Text("BGM再生状態 <- %s",
-					Sound::checkPlaySound(soundData1.get())
+					Sound::checkPlaySound(bgm.get())
 					? "再生|>"
 					: "停止[]");
 		ImGui::Text("ホイール%d", input->getInstance()->getMouseWheelScroll());
@@ -694,54 +682,25 @@ void PlayScene::drawImGui() {
 	}
 
 	ImGui::Begin("操作説明", nullptr, winFlags);
-	//ImGui::SetWindowPos(ImVec2(20, 200));
-
 	ImGui::Text("0 : BGM再生/停止");
-	ImGui::Text("SPACE : 終了");
+	ImGui::Text("SPACE : 弾発射");
+	ImGui::Text("左シフト + SPACE : 終了");
 	ImGui::Text("WASD : 視線方向に移動");
 	ImGui::Text("arrow : カメラ回転");
-	ImGui::Text("P : ﾊﾟｰﾃｨｸﾙ生成(SE再生)");
 	ImGui::Text("M : シェーダー変更");
 	ImGui::SetNextWindowPos(getWindowLBPos());
 	ImGui::End();
-
-	//ImGui::Begin("てすと", nullptr, winFlags);
-	////ImGui::SetWindowPos(ImVec2(20, 400));
-	//ImGui::SetWindowSize(ImVec2(200, 300));
-	//ImGui::Separator();
-	//if (ImGui::CollapsingHeader("にゅうりょくへっだぁ")) {
-	//	static bool selected = true;
-	//	ImGui::Selectable("選べる文字だよ！", &selected);
-	//	static bool checked = true;
-	//	ImGui::Checkbox("ちぇっくぼっくす", &checked);
-	//	ImGui::Separator();
-	//	ImGui::Text("ラジオボタン");
-	//	static int radioBotton = 0;
-	//	ImGui::RadioButton("ラジオ0", &radioBotton, 0);
-	//	ImGui::RadioButton("ラジオ1", &radioBotton, 1);
-	//	ImGui::RadioButton("ラジオ2", &radioBotton, 2);
-	//	ImGui::Separator();
-	//	static float fNum = 0.f;
-	//	ImGui::DragFloat("どらっぐ", &fNum, 0.001f, -0.1f, 0.1f);
-	//	static float fNum2 = 0.f;
-	//	ImGui::SliderFloat("すらいだぁ", &fNum2,
-	//					   -0.1f, 0.1f, "%.5f",
-	//					   ImGuiSliderFlags_::ImGuiSliderFlags_AlwaysClamp);
-	//}
-	//if (ImGui::CollapsingHeader("そのたのへっだぁ")) {
-	//	ImGui::TextColored(ImVec4(1.f, 0.5f, 1.f, 1.f), "マゼンタ");
-	//}
-	//ImGui::End();
 }
 
 void PlayScene::createParticle(const DirectX::XMFLOAT3 &pos,
 							   const UINT particleNum,
-							   const float startScale) {
+							   const float startScale,
+							   const float vel) {
 	for (UINT i = 0U; i < particleNum; ++i) {
 
 		const float theata = RandomNum::getRandf(0, XM_PI);
 		const float phi = RandomNum::getRandf(0, XM_PI * 2.f);
-		const float r = RandomNum::getRandf(0, 5.f);
+		const float r = RandomNum::getRandf(0, vel);
 
 		XMFLOAT3 generatePos = pos;
 
@@ -759,8 +718,10 @@ void PlayScene::createParticle(const DirectX::XMFLOAT3 &pos,
 		constexpr float endScale = 0.f;
 		constexpr float startRota = 0.f, endRota = 0.f;
 
+		particleTimer.reset(new Time());
+
 		// 追加
-		particleMgr->add(timer.get(),
+		particleMgr->add(std::move(particleTimer),
 						 life, generatePos, vel, acc,
 						 startScale, endScale,
 						 startRota, endRota,
@@ -769,5 +730,5 @@ void PlayScene::createParticle(const DirectX::XMFLOAT3 &pos,
 }
 
 PlayScene::~PlayScene() {
-	//Sound::SoundStopWave(soundData1.get());
+	//Sound::SoundStopWave(bgm.get());
 }

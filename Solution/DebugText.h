@@ -8,7 +8,7 @@
 class DebugText {
 public: // 定数の宣言    
 	static const int maxCharCount = 256;    // 最大文字数
-	// todo 画像サイズに合わせて変えたい(fontWidth, fontHeight)
+	// 画像サイズに合わせて変えたい(fontWidth, fontHeight)
 	static const int fontWidth = 9 * 2;         // フォント画像内1文字分の横幅
 	static const int fontHeight = 18 * 2;       // フォント画像内1文字分の縦幅
 	static const int fontLineCount = 14;    // フォント画像内1行分の文字数
