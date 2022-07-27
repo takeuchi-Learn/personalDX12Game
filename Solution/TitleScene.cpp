@@ -9,7 +9,8 @@
 TitleScene::TitleScene()
 	: titleStrPos(0.f, 0.f),
 	update_proc(std::bind(&TitleScene::update_normal, this)) {
-	WinAPI::getInstance()->setWindowText("Press SPACE to change scene - now : Title");
+	//WinAPI::getInstance()->setWindowText("Press SPACE to change scene - now : Title");
+	WinAPI::getInstance()->setWindowText("DX12Game (SE : OtoLogic)");
 
 	input = Input::getInstance();
 

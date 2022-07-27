@@ -26,8 +26,18 @@ public:
 	inline void setPos(const XMVECTOR &newPos) { pos = newPos; }
 	inline void setPos(const XMFLOAT3 &newPos) { pos = DirectX::XMLoadFloat3(&newPos); }
 
-	void moveForward(float moveVel);
+	/// <summary>
+	/// 視線方向に前進
+	/// </summary>
+	/// <param name="moveVel">移動量</param>
+	/// <param name="moveYFlag">Y方向に移動するか</param>
+	void moveForward(float moveVel, bool moveYFlag = false);
 
+	/// <summary>
+	/// 右に移動。前進処理のベクトルを右に90度傾けた移動。
+	/// </summary>
+	/// <param name="moveVel">移動量</param>
+	/// <param name="moveYFlag">Y方向に移動するか</param>
 	void moveRight(float moveVel, bool moveYFlag = false);
 };
 

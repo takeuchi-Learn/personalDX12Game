@@ -12,7 +12,7 @@ EndScene::EndScene() {
 	PostEffect::getInstance()->setAlpha(1.f);
 	PostEffect::getInstance()->setMosaicNum(DirectX::XMFLOAT2(WinAPI::window_width, WinAPI::window_height));
 
-	WinAPI::getInstance()->setWindowText("Press SPACE to change scene - now : End");
+	//WinAPI::getInstance()->setWindowText("Press SPACE to change scene - now : End");
 
 	input = Input::getInstance();
 

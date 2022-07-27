@@ -1,9 +1,15 @@
 ﻿#include "Player.h"
+#include <DirectXMath.h>
+using namespace DirectX;
 
-void Player::moveForward(float moveVel) {
+void Player::moveForward(float moveVel, bool moveYFlag) {
 	XMVECTOR moveVec =
 		DirectX::XMVectorScale(DirectX::XMVector3Normalize(lookVec),
 							   moveVel);
+
+	if (!moveYFlag) {
+		moveVec = XMVectorSetY(moveVec, 0.f);
+	}
 
 	pos = DirectX::XMVectorAdd(pos, moveVec);
 }
@@ -13,13 +19,9 @@ void Player::moveRight(float moveVel, bool moveYFlag) {
 		DirectX::XMVectorScale(DirectX::XMVector3Normalize(lookVec),
 							   moveVel);
 
-	XMFLOAT3 val{ moveVec.m128_f32[2], 0, -moveVec.m128_f32[0] };
-
-	if (moveYFlag) {
-		val.y = moveVec.m128_f32[1];
+	if (!moveYFlag) {
+		moveVec = XMVectorSetY(moveVec, 0.f);
 	}
 
-	XMVECTOR valVec = DirectX::XMLoadFloat3(&val);
-
-	pos = DirectX::XMVectorAdd(pos, valVec);
+	pos = DirectX::XMVectorAdd(pos, moveVec);
 }

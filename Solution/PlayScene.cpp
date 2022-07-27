@@ -169,7 +169,7 @@ void PlayScene::timerInit() {
 
 PlayScene::PlayScene()
 	: update_proc(std::bind(&PlayScene::update_start, this)) {
-	WinAPI::getInstance()->setWindowText("Press SPACE to change scene - now : Play (SE : OtoLogic)");
+	//WinAPI::getInstance()->setWindowText("Press SPACE to change scene - now : Play (SE : OtoLogic)");
 
 	dxBase = DX12Base::getInstance();
 
@@ -220,7 +220,7 @@ void PlayScene::updateSound() {
 void PlayScene::updateMouse() {
 	const XMFLOAT2 mousePos(float(input->getMousePos().x), float(input->getMousePos().y));
 
-	if (input->hitMouseBotton(Input::MOUSE::LEFT)) {
+	/*if (input->hitMouseBotton(Input::MOUSE::LEFT)) {
 		debugText->Print(spriteBase.get(), "input mouse left",
 						 mousePos.x, mousePos.y, 0.75f);
 	}
@@ -233,7 +233,7 @@ void PlayScene::updateMouse() {
 		debugText->Print(spriteBase.get(), "input mouse wheel",
 						 mousePos.x,
 						 mousePos.y + DebugText::fontHeight * 2, 0.75f);
-	}
+	}*/
 
 	// Rを押すたびマウスカーソルの表示非表示を切り替え
 	if (input->triggerKey(DIK_R)) {
@@ -307,6 +307,7 @@ void PlayScene::updateSprite() {
 			particleNum = particleNumMax;
 			startScale = 10.f;
 		}
+		createParticle(fbxObj3d->getPosition(), particleNum, startScale);
 		createParticle(fbxObj3d->getPosition(), particleNum, startScale);
 
 		Sound::SoundPlayWave(soundBase.get(), particleSE.get());
@@ -395,10 +396,29 @@ void PlayScene::updatePlayer() {
 		if (triggerSpace && !playerBul.second) {
 			playerBul.second = true;
 			playerBul.first->setPos(camera->getEye());
+			//playerBul.first->setPos(player->getPosF3());
 
 			playerBulVel = camera->getLook();
+			//XMStoreFloat3(&playerBulVel, player->getLookVec());
 
 			playerBulTimer->reset();
+		}
+	}
+
+	// 敵との衝突
+	{
+		Sphere bossSphere{};
+		bossSphere.center = XMLoadFloat3(&boss->getPos());
+		bossSphere.radius = boss->getScale().x;
+
+		Sphere playerSphere{};
+		playerSphere.center = XMLoadFloat3(&camera->getEye());
+		playerSphere.radius = fbxObj3d->getScale().x;
+
+		const bool hitBoss = Collision::CheckSphere2Sphere(playerSphere, bossSphere);
+
+		if (hitBoss) {
+			changeEndScene();
 		}
 	}
 }
@@ -499,17 +519,17 @@ void PlayScene::update_play() {
 
 #pragma region 情報表示
 
-	if (input->triggerKey(DIK_T)) {
-		debugText->tabSize++;
-		if (input->hitKey(DIK_LSHIFT)) debugText->tabSize = 4U;
-	}
+	//if (input->triggerKey(DIK_T)) {
+	//	debugText->tabSize++;
+	//	if (input->hitKey(DIK_LSHIFT)) debugText->tabSize = 4U;
+	//}
 
 
-	debugText->formatPrint(spriteBase.get(),
-						   DebugText::fontWidth * 2.f, DebugText::fontHeight * 17.f,
-						   1.f,
-						   XMFLOAT4(1, 1, 1, 1),
-						   "newLine\ntab(size %u)\tendString", debugText->tabSize);
+	//debugText->formatPrint(spriteBase.get(),
+	//					   DebugText::fontWidth * 2.f, DebugText::fontHeight * 17.f,
+	//					   1.f,
+	//					   XMFLOAT4(1, 1, 1, 1),
+	//					   "newLine\ntab(size %u)\tendString", debugText->tabSize);
 
 #pragma endregion 情報表示
 }
@@ -625,7 +645,8 @@ void PlayScene::drawObj3d() {
 	boss->drawWithUpdate(light.get());
 	if (playerBul.second) playerBul.first->drawWithUpdate(light.get());
 
-	fbxObj3d->drawWithUpdate(dxBase->getCmdList(), light.get());
+	// 自機描画
+	//fbxObj3d->drawWithUpdate(dxBase->getCmdList(), light.get());
 }
 
 void PlayScene::drawFrontSprite() {
@@ -677,7 +698,7 @@ void PlayScene::drawImGui() {
 
 	ImGui::Text("0 : BGM再生/停止");
 	ImGui::Text("SPACE : 終了");
-	ImGui::Text("WASD : カメラ移動");
+	ImGui::Text("WASD : 視線方向に移動");
 	ImGui::Text("arrow : カメラ回転");
 	ImGui::Text("P : ﾊﾟｰﾃｨｸﾙ生成(SE再生)");
 	ImGui::Text("M : シェーダー変更");
