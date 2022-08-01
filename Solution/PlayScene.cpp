@@ -218,19 +218,19 @@ void PlayScene::updateSound() {
 }
 
 void PlayScene::updateMouse() {
-	const XMFLOAT2 mousePos(float(input->getMousePos().x), float(input->getMousePos().y));
+	constexpr XMFLOAT2 centerPos = XMFLOAT2((float)WinAPI::window_width / 2.f,
+											(float)WinAPI::window_height / 2.f);
 
-	// Rを押すたびマウスカーソルの表示非表示を切り替え
-	if (input->triggerKey(DIK_R)) {
-		static bool mouseDispFlag = true;
-		mouseDispFlag = !mouseDispFlag;
-		input->changeDispMouseCursorFlag(mouseDispFlag);
-	}
+	// 中心からの距離
+	const XMFLOAT2 mousePos(float(input->getMousePos().x) - centerPos.x,
+							float(input->getMousePos().y) - centerPos.y);
 
-	// Mキーでマウスカーソル位置を0,0に移動
-	if (input->triggerKey(DIK_M)) {
-		input->setMousePos(0, 0);
-	}
+	const float camMoveVel = 0.125f / dxBase->getFPS();
+
+	cameraMoveVel.x += camMoveVel * mousePos.x;
+	cameraMoveVel.y += camMoveVel * mousePos.y;
+
+	input->setMousePos((int)centerPos.x, (int)centerPos.y);
 }
 
 void PlayScene::updateCamera() {
@@ -243,7 +243,10 @@ void PlayScene::updateCamera() {
 	constexpr float player2targetLen = camLen * 2.f;
 
 	// 自機の視線ベクトル
-	const XMVECTOR look = XMVector3Normalize(player->getLookVec());
+	const XMVECTOR look = XMVector3Rotate(XMVector3Normalize(player->getLookVec()),
+										  XMQuaternionRotationRollPitchYaw(cameraMoveVel.y,
+																		   cameraMoveVel.x,
+																		   0.f));
 
 	// 自機->カメラのベクトル
 	const XMVECTOR player2cam = XMVectorAdd(XMVectorScale(look, -camLen),
@@ -282,50 +285,6 @@ void PlayScene::updateSprite() {
 }
 
 void PlayScene::updatePlayer() {
-
-	// 回転
-	{
-		const bool hitUP = input->hitKey(DIK_UP);
-		const bool hitDOWN = input->hitKey(DIK_DOWN);
-		const bool hitLEFT = input->hitKey(DIK_LEFT);
-		const bool hitRIGHT = input->hitKey(DIK_RIGHT);
-
-		if (hitUP || hitDOWN || hitRIGHT || hitLEFT) {
-
-			// 現在の回転(ピッチ)を取得
-			const float nowRotaP = player->getLookVec().m128_f32[1];
-
-			// 回転速度
-			const float rotaSpeed = XM_PIDIV2 / dxBase->getFPS();
-
-			// ----------
-			// 入力
-			// ----------
-
-			if (hitUP && playerRota.x + rotaSpeed < XM_PIDIV2) {
-				playerRota.x += rotaSpeed;
-			} else if (hitDOWN && playerRota.x - rotaSpeed > -XM_PIDIV2) {
-				playerRota.x -= rotaSpeed;
-			}
-
-			if (hitRIGHT) {
-				playerRota.y += rotaSpeed;
-			} else if (hitLEFT) {
-				playerRota.y -= rotaSpeed;
-			}
-
-			// ----------
-			// 視線を回転
-			// ----------
-
-			XMFLOAT3 rotaVec{};
-			rotaVec.x += 175.f * dxBase->nearSin(playerRota.y) * dxBase->nearCos(playerRota.x);
-			rotaVec.y += 175.f * dxBase->nearSin(playerRota.x);
-			rotaVec.z += 175.f * dxBase->nearCos(playerRota.y) * dxBase->nearCos(playerRota.x);
-
-			player->setLookVec(XMLoadFloat3(&rotaVec));
-		}
-	}
 
 	// 移動
 	{
@@ -421,6 +380,8 @@ void PlayScene::updatePlayerBullet() {
 			const bool hitBoss = Collision::CheckSphere2Sphere(pBul, bossCol);
 
 			const bool hitGround = Collision::CheckSphere2Plane(pBul, gr);
+			debugText->formatPrint(spriteBase.get(), 300, 0, 1.f, { 1,1,1,1 },
+								   "%s", hitGround ? "true" : "false");
 
 			const bool lifeEnd = playerBulTimer->getNowTime() > Time::oneSec;
 
@@ -686,7 +647,7 @@ void PlayScene::drawImGui() {
 	ImGui::Text("SPACE : 弾発射");
 	ImGui::Text("左シフト + SPACE : 終了");
 	ImGui::Text("WASD : 視線方向に移動");
-	ImGui::Text("arrow : カメラ回転");
+	ImGui::Text("マウス : カメラ回転");
 	ImGui::Text("M : シェーダー変更");
 	ImGui::SetNextWindowPos(getWindowLBPos());
 	ImGui::End();

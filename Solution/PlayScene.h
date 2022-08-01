@@ -37,6 +37,7 @@ class PlayScene :
 #pragma region カメラ
 
 	std::unique_ptr<Camera> camera;
+	DirectX::XMFLOAT2 cameraMoveVel{};
 
 #pragma endregion カメラ
 
