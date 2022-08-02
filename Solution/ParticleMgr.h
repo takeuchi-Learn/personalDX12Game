@@ -85,7 +85,7 @@ private:
 	// メンバ変数
 private:
 	// デバイス
-	ID3D12Device* dev = nullptr;
+	ID3D12Device *dev = nullptr;
 	// デスクリプタサイズ
 	UINT descriptorHandleIncrementSize = 0U;
 	// ルートシグネチャ
@@ -108,26 +108,26 @@ private:
 	ComPtr<ID3D12Resource> constBuff;
 	// パーティクル配列
 	std::forward_list<Particle> particles;
-	Camera* camera = nullptr;
+	Camera *camera = nullptr;
 
 	// メンバ関数
 public:
-	static void ParticleMgr::startDraw(ID3D12GraphicsCommandList* cmdList,
-										   Object3d::PipelineSet& ppSet,
-										   D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	static void ParticleMgr::startDraw(ID3D12GraphicsCommandList *cmdList,
+									   Object3d::PipelineSet &ppSet,
+									   D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// テクスチャは1x1白で初期化
 	ParticleMgr();
 
-	ParticleMgr(const wchar_t* texFilePath, Camera* camera);
+	ParticleMgr(const wchar_t *texFilePath, Camera *camera);
 
-	void init(ID3D12Device* device, const wchar_t* texFilePath);
+	void init(ID3D12Device *device, const wchar_t *texFilePath);
 	void update();
-	void draw(ID3D12GraphicsCommandList* cmdList);
+	void draw(ID3D12GraphicsCommandList *cmdList);
 
-	void drawWithUpdate(ID3D12GraphicsCommandList* cmdList);
+	void drawWithUpdate(ID3D12GraphicsCommandList *cmdList);
 
-	inline void setCamera(Camera* camera) { this->camera = camera; }
+	inline void setCamera(Camera *camera) { this->camera = camera; }
 
 	/// <summary>
 	/// パーティクルの追加
@@ -140,10 +140,10 @@ public:
 	/// <param name="end_scale">終了時スケール</param>
 	void add(std::unique_ptr<Time> timer,
 			 int life,
-			 XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel,
+			 const XMFLOAT3 &position, const XMFLOAT3 &velocity, const XMFLOAT3 &accel,
 			 float start_scale, float end_scale,
 			 float start_rotation, float end_rotation,
-			 XMFLOAT3 start_color, XMFLOAT3 end_color);
+			 const XMFLOAT3 &start_color, const XMFLOAT3 &end_color);
 
 	/// <summary>
 	/// デスクリプタヒープの初期化
@@ -161,7 +161,7 @@ public:
 	/// テクスチャ読み込み
 	/// </summary>
 	/// <returns>成否</returns>
-	void LoadTexture(const wchar_t* filePath);
+	void LoadTexture(const wchar_t *filePath);
 
 	/// <summary>
 	/// モデル作成

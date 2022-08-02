@@ -102,7 +102,7 @@ void PlayScene::obj3dInit() {
 	// ボス
 	// ----------
 	{
-		bossTimer = std::make_unique<Time>();
+		bossStartTime = std::make_unique<Time::timeType>();
 
 		boss = std::make_unique<ObjSet>(camera.get(), "Resources/sphere", "sphere", true);
 
@@ -120,7 +120,8 @@ void PlayScene::obj3dInit() {
 		constexpr float pBulScale = 10.f;
 		playerBul.first->setScale(XMFLOAT3(pBulScale, pBulScale, pBulScale));
 
-		playerBulTimer = std::make_unique<Time>();
+		playerBulStartTime = std::make_unique<Time::timeType>();
+		playerBulStartTime = 0u;
 	}
 
 	// ----------
@@ -328,7 +329,8 @@ void PlayScene::updatePlayer() {
 			playerBulVel = camera->getLook();
 			//XMStoreFloat3(&playerBulVel, player->getLookVec());
 
-			playerBulTimer->reset();
+			playerBulStartTime.reset(new Time::timeType());
+			*playerBulStartTime = timer->getNowTime();
 		}
 	}
 
@@ -367,6 +369,8 @@ void PlayScene::updatePlayerBullet() {
 			Sphere pBul{};
 			pBul.center = XMLoadFloat3(&pos);
 			pBul.radius = playerBul.first->getScale().x;
+			const Time::timeType pBulStartTime = *playerBulStartTime;
+			const Time::timeType pBulNowTime = timer->getNowTime() - pBulStartTime;
 
 
 			Sphere bossCol{};
@@ -380,13 +384,12 @@ void PlayScene::updatePlayerBullet() {
 			const bool hitBoss = Collision::CheckSphere2Sphere(pBul, bossCol);
 
 			const bool hitGround = Collision::CheckSphere2Plane(pBul, gr);
-			debugText->formatPrint(spriteBase.get(), 300, 0, 1.f, { 1,1,1,1 },
-								   "%s", hitGround ? "true" : "false");
 
-			const bool lifeEnd = playerBulTimer->getNowTime() > Time::oneSec;
+			const bool lifeEnd = pBulNowTime > Time::oneSec;
 
-			if (hitBoss || hitGround || lifeEnd) {
+			if (lifeEnd || hitBoss || hitGround) {
 				playerBul.second = false;
+				playerBulStartTime.reset();
 
 				// 弾がボスに当たったら終了
 				if (hitBoss) {
@@ -410,8 +413,11 @@ void PlayScene::updatePlayerBullet() {
 void PlayScene::updateBoss() {
 	const float moveRange = boss->getScale().x * 5.f;
 	XMFLOAT3 bossPos = boss->getPos();
-	bossPos.x = dxBase->nearSin(bossTimer->getNowTime() / Time::oneSecF * XM_PIDIV2) * moveRange;
-	bossPos.z = dxBase->nearCos(bossTimer->getNowTime() / Time::oneSecF * XM_1DIVPI) * moveRange;
+
+	const Time::timeType nowTime = timer->getNowTime() - *bossStartTime;
+
+	bossPos.x = dxBase->nearSin(nowTime / Time::oneSecF * XM_PIDIV2) * moveRange;
+	bossPos.z = dxBase->nearCos(nowTime / Time::oneSecF * XM_1DIVPI) * moveRange;
 	boss->setPos(bossPos);
 }
 
@@ -457,22 +463,6 @@ void PlayScene::update_play() {
 
 	// スプライトの更新
 	updateSprite();
-
-#pragma region 情報表示
-
-	//if (input->triggerKey(DIK_T)) {
-	//	debugText->tabSize++;
-	//	if (input->hitKey(DIK_LSHIFT)) debugText->tabSize = 4U;
-	//}
-
-
-	//debugText->formatPrint(spriteBase.get(),
-	//					   DebugText::fontWidth * 2.f, DebugText::fontHeight * 17.f,
-	//					   1.f,
-	//					   XMFLOAT4(1, 1, 1, 1),
-	//					   "newLine\ntab(size %u)\tendString", debugText->tabSize);
-
-#pragma endregion 情報表示
 }
 
 #pragma endregion 更新関数
@@ -663,15 +653,16 @@ void PlayScene::createParticle(const DirectX::XMFLOAT3 &pos,
 		const float phi = RandomNum::getRandf(0, XM_PI * 2.f);
 		const float r = RandomNum::getRandf(0, vel);
 
-		XMFLOAT3 generatePos = pos;
-
 		const XMFLOAT3 vel{
 			r * dxBase->nearSin(theata) * dxBase->nearCos(phi),
 			r * dxBase->nearCos(theata),
 			r * dxBase->nearSin(theata) * dxBase->nearSin(phi)
 		};
 
-		XMFLOAT3 acc{};
+		constexpr float accNum = 10.f;
+		const XMFLOAT3 acc = XMFLOAT3(vel.x / accNum,
+									  vel.y / accNum,
+									  vel.z / accNum);
 
 
 		constexpr XMFLOAT3 startCol = XMFLOAT3(1, 1, 0.25f), endCol = XMFLOAT3(1, 0, 1);
@@ -679,11 +670,9 @@ void PlayScene::createParticle(const DirectX::XMFLOAT3 &pos,
 		constexpr float endScale = 0.f;
 		constexpr float startRota = 0.f, endRota = 0.f;
 
-		particleTimer.reset(new Time());
-
 		// 追加
-		particleMgr->add(std::move(particleTimer),
-						 life, generatePos, vel, acc,
+		particleMgr->add(std::make_unique<Time>(),
+						 life, pos, vel, acc,
 						 startScale, endScale,
 						 startRota, endRota,
 						 startCol, endCol);

@@ -78,8 +78,6 @@ ParticleMgr::ParticleMgr(const wchar_t *texFilePath,
 }
 
 void ParticleMgr::update() {
-	HRESULT result = S_FALSE;
-
 	// 全パーティクル更新
 	for (std::forward_list<Particle>::iterator it = particles.begin();
 		 it != particles.end();
@@ -116,7 +114,7 @@ void ParticleMgr::update() {
 
 	// 頂点バッファへデータ転送
 	VertexPos *vertMap = nullptr;
-	result = vertBuff->Map(0, nullptr, (void **)&vertMap);
+	HRESULT result = vertBuff->Map(0, nullptr, (void **)&vertMap);
 	if (SUCCEEDED(result)) {
 		int vertCount = 0;
 		// パーティクルの情報を1つずつ反映
@@ -188,10 +186,10 @@ void ParticleMgr::drawWithUpdate(ID3D12GraphicsCommandList *cmdList) {
 
 void ParticleMgr::add(std::unique_ptr<Time> timer,
 					  int life,
-					  XMFLOAT3 position, XMFLOAT3 velocity, XMFLOAT3 accel,
+					  const XMFLOAT3 &position, const XMFLOAT3 &velocity, const XMFLOAT3 &accel,
 					  float start_scale, float end_scale,
 					  float start_rotation, float end_rotation,
-					  XMFLOAT3 start_color, XMFLOAT3 end_color) {
+					  const  XMFLOAT3 &start_color, const  XMFLOAT3 &end_color) {
 	// リストに要素を追加
 	particles.emplace_front();
 	// 追加した要素の参照

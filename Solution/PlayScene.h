@@ -100,7 +100,7 @@ class PlayScene :
 	/// ボス
 	/// </summary>
 	std::unique_ptr<ObjSet> boss;
-	std::unique_ptr<Time> bossTimer;
+	std::unique_ptr<Time::timeType> bossStartTime;
 	bool bossAlive = true;
 
 	/// <summary>
@@ -109,19 +109,20 @@ class PlayScene :
 	std::unique_ptr<Player> player;
 	std::pair<std::unique_ptr<ObjSet>, bool> playerBul;	// second : 生存フラグ
 	DirectX::XMFLOAT3 playerBulVel{};
-	std::unique_ptr<Time> playerBulTimer;
+	std::unique_ptr<Time::timeType> playerBulStartTime;
 	DirectX::XMFLOAT2 playerRota{};
 
 	std::unique_ptr<FbxModel> playerFbxModel;
 	std::unique_ptr<FbxObj3d> playerFbxObj3d;
 
-#pragma endregion 3Dオブジェクト
-
 	/// <summary>
 	/// パーティクル
 	/// </summary>
 	std::unique_ptr<ParticleMgr> particleMgr;
-	std::unique_ptr<Time> particleTimer;
+
+#pragma endregion 3Dオブジェクト
+
+#pragma region シーン全体設定
 
 	/// <summary>
 	/// 時間
@@ -133,17 +134,18 @@ class PlayScene :
 	/// </summary>
 	bool guiWinAlive = true;
 
-#pragma region ポストエフェクトの設定
+	/*----- ポストエフェクト設定 -----*/
+
 	// 透明度
 	float drawAlpha = 0.f;
 
 	// シーン遷移にかける時間
-	Time::timeType sceneTransTime = Time::oneSec;
+	static constexpr Time::timeType sceneTransTime = Time::oneSec;
 
 	// 現在のポストエフェクトの管理番号格納変数
 	UINT postEff2Num = 0u;
 
-#pragma endregion ポストエフェクトの設定
+#pragma endregion シーン全体設定
 
 #pragma region シングルトンインスタンス
 
