@@ -134,6 +134,10 @@ class PlayScene :
 	/// </summary>
 	bool guiWinAlive = true;
 
+	uint8_t fbxPhongNum;
+	uint8_t fbxLambertNum;
+	uint8_t nowFbxPSNum = FbxObj3d::ppStateNum;
+
 	/*----- ポストエフェクト設定 -----*/
 
 	// 透明度

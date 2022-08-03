@@ -12,6 +12,8 @@
 
 #include "Light.h"
 
+#include <vector>
+
 class FbxObj3d {
 protected:
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
@@ -38,7 +40,7 @@ public:
 	static void setDevice(ID3D12Device* dev) { FbxObj3d::dev = dev; }
 	static void setCamera(Camera* camera) { FbxObj3d::camera = camera; }
 
-	static void createGraphicsPipeline(const wchar_t* vsPath = L"Resources/shaders/FBXVS.hlsl",
+	static uint8_t createGraphicsPipeline(const wchar_t* vsPath = L"Resources/shaders/FBXVS.hlsl",
 									   const wchar_t* psPath = L"Resources/shaders/FBXPS.hlsl");
 
 private:
@@ -46,9 +48,11 @@ private:
 	static Camera* camera;
 
 	static ComPtr<ID3D12RootSignature> rootsignature;
-	static ComPtr<ID3D12PipelineState> pipelinestate;
+	static std::vector<ComPtr<ID3D12PipelineState>> pipelinestate;
 
 public:
+	static uint8_t ppStateNum;
+
 	// モデル未読み込み
 	FbxObj3d(bool animLoop = true);
 	// モデル読み込む

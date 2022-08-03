@@ -138,19 +138,30 @@ void PlayScene::obj3dInit() {
 void PlayScene::fbxInit() {
 	FbxObj3d::setDevice(dxBase->getDev());
 	FbxObj3d::setCamera(camera.get());
-	FbxObj3d::createGraphicsPipeline(L"Resources/Shaders/FBXVS.hlsl",
-									 L"Resources/Shaders/FBXPS.hlsl");
+	fbxPhongNum = FbxObj3d::createGraphicsPipeline(L"Resources/Shaders/FBXVS.hlsl",
+												   L"Resources/Shaders/FBXPS.hlsl");
+	fbxLambertNum = FbxObj3d::createGraphicsPipeline(L"Resources/Shaders/FBXVS.hlsl",
+													 L"Resources/Shaders/FBXLambertPS.hlsl");
+	nowFbxPSNum = fbxPhongNum;
+	FbxObj3d::ppStateNum = nowFbxPSNum;
 
-	constexpr char fbxName[] = "player";
-	playerFbxModel.reset(FbxLoader::GetInstance()->loadModelFromFile(fbxName));
+	// player
+	{
+		constexpr char fbxName[] = "player";
+		playerFbxModel.reset(FbxLoader::GetInstance()->loadModelFromFile(fbxName));
 
-	/*playerFbxModel->setAmbient(XMFLOAT3(0.5f, 0.5f, 0.5f));
-	playerFbxModel->setSpecular(XMFLOAT3(0.8f, 0.8f, 0.8f));*/
+		constexpr float ambient = 0.4f;
+		playerFbxModel->setAmbient(XMFLOAT3(ambient, ambient, ambient));
+		constexpr float specular = 1.f;
+		playerFbxModel->setSpecular(XMFLOAT3(specular, specular, specular));
+		constexpr float diffuse = 0.6f;
+		playerFbxModel->setDiffuse(XMFLOAT3(diffuse, diffuse, diffuse));
 
-	playerFbxObj3d.reset(new FbxObj3d(playerFbxModel.get()/*, false*/));
-	const float fbxObjScale = 0.125f;
-	playerFbxObj3d->setScale(XMFLOAT3(fbxObjScale, fbxObjScale, fbxObjScale));
-	playerFbxObj3d->setPosition(player->getPosF3());
+		playerFbxObj3d.reset(new FbxObj3d(playerFbxModel.get()/*, false*/));
+		const float fbxObjScale = 0.125f;
+		playerFbxObj3d->setScale(XMFLOAT3(fbxObjScale, fbxObjScale, fbxObjScale));
+		playerFbxObj3d->setPosition(player->getPosF3());
+	}
 }
 
 void PlayScene::particleInit() {
@@ -197,6 +208,8 @@ PlayScene::PlayScene()
 }
 
 void PlayScene::init() {
+	// マウスカーソルは表示しない
+	input->changeDispMouseCursorFlag(false);
 	// BGM再生
 	Sound::SoundPlayWave(soundBase.get(), bgm.get(), XAUDIO2_LOOP_INFINITE);
 	// タイマー開始
@@ -475,6 +488,17 @@ void PlayScene::update() {
 		back->setRotation(backRota);
 	}
 
+	{
+		if (input->triggerKey(DIK_P)) {
+			if (nowFbxPSNum == fbxPhongNum) {
+				nowFbxPSNum = fbxLambertNum;
+			} else {
+				nowFbxPSNum = fbxPhongNum;
+			}
+			FbxObj3d::ppStateNum = nowFbxPSNum;
+		}
+	}
+
 	// 主な処理
 	update_proc();
 
@@ -577,7 +601,7 @@ void PlayScene::drawObj3d() {
 	if (playerBul.second) playerBul.first->drawWithUpdate(light.get());
 
 	// 自機描画
-	//playerFbxObj3d->drawWithUpdate(dxBase->getCmdList(), light.get());
+	playerFbxObj3d->drawWithUpdate(dxBase->getCmdList(), light.get());
 }
 
 void PlayScene::drawFrontSprite() {
@@ -618,7 +642,7 @@ void PlayScene::drawImGui() {
 	if (guiWinAlive) {
 		ImGui::Begin("情報表示", &guiWinAlive, winFlags);
 		//ImGui::SetWindowPos(ImVec2(20, 20));
-		//ImGui::SetWindowSize(ImVec2(300, 300));
+		ImGui::SetWindowSize(ImVec2(150, 120));
 		ImGui::Text("FPS <- %.3f", dxBase->getFPS());
 		ImGui::Text("時間 <- %.6f秒",
 					float(timer->getNowTime()) / float(Time::oneSec));
@@ -627,6 +651,10 @@ void PlayScene::drawImGui() {
 					? "再生|>"
 					: "停止[]");
 		ImGui::Text("ホイール%d", input->getInstance()->getMouseWheelScroll());
+		ImGui::Text("FBXシェーダー : %s",
+					FbxObj3d::ppStateNum == fbxPhongNum
+					? "フォン"
+					: "ランバート");
 		// 次のウインドウは今のウインドウのすぐ下
 		ImGui::SetNextWindowPos(getWindowLBPos());
 		ImGui::End();
@@ -639,6 +667,7 @@ void PlayScene::drawImGui() {
 	ImGui::Text("WASD : 視線方向に移動");
 	ImGui::Text("マウス : カメラ回転");
 	ImGui::Text("M : シェーダー変更");
+	ImGui::Text("P : FBXシェーダー変更");
 	ImGui::SetNextWindowPos(getWindowLBPos());
 	ImGui::End();
 }
@@ -664,7 +693,6 @@ void PlayScene::createParticle(const DirectX::XMFLOAT3 &pos,
 									  vel.y / accNum,
 									  vel.z / accNum);
 
-
 		constexpr XMFLOAT3 startCol = XMFLOAT3(1, 1, 0.25f), endCol = XMFLOAT3(1, 0, 1);
 		constexpr int life = Time::oneSec / 4;
 		constexpr float endScale = 0.f;
@@ -681,4 +709,5 @@ void PlayScene::createParticle(const DirectX::XMFLOAT3 &pos,
 
 PlayScene::~PlayScene() {
 	//Sound::SoundStopWave(bgm.get());
+	PostEffect::getInstance()->changePipeLine(0u);
 }

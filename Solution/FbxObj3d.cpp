@@ -14,9 +14,10 @@ ID3D12Device *FbxObj3d::dev = nullptr;
 Camera *FbxObj3d::camera = nullptr;
 
 ComPtr<ID3D12RootSignature> FbxObj3d::rootsignature;
-ComPtr<ID3D12PipelineState> FbxObj3d::pipelinestate;
+std::vector<ComPtr<ID3D12PipelineState>> FbxObj3d::pipelinestate;
+uint8_t FbxObj3d::ppStateNum = 0U;
 
-void FbxObj3d::createGraphicsPipeline(const wchar_t *vsPath, const wchar_t *psPath) {
+uint8_t FbxObj3d::createGraphicsPipeline(const wchar_t *vsPath, const wchar_t *psPath) {
 	HRESULT result = S_FALSE;
 	ComPtr<ID3DBlob> vsBlob; // 頂点シェーダオブジェクト
 	ComPtr<ID3DBlob> psBlob;    // ピクセルシェーダオブジェクト
@@ -178,13 +179,17 @@ void FbxObj3d::createGraphicsPipeline(const wchar_t *vsPath, const wchar_t *psPa
 	result = D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &rootSigBlob, &errorBlob);
 	// ルートシグネチャの生成
 	result = dev->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(rootsignature.ReleaseAndGetAddressOf()));
-	if (FAILED(result)) { assert(0); }
+	assert(SUCCEEDED(result));
 
 	gpipeline.pRootSignature = rootsignature.Get();
 
 	// グラフィックスパイプラインの生成
-	result = dev->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(pipelinestate.ReleaseAndGetAddressOf()));
-	if (FAILED(result)) { assert(0); }
+	pipelinestate.emplace_back();
+	ppStateNum = uint8_t(pipelinestate.size() - 1u);
+	result = dev->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(pipelinestate[ppStateNum].ReleaseAndGetAddressOf()));
+	assert(SUCCEEDED(result));
+
+	return ppStateNum;
 }
 
 
@@ -304,7 +309,7 @@ void FbxObj3d::draw(ID3D12GraphicsCommandList *cmdList, Light *light) {
 	assert(light != nullptr);
 
 	// パイプラインステートの設定
-	cmdList->SetPipelineState(pipelinestate.Get());
+	cmdList->SetPipelineState(pipelinestate[ppStateNum].Get());
 	// ルートシグネチャの設定
 	cmdList->SetGraphicsRootSignature(rootsignature.Get());
 	// プリミティブ形状を設定
@@ -349,5 +354,5 @@ void FbxObj3d::playAnimation() {
 
 void FbxObj3d::stopAnimation(bool resetPoseFlag) {
 	isPlay = false;
-	if(resetPoseFlag) currentTime = startTime;
+	if (resetPoseFlag) currentTime = startTime;
 }
