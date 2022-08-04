@@ -241,8 +241,8 @@ void PlayScene::updateMouse() {
 
 	const float camMoveVel = 0.125f / dxBase->getFPS();
 
-	cameraMoveVel.x += camMoveVel * mousePos.x;
-	cameraMoveVel.y += camMoveVel * mousePos.y;
+	cameraMoveVel.x = camMoveVel * mousePos.x;
+	cameraMoveVel.y = camMoveVel * mousePos.y;
 
 	input->setMousePos((int)centerPos.x, (int)centerPos.y);
 }
@@ -257,10 +257,13 @@ void PlayScene::updateCamera() {
 	constexpr float player2targetLen = camLen * 2.f;
 
 	// 自機の視線ベクトル
-	const XMVECTOR look = XMVector3Rotate(XMVector3Normalize(player->getLookVec()),
-										  XMQuaternionRotationRollPitchYaw(cameraMoveVel.y,
-																		   cameraMoveVel.x,
-																		   0.f));
+	if (cameraMoveVel.x != 0.f && cameraMoveVel.y != 0.f) {
+		player->setLookVec(XMVector3Rotate(XMVector3Normalize(player->getLookVec()),
+										   XMQuaternionRotationRollPitchYaw(cameraMoveVel.y,
+																			cameraMoveVel.x,
+																			0.f)));
+	}
+	const XMVECTOR &look = player->getLookVec();
 
 	// 自機->カメラのベクトル
 	const XMVECTOR player2cam = XMVectorAdd(XMVectorScale(look, -camLen),
@@ -308,8 +311,8 @@ void PlayScene::updatePlayer() {
 		const bool hitD = input->hitKey(DIK_D);
 
 		if (hitW || hitA || hitS || hitD) {
-			// 移動速度は毎秒60
-			const float moveVel = 60.f / dxBase->getFPS();
+			// 移動速度は毎秒256.f
+			const float moveVel = 256.f / dxBase->getFPS();
 
 			if (hitW) {
 				player->moveForward(moveVel);
@@ -329,11 +332,12 @@ void PlayScene::updatePlayer() {
 
 	// 弾発射
 	{
-		const bool triggerSpace = input->triggerKey(DIK_SPACE);
+		const bool shootInput = input->triggerMouseBotton(Input::MOUSE::LEFT)
+			|| input->triggerKey(DIK_SPACE);
 
 		// playerBul.secondは生存フラグ
 
-		if (triggerSpace && !playerBul.second) {
+		if (shootInput && !playerBul.second) {
 			playerBul.second = true;
 			playerBul.first->setPos(camera->getEye());
 			// todo 自機から出るようにする
@@ -394,11 +398,15 @@ void PlayScene::updatePlayerBullet() {
 			gr.normal = XMVectorSet(0, 1, 0, 1);
 			gr.distance = Collision::vecLength(XMLoadFloat3(&ground->getPos()));
 
+			constexpr Time::timeType bulLife = Time::oneSec;
+
 			const bool hitBoss = Collision::CheckSphere2Sphere(pBul, bossCol);
 
-			const bool hitGround = Collision::CheckSphere2Plane(pBul, gr);
+			// 弾寿命の半分を超えたら
+			const bool hitGround = pBulNowTime > bulLife / 3.f
+				&& Collision::CheckSphere2Plane(pBul, gr);
 
-			const bool lifeEnd = pBulNowTime > Time::oneSec;
+			const bool lifeEnd = pBulNowTime > bulLife;
 
 			if (lifeEnd || hitBoss || hitGround) {
 				playerBul.second = false;
@@ -488,6 +496,20 @@ void PlayScene::update() {
 		back->setRotation(backRota);
 	}
 
+	// 地面のテクスチャのタイリング
+	{
+		if (input->triggerKey(DIK_B)) {
+			static bool tillingFlag = false;
+			if (tillingFlag) {
+				ground->getModelPt()->setTexTilling(XMFLOAT2(1, 1));
+			} else {
+				ground->getModelPt()->setTexTilling(XMFLOAT2(256, 256));
+			}
+			tillingFlag = !tillingFlag;
+		}
+	}
+
+	// FBXのシェーダー切り替え
 	{
 		if (input->triggerKey(DIK_P)) {
 			if (nowFbxPSNum == fbxPhongNum) {
@@ -508,7 +530,7 @@ void PlayScene::update() {
 		XMFLOAT3 gPos = ground->getPos();
 		gPos.x = back->getPos().x;
 		gPos.z = back->getPos().z;
-		ground->setPos(gPos);
+		//ground->setPos(gPos);
 	}
 
 	// ライトとカメラの更新
@@ -572,6 +594,9 @@ void PlayScene::changeEndScene() {
 	if (Sound::checkPlaySound(bgm.get())) {
 		Sound::SoundStopWave(bgm.get());
 	}
+
+	// ポストエフェクトはかける
+	PostEffect::getInstance()->changePipeLine(0u);
 
 	/*for (Sprite &i : sprites) {
 		i.isInvisible = true;
@@ -642,7 +667,7 @@ void PlayScene::drawImGui() {
 	if (guiWinAlive) {
 		ImGui::Begin("情報表示", &guiWinAlive, winFlags);
 		//ImGui::SetWindowPos(ImVec2(20, 20));
-		ImGui::SetWindowSize(ImVec2(150, 120));
+		ImGui::SetWindowSize(ImVec2(150, 150));
 		ImGui::Text("FPS <- %.3f", dxBase->getFPS());
 		ImGui::Text("時間 <- %.6f秒",
 					float(timer->getNowTime()) / float(Time::oneSec));
@@ -655,6 +680,11 @@ void PlayScene::drawImGui() {
 					FbxObj3d::ppStateNum == fbxPhongNum
 					? "フォン"
 					: "ランバート");
+		{
+			XMFLOAT3 tmp{};
+			XMStoreFloat3(&tmp, player->getLookVec());
+			ImGui::Text("自機視線 : %+.1f, %+.1f, %+.1f", tmp.x, tmp.y, tmp.z);
+		}
 		// 次のウインドウは今のウインドウのすぐ下
 		ImGui::SetNextWindowPos(getWindowLBPos());
 		ImGui::End();
@@ -662,7 +692,7 @@ void PlayScene::drawImGui() {
 
 	ImGui::Begin("操作説明", nullptr, winFlags);
 	ImGui::Text("0 : BGM再生/停止");
-	ImGui::Text("SPACE : 弾発射");
+	ImGui::Text("左クリック : 弾発射");
 	ImGui::Text("左シフト + SPACE : 終了");
 	ImGui::Text("WASD : 視線方向に移動");
 	ImGui::Text("マウス : カメラ回転");
@@ -709,5 +739,4 @@ void PlayScene::createParticle(const DirectX::XMFLOAT3 &pos,
 
 PlayScene::~PlayScene() {
 	//Sound::SoundStopWave(bgm.get());
-	PostEffect::getInstance()->changePipeLine(0u);
 }

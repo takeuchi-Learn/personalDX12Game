@@ -14,6 +14,8 @@ class ObjSet {
 public:
 	ObjSet(Camera* camera, const std::string &dirPath, const std::string &name, bool smoothing = false);
 
+	inline ObjModel *getModelPt() { return model.get(); }
+
 	inline void setPos(const DirectX::XMFLOAT3 &pos) { obj->position = pos; }
 	inline const DirectX::XMFLOAT3 &getPos() { return obj->position; }
 

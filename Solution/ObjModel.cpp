@@ -428,6 +428,15 @@ void ObjModel::init(const std::string& dirPath, const std::string& modelname, UI
 }
 
 void ObjModel::draw(ID3D12GraphicsCommandList* cmdList) {
+	if (materialDirty) {
+		// マテリアルの数値を定数バッファに反映
+		for (auto &m : materials) {
+			m.second->texTilling = texTilling;
+			m.second->update();
+		}
+		materialDirty = false;
+	}
+
 	// デスクリプタヒープの配列
 	if (descHeap) {
 		ID3D12DescriptorHeap* ppHeaps[] = { descHeap.Get() };

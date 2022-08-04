@@ -49,15 +49,17 @@ public:
 
 	void resetState();
 
-	enum MOUSE : UINT {
+	enum MOUSE : BYTE {
 		LEFT = 0,
 		RIGHT = 1,
 		WHEEL = 2
 	};
 
-	// @param Input::MOUSE::なんとか、rgbButtons配列の添え字
+	// @param keyCode Input::MOUSE::なんとか、rgbButtons配列の添え字
 	bool hitMouseBotton(_In_ BYTE keyCode);
+	// @param keyCode Input::MOUSE::なんとか、rgbButtons配列の添え字
 	bool hitPreMouseBotton(_In_ BYTE keyCode);
+	// @param keyCode Input::MOUSE::なんとか、rgbButtons配列の添え字
 	bool triggerMouseBotton(_In_ BYTE keyCode);
 
 	MouseMove getMouseMove();

@@ -15,8 +15,10 @@ void Player::moveForward(float moveVel, bool moveYFlag) {
 }
 
 void Player::moveRight(float moveVel, bool moveYFlag) {
+	const XMVECTOR look = DirectX::XMVector3Normalize(lookVec);
+
 	XMVECTOR moveVec =
-		DirectX::XMVectorScale(DirectX::XMVector3Normalize(lookVec),
+		DirectX::XMVectorScale(XMVector3Rotate(look, XMQuaternionRotationRollPitchYaw(0, XM_PIDIV2, 0)),
 							   moveVel);
 
 	if (!moveYFlag) {

@@ -28,8 +28,6 @@ void Material::loadTexture(const std::string& directoryPath, UINT texNum,
 	cpuDescHandleSRV = cpuHandle;
 	gpuDescHandleSRV = gpuHandle;
 
-	HRESULT result = S_FALSE;
-
 	// WICテクスチャのロード
 	TexMetadata metadata{};
 	ScratchImage scratchImg{};
@@ -37,15 +35,13 @@ void Material::loadTexture(const std::string& directoryPath, UINT texNum,
 	std::string filepath = directoryPath + texFileName;
 
 	constexpr size_t wfilePathSize = 128;
-	wchar_t wfilepath[wfilePathSize];
+	wchar_t wfilepath[wfilePathSize]{};
 	MultiByteToWideChar(CP_ACP, 0, filepath.c_str(), -1, wfilepath, wfilePathSize);
 
-	result = LoadFromWICFile(
+	HRESULT result = LoadFromWICFile(
 		wfilepath, WIC_FLAGS_NONE,
 		&metadata, scratchImg);
-	if (FAILED(result)) {
-		assert(0);
-	}
+	assert(SUCCEEDED(result));
 
 	const Image* img = scratchImg.GetImage(0, 0, 0); // 生データ抽出
 
@@ -66,9 +62,7 @@ void Material::loadTexture(const std::string& directoryPath, UINT texNum,
 		D3D12_RESOURCE_STATE_GENERIC_READ, // テクスチャ用指定
 		nullptr,
 		IID_PPV_ARGS(&texbuff[texNum]));
-	if (FAILED(result)) {
-		assert(0);
-	}
+	assert(SUCCEEDED(result));
 
 	// テクスチャバッファにデータ転送
 	result = texbuff[texNum]->WriteToSubresource(
@@ -78,9 +72,7 @@ void Material::loadTexture(const std::string& directoryPath, UINT texNum,
 		(UINT)img->rowPitch,  // 1ラインサイズ
 		(UINT)img->slicePitch // 1枚サイズ
 	);
-	if (FAILED(result)) {
-		assert(0);
-	}
+	assert(SUCCEEDED(result));
 
 	// シェーダリソースビュー作成
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{}; // 設定構造体
@@ -98,30 +90,27 @@ void Material::loadTexture(const std::string& directoryPath, UINT texNum,
 }
 
 void Material::update() {
-	HRESULT result = S_FALSE;
 	// 定数バッファへデータ転送
 	ConstBufferDataB1* constMap = nullptr;
-	result = constBuff->Map(0, nullptr, (void**)&constMap);
+	HRESULT result = constBuff->Map(0, nullptr, (void**)&constMap);
 	if (SUCCEEDED(result)) {
 		constMap->ambient = ambient;
 		constMap->diffuse = diffuse;
 		constMap->specular = specular;
 		constMap->alpha = alpha;
+		constMap->texTilling = texTilling;
 		constBuff->Unmap(0, nullptr);
 	}
 }
 
 void Material::createConstBuff() {
-	HRESULT result = S_FALSE;
 	// 定数バッファの生成
-	result = dev->CreateCommittedResource(
+	HRESULT result = dev->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 	// アップロード可能
 		D3D12_HEAP_FLAG_NONE,
 		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataB1) + 0xff) & ~0xff),
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(&constBuff));
-	if (FAILED(result)) {
-		assert(0);
-	}
+	assert(SUCCEEDED(result));
 }

@@ -36,6 +36,8 @@ private:
 	Material* defaultMaterial = nullptr;
 	// デスクリプタヒープ
 	ComPtr<ID3D12DescriptorHeap> descHeap;
+	DirectX::XMFLOAT2 texTilling{ 1, 1 };
+	bool materialDirty = false;
 
 	/// <summary>
 	/// マテリアル読み込み
@@ -67,6 +69,8 @@ public:
 
 
 	// メンバ
+
+	inline void setTexTilling(const DirectX::XMFLOAT2 &tillingNum) { texTilling = tillingNum; materialDirty = true; }
 
 	// @param dirPath : objファイルのある場所のパス(例 : Resources/player/)
 	// @param objModelName : objファイルのファイル名(拡張子なし。例 : player.obj -> player)
