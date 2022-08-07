@@ -500,11 +500,11 @@ void PlayScene::update() {
 	{
 		if (input->triggerKey(DIK_B)) {
 			static bool tillingFlag = false;
+			XMFLOAT2 tillingNum = XMFLOAT2(256, 256);
 			if (tillingFlag) {
-				ground->getModelPt()->setTexTilling(XMFLOAT2(1, 1));
-			} else {
-				ground->getModelPt()->setTexTilling(XMFLOAT2(256, 256));
+				tillingNum = XMFLOAT2(1, 1);
 			}
+			ground->getModelPt()->setTexTilling(tillingNum);
 			tillingFlag = !tillingFlag;
 		}
 	}
@@ -571,6 +571,10 @@ void PlayScene::update_end() {
 	drawAlpha = 1.f - raito;
 	if (raito > 1.f) {
 		drawAlpha = 0.f;
+
+		// マウスカーソルは表示させてから終了
+		input->changeDispMouseCursorFlag(true);
+
 		SceneManager::getInstange()->changeScene(new EndScene());
 	}
 
