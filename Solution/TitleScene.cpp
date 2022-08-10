@@ -5,6 +5,7 @@
 #include "WinAPI.h"
 
 #include "PlayScene.h"
+#include "RailShoot.h"
 
 TitleScene::TitleScene()
 	: titleStrPos(0.f, 0.f),
@@ -36,7 +37,7 @@ void TitleScene::update_end() {
 	titleStrPos.y += 20.f;
 
 	if (titleStrPos.y > WinAPI::window_height) {
-		SceneManager::getInstange()->changeScene(new PlayScene());
+		SceneManager::getInstange()->changeScene(new RailShoot());
 	}
 }
 

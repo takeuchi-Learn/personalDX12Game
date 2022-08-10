@@ -8,7 +8,7 @@ SceneManager::SceneManager()
 	: nextScene(nullptr) {
 
 	nowScene = (GameScene *)new TitleScene();
-	nowScene->init();
+	nowScene->start();
 }
 
 SceneManager *SceneManager::getInstange() {
@@ -26,11 +26,11 @@ void SceneManager::update() {
 		delete nowScene;
 		nowScene = nextScene;
 
-		// 次のシーンの初期化処理
-		nextScene->init();
-
 		//次シーンの情報をクリア
 		nextScene = nullptr;
+
+		// 次のシーンの初期化処理
+		nowScene->start();
 	}
 
 	nowScene->update();

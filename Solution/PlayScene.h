@@ -226,7 +226,7 @@ private:
 public:
 
 	PlayScene();
-	void init() override;
+	void start() override;
 	void update() override;
 	void drawObj3d() override;
 	void drawFrontSprite() override;

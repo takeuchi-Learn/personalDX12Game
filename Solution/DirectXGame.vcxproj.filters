@@ -184,7 +184,10 @@
       <Filter>GameObject\Player</Filter>
     </ClCompile>
     <ClCompile Include="ObjSet.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>Object共通\3Dオブジェクト</Filter>
+    </ClCompile>
+    <ClCompile Include="RailShoot.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -282,7 +285,10 @@
       <Filter>GameObject\Player</Filter>
     </ClInclude>
     <ClInclude Include="ObjSet.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>Object共通\3Dオブジェクト</Filter>
+    </ClInclude>
+    <ClInclude Include="RailShoot.h">
+      <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

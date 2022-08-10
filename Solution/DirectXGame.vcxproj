@@ -180,6 +180,7 @@
     <ClCompile Include="ObjModel.cpp" />
     <ClCompile Include="ObjSet.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="RailShoot.cpp" />
     <ClCompile Include="SoundBase.cpp" />
     <ClCompile Include="SpriteCommon.cpp" />
     <ClCompile Include="Object3d.cpp" />
@@ -222,6 +223,7 @@
     <ClInclude Include="ObjModel.h" />
     <ClInclude Include="ObjSet.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="RailShoot.h" />
     <ClInclude Include="SoundBase.h" />
     <ClInclude Include="SpriteCommon.h" />
     <ClInclude Include="Object3d.h" />

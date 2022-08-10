@@ -82,7 +82,8 @@ void PlayScene::obj3dInit() {
 	// 3Dオブジェクト用パイプライン生成
 	object3dPipelineSet = Object3d::createGraphicsPipeline(dxBase->getDev());
 
-	backPipelineSet = Object3d::createGraphicsPipeline(dxBase->getDev(), Object3d::BLEND_MODE::ALPHA,
+	backPipelineSet = Object3d::createGraphicsPipeline(dxBase->getDev(),
+													   Object3d::BLEND_MODE::ALPHA,
 													   L"Resources/Shaders/BackVS.hlsl",
 													   L"Resources/Shaders/BackPS.hlsl");
 
@@ -121,7 +122,7 @@ void PlayScene::obj3dInit() {
 		playerBul.first->setScale(XMFLOAT3(pBulScale, pBulScale, pBulScale));
 
 		playerBulStartTime = std::make_unique<Time::timeType>();
-		playerBulStartTime = 0u;
+		*playerBulStartTime = 0u;
 	}
 
 	// ----------
@@ -179,11 +180,9 @@ void PlayScene::timerInit() {
 #pragma endregion 初期化関数
 
 PlayScene::PlayScene()
-	: update_proc(std::bind(&PlayScene::update_start, this)) {
-
-	dxBase = DX12Base::getInstance();
-
-	input = Input::getInstance();
+	: update_proc(std::bind(&PlayScene::update_start, this)),
+	dxBase(DX12Base::getInstance()),
+	input(Input::getInstance()) {
 
 	postEff2Num = (UINT)PostEffect::getInstance()->addPipeLine(L"Resources/Shaders/PostEffectPS_2.hlsl");
 
@@ -207,7 +206,7 @@ PlayScene::PlayScene()
 	timerInit();
 }
 
-void PlayScene::init() {
+void PlayScene::start() {
 	// マウスカーソルは表示しない
 	input->changeDispMouseCursorFlag(false);
 	// BGM再生
@@ -679,7 +678,7 @@ void PlayScene::drawImGui() {
 					Sound::checkPlaySound(bgm.get())
 					? "再生|>"
 					: "停止[]");
-		ImGui::Text("ホイール%d", input->getInstance()->getMouseWheelScroll());
+		ImGui::Text("ホイール%d", input->getMouseWheelScroll());
 		ImGui::Text("FBXシェーダー : %s",
 					FbxObj3d::ppStateNum == fbxPhongNum
 					? "フォン"
@@ -742,5 +741,6 @@ void PlayScene::createParticle(const DirectX::XMFLOAT3 &pos,
 }
 
 PlayScene::~PlayScene() {
-	//Sound::SoundStopWave(bgm.get());
+	PostEffect::getInstance()->setAlpha(1.f);
+	PostEffect::getInstance()->setMosaicNum(XMFLOAT2(WinAPI::window_width, WinAPI::window_height));
 }
