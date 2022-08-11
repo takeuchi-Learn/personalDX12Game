@@ -11,7 +11,12 @@ private:
 	GameScene* nowScene = nullptr;
 	GameScene* nextScene = nullptr;
 
+	using UINT = unsigned int;
+
+	UINT postEff2Num = 0U;
+
 public:
+	inline UINT getPostEff2Num() { return postEff2Num; }
 
 	static SceneManager* getInstange();
 

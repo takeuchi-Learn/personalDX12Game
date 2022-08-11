@@ -16,7 +16,7 @@ RailShoot::RailShoot()
 
 	update_proc(std::bind(&RailShoot::update_start, this)),
 
-	camera(std::make_unique<Camera>(WinAPI::window_width, WinAPI::window_height)),
+	camera(std::make_unique<Camera>(WinAPI::WinAPI::getInstance()->getWindowSIze().x, WinAPI::getInstance()->getWindowSIze().y)),
 	light(std::make_unique<Light>()),
 
 	timer(std::make_unique<Time>()),
@@ -24,7 +24,7 @@ RailShoot::RailShoot()
 	spriteBase(std::make_unique<SpriteBase>()),
 
 	back(std::make_unique<ObjSet>(camera.get(), "Resources/back/", "back", true)),
-	playerObj(std::make_unique<ObjSet>(camera.get(), "Resources/sphere", "sphere", false)),
+	playerObj(std::make_unique<ObjSet>(camera.get(), "Resources/box", "box", false)),
 
 	startSceneChangeTime(0U),
 
@@ -86,18 +86,25 @@ void RailShoot::update() {
 void RailShoot::update_start() {
 	const Time::timeType nowTime = timer->getNowTime() - startSceneChangeTime;
 	if (nowTime >= sceneChangeTime) {
+		PostEffect::getInstance()->changePipeLine(SceneManager::getInstange()->getPostEff2Num());
+
 		update_proc = std::bind(&RailShoot::update_play, this);
 	}
 
 	const float timeRaito = (float)nowTime / sceneChangeTime;
 	PostEffect::getInstance()->setAlpha(timeRaito);
+
+	const float mosCoe = powf(timeRaito, 5);
+	PostEffect::getInstance()->setMosaicNum(XMFLOAT2(WinAPI::getInstance()->getWindowSIze().x * mosCoe,
+													 WinAPI::getInstance()->getWindowSIze().y * mosCoe));
 }
 
 void RailShoot::update_play() {
-	debugText->Print(spriteBase.get(), "RailShoot",
-					 0, WinAPI::window_height / 2.f, 5.f);
+	debugText->Print(spriteBase.get(), "RailShoot", 0, 0);
 
-	if (input->hitKey(DIK_SPACE)) {
+	if (input->hitKey(DIK_LSHIFT) && input->hitKey(DIK_SPACE)) {
+		PostEffect::getInstance()->changePipeLine(0U);
+
 		update_proc = std::bind(&RailShoot::update_end, this);
 		startSceneChangeTime = timer->getNowTime();
 	}
@@ -114,14 +121,14 @@ void RailShoot::update_play() {
 		XMFLOAT3 pPos = playerObj->getPos();
 		constexpr float speed = 1.f;
 
-		if (hitW) {
+		if (hitW && pPos.y < WinAPI::window_height * 0.12f) {
 			pPos.y += speed;
-		} else if (hitS) {
+		} else if (hitS && pPos.y > -WinAPI::window_height * 0.12f) {
 			pPos.y -= speed;
 		}
-		if (hitA) {
+		if (hitA && pPos.x > -WinAPI::window_width * 0.125f) {
 			pPos.x -= speed;
-		} else if (hitD) {
+		} else if (hitD && pPos.x < WinAPI::window_width * 0.125f) {
 			pPos.x += speed;
 		}
 		if (hitE) {
@@ -131,6 +138,26 @@ void RailShoot::update_play() {
 		}
 
 		playerObj->setPos(pPos);
+	}
+
+	{
+		const XMFLOAT3 &pos = playerObj->getPos();
+		debugText->formatPrint(spriteBase.get(),
+							   0, DebugText::fontHeight, 1.f,
+							   XMFLOAT4(1, 1, 1, 1),
+							   "player : %.2f,%.2f,%.2f\n%d, %d",
+							   pos.x, pos.y, pos.z,
+							   WinAPI::getInstance()->getWindowSIze().x,
+							   WinAPI::getInstance()->getWindowSIze().y);
+		if (input->triggerKey(DIK_9)) {
+			static bool tmp = false;
+			tmp = !tmp;
+			if (tmp) {
+				WinAPI::getInstance()->setWindowWidth(800);
+			} else {
+				WinAPI::getInstance()->setWindowWidth(1280);
+			}
+		}
 	}
 }
 
@@ -166,4 +193,5 @@ RailShoot::~RailShoot() {
 	PostEffect::getInstance()->setAlpha(1.f);
 	PostEffect::getInstance()->setMosaicNum(XMFLOAT2(WinAPI::window_width,
 													 WinAPI::window_height));
+	PostEffect::getInstance()->changePipeLine(0U);
 }

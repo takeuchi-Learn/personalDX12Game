@@ -146,9 +146,6 @@ class PlayScene :
 	// シーン遷移にかける時間
 	static constexpr Time::timeType sceneTransTime = Time::oneSec;
 
-	// 現在のポストエフェクトの管理番号格納変数
-	UINT postEff2Num = 0u;
-
 #pragma endregion シーン全体設定
 
 #pragma region シングルトンインスタンス

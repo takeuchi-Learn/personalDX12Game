@@ -192,6 +192,10 @@ Camera::Camera(const float window_width, const float window_height) {
 }
 
 Camera::~Camera() {
+#ifdef _DEBUG
+	OutputDebugStringA("delete camera\n");
+#endif // _DEBUG
+
 }
 
 void Camera::update() {

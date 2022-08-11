@@ -22,6 +22,9 @@ float noise(float2 uv, float time) {
 
 float4 main(VSOutput input) : SV_TARGET
 {
+	#define PI (3.141592653589793f)
+	#define PI2 (6.283185307179586f)
+	
 	// 画面を左右それぞれmosaicNum分割した大きさのモザイクになる
 	float2 uv = floor(input.uv * mosaicNum) / mosaicNum;
 	// 時間[s]
@@ -30,32 +33,33 @@ float4 main(VSOutput input) : SV_TARGET
 	float vignNum = vignatte(uv);
 
 	// 走査線のようなもの
-	float sSpeed = 8.f;
-	float sDivLevel = 96.f;
-	float sPower = 24.f;
-	float sinNum = uv.y * sDivLevel + time * sSpeed;
+	#define slnSpeed  (8.f)
+	#define slnDivLevel (96.f)
+	#define slnPower (24.f)
+	float sinNum = uv.y * slnDivLevel + time * slnSpeed;
 	float sLineNum = fracNoise(float2(time, uv.y)) * sin(sinNum) * sin(sinNum + 0.75f) + 1;
-	sLineNum /= -sPower;
+	sLineNum /= -slnPower;
 
 	// 走査線
-	float slSpeed = 0.25f;
-	float slSize = 0.03125f;
-	float slPower = 0.0625f;
+	#define slSpeed (0.25f)
+	#define slSize (0.03125f)
+	#define slPower (0.0625f)
 	float sbTime = frac(time * slSpeed);
 	float seTime = sbTime + slSize;
-
-	// 6.28318f = 2PI
+	
 	float2 slUv = float2(
 		uv.x + sin(smoothstep(sbTime, seTime, uv.y) *
-				   6.28318f) * slPower,
+				   PI2) * slPower,
 		uv.y
 	);
 	uv = slUv;
 
 	// rgbずらし
-	float rgbUvNum = 0.005f * sin(time * 3.141592653589793f);
-	float4 texColor0 = tex0.Sample(smp, uv);
+	float shiftRaito = fmod(time, 1.f);
+	float rgbUvNum = 0.005f * sin(shiftRaito * PI2);
+	float4 texColor0;
 	texColor0.r = tex0.Sample(smp, uv + float2(rgbUvNum, 0.f)).r;
+	texColor0.gba = tex0.Sample(smp, uv).gba;
 	float4 texColor1 = tex1.Sample(smp, uv);
 	texColor1.r = tex1.Sample(smp, uv + float2(rgbUvNum, 0.f)).r;
 

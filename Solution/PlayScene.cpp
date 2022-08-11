@@ -184,8 +184,6 @@ PlayScene::PlayScene()
 	dxBase(DX12Base::getInstance()),
 	input(Input::getInstance()) {
 
-	postEff2Num = (UINT)PostEffect::getInstance()->addPipeLine(L"Resources/Shaders/PostEffectPS_2.hlsl");
-
 
 	cameraInit();
 
@@ -454,7 +452,7 @@ void PlayScene::update_play() {
 	if (input->triggerKey(DIK_M)) {
 		UINT nextEffNum = 0u;
 		if (PostEffect::getInstance()->getPipeLineNum() == 0u) {
-			nextEffNum = postEff2Num;
+			nextEffNum = SceneManager::getInstange()->getPostEff2Num();
 		}
 		PostEffect::getInstance()->changePipeLine(nextEffNum);
 	}

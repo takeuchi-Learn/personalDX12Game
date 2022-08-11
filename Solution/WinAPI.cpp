@@ -1,15 +1,16 @@
 ﻿#include "WinAPI.h"
 
 #include <imgui_impl_win32.h>
+#include <cmath>
+
+// 通常スタイルからサイズ変更を無くしたスタイル
+const DWORD	WinAPI::windowStyle = WS_OVERLAPPEDWINDOW /*^ WS_THICKFRAME*/;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 WinAPI::WinAPI() {
 	// 初期状態のウィンドウタイトル
 	constexpr wchar_t winTitleDef[] = L"DX12Game (SE : OtoLogic)";
-
-	// 通常スタイルからサイズ変更を無くしたスタイル
-	constexpr DWORD windowStyle = WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME;
 
 	w.cbSize = sizeof(WNDCLASSEX);
 	w.lpfnWndProc = (WNDPROC)WindowProc; // ウィンドウプロシージャを設定
@@ -38,6 +39,44 @@ WinAPI::WinAPI() {
 
 	// ウィンドウ表示
 	ShowWindow(hwnd, SW_SHOW);
+}
+
+bool WinAPI::setWindowSize(int sizeX, int sizeY, bool bRepaint) {
+	WINDOWINFO wInfo{};
+	GetWindowInfo(hwnd, &wInfo);
+
+	RECT wrc = { 0, 0, sizeX, sizeY };
+	AdjustWindowRect(&wrc, windowStyle, false); // 自動でサイズ補正
+
+	return (bool)MoveWindow(hwnd,
+							wInfo.rcWindow.left,
+							wInfo.rcWindow.top,
+							wrc.right - wrc.left,
+							wrc.bottom - wrc.top,
+							bRepaint ? TRUE : FALSE);
+}
+
+bool WinAPI::setWindowWidth(int sizeX) {
+	const float raito = (float)getWindowSIze().y / (float)getWindowSIze().x;
+
+	return setWindowSize(sizeX, (int)std::round(sizeX * raito));
+}
+
+bool WinAPI::setWindowHeight(int sizeY) {
+	const float raito = (float)getWindowSIze().x / (float)getWindowSIze().y;
+
+	return setWindowSize((int)std::roundf(sizeY * raito), sizeY);
+}
+
+POINT WinAPI::getWindowSIze() {
+	WINDOWINFO tmp{};
+	GetWindowInfo(hwnd, &tmp);
+
+	POINT ret{};
+	ret.x = tmp.rcClient.right - tmp.rcClient.left;
+	ret.y = tmp.rcClient.bottom - tmp.rcClient.top;
+
+	return ret;
 }
 
 WinAPI::~WinAPI() {

@@ -3,9 +3,12 @@
 #include "TitleScene.h"
 
 #include "Input.h"
+#include "PostEffect.h"
 
 SceneManager::SceneManager()
 	: nextScene(nullptr) {
+
+	postEff2Num = (UINT)PostEffect::getInstance()->addPipeLine(L"Resources/Shaders/PostEffectPS_2.hlsl");
 
 	nowScene = (GameScene *)new TitleScene();
 	nowScene->start();
