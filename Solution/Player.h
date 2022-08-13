@@ -1,30 +1,33 @@
 ﻿#pragma once
 #include <DirectXMath.h>
+#include <memory>
+
+#include "ObjSet.h"
 
 class Player {
 	using XMFLOAT3 = DirectX::XMFLOAT3;
 	using XMVECTOR = DirectX::XMVECTOR;
 
-	XMVECTOR lookVec{};
-
-	XMVECTOR pos{};
+	std::unique_ptr<ObjSet> obj;
 
 public:
-	Player()
-		: lookVec(DirectX::XMVectorSet(0, 0, 1, 0)),
-		pos(DirectX::XMVectorSet(0, 0, 0, 1)) {
+	Player(Camera *camera,
+		   const std::string &dirPath,
+		   const std::string &name,
+		   bool smoothing = false)
+		: obj(new ObjSet(camera, dirPath, name, smoothing)) {
 	}
-	inline const XMVECTOR &getLookVec() { return lookVec; }
-	inline void setLookVec(const XMVECTOR &lookVec) { this->lookVec = lookVec; }
 
-	inline XMVECTOR getPosVec() { return pos; }
-	inline XMFLOAT3 getPosF3() {
-		XMFLOAT3 ret{};
-		DirectX::XMStoreFloat3(&ret, pos);
-		return ret;
-	}
-	inline void setPos(const XMVECTOR &newPos) { pos = newPos; }
-	inline void setPos(const XMFLOAT3 &newPos) { pos = DirectX::XMLoadFloat3(&newPos); }
+	inline const XMFLOAT3 &getPos() { return obj->getPos(); }
+	inline void setPos(const XMFLOAT3 &pos) { obj->setPos(pos); }
+
+	inline const XMFLOAT3 &getRotation() { return obj->getRotation(); }
+	inline void setRotation(const XMFLOAT3 &rota) { obj->setRotation(rota); }
+
+	inline const XMFLOAT3 &getScale() { return obj->getScale(); }
+	inline void setScale(const XMFLOAT3 &scale) { obj->setScale(scale); }
+
+	XMVECTOR getLookVec(float len = 1.f);
 
 	/// <summary>
 	/// 視線方向に前進
@@ -39,5 +42,7 @@ public:
 	/// <param name="moveVel">移動量</param>
 	/// <param name="moveYFlag">Y方向に移動するか</param>
 	void moveRight(float moveVel, bool moveYFlag = false);
+
+	void drawWithUpdate(Light *light);
 };
 

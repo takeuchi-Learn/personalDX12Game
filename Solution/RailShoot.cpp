@@ -115,49 +115,39 @@ void RailShoot::update_play() {
 	const bool hitS = input->hitKey(DIK_S);
 	const bool hitD = input->hitKey(DIK_D);
 	const bool hitE = input->hitKey(DIK_E);
-	const bool hitZ = input->hitKey(DIK_Z);
+	const bool hitQ = input->hitKey(DIK_Q);
 
-	if (hitW || hitA || hitS || hitD || hitE || hitZ) {
+	if (hitW || hitA || hitS || hitD) {
 		XMFLOAT3 pPos = playerObj->getPos();
-		constexpr float speed = 1.f;
+		const float speed = 60.f / dxBase->getFPS();
 
+		// 高さ方向に移動
 		if (hitW && pPos.y < WinAPI::window_height * 0.12f) {
 			pPos.y += speed;
 		} else if (hitS && pPos.y > -WinAPI::window_height * 0.12f) {
 			pPos.y -= speed;
 		}
+		// 横方向に移動
 		if (hitA && pPos.x > -WinAPI::window_width * 0.125f) {
 			pPos.x -= speed;
 		} else if (hitD && pPos.x < WinAPI::window_width * 0.125f) {
 			pPos.x += speed;
 		}
-		if (hitE) {
-			pPos.z += speed;
-		} else if (hitZ) {
-			pPos.z -= speed;
-		}
-
 		playerObj->setPos(pPos);
 	}
+	if (hitE || hitQ) {
+		const float speed = 90.f / dxBase->getFPS();
 
-	{
-		const XMFLOAT3 &pos = playerObj->getPos();
-		debugText->formatPrint(spriteBase.get(),
-							   0, DebugText::fontHeight, 1.f,
-							   XMFLOAT4(1, 1, 1, 1),
-							   "player : %.2f,%.2f,%.2f\n%d, %d",
-							   pos.x, pos.y, pos.z,
-							   WinAPI::getInstance()->getWindowSIze().x,
-							   WinAPI::getInstance()->getWindowSIze().y);
-		if (input->triggerKey(DIK_9)) {
-			static bool tmp = false;
-			tmp = !tmp;
-			if (tmp) {
-				WinAPI::getInstance()->setWindowWidth(800);
-			} else {
-				WinAPI::getInstance()->setWindowWidth(1280);
-			}
+		XMFLOAT3 rota = playerObj->getRotation();
+
+		// y軸を回転軸とする回転
+		if (hitE) {
+			rota.y += speed;
+		} else if (hitQ) {
+			rota.y -= speed;
 		}
+
+		playerObj->setRotation(rota);
 	}
 }
 

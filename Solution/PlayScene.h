@@ -112,9 +112,6 @@ class PlayScene :
 	std::unique_ptr<Time::timeType> playerBulStartTime;
 	DirectX::XMFLOAT2 playerRota{};
 
-	std::unique_ptr<FbxModel> playerFbxModel;
-	std::unique_ptr<FbxObj3d> playerFbxObj3d;
-
 	/// <summary>
 	/// パーティクル
 	/// </summary>

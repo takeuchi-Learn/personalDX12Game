@@ -145,39 +145,21 @@ void PlayScene::fbxInit() {
 													 L"Resources/Shaders/FBXLambertPS.hlsl");
 	nowFbxPSNum = fbxPhongNum;
 	FbxObj3d::ppStateNum = nowFbxPSNum;
-
-	// player
-	{
-		constexpr char fbxName[] = "player";
-		playerFbxModel.reset(FbxLoader::GetInstance()->loadModelFromFile(fbxName));
-
-		constexpr float ambient = 0.4f;
-		playerFbxModel->setAmbient(XMFLOAT3(ambient, ambient, ambient));
-		constexpr float specular = 1.f;
-		playerFbxModel->setSpecular(XMFLOAT3(specular, specular, specular));
-		constexpr float diffuse = 0.6f;
-		playerFbxModel->setDiffuse(XMFLOAT3(diffuse, diffuse, diffuse));
-
-		playerFbxObj3d.reset(new FbxObj3d(playerFbxModel.get()/*, false*/));
-		const float fbxObjScale = 0.125f;
-		playerFbxObj3d->setScale(XMFLOAT3(fbxObjScale, fbxObjScale, fbxObjScale));
-		playerFbxObj3d->setPosition(player->getPosF3());
-	}
 }
 
 void PlayScene::particleInit() {
 	particleMgr.reset(new ParticleMgr(L"Resources/effect1.png", camera.get()));
 }
 void PlayScene::playerInit() {
-	player = std::make_unique<Player>();
+	player = std::make_unique<Player>(camera.get(), "Resources/sphere", "sphere", true);
 	player->setPos(XMFLOAT3(0, 10, -300.f));
+	constexpr float playerScale = 10.f;
+	player->setScale(XMFLOAT3(playerScale, playerScale, playerScale));
 }
 
 void PlayScene::timerInit() {
 	timer.reset(new Time());
 }
-
-#pragma endregion 初期化関数
 
 PlayScene::PlayScene()
 	: update_proc(std::bind(&PlayScene::update_start, this)),
@@ -212,6 +194,8 @@ void PlayScene::start() {
 	// タイマー開始
 	timer->reset();
 }
+
+#pragma endregion 初期化関数
 
 #pragma region 更新関数
 
@@ -254,11 +238,20 @@ void PlayScene::updateCamera() {
 	constexpr float player2targetLen = camLen * 2.f;
 
 	// 自機の視線ベクトル
-	if (cameraMoveVel.x != 0.f && cameraMoveVel.y != 0.f) {
-		player->setLookVec(XMVector3Rotate(XMVector3Normalize(player->getLookVec()),
-										   XMQuaternionRotationRollPitchYaw(cameraMoveVel.y,
-																			cameraMoveVel.x,
-																			0.f)));
+	{
+		XMFLOAT3 rota = player->getRotation();
+
+		rota.x += cameraMoveVel.y;
+		rota.y += cameraMoveVel.x;
+
+		player->setRotation(rota);
+
+		/*if (cameraMoveVel.x != 0.f && cameraMoveVel.y != 0.f) {
+			player->setLookVec(XMVector3Rotate(XMVector3Normalize(player->getLookVec()),
+											   XMQuaternionRotationRollPitchYaw(cameraMoveVel.y,
+																				cameraMoveVel.x,
+																				0.f)));
+		}*/
 	}
 	const XMVECTOR &look = player->getLookVec();
 
@@ -268,7 +261,7 @@ void PlayScene::updateCamera() {
 
 	// カメラの位置
 	{
-		const XMVECTOR pos = XMVectorAdd(player->getPosVec(), player2cam);
+		const XMVECTOR pos = XMVectorAdd(XMLoadFloat3(&player->getPos()), player2cam);
 
 		XMFLOAT3 camPos{};
 		XMStoreFloat3(&camPos, pos);
@@ -279,7 +272,7 @@ void PlayScene::updateCamera() {
 	// 注視点設定
 	{
 		const XMVECTOR targetPos = XMVectorAdd(XMVectorScale(look, player2targetLen),
-											   player->getPosVec());
+											   XMLoadFloat3(&player->getPos()));
 		XMFLOAT3 targetF3{};
 		XMStoreFloat3(&targetF3, targetPos);
 
@@ -289,7 +282,6 @@ void PlayScene::updateCamera() {
 
 void PlayScene::updateLight() {
 	XMFLOAT3 pos = camera->getEye();
-	//pos.y += playerFbxObj3d->getScale().y * 3.f;
 
 	light->setLightPos(pos);
 }
@@ -323,8 +315,6 @@ void PlayScene::updatePlayer() {
 				player->moveRight(moveVel);
 			}
 		}
-
-		playerFbxObj3d->setPosition(player->getPosF3());
 	}
 
 	// 弾発射
@@ -356,7 +346,7 @@ void PlayScene::updatePlayer() {
 
 		Sphere playerSphere{};
 		playerSphere.center = XMLoadFloat3(&camera->getEye());
-		playerSphere.radius = playerFbxObj3d->getScale().x;
+		playerSphere.radius = player->getScale().x;
 
 		const bool hitBoss = Collision::CheckSphere2Sphere(playerSphere, bossSphere);
 
@@ -542,7 +532,6 @@ void PlayScene::update_start() {
 	if (drawAlpha > 1.f) {
 		drawAlpha = 1.f;
 
-		playerFbxObj3d->playAnimation();
 		timer->reset();
 
 		update_proc = std::bind(&PlayScene::update_play, this);
@@ -599,13 +588,6 @@ void PlayScene::changeEndScene() {
 	// ポストエフェクトはかける
 	PostEffect::getInstance()->changePipeLine(0u);
 
-	/*for (Sprite &i : sprites) {
-		i.isInvisible = true;
-	}*/
-
-	// fbxのアニメーションを停止する
-	playerFbxObj3d->stopAnimation(false);
-
 	drawAlpha = 1.f;
 	PostEffect::getInstance()->setAlpha(drawAlpha);
 
@@ -625,9 +607,7 @@ void PlayScene::drawObj3d() {
 	ground->drawWithUpdate(light.get());
 	if (bossAlive) boss->drawWithUpdate(light.get());
 	if (playerBul.second) playerBul.first->drawWithUpdate(light.get());
-
-	// 自機描画
-	playerFbxObj3d->drawWithUpdate(dxBase->getCmdList(), light.get());
+	player->drawWithUpdate(light.get());	// 自機描画
 }
 
 void PlayScene::drawFrontSprite() {

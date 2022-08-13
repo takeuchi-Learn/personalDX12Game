@@ -2,28 +2,56 @@
 #include <DirectXMath.h>
 using namespace DirectX;
 
-void Player::moveForward(float moveVel, bool moveYFlag) {
-	XMVECTOR moveVec =
-		DirectX::XMVectorScale(DirectX::XMVector3Normalize(lookVec),
-							   moveVel);
+XMVECTOR Player::getLookVec(float len) {
+	return XMVector3Rotate(XMVectorSet(0, 0, len, 1),
+						   XMQuaternionRotationRollPitchYaw(obj->getRotation().x,
+															obj->getRotation().y,
+															obj->getRotation().z));
+}
 
+void Player::moveForward(float moveVel, bool moveYFlag) {
+	XMVECTOR forward = getLookVec(moveVel);
 	if (!moveYFlag) {
-		moveVec = XMVectorSetY(moveVec, 0.f);
+		const float velSign = moveVel < 0 ? -1.f : 1.f;
+
+		forward = XMVectorSet(forward.m128_f32[0] * velSign,
+							  0,
+							  forward.m128_f32[2] * velSign,
+							  forward.m128_f32[3] * velSign);
+		forward = XMVectorScale(XMVector3Normalize(forward), moveVel);
 	}
 
-	pos = DirectX::XMVectorAdd(pos, moveVec);
+	const XMVECTOR posVec = DirectX::XMVectorAdd(XMLoadFloat3(&obj->getPos()),
+												 forward);
+
+	XMFLOAT3 pos{};
+	XMStoreFloat3(&pos, posVec);
+	obj->setPos(pos);
 }
 
 void Player::moveRight(float moveVel, bool moveYFlag) {
-	const XMVECTOR look = DirectX::XMVector3Normalize(lookVec);
-
-	XMVECTOR moveVec =
-		DirectX::XMVectorScale(XMVector3Rotate(look, XMQuaternionRotationRollPitchYaw(0, XM_PIDIV2, 0)),
-							   moveVel);
-
+	XMVECTOR right = XMVector3Rotate(XMVectorSet(moveVel, 0, 0, 1),
+										   XMQuaternionRotationRollPitchYaw(obj->getRotation().x,
+																			obj->getRotation().y,
+																			obj->getRotation().z));
 	if (!moveYFlag) {
-		moveVec = XMVectorSetY(moveVec, 0.f);
+		const float velSign = moveVel < 0 ? -1.f : 1.f;
+
+		right = XMVectorSet(right.m128_f32[0] * velSign,
+							0,
+							right.m128_f32[2] * velSign,
+							right.m128_f32[3] * velSign);
+		right = XMVectorScale(XMVector3Normalize(right), moveVel);
 	}
 
-	pos = DirectX::XMVectorAdd(pos, moveVec);
+	const XMVECTOR posVec = DirectX::XMVectorAdd(XMLoadFloat3(&obj->getPos()),
+												 right);
+
+	XMFLOAT3 pos{};
+	XMStoreFloat3(&pos, posVec);
+	obj->setPos(pos);
+}
+
+void Player::drawWithUpdate(Light *light) {
+	obj->drawWithUpdate(light);
 }
