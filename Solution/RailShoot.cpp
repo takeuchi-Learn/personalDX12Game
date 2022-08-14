@@ -24,7 +24,7 @@ RailShoot::RailShoot()
 	spriteBase(std::make_unique<SpriteBase>()),
 
 	back(std::make_unique<ObjSet>(camera.get(), "Resources/back/", "back", true)),
-	playerObj(std::make_unique<ObjSet>(camera.get(), "Resources/box", "box", false)),
+	player(std::make_unique<Player>(camera.get(), "Resources/box", "box", false)),
 
 	startSceneChangeTime(0U),
 
@@ -48,9 +48,9 @@ RailShoot::RailShoot()
 	light->setLightPos(camera->getEye());
 
 	// 自機初期化
-	playerObj->setPos(XMFLOAT3(0, 0, 0));
+	player->setPos(XMFLOAT3(0, 0, 0));
 	constexpr float playerScale = 10.f;
-	playerObj->setScale(XMFLOAT3(playerScale, playerScale, playerScale));
+	player->setScale(XMFLOAT3(playerScale, playerScale, playerScale));
 
 	// 天球
 	const float backScale = camera->getFarZ() * 0.9f;
@@ -118,7 +118,7 @@ void RailShoot::update_play() {
 	const bool hitQ = input->hitKey(DIK_Q);
 
 	if (hitW || hitA || hitS || hitD) {
-		XMFLOAT3 pPos = playerObj->getPos();
+		XMFLOAT3 pPos = player->getPos();
 		const float speed = 60.f / dxBase->getFPS();
 
 		// 高さ方向に移動
@@ -133,12 +133,12 @@ void RailShoot::update_play() {
 		} else if (hitD && pPos.x < WinAPI::window_width * 0.125f) {
 			pPos.x += speed;
 		}
-		playerObj->setPos(pPos);
+		player->setPos(pPos);
 	}
 	if (hitE || hitQ) {
 		const float speed = 90.f / dxBase->getFPS();
 
-		XMFLOAT3 rota = playerObj->getRotation();
+		XMFLOAT3 rota = player->getRotation();
 
 		// y軸を回転軸とする回転
 		if (hitE) {
@@ -147,7 +147,7 @@ void RailShoot::update_play() {
 			rota.y -= speed;
 		}
 
-		playerObj->setRotation(rota);
+		player->setRotation(rota);
 	}
 }
 
@@ -170,7 +170,7 @@ void RailShoot::drawObj3d() {
 	back->drawWithUpdate(light.get());
 
 	Object3d::startDraw(dxBase->getCmdList(), object3dPipelineSet);
-	playerObj->drawWithUpdate(light.get());
+	player->drawWithUpdate(light.get());
 
 }
 

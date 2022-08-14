@@ -9,24 +9,26 @@
 
 class ObjSet {
 	std::unique_ptr<ObjModel> model;
-	std::unique_ptr<Object3d> obj;
+	std::vector<Object3d> obj;
 
 public:
 	ObjSet(Camera* camera, const std::string &dirPath, const std::string &name, bool smoothing = false);
 
 	inline ObjModel *getModelPt() { return model.get(); }
 
-	inline void setPos(const DirectX::XMFLOAT3 &pos) { obj->position = pos; }
-	inline const DirectX::XMFLOAT3 &getPos() { return obj->position; }
+	inline void addObj(Camera *camera) { obj.emplace_back(DX12Base::getInstance()->getDev(), camera, model.get(), 0U); }
 
-	inline void setScale(const DirectX::XMFLOAT3 &scale) { obj->scale = scale; }
-	inline const DirectX::XMFLOAT3 &getScale() { return obj->scale; }
+	inline void setPos(const DirectX::XMFLOAT3 &pos, UINT num = 0U) { obj[num].position = pos; }
+	inline const DirectX::XMFLOAT3 &getPos(UINT num = 0U) { return obj[num].position; }
 
-	inline void setRotation(const DirectX::XMFLOAT3 &rotation) { obj->rotation = rotation; }
-	inline const DirectX::XMFLOAT3 &getRotation() { return obj->rotation; }
+	inline void setScale(const DirectX::XMFLOAT3 &scale, UINT num = 0U) { obj[num].scale = scale; }
+	inline const DirectX::XMFLOAT3 &getScale(UINT num = 0U) { return obj[num].scale; }
 
-	inline void setColor(const DirectX::XMFLOAT4 &color) { obj->color = color; }
-	inline const DirectX::XMFLOAT4 &getColor() { return obj->color; }
+	inline void setRotation(const DirectX::XMFLOAT3 &rotation, UINT num = 0U) { obj[num].rotation = rotation; }
+	inline const DirectX::XMFLOAT3 &getRotation(UINT num = 0U) { return obj[num].rotation; }
+
+	inline void setColor(const DirectX::XMFLOAT4 &color, UINT num = 0U) { obj[num].color = color; }
+	inline const DirectX::XMFLOAT4 &getColor(UINT num = 0U) { return obj[num].color; }
 
 	void drawWithUpdate(Light* light);
 };
