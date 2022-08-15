@@ -10,6 +10,10 @@ struct Sphere {
 	DirectX::XMVECTOR center = { 0, 0, 0, 1 };
 	// 半径
 	float radius = 1.f;
+
+	Sphere(const DirectX::XMVECTOR &center = { 0,0,0,1 }, float r = 1.f)
+		: center(center), radius(r) {
+	}
 };
 
 // 平面

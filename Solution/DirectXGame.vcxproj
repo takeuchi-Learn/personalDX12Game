@@ -170,6 +170,7 @@
     <ClCompile Include="DebugText.cpp" />
     <ClCompile Include="DX12Base.cpp" />
     <ClCompile Include="EndScene.cpp" />
+    <ClCompile Include="Enemy.cpp" />
     <ClCompile Include="GameObj.cpp" />
     <ClCompile Include="FbxLoader.cpp" />
     <ClCompile Include="FbxModel.cpp" />
@@ -216,6 +217,7 @@
     <ClInclude Include="DebugText.h" />
     <ClInclude Include="DX12Base.h" />
     <ClInclude Include="EndScene.h" />
+    <ClInclude Include="Enemy.h" />
     <ClInclude Include="GameObj.h" />
     <ClInclude Include="FbxLoader.h" />
     <ClInclude Include="FbxModel.h" />

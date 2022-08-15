@@ -6,6 +6,10 @@
 
 #include "PostEffect.h"
 
+#include "Collision.h"
+
+#include "RandomNum.h"
+
 using namespace DirectX;
 
 const Time::timeType RailShoot::sceneChangeTime = Time::oneSec;
@@ -24,9 +28,12 @@ RailShoot::RailShoot()
 	spriteBase(std::make_unique<SpriteBase>()),
 
 	back(std::make_unique<ObjSet>(camera.get(), "Resources/back/", "back", true)),
+	enemyModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
 	playerModel(std::make_unique<ObjModel>("Resources/box", "box")),
 
 	playerBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
+
+	particleMgr(std::make_unique<ParticleMgr>(L"Resources/effect1.png", camera.get())),
 
 	startSceneChangeTime(0U),
 
@@ -49,10 +56,23 @@ RailShoot::RailShoot()
 	// ライト初期化
 	light->setLightPos(camera->getEye());
 
+
 	// 自機初期化
 	constexpr XMFLOAT3 playerStartPos = XMFLOAT3(0, 0, 0);
 	player = std::make_unique<Player>(camera.get(), playerModel.get(), playerStartPos);
 	player->setScale(10.f);
+
+	// 敵初期化
+	constexpr size_t enemyNumDef = 1U;
+	constexpr XMFLOAT3 enemyPosDef = XMFLOAT3(playerStartPos.x,
+											  playerStartPos.y - 20.f,
+											  playerStartPos.z + 300.f);
+	enemy.resize(enemyNumDef);
+	for (auto &i : enemy) {
+		i = std::make_unique<Enemy>(camera.get(), enemyModel.get(), enemyPosDef);
+		i->setVel(XMFLOAT3(0, 0, -1.f));
+		i->setScale(5.f);
+	}
 
 	// 天球
 	const float backScale = camera->getFarZ() * 0.9f;
@@ -85,6 +105,48 @@ void RailShoot::update() {
 	camera->update();
 }
 
+void RailShoot::createParticle(const DirectX::XMFLOAT3 &pos,
+							   const UINT particleNum,
+							   const float startScale,
+							   const float vel) {
+	for (UINT i = 0U; i < particleNum; ++i) {
+
+		const float theata = RandomNum::getRandf(0, XM_PI);
+		const float phi = RandomNum::getRandf(0, XM_PI * 2.f);
+		const float r = RandomNum::getRandf(0, vel);
+
+		const XMFLOAT3 vel{
+			r * dxBase->nearSin(theata) * dxBase->nearCos(phi),
+			r * dxBase->nearCos(theata),
+			r * dxBase->nearSin(theata) * dxBase->nearSin(phi)
+		};
+
+		constexpr float accNum = 10.f;
+		const XMFLOAT3 acc = XMFLOAT3(vel.x / accNum,
+									  vel.y / accNum,
+									  vel.z / accNum);
+
+		constexpr XMFLOAT3 startCol = XMFLOAT3(1, 1, 0.25f), endCol = XMFLOAT3(1, 0, 1);
+		constexpr int life = Time::oneSec / 4;
+		constexpr float endScale = 0.f;
+		constexpr float startRota = 0.f, endRota = 0.f;
+
+		// 追加
+		particleMgr->add(std::make_unique<Time>(),
+						 life, pos, vel, acc,
+						 startScale, endScale,
+						 startRota, endRota,
+						 startCol, endCol);
+	}
+}
+
+void RailShoot::changeNextScene() {
+	PostEffect::getInstance()->changePipeLine(0U);
+
+	update_proc = std::bind(&RailShoot::update_end, this);
+	startSceneChangeTime = timer->getNowTime();
+}
+
 void RailShoot::update_start() {
 	const Time::timeType nowTime = timer->getNowTime() - startSceneChangeTime;
 	if (nowTime >= sceneChangeTime) {
@@ -105,10 +167,7 @@ void RailShoot::update_play() {
 	debugText->Print(spriteBase.get(), "RailShoot", 0, 0);
 
 	if (input->hitKey(DIK_LSHIFT) && input->hitKey(DIK_SPACE)) {
-		PostEffect::getInstance()->changePipeLine(0U);
-
-		update_proc = std::bind(&RailShoot::update_end, this);
-		startSceneChangeTime = timer->getNowTime();
+		changeNextScene();
 	}
 
 
@@ -157,6 +216,36 @@ void RailShoot::update_play() {
 		constexpr float bulSpeed = 8.f;
 		player->shot(camera.get(), playerBulModel.get(), bulSpeed);
 	}
+
+	// 自機弾と敵の当たり判定
+	{
+		Sphere pBulCol{};
+		for (auto &pb : player->getBulArr()) {
+			pBulCol.center = XMLoadFloat3(&pb.getPos());
+			pBulCol.radius = pb.getScale();
+
+			for (auto &e : enemy) {
+				if (e->getAlive()
+					&& Collision::CheckHit(pBulCol,
+										   Sphere(XMLoadFloat3(&e->getPos()),
+												  e->getScale()))) {
+					e->kill();
+					createParticle(e->getPos(), 98U, 32.f, 16.f);
+				}
+			}
+		}
+
+		// 死んだ敵は消す
+		enemy.erase(std::remove_if(enemy.begin(),
+								   enemy.end(),
+								   [](const std::unique_ptr<Enemy> &i) {return !i->getAlive(); }),
+					enemy.end());
+
+		// 敵がすべて消えたら次のシーンへ
+		if (0 == enemy.size()) {
+			changeNextScene();
+		}
+	}
 }
 
 void RailShoot::update_end() {
@@ -179,7 +268,12 @@ void RailShoot::drawObj3d() {
 
 	Object3d::startDraw(dxBase->getCmdList(), object3dPipelineSet);
 	player->drawWithUpdate(light.get());
+	for (auto &i : enemy) {
+		i->drawWithUpdate(light.get());
+	}
 
+	ParticleMgr::startDraw(dxBase->getCmdList(), object3dPipelineSet);
+	particleMgr->drawWithUpdate(dxBase->getCmdList());
 }
 
 void RailShoot::drawFrontSprite() {

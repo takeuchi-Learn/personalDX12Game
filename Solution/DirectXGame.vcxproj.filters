@@ -91,6 +91,9 @@
     <Filter Include="GameObject\GameObj">
       <UniqueIdentifier>{679d779e-6166-45aa-b7b3-f15a345cd2eb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObject\Enemy">
+      <UniqueIdentifier>{e620e69a-57c4-49ab-ae31-2681ad23c6e9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="System.cpp">
@@ -201,6 +204,9 @@
     <ClCompile Include="GameObj.cpp">
       <Filter>GameObject\GameObj</Filter>
     </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -307,6 +313,9 @@
     </ClInclude>
     <ClInclude Include="GameObj.h">
       <Filter>GameObject\GameObj</Filter>
+    </ClInclude>
+    <ClInclude Include="Enemy.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

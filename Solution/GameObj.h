@@ -17,6 +17,8 @@ protected:
 
 public:
 	inline bool getAlive() const { return alive; }
+	// aliveをfalseにする
+	inline void kill() { alive = false; }
 
 	inline void setPos(const DirectX::XMFLOAT3 &pos) { obj->position = pos; }
 	inline const DirectX::XMFLOAT3 &getPos() const { return obj->position; }

@@ -44,6 +44,9 @@ public:
 	static bool CheckSphere2Plane(const Sphere &sphere,
 								  const Plane &plane, DirectX::XMVECTOR *inter = nullptr);
 
+	inline static bool CheckHit(const Sphere &sphere, const Plane &plane) { return CheckSphere2Plane(sphere, plane); }
+	inline static bool CheckHit(const Plane &plane, const Sphere &sphere) { return CheckSphere2Plane(sphere, plane); }
+
 	/// <summary>
 	/// 点と三角形の最近接点を求める
 	/// </summary>
@@ -63,6 +66,9 @@ public:
 	static bool CheckSphere2Triangle(const Sphere &sphere, const Triangle &triangle,
 									 DirectX::XMVECTOR *inter = nullptr);
 
+	inline static bool CheckHit(const Sphere &sphere, const Triangle &triangle) { return CheckSphere2Triangle(sphere, triangle); }
+	inline static bool CheckHit(const Triangle &triangle, const Sphere &sphere) { return CheckSphere2Triangle(sphere, triangle); }
+
 	/// <summary>
 	/// レイと平面の当たり判定
 	/// </summary>
@@ -73,6 +79,9 @@ public:
 	/// <returns>交差しているか否か</returns>
 	static bool CheckRay2Plane(const Ray &ray, const Plane &plane,
 							   float *distance = nullptr, DirectX::XMVECTOR *inter = nullptr);
+
+	inline static bool CheckHit(const Ray &ray, const Plane &plane) { return CheckRay2Plane(ray, plane); }
+	inline static bool CheckHit(const Plane &plane, const Ray &ray) { return CheckRay2Plane(ray, plane); }
 
 	/// <summary>
 	/// レイと法線付き三角形の当たり判定
@@ -85,6 +94,9 @@ public:
 	static bool CheckRay2Triangle(const Ray &ray, const Triangle &triangle,
 								  float *distance = nullptr, DirectX::XMVECTOR *inter = nullptr);
 
+	inline static bool CheckHit(const Ray &ray, const Triangle &triangle) { return CheckRay2Triangle(ray, triangle); }
+	inline static bool CheckHit(const Triangle &triangle, const Ray &ray) { return CheckRay2Triangle(ray, triangle); }
+
 	/// <summary>
 	/// レイと球の当たり判定
 	/// </summary>
@@ -96,6 +108,9 @@ public:
 	static bool CheckRay2Sphere(const Ray &ray, const Sphere &sphere,
 								float *distance = nullptr, DirectX::XMVECTOR *inter = nullptr);
 
+	inline static bool CheckHit(const Ray &ray, const Sphere &sphere) { return CheckRay2Sphere(ray, sphere); }
+	inline static bool CheckHit(const Sphere &sphere, const Ray &ray) { return CheckRay2Sphere(ray, sphere); }
+
 	/// <summary>
 	/// 球と直方体(AABB)の当たり判定
 	/// </summary>
@@ -103,6 +118,9 @@ public:
 	/// <param name="aabb">直方体(AABB)</param>
 	/// <returns>衝突しているか否か</returns>
 	static bool CheckSphere2AABB(const Sphere &sphere, const AABB &aabb);
+
+	inline static bool CheckHit(const Sphere &sphere, const AABB &aabb) { return CheckSphere2AABB(sphere, aabb); }
+	inline static bool CheckHit(const AABB &aabb, const Sphere &sphere) { return CheckSphere2AABB(sphere, aabb); }
 
 	/// <summary>
 	/// 球とカプセルの当たり判定
@@ -112,6 +130,9 @@ public:
 	/// <returns>衝突しているか否か</returns>
 	static bool CheckSphere2Capsule(const Sphere &sphere, const Capsule &capsule);
 
+	inline static bool CheckHit(const Sphere &sphere, const Capsule &capsule) { return CheckSphere2Capsule(sphere, capsule); }
+	inline static bool CheckHit(const Capsule &capsule, const Sphere &sphere) { return CheckSphere2Capsule(sphere, capsule); }
+
 	/// <summary>
 	/// カプセル同士の当たり判定
 	/// </summary>
@@ -120,6 +141,8 @@ public:
 	/// <returns>衝突しているか否か</returns>
 	static bool CheckCapsule2Capsule(const Capsule &capsule1, const Capsule &capsule2);
 
+	inline static bool CheckHit(const Capsule &capsule, const Capsule &capsule2) { return CheckCapsule2Capsule(capsule, capsule2); }
+
 	/// <summary>
 	/// 球同士の当たり判定
 	/// </summary>
@@ -127,4 +150,6 @@ public:
 	/// <param name="sphere2">球</param>
 	/// <returns>衝突しているか否か</returns>
 	static bool CheckSphere2Sphere(const Sphere &sphere1, const Sphere &sphere2);
+
+	inline static bool CheckHit(const Sphere &sphere, const Sphere &sphere2) { return CheckSphere2Sphere(sphere, sphere2); }
 };

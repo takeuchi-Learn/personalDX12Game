@@ -2,8 +2,7 @@
 
 void PlayerBullet::update(Light *light) {
 	// 寿命が来たら死ぬ
-	++age;
-	if (age > life) {
+	if (++age > life) {
 		alive = false;
 	}
 

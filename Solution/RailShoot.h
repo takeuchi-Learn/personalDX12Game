@@ -16,6 +16,10 @@
 
 #include "DebugText.h"
 
+#include "Enemy.h"
+
+#include "ParticleMgr.h"
+
 class RailShoot
 	: public GameScene {
 
@@ -43,10 +47,16 @@ class RailShoot
 
 	std::unique_ptr<ObjSet> back;
 
+	std::vector<std::unique_ptr<Enemy>> enemy;
+	std::unique_ptr<ObjModel> enemyModel;
+
 	std::unique_ptr<Player> player;
 	std::unique_ptr<ObjModel> playerModel;
 
 	std::unique_ptr<ObjModel> playerBulModel;
+
+
+	std::unique_ptr<ParticleMgr> particleMgr;
 
 
 
@@ -55,6 +65,13 @@ class RailShoot
 	Time::timeType startSceneChangeTime{};
 
 
+
+	void createParticle(const DirectX::XMFLOAT3 &pos,
+						const UINT particleNum = 10U,
+						const float startScale = 1.f,
+						const float vel = 5.f);
+
+	void changeNextScene();
 
 	// update_何とか関数を格納する
 	std::function<void()> update_proc;
