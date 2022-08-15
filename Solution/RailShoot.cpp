@@ -24,7 +24,7 @@ RailShoot::RailShoot()
 	spriteBase(std::make_unique<SpriteBase>()),
 
 	back(std::make_unique<ObjSet>(camera.get(), "Resources/back/", "back", true)),
-	player(std::make_unique<Player>(camera.get(), "Resources/box", "box", false)),
+	playerModel(std::make_unique<ObjModel>("Resources/box", "box")),
 
 	playerBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
 
@@ -50,9 +50,9 @@ RailShoot::RailShoot()
 	light->setLightPos(camera->getEye());
 
 	// 自機初期化
-	player->setPos(XMFLOAT3(0, 0, 0));
-	constexpr float playerScale = 10.f;
-	player->setScale(XMFLOAT3(playerScale, playerScale, playerScale));
+	constexpr XMFLOAT3 playerStartPos = XMFLOAT3(0, 0, 0);
+	player = std::make_unique<Player>(camera.get(), playerModel.get(), playerStartPos);
+	player->setScale(10.f);
 
 	// 天球
 	const float backScale = camera->getFarZ() * 0.9f;

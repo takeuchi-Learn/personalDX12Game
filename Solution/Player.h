@@ -6,29 +6,17 @@
 #include "PlayerBullet.h"
 #include <forward_list>
 
-class Player {
+#include "GameObj.h"
+
+class Player
+	: public GameObj {
 	using XMFLOAT3 = DirectX::XMFLOAT3;
 	using XMVECTOR = DirectX::XMVECTOR;
 
-	std::unique_ptr<ObjSet> obj;
 	std::forward_list<PlayerBullet> bul;
 
 public:
-	Player(Camera *camera,
-		   const std::string &dirPath,
-		   const std::string &name,
-		   bool smoothing = false)
-		: obj(new ObjSet(camera, dirPath, name, smoothing)) {
-	}
-
-	inline const XMFLOAT3 &getPos() { return obj->getPos(); }
-	inline void setPos(const XMFLOAT3 &pos) { obj->setPos(pos); }
-
-	inline const XMFLOAT3 &getRotation() { return obj->getRotation(); }
-	inline void setRotation(const XMFLOAT3 &rota) { obj->setRotation(rota); }
-
-	inline const XMFLOAT3 &getScale() { return obj->getScale(); }
-	inline void setScale(const XMFLOAT3 &scale) { obj->setScale(scale); }
+	using GameObj::GameObj;
 
 	XMVECTOR getLookVec(float len = 1.f);
 
@@ -46,11 +34,11 @@ public:
 	/// <param name="moveYFlag">Y方向に移動するか</param>
 	void moveRight(float moveVel, bool moveYFlag = false);
 
+	// @param vel 毎秒進む値
 	void shot(Camera *camera,
 			  ObjModel *model,
 			  float vel = 1.f);
 
-	// 自機弾すべてとオブジェクトの描画
-	void drawWithUpdate(Light *light);
+	void update(Light* light) override;
 };
 

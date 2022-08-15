@@ -151,10 +151,9 @@ void PlayScene::particleInit() {
 	particleMgr.reset(new ParticleMgr(L"Resources/effect1.png", camera.get()));
 }
 void PlayScene::playerInit() {
-	player = std::make_unique<Player>(camera.get(), "Resources/sphere", "sphere", true);
-	player->setPos(XMFLOAT3(0, 10, -300.f));
-	constexpr float playerScale = 10.f;
-	player->setScale(XMFLOAT3(playerScale, playerScale, playerScale));
+	playerModel = std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true);
+	player = std::make_unique<Player>(camera.get(), playerModel.get(), XMFLOAT3(0, 10, -300));
+	player->setScale(10.f);
 }
 
 void PlayScene::timerInit() {
@@ -346,7 +345,7 @@ void PlayScene::updatePlayer() {
 
 		Sphere playerSphere{};
 		playerSphere.center = XMLoadFloat3(&camera->getEye());
-		playerSphere.radius = player->getScale().x;
+		playerSphere.radius = player->getScale();
 
 		const bool hitBoss = Collision::CheckSphere2Sphere(playerSphere, bossSphere);
 

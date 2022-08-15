@@ -1,44 +1,26 @@
 ﻿#pragma once
 
-#include "ObjModel.h"
-#include "Object3d.h"
-#include <DirectXMath.h>
+#include "GameObj.h"
 
-class PlayerBullet {
-	const bool needToDeleteObj = false;
-
-	Object3d *obj = nullptr;
-
-	DirectX::XMFLOAT3 pos{};
-	bool posDirty = false;
+class PlayerBullet
+	: public GameObj {
 
 	DirectX::XMFLOAT3 vel{};
 
 public:
-	bool alive = true;
 
 	uint8_t life = 60;
 	uint8_t age = 0;
 
+private:
+	void update(Light* light) override;
+
 public:
-	PlayerBullet(Object3d *obj,
-				 const DirectX::XMFLOAT3 &pos = { 0,0,0 });
+	using GameObj::GameObj;
 
-	PlayerBullet(Camera *camera,
-				 ObjModel *model,
-				 const DirectX::XMFLOAT3 &pos = { 0,0,0 });
-
-	~PlayerBullet();
-
+	// @return 毎秒進む値
 	inline const DirectX::XMFLOAT3 &getVel() { return vel; }
+	// @param vel 毎秒進む値
 	inline void setVel(const DirectX::XMFLOAT3 &vel) { this->vel = vel; }
-
-	inline const DirectX::XMFLOAT3 &getPos() { return pos; }
-	inline void setPos(const DirectX::XMFLOAT3 &pos) { this->pos = pos; posDirty = true; }
-
-	inline const DirectX::XMFLOAT3 &getScale() { return obj->scale; }
-	inline void setScale(float scale) { obj->scale = DirectX::XMFLOAT3(scale, scale, scale); }
-
-	void drawWithUpdate(Light *light);
 };
 

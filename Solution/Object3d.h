@@ -54,7 +54,7 @@ public:
 private:
 	static ID3D12Device* dev;
 	static PipelineSet ppSetDef;
-	static Camera* camera;
+	Camera* camera;
 
 	static void createTransferBufferB0(ID3D12Device* dev, ComPtr<ID3D12Resource>& constBuff);
 
@@ -91,6 +91,10 @@ private:
 	// ワールド変換行列
 	XMMATRIX matWorld;
 
+	XMMATRIX matScale{};
+	XMMATRIX matRot{};
+	XMMATRIX matTrans{};
+
 public:
 	UINT texNum = 0;
 
@@ -109,9 +113,11 @@ public:
 	bool isBillboard = false;
 	bool isBillBoardY = false;// isBillboardがfalseの場合のみ機能する
 
-	const XMMATRIX &getMatWorld() const;
+	inline const XMMATRIX &getMatWorld() const { return matWorld; }
 
 	//void setTexture(ID3D12Device* dev, const UINT newTexNum);
+
+	inline const XMMATRIX &getMatRota() const { return matRot; }
 
 
 	// モデルは後から手動で読み込む(deleteも手動)

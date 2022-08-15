@@ -44,6 +44,7 @@ class RailShoot
 	std::unique_ptr<ObjSet> back;
 
 	std::unique_ptr<Player> player;
+	std::unique_ptr<ObjModel> playerModel;
 
 	std::unique_ptr<ObjModel> playerBulModel;
 

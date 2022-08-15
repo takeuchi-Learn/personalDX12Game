@@ -107,6 +107,7 @@ class PlayScene :
 	/// <summary>
 	/// 自機
 	/// </summary>
+	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<Player> player;
 	std::pair<std::unique_ptr<ObjSet>, bool> playerBul;	// second : 生存フラグ
 	DirectX::XMFLOAT3 playerBulVel{};

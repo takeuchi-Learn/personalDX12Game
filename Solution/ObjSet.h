@@ -12,7 +12,7 @@ class ObjSet {
 	std::vector<Object3d> obj;
 
 public:
-	ObjSet(Camera* camera, const std::string &dirPath, const std::string &name, bool smoothing = false);
+	ObjSet(Camera *camera, const std::string &dirPath, const std::string &name, bool smoothing = false);
 
 	inline ObjModel *getModelPt() { return model.get(); }
 
@@ -32,6 +32,8 @@ public:
 	inline void setColor(const DirectX::XMFLOAT4 &color, UINT num = 0U) { obj[num].color = color; }
 	inline const DirectX::XMFLOAT4 &getColor(UINT num = 0U) { return obj[num].color; }
 
-	void drawWithUpdate(Light* light);
+	inline const DirectX::XMMATRIX &getMatRota(UINT num = 0U) const { return obj[num].getMatRota(); }
+
+	void drawWithUpdate(Light *light);
 };
 

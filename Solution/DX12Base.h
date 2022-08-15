@@ -42,6 +42,7 @@ class DX12Base {
 #pragma endregion
 
 #pragma region FPS
+private:
 	static const USHORT divNum = 2;	// 2以上にする
 	LONGLONG fpsTime[divNum]{};
 	float fps;
@@ -52,11 +53,9 @@ class DX12Base {
 public:
 	float getFPS();
 
-private:
-
 #pragma endregion
 
-
+private:
 
 	void initDevice();
 	void initCommand();

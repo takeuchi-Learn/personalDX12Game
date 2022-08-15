@@ -10,11 +10,10 @@
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-ID3D12Device* Object3d::dev = nullptr;
+ID3D12Device *Object3d::dev = nullptr;
 Object3d::PipelineSet Object3d::ppSetDef{};
-Camera* Object3d::camera = nullptr;
 
-void Object3d::createTransferBufferB0(ID3D12Device* dev, ComPtr<ID3D12Resource>& constBuffB0) {
+void Object3d::createTransferBufferB0(ID3D12Device *dev, ComPtr<ID3D12Resource> &constBuffB0) {
 	// 定数バッファの生成
 	HRESULT result = dev->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),   // アップロード可能
@@ -26,33 +25,20 @@ void Object3d::createTransferBufferB0(ID3D12Device* dev, ComPtr<ID3D12Resource>&
 	);
 }
 
-const XMMATRIX &Object3d::getMatWorld() const { return matWorld; }
-
-//void Object3d::setTexture(ID3D12Device* dev, const UINT newTexNum) {
-//	texNum = newTexNum;
-//	//model->setTexture(dev, newTexNum, constantBufferNum);
-//}
-
-Object3d::Object3d(ID3D12Device* dev, Camera* camera) {
-
-	matWorld = {};
+Object3d::Object3d(ID3D12Device *dev, Camera *camera)
+	: camera(camera), matWorld() {
 
 	// 定数バッファの生成
 	createTransferBufferB0(dev, constBuffB0);
 }
-Object3d::Object3d(ID3D12Device* dev, Camera* camera, ObjModel* model, const UINT texNum) : texNum(texNum) {
-	matWorld = {};
+Object3d::Object3d(ID3D12Device *dev, Camera *camera, ObjModel *model, const UINT texNum)
+	: camera(camera), model(model), texNum(texNum), matWorld() {
 
 	// 定数バッファの生成
 	createTransferBufferB0(dev, constBuffB0);
-
-	this->model = model;
-	this->camera = camera;
 }
 
-void Object3d::update(ID3D12Device* dev) {
-	XMMATRIX matScale, matRot, matTrans;
-
+void Object3d::update(ID3D12Device *dev) {
 	// スケール、回転、平行移動行列の計算
 	matScale = XMMatrixScaling(scale.x, scale.y, scale.z);
 	matRot = XMMatrixIdentity();
@@ -66,10 +52,10 @@ void Object3d::update(ID3D12Device* dev) {
 	matWorld *= matScale; // ワールド行列にスケーリングを反映
 	matWorld *= matRot; // ワールド行列に回転を反映
 	if (isBillboard) {
-		const XMMATRIX& matBillBoard = camera->getBillboardMatrix();
+		const XMMATRIX &matBillBoard = camera->getBillboardMatrix();
 		matWorld *= matBillBoard;
 	} else if (isBillBoardY) {
-		const XMMATRIX& matBillBoardY = camera->getBillboardMatrixY();
+		const XMMATRIX &matBillBoardY = camera->getBillboardMatrixY();
 		matWorld *= matBillBoardY;
 	}
 	matWorld *= matTrans; // ワールド行列に平行移動を反映
@@ -81,8 +67,8 @@ void Object3d::update(ID3D12Device* dev) {
 	}
 
 	// 定数バッファへデータ転送
-	ConstBufferDataB0* constMapB0 = nullptr;
-	if (SUCCEEDED(constBuffB0->Map(0, nullptr, (void**)&constMapB0))) {
+	ConstBufferDataB0 *constMapB0 = nullptr;
+	if (SUCCEEDED(constBuffB0->Map(0, nullptr, (void **)&constMapB0))) {
 		//constMap->color = color; // RGBA
 		constMapB0->viewProj = camera->getViewProjectionMatrix();
 		constMapB0->world = matWorld;
@@ -100,7 +86,7 @@ void Object3d::update(ID3D12Device* dev) {
 	//model->update(dev);
 }
 
-void Object3d::draw(DX12Base* dxBase, Light* light) {
+void Object3d::draw(DX12Base *dxBase, Light *light) {
 	// 定数バッファビューをセット
 	dxBase->getCmdList()->SetGraphicsRootConstantBufferView(0, constBuffB0->GetGPUVirtualAddress());
 
@@ -109,7 +95,7 @@ void Object3d::draw(DX12Base* dxBase, Light* light) {
 	model->draw(dxBase->getCmdList());
 }
 
-void Object3d::drawWithUpdate(DX12Base* dxBase, Light* light) {
+void Object3d::drawWithUpdate(DX12Base *dxBase, Light *light) {
 	update(dxBase->getDev());
 	draw(dxBase, light);
 }
@@ -118,14 +104,14 @@ Object3d::~Object3d() {}
 
 
 
-void Object3d::startDraw(ID3D12GraphicsCommandList* cmdList, Object3d::PipelineSet& ppSet, D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology) {
+void Object3d::startDraw(ID3D12GraphicsCommandList *cmdList, Object3d::PipelineSet &ppSet, D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology) {
 	cmdList->SetPipelineState(ppSet.pipelinestate.Get());
 	cmdList->SetGraphicsRootSignature(ppSet.rootsignature.Get());
 	//プリミティブ形状を設定
 	cmdList->IASetPrimitiveTopology(PrimitiveTopology);
 }
 
-void Object3d::staticInit(ID3D12Device* device) {
+void Object3d::staticInit(ID3D12Device *device) {
 	// 再初期化チェック
 	assert(!Object3d::dev);
 
@@ -139,9 +125,9 @@ void Object3d::staticInit(ID3D12Device* device) {
 	ObjModel::staticInit(device);
 }
 
-Object3d::PipelineSet Object3d::createGraphicsPipeline(ID3D12Device* dev,
+Object3d::PipelineSet Object3d::createGraphicsPipeline(ID3D12Device *dev,
 													   BLEND_MODE blendMode,
-													   const wchar_t* vsShaderPath, const wchar_t* psShaderPath) {
+													   const wchar_t *vsShaderPath, const wchar_t *psShaderPath) {
 	HRESULT result = S_FALSE;
 
 	ComPtr<ID3DBlob> vsBlob;	// 頂点シェーダオブジェクト
@@ -163,7 +149,7 @@ Object3d::PipelineSet Object3d::createGraphicsPipeline(ID3D12Device* dev,
 		std::string errstr;
 		errstr.resize(errorBlob->GetBufferSize());
 
-		std::copy_n((char*)errorBlob->GetBufferPointer(),
+		std::copy_n((char *)errorBlob->GetBufferPointer(),
 					errorBlob->GetBufferSize(),
 					errstr.begin());
 		errstr += "\n";
@@ -188,7 +174,7 @@ Object3d::PipelineSet Object3d::createGraphicsPipeline(ID3D12Device* dev,
 		std::string errstr;
 		errstr.resize(errorBlob->GetBufferSize());
 
-		std::copy_n((char*)errorBlob->GetBufferPointer(),
+		std::copy_n((char *)errorBlob->GetBufferPointer(),
 					errorBlob->GetBufferSize(),
 					errstr.begin());
 		errstr += "\n";
