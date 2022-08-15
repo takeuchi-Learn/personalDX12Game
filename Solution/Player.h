@@ -48,8 +48,9 @@ public:
 
 	void shot(Camera *camera,
 			  ObjModel *model,
-			  const DirectX::XMFLOAT3 &vel = { 0,0,1 });
+			  float vel = 1.f);
 
+	// 自機弾すべてとオブジェクトの描画
 	void drawWithUpdate(Light *light);
 };
 

@@ -109,7 +109,7 @@ public:
 	bool isBillboard = false;
 	bool isBillBoardY = false;// isBillboardがfalseの場合のみ機能する
 
-	XMMATRIX getMatWorld() const;
+	const XMMATRIX &getMatWorld() const;
 
 	//void setTexture(ID3D12Device* dev, const UINT newTexNum);
 

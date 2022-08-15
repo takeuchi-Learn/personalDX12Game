@@ -54,14 +54,24 @@ void Player::moveRight(float moveVel, bool moveYFlag) {
 
 void Player::shot(Camera *camera,
 				  ObjModel *model,
-				  const DirectX::XMFLOAT3 &vel) {
+				  float vel) {
 
 	// C++17から追加した要素の参照が返ってくるようになった
 	PlayerBullet &i = bul.emplace_front(camera, model, XMFLOAT3(0, 0, 1));
 
-	i.vel = vel;
+	// 自機の回転行列
+	XMMATRIX matRot = XMMatrixIdentity();
+	matRot *= XMMatrixRotationZ(XMConvertToRadians(obj->getRotation().z));
+	matRot *= XMMatrixRotationX(XMConvertToRadians(obj->getRotation().x));
+	matRot *= XMMatrixRotationY(XMConvertToRadians(obj->getRotation().y));
+
+	// Z方向のベクトルを、自機の向いている向きに回転
+	XMFLOAT3 velF3{};
+	XMStoreFloat3(&velF3, XMVector3Transform(XMVectorSet(0, 0, vel, 1), matRot));
+
+	i.setVel(velF3);
 	i.setPos(obj->getPos());
-	i.setScale(XMFLOAT3(10, 10, 10));
+	i.setScale(10.f);
 }
 
 void Player::drawWithUpdate(Light *light) {

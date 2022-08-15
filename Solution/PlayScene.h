@@ -30,6 +30,7 @@
 
 #include "ObjSet.h"
 #include <utility>
+#include <memory>
 
 class PlayScene :
 	public GameScene {

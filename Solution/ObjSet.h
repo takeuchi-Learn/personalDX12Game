@@ -18,6 +18,8 @@ public:
 
 	inline void addObj(Camera *camera) { obj.emplace_back(DX12Base::getInstance()->getDev(), camera, model.get(), 0U); }
 
+	inline const DirectX::XMMATRIX &getMatWorld(UINT num = 0U) { return obj[num].getMatWorld(); }
+
 	inline void setPos(const DirectX::XMFLOAT3 &pos, UINT num = 0U) { obj[num].position = pos; }
 	inline const DirectX::XMFLOAT3 &getPos(UINT num = 0U) { return obj[num].position; }
 

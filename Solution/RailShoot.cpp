@@ -155,7 +155,7 @@ void RailShoot::update_play() {
 	// 弾発射
 	if (input->triggerKey(DIK_SPACE)) {
 		constexpr float bulSpeed = 8.f;
-		player->shot(camera.get(), playerBulModel.get(), XMFLOAT3(0, 0, bulSpeed));
+		player->shot(camera.get(), playerBulModel.get(), bulSpeed);
 	}
 }
 

@@ -26,7 +26,7 @@ void Object3d::createTransferBufferB0(ID3D12Device* dev, ComPtr<ID3D12Resource>&
 	);
 }
 
-XMMATRIX Object3d::getMatWorld() const { return matWorld; }
+const XMMATRIX &Object3d::getMatWorld() const { return matWorld; }
 
 //void Object3d::setTexture(ID3D12Device* dev, const UINT newTexNum) {
 //	texNum = newTexNum;
