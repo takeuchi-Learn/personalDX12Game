@@ -191,9 +191,8 @@ void ParticleMgr::add(std::unique_ptr<Time> timer,
 					  float start_rotation, float end_rotation,
 					  const  XMFLOAT3 &start_color, const  XMFLOAT3 &end_color) {
 	// リストに要素を追加
-	particles.emplace_front();
-	// 追加した要素の参照
-	Particle &p = particles.front();
+	// C++17からは追加した要素の参照が返ってくる
+	Particle &p = particles.emplace_front();
 	p.position = position;
 	p.velocity = velocity;
 	p.accel = accel;

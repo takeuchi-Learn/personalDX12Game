@@ -26,6 +26,8 @@ RailShoot::RailShoot()
 	back(std::make_unique<ObjSet>(camera.get(), "Resources/back/", "back", true)),
 	player(std::make_unique<Player>(camera.get(), "Resources/box", "box", false)),
 
+	playerBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
+
 	startSceneChangeTime(0U),
 
 	object3dPipelineSet(Object3d::createGraphicsPipeline(dxBase->getDev())),
@@ -148,6 +150,12 @@ void RailShoot::update_play() {
 		}
 
 		player->setRotation(rota);
+	}
+
+	// 弾発射
+	if (input->triggerKey(DIK_SPACE)) {
+		constexpr float bulSpeed = 8.f;
+		player->shot(camera.get(), playerBulModel.get(), XMFLOAT3(0, 0, bulSpeed));
 	}
 }
 

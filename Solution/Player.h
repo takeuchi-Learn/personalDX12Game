@@ -3,12 +3,15 @@
 #include <memory>
 
 #include "ObjSet.h"
+#include "PlayerBullet.h"
+#include <forward_list>
 
 class Player {
 	using XMFLOAT3 = DirectX::XMFLOAT3;
 	using XMVECTOR = DirectX::XMVECTOR;
 
 	std::unique_ptr<ObjSet> obj;
+	std::forward_list<PlayerBullet> bul;
 
 public:
 	Player(Camera *camera,
@@ -42,6 +45,10 @@ public:
 	/// <param name="moveVel">移動量</param>
 	/// <param name="moveYFlag">Y方向に移動するか</param>
 	void moveRight(float moveVel, bool moveYFlag = false);
+
+	void shot(Camera *camera,
+			  ObjModel *model,
+			  const DirectX::XMFLOAT3 &vel = { 0,0,1 });
 
 	void drawWithUpdate(Light *light);
 };

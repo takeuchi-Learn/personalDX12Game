@@ -45,6 +45,8 @@ class RailShoot
 
 	std::unique_ptr<Player> player;
 
+	std::unique_ptr<ObjModel> playerBulModel;
+
 
 
 	static const Time::timeType sceneChangeTime;

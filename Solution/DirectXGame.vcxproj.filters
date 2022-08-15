@@ -85,6 +85,9 @@
     <Filter Include="GameObject\Player">
       <UniqueIdentifier>{e1ab2d86-50f5-4726-a540-1ac81d9cb783}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObject\PlayerBullet">
+      <UniqueIdentifier>{ac19c37f-c185-415e-b45e-23194e949c3e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="System.cpp">
@@ -189,6 +192,9 @@
     <ClCompile Include="RailShoot.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="PlayerBullet.cpp">
+      <Filter>GameObject\PlayerBullet</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -289,6 +295,9 @@
     </ClInclude>
     <ClInclude Include="RailShoot.h">
       <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="PlayerBullet.h">
+      <Filter>GameObject\PlayerBullet</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
