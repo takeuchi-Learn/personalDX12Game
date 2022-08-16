@@ -12,13 +12,16 @@ private:
 	WNDCLASSEX w{}; // ウィンドウクラスの設定
 	HWND hwnd;
 
+	POINT windowSize{};
+
 	static const DWORD windowStyle;
 
 	//ウィンドウプロシージャ
 	static LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
 
-	bool setWindowSize(int sizeX, int sizeY, bool bRepaint = true);
+public:
+	bool setWindowSize(int sizeX, int sizeY, const POINT *pos = nullptr, bool bRepaint = true);
 
 public:
 	const static int window_width = 1280;
@@ -29,7 +32,7 @@ public:
 	// アスペクト比固定でウィンドウサイズを変更
 	bool setWindowHeight(int sizeY);
 
-	POINT getWindowSIze();
+	inline const POINT &getWindowSize() const { return windowSize; }
 
 	static WinAPI *getInstance();
 

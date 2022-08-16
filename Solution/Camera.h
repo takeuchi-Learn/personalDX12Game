@@ -132,6 +132,8 @@ public:
 
 	Camera(const float window_width, const float window_height);
 
+	inline Camera(POINT windowSize) :Camera((float)windowSize.x, (float)windowSize.y) {}
+
 	~Camera();
 
 	void update();

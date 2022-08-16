@@ -4,11 +4,12 @@
 #include <cmath>
 
 // 通常スタイルからサイズ変更を無くしたスタイル
-const DWORD	WinAPI::windowStyle = WS_OVERLAPPEDWINDOW /*^ WS_THICKFRAME*/;
+const DWORD	WinAPI::windowStyle = WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME;
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-WinAPI::WinAPI() {
+WinAPI::WinAPI()
+	: windowSize({ window_width, window_height }) {
 	// 初期状態のウィンドウタイトル
 	constexpr wchar_t winTitleDef[] = L"DX12Game (SE : OtoLogic)";
 
@@ -41,42 +42,47 @@ WinAPI::WinAPI() {
 	ShowWindow(hwnd, SW_SHOW);
 }
 
-bool WinAPI::setWindowSize(int sizeX, int sizeY, bool bRepaint) {
-	WINDOWINFO wInfo{};
-	GetWindowInfo(hwnd, &wInfo);
+bool WinAPI::setWindowSize(int sizeX, int sizeY, const POINT *pos, bool bRepaint) {
+	POINT winPos{};
+
+	if (pos == nullptr) {
+		WINDOWINFO wInfo{};
+		GetWindowInfo(hwnd, &wInfo);
+
+		winPos.x = wInfo.rcWindow.left;
+		winPos.y = wInfo.rcWindow.top;
+	} else {
+		winPos = *pos;
+	}
 
 	RECT wrc = { 0, 0, sizeX, sizeY };
 	AdjustWindowRect(&wrc, windowStyle, false); // 自動でサイズ補正
 
-	return (bool)MoveWindow(hwnd,
-							wInfo.rcWindow.left,
-							wInfo.rcWindow.top,
-							wrc.right - wrc.left,
-							wrc.bottom - wrc.top,
-							bRepaint ? TRUE : FALSE);
+	const bool ret
+		= MoveWindow(hwnd,
+					 winPos.x,
+					 winPos.y,
+					 wrc.right - wrc.left,
+					 wrc.bottom - wrc.top,
+					 bRepaint ? TRUE : FALSE)
+		? true : false;
+
+	windowSize.x = sizeX;
+	windowSize.y = sizeY;
+
+	return ret;
 }
 
 bool WinAPI::setWindowWidth(int sizeX) {
-	const float raito = (float)getWindowSIze().y / (float)getWindowSIze().x;
+	const float raito = (float)windowSize.y / (float)windowSize.x;
 
 	return setWindowSize(sizeX, (int)std::round(sizeX * raito));
 }
 
 bool WinAPI::setWindowHeight(int sizeY) {
-	const float raito = (float)getWindowSIze().x / (float)getWindowSIze().y;
+	const float raito = (float)windowSize.x / (float)windowSize.y;
 
 	return setWindowSize((int)std::roundf(sizeY * raito), sizeY);
-}
-
-POINT WinAPI::getWindowSIze() {
-	WINDOWINFO tmp{};
-	GetWindowInfo(hwnd, &tmp);
-
-	POINT ret{};
-	ret.x = tmp.rcClient.right - tmp.rcClient.left;
-	ret.y = tmp.rcClient.bottom - tmp.rcClient.top;
-
-	return ret;
 }
 
 WinAPI::~WinAPI() {

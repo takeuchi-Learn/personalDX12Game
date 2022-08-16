@@ -20,7 +20,7 @@ RailShoot::RailShoot()
 
 	update_proc(std::bind(&RailShoot::update_start, this)),
 
-	camera(std::make_unique<Camera>(WinAPI::WinAPI::getInstance()->getWindowSIze().x, WinAPI::getInstance()->getWindowSIze().y)),
+	camera(std::make_unique<Camera>(WinAPI::WinAPI::getInstance()->getWindowSize())),
 	light(std::make_unique<Light>()),
 
 	timer(std::make_unique<Time>()),
@@ -48,7 +48,7 @@ RailShoot::RailShoot()
 
 	// カメラ初期化
 	camera->setFarZ(5000.f);
-	camera->setEye(XMFLOAT3(0, 0, -175));	// 視点座標
+	camera->setEye(XMFLOAT3(0, WinAPI::getInstance()->getWindowSize().y * 0.06f, -180));	// 視点座標
 	camera->setTarget(XMFLOAT3(0, 0, 0));	// 注視点座標
 	camera->setUp(XMFLOAT3(0, 1, 0));		// 上方向
 	camera->update();
@@ -78,6 +78,7 @@ RailShoot::RailShoot()
 	const float backScale = camera->getFarZ() * 0.9f;
 	back->setScale({ backScale, backScale, backScale });
 
+	WinAPI::getInstance()->setWindowSize(WinAPI::window_width, WinAPI::window_height);
 }
 
 void RailShoot::start() {
@@ -159,12 +160,15 @@ void RailShoot::update_start() {
 	PostEffect::getInstance()->setAlpha(timeRaito);
 
 	const float mosCoe = powf(timeRaito, 5);
-	PostEffect::getInstance()->setMosaicNum(XMFLOAT2(WinAPI::getInstance()->getWindowSIze().x * mosCoe,
-													 WinAPI::getInstance()->getWindowSIze().y * mosCoe));
+	PostEffect::getInstance()->setMosaicNum(XMFLOAT2(WinAPI::getInstance()->getWindowSize().x * mosCoe,
+													 WinAPI::getInstance()->getWindowSize().y * mosCoe));
 }
 
 void RailShoot::update_play() {
 	debugText->Print(spriteBase.get(), "RailShoot", 0, 0);
+	debugText->formatPrint(spriteBase.get(),
+						   0, DebugText::fontHeight, 1.f, { 1,1,0,1 },
+						   "%6.2f FPS", dxBase->getFPS());
 
 	if (input->hitKey(DIK_LSHIFT) && input->hitKey(DIK_SPACE)) {
 		changeNextScene();
@@ -189,9 +193,9 @@ void RailShoot::update_play() {
 			pPos.y -= speed;
 		}
 		// 横方向に移動
-		if (hitA && pPos.x > -WinAPI::window_width * 0.125f) {
+		if (hitA && pPos.x > -WinAPI::window_width * 0.12f) {
 			pPos.x -= speed;
-		} else if (hitD && pPos.x < WinAPI::window_width * 0.125f) {
+		} else if (hitD && pPos.x < WinAPI::window_width * 0.12f) {
 			pPos.x += speed;
 		}
 		player->setPos(pPos);

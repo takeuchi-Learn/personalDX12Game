@@ -78,10 +78,12 @@ int DebugText::formatPrint(const SpriteBase *spriteCommon,
 
 	char outStrChar[maxCharCount]{};
 
+	constexpr size_t bufferCount = size_t(maxCharCount - 1);
+
 	va_list args;
 
 	va_start(args, fmt);
-	const int ret = vsnprintf(outStrChar, maxCharCount - 1, fmt, args);
+	const int ret = vsnprintf(outStrChar, bufferCount, fmt, args);
 
 	Print(spriteCommon, outStrChar, x, y, scale, color);
 	va_end(args);

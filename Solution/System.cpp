@@ -16,7 +16,7 @@ System::System() {
 }
 
 void System::update() {
-	if (error == false) {
+	if (!error) {
 		// ゲームループ
 		while (!WinAPI::getInstance()->processMessage()
 			   && !Looper::getInstance()->loop()) {
