@@ -13,14 +13,14 @@ class Player
 	using XMFLOAT3 = DirectX::XMFLOAT3;
 	using XMVECTOR = DirectX::XMVECTOR;
 
-	std::vector<PlayerBullet> bul;
+	std::forward_list<PlayerBullet> bul;
 
 public:
 	using GameObj::GameObj;
 
 	XMVECTOR getLookVec(float len = 1.f);
 
-	inline auto &getBulArr() const { return bul; }
+	inline auto &getBulArr() { return bul; }
 
 	/// <summary>
 	/// 視線方向に前進

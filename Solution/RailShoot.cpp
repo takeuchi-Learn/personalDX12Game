@@ -174,6 +174,13 @@ void RailShoot::update_play() {
 		changeNextScene();
 	}
 
+	// 敵を増やす
+	const bool triggerEnter = input->triggerKey(DIK_RETURN);
+	if (triggerEnter) {
+		enemy.emplace_back(std::make_unique<Enemy>(camera.get(), enemyModel.get(), XMFLOAT3(0, -20, 300)));
+		enemy.back()->setScale(5.f);
+		enemy.back()->setVel(XMFLOAT3(0, 0, -1));
+	}
 
 	const bool hitW = input->hitKey(DIK_W);
 	const bool hitA = input->hitKey(DIK_A);
@@ -182,6 +189,7 @@ void RailShoot::update_play() {
 	const bool hitE = input->hitKey(DIK_E);
 	const bool hitQ = input->hitKey(DIK_Q);
 
+	// 自機移動
 	if (hitW || hitA || hitS || hitD) {
 		XMFLOAT3 pPos = player->getPos();
 		const float speed = 60.f / dxBase->getFPS();
@@ -200,6 +208,7 @@ void RailShoot::update_play() {
 		}
 		player->setPos(pPos);
 	}
+	// 自機回転
 	if (hitE || hitQ) {
 		const float speed = 90.f / dxBase->getFPS();
 
@@ -225,6 +234,8 @@ void RailShoot::update_play() {
 	{
 		Sphere pBulCol{};
 		for (auto &pb : player->getBulArr()) {
+			if (!pb.getAlive()) continue;
+
 			pBulCol.center = XMLoadFloat3(&pb.getPos());
 			pBulCol.radius = pb.getScale();
 
@@ -233,8 +244,11 @@ void RailShoot::update_play() {
 					&& Collision::CheckHit(pBulCol,
 										   Sphere(XMLoadFloat3(&e->getPos()),
 												  e->getScale()))) {
-					e->kill();
+					// パーティクルを生成
 					createParticle(e->getPos(), 98U, 32.f, 16.f);
+					// 敵も自機弾もさよなら
+					e->kill();
+					pb.kill();
 				}
 			}
 		}
@@ -248,6 +262,11 @@ void RailShoot::update_play() {
 		// 敵がすべて消えたら次のシーンへ
 		if (0 == enemy.size()) {
 			changeNextScene();
+		} else {
+			debugText->formatPrint(spriteBase.get(),
+								   0, DebugText::fontHeight * 2.f, 1.f,
+								   { 1,1,1,1 },
+								   "EnemyNum : %u", enemy.size());
 		}
 	}
 }

@@ -53,7 +53,7 @@ void Player::shot(Camera *camera,
 				  float vel) {
 
 	// C++17から追加した要素の参照が返ってくるようになった
-	PlayerBullet &i = bul.emplace_back(camera, model, obj->position);
+	PlayerBullet &i = bul.emplace_front(camera, model, obj->position);
 
 	// Z方向のベクトルを、自機の向いている向きに回転
 	XMFLOAT3 velF3{};
@@ -65,10 +65,9 @@ void Player::shot(Camera *camera,
 
 void Player::update(Light *light) {
 	// 死んだ弾は消す
-	bul.erase(std::remove_if(bul.begin(), bul.end(),
-							 [](PlayerBullet &i) {return !i.getAlive(); }), bul.end());
+	bul.remove_if([](PlayerBullet &i) {return !i.getAlive(); });
 
-	for (PlayerBullet &i : bul) {
+	for (auto &i : bul) {
 		i.drawWithUpdate(light);
 	}
 }
