@@ -42,7 +42,6 @@ class RailShoot
 
 
 	// 3Dオブジェクト用パイプライン
-	Object3d::PipelineSet object3dPipelineSet;
 	Object3d::PipelineSet backPipelineSet;
 
 	std::unique_ptr<ObjSet> back;

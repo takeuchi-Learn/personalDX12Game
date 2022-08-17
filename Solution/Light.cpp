@@ -4,13 +4,7 @@
 
 using namespace DirectX;
 
-ID3D12Device *Light::dev = nullptr;
-
-void Light::staticInit(ID3D12Device *dev) {
-	assert(!Light::dev);
-	assert(dev);
-	Light::dev = dev;
-}
+DX12Base *Light::dxBase = DX12Base::getInstance();
 
 Light::Light() {
 	init();
@@ -30,7 +24,7 @@ void Light::transferConstBuffer() {
 
 void Light::init() {
 	//定数バッファ生成
-	HRESULT result = dev->CreateCommittedResource(
+	HRESULT result = dxBase->getDev()->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 		D3D12_HEAP_FLAG_NONE,
 		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferData) + 0xff) & ~0xff),
@@ -61,7 +55,7 @@ void Light::update() {
 	}
 }
 
-void Light::draw(DX12Base *dxBase, UINT rootParamIndex) {
+void Light::draw(UINT rootParamIndex) {
 	dxBase->getCmdList()->SetGraphicsRootConstantBufferView(rootParamIndex,
 														   constBuff->GetGPUVirtualAddress());
 }

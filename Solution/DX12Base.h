@@ -51,7 +51,7 @@ private:
 	void updateFPS();
 
 public:
-	float getFPS();
+	inline float getFPS() const { return fps; }
 
 #pragma endregion
 
@@ -99,7 +99,7 @@ public:
 	void startDraw(const DirectX::XMFLOAT3& clearColor = DirectX::XMFLOAT3(0.5f, 0.5f, 0.f));
 	void endDraw();
 
-	ID3D12Device* getDev();
-	ID3D12GraphicsCommandList* getCmdList();
+	inline ID3D12Device *getDev() { return dev.Get(); };
+	inline ID3D12GraphicsCommandList *getCmdList() { return cmdList.Get(); };
 };
 

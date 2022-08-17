@@ -1004,10 +1004,6 @@ void DX12Base::endDraw() {
 	flipTimeFPS();
 }
 
-ID3D12Device *DX12Base::getDev() { return dev.Get(); }
-
-ID3D12GraphicsCommandList *DX12Base::getCmdList() { return cmdList.Get(); }
-
 
 // --------------------
 // FPS
@@ -1032,5 +1028,3 @@ void DX12Base::updateFPS() {
 	fps = -1.f;
 	if (avgDiffTime != 0ll) fps = Time::oneSecF / avgDiffTime;
 }
-
-float DX12Base::getFPS() { return fps; }

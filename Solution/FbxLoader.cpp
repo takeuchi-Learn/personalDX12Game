@@ -1,5 +1,6 @@
 ﻿#include "FbxLoader.h"
 #include <cassert>
+#include "DX12Base.h"
 
 using namespace DirectX;
 
@@ -11,6 +12,14 @@ FbxLoader* FbxLoader::GetInstance() {
 	return &instance;
 }
 
+FbxLoader::FbxLoader() {
+	init();
+}
+
+FbxLoader::~FbxLoader() {
+	fin();
+}
+
 void FbxLoader::convertMatrixFromFbx(DirectX::XMMATRIX* dst,
 									 const FbxAMatrix& src) {
 	for (int y = 0; y < 4; y++) {
@@ -20,9 +29,9 @@ void FbxLoader::convertMatrixFromFbx(DirectX::XMMATRIX* dst,
 	}
 }
 
-void FbxLoader::init(ID3D12Device* dev) {
+void FbxLoader::init() {
 	assert(fbxManager == nullptr);
-	this->dev = dev;
+	this->dev = DX12Base::getInstance()->getDev();
 	// マネージャーの生成
 	fbxManager = FbxManager::Create();
 	// マネージャーの入出力設定
@@ -71,7 +80,7 @@ FbxModel* FbxLoader::loadModelFromFile(const std::string& modelName) {
 
 	model->fbxScene = fbxScene;
 
-	model->createBuffers(dev);
+	model->createBuffers();
 
 	return model;
 }

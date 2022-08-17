@@ -10,7 +10,7 @@
 using namespace Microsoft::WRL;
 using namespace DirectX;
 
-ID3D12Device *FbxObj3d::dev = nullptr;
+DX12Base *FbxObj3d::dxBase = DX12Base::getInstance();
 Camera *FbxObj3d::camera = nullptr;
 
 ComPtr<ID3D12RootSignature> FbxObj3d::rootsignature;
@@ -23,7 +23,7 @@ uint8_t FbxObj3d::createGraphicsPipeline(const wchar_t *vsPath, const wchar_t *p
 	ComPtr<ID3DBlob> psBlob;    // ピクセルシェーダオブジェクト
 	ComPtr<ID3DBlob> errorBlob; // エラーオブジェクト
 
-	assert(dev);
+	assert(dxBase);
 
 	// 頂点シェーダの読み込みとコンパイル
 	result = D3DCompileFromFile(
@@ -178,7 +178,7 @@ uint8_t FbxObj3d::createGraphicsPipeline(const wchar_t *vsPath, const wchar_t *p
 	// バージョン自動判定のシリアライズ
 	result = D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &rootSigBlob, &errorBlob);
 	// ルートシグネチャの生成
-	result = dev->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(rootsignature.ReleaseAndGetAddressOf()));
+	result = dxBase->getDev()->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(rootsignature.ReleaseAndGetAddressOf()));
 	assert(SUCCEEDED(result));
 
 	gpipeline.pRootSignature = rootsignature.Get();
@@ -186,7 +186,7 @@ uint8_t FbxObj3d::createGraphicsPipeline(const wchar_t *vsPath, const wchar_t *p
 	// グラフィックスパイプラインの生成
 	pipelinestate.emplace_back();
 	ppStateNum = uint8_t(pipelinestate.size() - 1u);
-	result = dev->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(pipelinestate[ppStateNum].ReleaseAndGetAddressOf()));
+	result = dxBase->getDev()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(pipelinestate[ppStateNum].ReleaseAndGetAddressOf()));
 	assert(SUCCEEDED(result));
 
 	return ppStateNum;
@@ -203,7 +203,7 @@ FbxObj3d::FbxObj3d(FbxModel *model, bool animLoop) : animLoop(animLoop) {
 }
 
 void FbxObj3d::init() {
-	HRESULT result = dev->CreateCommittedResource(
+	HRESULT result = dxBase->getDev()->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 		D3D12_HEAP_FLAG_NONE,
 		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataTransform) + 0xff) & ~0xff),
@@ -212,7 +212,7 @@ void FbxObj3d::init() {
 		IID_PPV_ARGS(&constBuffTransform)
 	);
 
-	result = dev->CreateCommittedResource(
+	result = dxBase->getDev()->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 		D3D12_HEAP_FLAG_NONE,
 		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataSkin) + 0xff) & ~0xff),
@@ -302,34 +302,34 @@ void FbxObj3d::update() {
 	constBuffSkin->Unmap(0, nullptr);
 }
 
-void FbxObj3d::draw(ID3D12GraphicsCommandList *cmdList, Light *light) {
+void FbxObj3d::draw(Light *light) {
 	//　モデルがないなら描画しない
 	if (model == nullptr) return;
 
 	assert(light != nullptr);
 
 	// パイプラインステートの設定
-	cmdList->SetPipelineState(pipelinestate[ppStateNum].Get());
+	dxBase->getCmdList()->SetPipelineState(pipelinestate[ppStateNum].Get());
 	// ルートシグネチャの設定
-	cmdList->SetGraphicsRootSignature(rootsignature.Get());
+	dxBase->getCmdList()->SetGraphicsRootSignature(rootsignature.Get());
 	// プリミティブ形状を設定
-	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	dxBase->getCmdList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	// 定数バッファビューをセット
-	cmdList->SetGraphicsRootConstantBufferView(0, constBuffTransform->GetGPUVirtualAddress());
+	dxBase->getCmdList()->SetGraphicsRootConstantBufferView(0, constBuffTransform->GetGPUVirtualAddress());
 	// --- 第一引数はcreateGraphicsPipeliine内rootparamsの該当する要素番号
-	cmdList->SetGraphicsRootConstantBufferView(2, constBuffSkin->GetGPUVirtualAddress());
+	dxBase->getCmdList()->SetGraphicsRootConstantBufferView(2, constBuffSkin->GetGPUVirtualAddress());
 
-	light->draw(DX12Base::getInstance(), 4);
+	light->draw(4);
 
-	cmdList->SetGraphicsRootConstantBufferView(3, model->getConstBuffB1()->GetGPUVirtualAddress());
+	dxBase->getCmdList()->SetGraphicsRootConstantBufferView(3, model->getConstBuffB1()->GetGPUVirtualAddress());
 
 	// モデルを描画
-	model->draw(cmdList);
+	model->draw();
 }
 
-void FbxObj3d::drawWithUpdate(ID3D12GraphicsCommandList *cmdList, Light *light) {
+void FbxObj3d::drawWithUpdate(Light *light) {
 	update();
-	draw(cmdList, light);
+	draw(light);
 }
 
 void FbxObj3d::playAnimation() {

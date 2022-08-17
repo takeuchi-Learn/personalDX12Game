@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include "Mesh.h"
+#include "DX12Base.h"
 
 class ObjModel {
 	// Microsoft::WRL::を省略
@@ -21,7 +22,7 @@ class ObjModel {
 public:
 
 private:
-	static ID3D12Device* dev;
+	static DX12Base *dxBase;
 	// デスクリプタサイズ
 	static UINT descriptorHandleIncrementSize;
 
@@ -65,7 +66,7 @@ public:
 	// ----------
 
 	// 静的初期化
-	static void staticInit(ID3D12Device* device);
+	static void staticInit();
 
 
 	// メンバ

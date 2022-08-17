@@ -37,14 +37,13 @@ public:
 	};
 
 public:
-	static void setDevice(ID3D12Device* dev) { FbxObj3d::dev = dev; }
 	static void setCamera(Camera* camera) { FbxObj3d::camera = camera; }
 
 	static uint8_t createGraphicsPipeline(const wchar_t* vsPath = L"Resources/shaders/FBXVS.hlsl",
 									   const wchar_t* psPath = L"Resources/shaders/FBXPS.hlsl");
 
 private:
-	static ID3D12Device* dev;
+	static DX12Base* dxBase;
 	static Camera* camera;
 
 	static ComPtr<ID3D12RootSignature> rootsignature;
@@ -61,9 +60,9 @@ public:
 
 	void init();	// コンストラクタ内で呼び出している
 	void update();
-	void draw(ID3D12GraphicsCommandList* cmdList, Light* light);
+	void draw(Light* light);
 
-	void drawWithUpdate(ID3D12GraphicsCommandList* cmdList, Light* light);
+	void drawWithUpdate(Light* light);
 
 	inline void setModel(FbxModel* model) { this->model = model; }
 

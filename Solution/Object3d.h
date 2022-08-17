@@ -52,13 +52,13 @@ public:
 	// staticメンバ
 	// --------------------
 private:
-	static ID3D12Device* dev;
+	static DX12Base *dxBase;
 	static PipelineSet ppSetDef;
-	Camera* camera;
+	Camera *camera;
 
-	static void createTransferBufferB0(ID3D12Device* dev, ComPtr<ID3D12Resource>& constBuff);
+	static void createTransferBufferB0(ComPtr<ID3D12Resource> &constBuff);
 
-	inline XMFLOAT3 subFloat3(const XMFLOAT3& left, const XMFLOAT3& right) {
+	inline XMFLOAT3 subFloat3(const XMFLOAT3 &left, const XMFLOAT3 &right) {
 		return XMFLOAT3(left.x - right.x,
 						left.y - right.y,
 						left.z - right.z);
@@ -68,19 +68,18 @@ public:
 	// 頂点バッファの最大数
 	static const int constantBufferNum = 128;
 
-	static PipelineSet& getGraphicsPipeline() { return ppSetDef; }
+	static inline PipelineSet &getGraphicsPipeline() { return ppSetDef; }
 
-	static void startDraw(ID3D12GraphicsCommandList* cmdList, Object3d::PipelineSet& ppSet,
-										D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	static void startDraw(Object3d::PipelineSet &ppSet = getGraphicsPipeline(),
+						  D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	static void staticInit(ID3D12Device* device);
+	static void staticInit();
 
 	//3Dオブジェクト用パイプライン生成
 	// シェーダーモデル指定は "*s_5_0"
-	static Object3d::PipelineSet createGraphicsPipeline(ID3D12Device* dev,
-														BLEND_MODE blendMode = BLEND_MODE::ALPHA,
-														const wchar_t* vsShaderPath = L"Resources/Shaders/BasicVS.hlsl",
-														const wchar_t* psShaderPath = L"Resources/Shaders/BasicPS.hlsl");
+	static Object3d::PipelineSet createGraphicsPipeline(BLEND_MODE blendMode = BLEND_MODE::ALPHA,
+														const wchar_t *vsShaderPath = L"Resources/Shaders/BasicVS.hlsl",
+														const wchar_t *psShaderPath = L"Resources/Shaders/BasicPS.hlsl");
 
 	// --------------------
 	// (動的)メンバ
@@ -105,10 +104,10 @@ public:
 	XMFLOAT3 rotation = { 0,0,0 };
 	XMFLOAT3 position = { 0,0,0 };
 	// 親オブジェクトへのポインタ
-	Object3d* parent = nullptr;
+	Object3d *parent = nullptr;
 
 	//モデルデータ
-	ObjModel* model = nullptr;
+	ObjModel *model = nullptr;
 
 	bool isBillboard = false;
 	bool isBillBoardY = false;// isBillboardがfalseの場合のみ機能する
@@ -118,19 +117,21 @@ public:
 	//void setTexture(ID3D12Device* dev, const UINT newTexNum);
 
 	inline const XMMATRIX &getMatRota() const { return matRot; }
+	inline const XMMATRIX &getMatScale() const { return matScale; }
+	inline const XMMATRIX &getMatTrans() const { return matTrans; }
 
 
 	// モデルは後から手動で読み込む(deleteも手動)
-	Object3d(ID3D12Device* dev, Camera* camera);
+	Object3d(Camera *camera);
 
 	// モデルデータもここで渡す(deleteは手動)
-	Object3d(ID3D12Device* dev, Camera* camera, ObjModel* model, const UINT texNum);
+	Object3d(Camera *camera, ObjModel *model, const UINT texNum);
 
-	void update(ID3D12Device* dev);
+	void update();
 
-	void draw(DX12Base* dxCom, Light* light);
+	void draw(DX12Base *dxCom, Light *light);
 
-	void drawWithUpdate(DX12Base* dxCom, Light* light);
+	void drawWithUpdate(DX12Base *dxCom, Light *light);
 
 
 	~Object3d();

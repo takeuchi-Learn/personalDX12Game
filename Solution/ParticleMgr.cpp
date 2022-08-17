@@ -10,6 +10,8 @@
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
+DX12Base *ParticleMgr::dxBase = DX12Base::getInstance();
+
 static const DirectX::XMFLOAT3 operator+(const DirectX::XMFLOAT3 &lhs, const DirectX::XMFLOAT3 &rhs) {
 	XMFLOAT3 result;
 	result.x = lhs.x + rhs.x;
@@ -34,14 +36,7 @@ const DirectX::XMFLOAT3 operator/(const DirectX::XMFLOAT3 &lhs, const float rhs)
 	return result;
 }
 
-void ParticleMgr::init(ID3D12Device *device, const wchar_t *texFilePath) {
-	// nullptrチェック
-	assert(device);
-
-	this->dev = device;
-
-	HRESULT result;
-
+void ParticleMgr::init(const wchar_t *texFilePath) {
 	// デスクリプタヒープの初期化
 	InitializeDescriptorHeap();
 
@@ -55,7 +50,7 @@ void ParticleMgr::init(ID3D12Device *device, const wchar_t *texFilePath) {
 	CreateModel();
 
 	// 定数バッファの生成
-	result = device->CreateCommittedResource(
+	HRESULT result = dxBase->getDev()->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 	// アップロード可能
 		D3D12_HEAP_FLAG_NONE,
 		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferData) + 0xff) & ~0xff),
@@ -68,12 +63,12 @@ void ParticleMgr::init(ID3D12Device *device, const wchar_t *texFilePath) {
 }
 
 ParticleMgr::ParticleMgr() {
-	init(DX12Base::getInstance()->getDev(), L"Resources/white.png");
+	init(L"Resources/white.png");
 }
 
 ParticleMgr::ParticleMgr(const wchar_t *texFilePath,
 						 Camera *camera) {
-	init(DX12Base::getInstance()->getDev(), texFilePath);
+	init(texFilePath);
 	setCamera(camera);
 }
 
@@ -143,7 +138,7 @@ void ParticleMgr::update() {
 	constBuff->Unmap(0, nullptr);
 }
 
-void ParticleMgr::draw(ID3D12GraphicsCommandList *cmdList) {
+void ParticleMgr::draw() {
 	UINT drawNum = (UINT)std::distance(particles.begin(), particles.end());
 	if (drawNum > vertexCount) {
 		drawNum = vertexCount;
@@ -154,34 +149,31 @@ void ParticleMgr::draw(ID3D12GraphicsCommandList *cmdList) {
 		return;
 	}
 
-	// nullptrチェック
-	assert(cmdList);
-
 	// パイプラインステートの設定
-	cmdList->SetPipelineState(pipelinestate.Get());
+	dxBase->getCmdList()->SetPipelineState(pipelinestate.Get());
 	// ルートシグネチャの設定
-	cmdList->SetGraphicsRootSignature(rootsignature.Get());
+	dxBase->getCmdList()->SetGraphicsRootSignature(rootsignature.Get());
 	// プリミティブ形状を設定
-	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
+	dxBase->getCmdList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_POINTLIST);
 
 	// 頂点バッファの設定
-	cmdList->IASetVertexBuffers(0, 1, &vbView);
+	dxBase->getCmdList()->IASetVertexBuffers(0, 1, &vbView);
 
 	// デスクリプタヒープの配列
 	ID3D12DescriptorHeap *ppHeaps[] = { descHeap.Get() };
-	cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+	dxBase->getCmdList()->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
 	// 定数バッファビューをセット
-	cmdList->SetGraphicsRootConstantBufferView(0, constBuff->GetGPUVirtualAddress());
+	dxBase->getCmdList()->SetGraphicsRootConstantBufferView(0, constBuff->GetGPUVirtualAddress());
 	// シェーダリソースビューをセット
-	cmdList->SetGraphicsRootDescriptorTable(1, gpuDescHandleSRV);
+	dxBase->getCmdList()->SetGraphicsRootDescriptorTable(1, gpuDescHandleSRV);
 	// 描画コマンド
-	cmdList->DrawInstanced(drawNum, 1, 0, 0);
+	dxBase->getCmdList()->DrawInstanced(drawNum, 1, 0, 0);
 }
 
-void ParticleMgr::drawWithUpdate(ID3D12GraphicsCommandList *cmdList) {
+void ParticleMgr::drawWithUpdate() {
 	update();
-	draw(cmdList);
+	draw();
 }
 
 void ParticleMgr::add(std::unique_ptr<Time> timer,
@@ -220,13 +212,13 @@ void ParticleMgr::InitializeDescriptorHeap() {
 	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;//シェーダから見えるように
 	descHeapDesc.NumDescriptors = 1; // シェーダーリソースビュー1つ
-	result = dev->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&descHeap));//生成
+	result = dxBase->getDev()->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&descHeap));//生成
 	if (FAILED(result)) {
 		assert(0);
 	}
 
 	// デスクリプタサイズを取得
-	descriptorHandleIncrementSize = dev->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	descriptorHandleIncrementSize = dxBase->getDev()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
 void ParticleMgr::InitializeGraphicsPipeline() {
@@ -409,7 +401,7 @@ void ParticleMgr::InitializeGraphicsPipeline() {
 	// バージョン自動判定のシリアライズ
 	result = D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &rootSigBlob, &errorBlob);
 	// ルートシグネチャの生成
-	result = dev->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&rootsignature));
+	result = dxBase->getDev()->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&rootsignature));
 	if (FAILED(result)) {
 		assert(0);
 	}
@@ -417,7 +409,7 @@ void ParticleMgr::InitializeGraphicsPipeline() {
 	gpipeline.pRootSignature = rootsignature.Get();
 
 	// グラフィックスパイプラインの生成
-	result = dev->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate));
+	result = dxBase->getDev()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate));
 
 	if (FAILED(result)) {
 		assert(0);
@@ -450,7 +442,7 @@ void ParticleMgr::LoadTexture(const wchar_t *filePath) {
 	);
 
 	// テクスチャ用バッファの生成
-	result = dev->CreateCommittedResource(
+	result = dxBase->getDev()->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0),
 		D3D12_HEAP_FLAG_NONE,
 		&texresDesc,
@@ -485,9 +477,9 @@ void ParticleMgr::LoadTexture(const wchar_t *filePath) {
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
 	srvDesc.Texture2D.MipLevels = 1;
 
-	dev->CreateShaderResourceView(texbuff.Get(), //ビューと関連付けるバッファ
-								  &srvDesc, //テクスチャ設定情報
-								  cpuDescHandleSRV
+	dxBase->getDev()->CreateShaderResourceView(texbuff.Get(), //ビューと関連付けるバッファ
+											   &srvDesc, //テクスチャ設定情報
+											   cpuDescHandleSRV
 	);
 }
 
@@ -495,7 +487,7 @@ void ParticleMgr::CreateModel() {
 	HRESULT result = S_FALSE;
 
 	// 頂点バッファ生成
-	result = dev->CreateCommittedResource(
+	result = dxBase->getDev()->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 		D3D12_HEAP_FLAG_NONE,
 		&CD3DX12_RESOURCE_DESC::Buffer(sizeof(VertexPos) * vertexCount),
@@ -511,11 +503,4 @@ void ParticleMgr::CreateModel() {
 	vbView.BufferLocation = vertBuff->GetGPUVirtualAddress();
 	vbView.SizeInBytes = sizeof(VertexPos) * vertexCount;
 	vbView.StrideInBytes = sizeof(VertexPos);
-}
-
-void ParticleMgr::startDraw(ID3D12GraphicsCommandList *cmdList, Object3d::PipelineSet &ppSet, D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology) {
-	cmdList->SetPipelineState(ppSet.pipelinestate.Get());
-	cmdList->SetGraphicsRootSignature(ppSet.rootsignature.Get());
-	//プリミティブ形状を設定
-	cmdList->IASetPrimitiveTopology(PrimitiveTopology);
 }

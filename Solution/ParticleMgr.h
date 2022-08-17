@@ -80,12 +80,12 @@ public:
 
 	// 定数
 private:
+	static DX12Base *dxBase;
+
 	static const int vertexCount = 0x10000;
 
 	// メンバ変数
 private:
-	// デバイス
-	ID3D12Device *dev = nullptr;
 	// デスクリプタサイズ
 	UINT descriptorHandleIncrementSize = 0U;
 	// ルートシグネチャ
@@ -112,20 +112,17 @@ private:
 
 	// メンバ関数
 public:
-	static void ParticleMgr::startDraw(ID3D12GraphicsCommandList *cmdList,
-									   Object3d::PipelineSet &ppSet,
-									   D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	// テクスチャは1x1白で初期化
 	ParticleMgr();
 
 	ParticleMgr(const wchar_t *texFilePath, Camera *camera);
 
-	void init(ID3D12Device *device, const wchar_t *texFilePath);
+	void init(const wchar_t *texFilePath);
 	void update();
-	void draw(ID3D12GraphicsCommandList *cmdList);
+	void draw();
 
-	void drawWithUpdate(ID3D12GraphicsCommandList *cmdList);
+	void drawWithUpdate();
 
 	inline void setCamera(Camera *camera) { this->camera = camera; }
 

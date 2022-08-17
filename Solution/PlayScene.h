@@ -84,7 +84,6 @@ class PlayScene :
 #pragma region 3Dオブジェクト
 
 	// 3Dオブジェクト用パイプライン
-	Object3d::PipelineSet object3dPipelineSet;
 	Object3d::PipelineSet backPipelineSet;
 
 	/// <summary>

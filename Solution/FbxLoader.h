@@ -1,7 +1,5 @@
 ﻿#pragma once
 
-#include "fbxsdk.h"
-
 #include <d3d12.h>
 #include <d3dx12.h>
 
@@ -19,13 +17,21 @@ public:
 
 private:
 	// privateなコンストラクタ（シングルトンパターン）
-	FbxLoader() = default;
+	FbxLoader();
 	// privateなデストラクタ（シングルトンパターン）
-	~FbxLoader() = default;
+	~FbxLoader();
 	// コピーコンストラクタを禁止（シングルトンパターン）
 	FbxLoader(const FbxLoader& obj) = delete;
 	// コピー代入演算子を禁止（シングルトンパターン）
 	void operator=(const FbxLoader& obj) = delete;
+
+
+
+	// 初期化
+	void init();
+
+	// 終了
+	void fin();
 
 public:
 	// モデルを格納するルートパス
@@ -33,11 +39,6 @@ public:
 
 	static void convertMatrixFromFbx(DirectX::XMMATRIX* dst,
 									 const FbxAMatrix& src);
-
-	// 初期化
-	void init(ID3D12Device* dev);
-
-	void fin();
 
 	// @param modelName ファイル名の拡張子を含まないもの
 	FbxModel* loadModelFromFile(const std::string& modelName);

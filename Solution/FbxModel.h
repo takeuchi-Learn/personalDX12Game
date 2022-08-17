@@ -15,6 +15,8 @@
 
 #include <fbxsdk.h>
 
+#include "DX12Base.h"
+
 class FbxModel {
 public:
 	friend class FbxLoader;
@@ -87,6 +89,8 @@ public:
 
 private:
 
+	static DX12Base *dxBase;
+
 	std::string name;
 	std::vector<Node> nodes;
 
@@ -144,9 +148,9 @@ public:
 	FbxModel();
 	~FbxModel();
 
-	void createBuffers(ID3D12Device* dev);
+	void createBuffers();
 
-	void draw(ID3D12GraphicsCommandList* cmdList);
+	void draw();
 
 	const XMMATRIX& GetModelTransform() { return meshNode->globalTransform; }
 

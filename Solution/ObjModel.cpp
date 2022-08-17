@@ -20,7 +20,7 @@ using namespace std;
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-ID3D12Device* ObjModel::dev = nullptr;
+DX12Base *ObjModel::dxBase = DX12Base::getInstance();
 UINT ObjModel::descriptorHandleIncrementSize = 0u;
 
 namespace {
@@ -71,14 +71,14 @@ void ObjModel::createDescriptorHeap() {
 		descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 		descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;//シェーダから見えるように
 		descHeapDesc.NumDescriptors = (UINT)count; // シェーダーリソースビューの数
-		result = dev->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&descHeap));//生成
+		result = dxBase->getDev()->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&descHeap));//生成
 		if (FAILED(result)) {
 			assert(0);
 		}
 	}
 
 	// デスクリプタサイズを取得
-	descriptorHandleIncrementSize = dev->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	descriptorHandleIncrementSize = dxBase->getDev()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
 void ObjModel::addMaterial(Material* material) {
@@ -175,14 +175,14 @@ void ObjModel::loadMaterial(const std::string& directoryPath, const std::string&
 	}
 }
 
-void ObjModel::staticInit(ID3D12Device* device) {
+void ObjModel::staticInit() {
 	// 再初期化チェック
-	assert(!ObjModel::dev);
-
-	ObjModel::dev = device;
+	static bool initialized = false;
+	assert(!initialized);
+	initialized = true;
 
 	// メッシュの静的初期化
-	Mesh::staticInit(device);
+	Mesh::staticInit(dxBase->getDev());
 }
 
 ObjModel::ObjModel(const std::string& dirPath, const std::string& objModelName, UINT texNum, bool smoothing) {

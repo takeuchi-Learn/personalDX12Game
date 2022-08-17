@@ -17,10 +17,7 @@ public:
 	};
 
 private:
-	static ID3D12Device *dev;
-
-public:
-	static void staticInit(ID3D12Device *dev);
+	static DX12Base *dxBase;
 
 private:
 	ComPtr<ID3D12Resource> constBuff;	// 定数バッファ
@@ -46,6 +43,6 @@ public:
 	void update();
 
 	// @param rootParamIndex : Object3dクラスのcreateGraphicsPipeline関数内のrootParamsの要素数
-	void draw(DX12Base *dxCom, UINT rootParamIndex);
+	void draw(UINT rootParamIndex);
 };
 

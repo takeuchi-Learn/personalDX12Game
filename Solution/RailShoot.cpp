@@ -37,9 +37,7 @@ RailShoot::RailShoot()
 
 	startSceneChangeTime(0U),
 
-	object3dPipelineSet(Object3d::createGraphicsPipeline(dxBase->getDev())),
-	backPipelineSet(Object3d::createGraphicsPipeline(dxBase->getDev(),
-													 Object3d::BLEND_MODE::ALPHA,
+	backPipelineSet(Object3d::createGraphicsPipeline(Object3d::BLEND_MODE::ALPHA,
 													 L"Resources/Shaders/BackVS.hlsl",
 													 L"Resources/Shaders/BackPS.hlsl")) {
 	// スプライト初期化
@@ -194,16 +192,19 @@ void RailShoot::update_play() {
 		XMFLOAT3 pPos = player->getPos();
 		const float speed = 60.f / dxBase->getFPS();
 
+		const XMFLOAT2 posSize = XMFLOAT2(WinAPI::getInstance()->getWindowSize().x * 0.12f,
+										  WinAPI::getInstance()->getWindowSize().y * 0.12f);
+
 		// 高さ方向に移動
-		if (hitW && pPos.y < WinAPI::window_height * 0.12f) {
+		if (hitW && pPos.y < posSize.y) {
 			pPos.y += speed;
-		} else if (hitS && pPos.y > -WinAPI::window_height * 0.12f) {
+		} else if (hitS && pPos.y > -posSize.y) {
 			pPos.y -= speed;
 		}
 		// 横方向に移動
-		if (hitA && pPos.x > -WinAPI::window_width * 0.12f) {
+		if (hitA && pPos.x > -posSize.x) {
 			pPos.x -= speed;
-		} else if (hitD && pPos.x < WinAPI::window_width * 0.12f) {
+		} else if (hitD && pPos.x < posSize.x) {
 			pPos.x += speed;
 		}
 		player->setPos(pPos);
@@ -260,7 +261,7 @@ void RailShoot::update_play() {
 					enemy.end());
 
 		// 敵がすべて消えたら次のシーンへ
-		if (0 == enemy.size()) {
+		if (enemy.empty()) {
 			changeNextScene();
 		} else {
 			debugText->formatPrint(spriteBase.get(),
@@ -286,17 +287,16 @@ void RailShoot::update_end() {
 }
 
 void RailShoot::drawObj3d() {
-	Object3d::startDraw(dxBase->getCmdList(), backPipelineSet);
+	Object3d::startDraw(backPipelineSet);
 	back->drawWithUpdate(light.get());
 
-	Object3d::startDraw(dxBase->getCmdList(), object3dPipelineSet);
+	Object3d::startDraw();
 	player->drawWithUpdate(light.get());
 	for (auto &i : enemy) {
 		i->drawWithUpdate(light.get());
 	}
 
-	ParticleMgr::startDraw(dxBase->getCmdList(), object3dPipelineSet);
-	particleMgr->drawWithUpdate(dxBase->getCmdList());
+	particleMgr->drawWithUpdate();
 }
 
 void RailShoot::drawFrontSprite() {

@@ -80,10 +80,7 @@ void PlayScene::spriteInit() {
 void PlayScene::obj3dInit() {
 
 	// 3Dオブジェクト用パイプライン生成
-	object3dPipelineSet = Object3d::createGraphicsPipeline(dxBase->getDev());
-
-	backPipelineSet = Object3d::createGraphicsPipeline(dxBase->getDev(),
-													   Object3d::BLEND_MODE::ALPHA,
+	backPipelineSet = Object3d::createGraphicsPipeline(Object3d::BLEND_MODE::ALPHA,
 													   L"Resources/Shaders/BackVS.hlsl",
 													   L"Resources/Shaders/BackPS.hlsl");
 
@@ -133,11 +130,12 @@ void PlayScene::obj3dInit() {
 		ground->setPos(XMFLOAT3(0, -playerBul.first->getScale().y, 0));
 		const float groundScale = camera->getFarZ();
 		ground->setScale(XMFLOAT3(groundScale, groundScale, groundScale));
+
+		ground->getModelPt()->setTexTilling(XMFLOAT2(256, 256));
 	}
 }
 
 void PlayScene::fbxInit() {
-	FbxObj3d::setDevice(dxBase->getDev());
 	FbxObj3d::setCamera(camera.get());
 	fbxPhongNum = FbxObj3d::createGraphicsPipeline(L"Resources/Shaders/FBXVS.hlsl",
 												   L"Resources/Shaders/FBXPS.hlsl");
@@ -216,13 +214,8 @@ void PlayScene::updateMouse() {
 											(float)WinAPI::window_height / 2.f);
 
 	// 中心からの距離
-	const XMFLOAT2 mousePos(float(input->getMousePos().x) - centerPos.x,
-							float(input->getMousePos().y) - centerPos.y);
-
-	const float camMoveVel = 0.125f / dxBase->getFPS();
-
-	cameraMoveVel.x = camMoveVel * mousePos.x;
-	cameraMoveVel.y = camMoveVel * mousePos.y;
+	cameraMoveVel.x = float(input->getMousePos().x) - centerPos.x;
+	cameraMoveVel.y = float(input->getMousePos().y) - centerPos.y;
 
 	input->setMousePos((int)centerPos.x, (int)centerPos.y);
 }
@@ -238,19 +231,16 @@ void PlayScene::updateCamera() {
 
 	// 自機の視線ベクトル
 	{
+		const float camMoveVel = 0.125f / dxBase->getFPS();
+
 		XMFLOAT3 rota = player->getRotation();
 
-		rota.x += cameraMoveVel.y;
-		rota.y += cameraMoveVel.x;
+		// マウスの横方向(X)の移動がカメラの縦方向(Y)の回転になる
+		rota.x += cameraMoveVel.y * camMoveVel;
+		// マウスの縦方向(Y)の移動がカメラの横方向(X)の回転になる
+		rota.y += cameraMoveVel.x * camMoveVel;
 
 		player->setRotation(rota);
-
-		/*if (cameraMoveVel.x != 0.f && cameraMoveVel.y != 0.f) {
-			player->setLookVec(XMVector3Rotate(XMVector3Normalize(player->getLookVec()),
-											   XMQuaternionRotationRollPitchYaw(cameraMoveVel.y,
-																				cameraMoveVel.x,
-																				0.f)));
-		}*/
 	}
 	const XMVECTOR &look = player->getLookVec();
 
@@ -482,19 +472,6 @@ void PlayScene::update() {
 		back->setRotation(backRota);
 	}
 
-	// 地面のテクスチャのタイリング
-	{
-		if (input->triggerKey(DIK_B)) {
-			static bool tillingFlag = false;
-			XMFLOAT2 tillingNum = XMFLOAT2(256, 256);
-			if (tillingFlag) {
-				tillingNum = XMFLOAT2(1, 1);
-			}
-			ground->getModelPt()->setTexTilling(tillingNum);
-			tillingFlag = !tillingFlag;
-		}
-	}
-
 	// FBXのシェーダー切り替え
 	{
 		if (input->triggerKey(DIK_P)) {
@@ -596,17 +573,16 @@ void PlayScene::changeEndScene() {
 
 void PlayScene::drawObj3d() {
 
-	Object3d::startDraw(dxBase->getCmdList(), backPipelineSet);
+	Object3d::startDraw(backPipelineSet);
 	back->drawWithUpdate(light.get());
 
-	ParticleMgr::startDraw(dxBase->getCmdList(), object3dPipelineSet);
-	particleMgr->drawWithUpdate(dxBase->getCmdList());
-
-	Object3d::startDraw(dxBase->getCmdList(), object3dPipelineSet);
+	Object3d::startDraw();
 	ground->drawWithUpdate(light.get());
 	if (bossAlive) boss->drawWithUpdate(light.get());
 	if (playerBul.second) playerBul.first->drawWithUpdate(light.get());
 	player->drawWithUpdate(light.get());	// 自機描画
+
+	particleMgr->drawWithUpdate();
 }
 
 void PlayScene::drawFrontSprite() {

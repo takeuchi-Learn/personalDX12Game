@@ -15,17 +15,10 @@
 
 Looper::Looper() {
 
-	FbxLoader::GetInstance()->init(DX12Base::getInstance()->getDev());
-
-
-	Object3d::staticInit(DX12Base::getInstance()->getDev());
-
-	Light::staticInit(DX12Base::getInstance()->getDev());
+	Object3d::staticInit();
 }
 
 Looper::~Looper() {
-
-	FbxLoader::GetInstance()->fin();
 }
 
 Looper *Looper::getInstance() {
