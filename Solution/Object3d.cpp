@@ -124,7 +124,8 @@ void Object3d::staticInit() {
 }
 
 Object3d::PipelineSet Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
-													   const wchar_t *vsShaderPath, const wchar_t *psShaderPath) {
+													   const wchar_t *vsShaderPath,
+													   const wchar_t *psShaderPath) {
 	HRESULT result = S_FALSE;
 
 	ComPtr<ID3DBlob> vsBlob;	// 頂点シェーダオブジェクト

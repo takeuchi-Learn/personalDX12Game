@@ -2,6 +2,7 @@
 #include <xaudio2.h>
 #include <cstdint>
 #include <wrl.h>
+#include <memory>
 class SoundBase {
 
 	class XAudio2VoiceCallback : public IXAudio2VoiceCallback {
@@ -21,12 +22,22 @@ class SoundBase {
 		// ボイスの実行エラー時
 		STDMETHOD_(void, OnVoiceError) (THIS_ void *pBufferContext, HRESULT Error) {};
 	};
+
+private:
+	SoundBase(const SoundBase &sb) = delete;
+	SoundBase &operator=(const SoundBase &sb) = delete;
+	SoundBase();
+
 public:
+	inline static SoundBase *getInstange() {
+		static std::unique_ptr<SoundBase> sb(new SoundBase());
+		return sb.get();
+	}
+
 	Microsoft::WRL::ComPtr<IXAudio2> xAudio2;
 	IXAudio2MasteringVoice *masterVoice;
 	XAudio2VoiceCallback voiceCallback;
 
-	SoundBase();
 	~SoundBase();
 };
 

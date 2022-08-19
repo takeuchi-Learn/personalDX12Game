@@ -12,18 +12,17 @@
 #include "Object3d.h"
 
 #include "Light.h"
+#include "SoundBase.h"
 
 Looper::Looper() {
 
 	Object3d::staticInit();
+
+	// Soundのクラスより先に消えないようにここで生成しておく
+	SoundBase::getInstange();
 }
 
 Looper::~Looper() {
-}
-
-Looper *Looper::getInstance() {
-	static Looper lpr;
-	return &lpr;
 }
 
 bool Looper::loopUpdate() {

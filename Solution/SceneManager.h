@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include "GameScene.h"
+#include <memory>
 
 class SceneManager
 	: public GameScene {
@@ -18,7 +19,10 @@ private:
 public:
 	inline UINT getPostEff2Num() { return postEff2Num; }
 
-	static SceneManager* getInstange();
+	inline static SceneManager *getInstange() {
+		static std::unique_ptr<SceneManager> sm(new SceneManager());
+		return sm.get();
+	}
 
 	~SceneManager() override;
 

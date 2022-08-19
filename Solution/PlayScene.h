@@ -44,8 +44,6 @@ class PlayScene :
 
 #pragma region 音
 
-	std::unique_ptr<SoundBase> soundBase;
-
 	std::unique_ptr<Sound> bgm;
 
 	std::unique_ptr<Sound> particleSE;

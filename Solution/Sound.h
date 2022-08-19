@@ -2,7 +2,6 @@
 #include <xaudio2.h>
 #include <cstdint>
 #include <wrl.h>
-#include "SoundBase.h"
 
 class Sound {
 public:
@@ -33,11 +32,11 @@ private:
 	//波形フォーマット
 	WAVEFORMATEX wfex;
 	//バッファの先頭アドレス
-	BYTE* pBuffer;
+	BYTE *pBuffer;
 	//バッファのサイズ
 	unsigned int bufferSize;
 
-	IXAudio2SourceVoice* pSourceVoice = nullptr;
+	IXAudio2SourceVoice *pSourceVoice = nullptr;
 
 
 
@@ -46,7 +45,7 @@ private:
 	// --------------------
 public:
 	// 音声データの読み込み
-	Sound(const char* filename, SoundBase* SoundBase);
+	Sound(const char *filename);
 
 	// 音声データの解放
 	~Sound();
@@ -57,22 +56,21 @@ public:
 	// static関数
 	// --------------------
 private:
-	static void createSourceVoice(SoundBase* SoundBase, Sound* soundData);
+	static void createSourceVoice(Sound *soundData);
 
 public:
 	// 音声再生停止
-	static void SoundStopWave(Sound* soundData);
+	static void SoundStopWave(Sound *soundData);
 
 	/// <summary>
 	/// 音声再生
 	/// </summary>
 	/// <param name="loopCount">0で繰り返し無し、XAUDIO2_LOOP_INFINITEで永遠</param>
 	/// <param name="volume">0 ~ 1</param>
-	static void SoundPlayWave(SoundBase* SoundBase,
-		Sound* soundData,
-		int loopCount = 0, float volume = 0.2);
+	static void SoundPlayWave(Sound *soundData,
+							  int loopCount = 0, float volume = 0.2);
 
 	//再生状態の確認
-	static bool checkPlaySound(Sound* soundData);
+	static bool checkPlaySound(Sound *soundData);
 };
 

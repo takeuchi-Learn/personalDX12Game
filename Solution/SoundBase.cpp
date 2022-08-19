@@ -13,5 +13,6 @@ SoundBase::SoundBase() {
 }
 
 SoundBase::~SoundBase() {
+	masterVoice->DestroyVoice();
 	this->xAudio2.Reset();
 }

@@ -50,7 +50,8 @@ void Player::moveRight(float moveVel, bool moveYFlag) {
 
 void Player::shot(Camera *camera,
 				  ObjModel *model,
-				  float vel) {
+				  float vel,
+				  float bulScale) {
 
 	// C++17から追加した要素の参照が返ってくるようになった
 	PlayerBullet &i = bul.emplace_front(camera, model, obj->position);
@@ -60,7 +61,7 @@ void Player::shot(Camera *camera,
 	XMStoreFloat3(&velF3, XMVector3Transform(XMVectorSet(0, 0, vel, 1), obj->getMatRota()));
 
 	i.setVel(velF3);
-	i.setScale(10.f);
+	i.setScale(bulScale);
 }
 
 void Player::update(Light *light) {

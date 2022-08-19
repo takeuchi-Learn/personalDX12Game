@@ -4,19 +4,15 @@
 
 #include "Input.h"
 #include "PostEffect.h"
+#include "SoundBase.h"
 
 SceneManager::SceneManager()
 	: nextScene(nullptr) {
-
+	
 	postEff2Num = (UINT)PostEffect::getInstance()->addPipeLine(L"Resources/Shaders/PostEffectPS_2.hlsl");
 
 	nowScene = (GameScene *)new TitleScene();
 	nowScene->start();
-}
-
-SceneManager *SceneManager::getInstange() {
-	static SceneManager sm;
-	return &sm;
 }
 
 

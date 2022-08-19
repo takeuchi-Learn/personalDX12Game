@@ -36,10 +36,9 @@ void PlayScene::lightInit() {
 }
 
 void PlayScene::soundInit() {
-	soundBase.reset(new SoundBase());
-	bgm.reset(new Sound("Resources/BGM.wav", soundBase.get()));
+	bgm.reset(new Sound("Resources/BGM.wav"));
 
-	particleSE.reset(new Sound("Resources/SE/Sys_Set03-click.wav", soundBase.get()));
+	particleSE.reset(new Sound("Resources/SE/Sys_Set03-click.wav"));
 }
 
 void PlayScene::spriteInit() {
@@ -187,7 +186,7 @@ void PlayScene::start() {
 	// マウスカーソルは表示しない
 	input->changeDispMouseCursorFlag(false);
 	// BGM再生
-	Sound::SoundPlayWave(soundBase.get(), bgm.get(), XAUDIO2_LOOP_INFINITE);
+	Sound::SoundPlayWave(bgm.get(), XAUDIO2_LOOP_INFINITE);
 	// タイマー開始
 	timer->reset();
 }
@@ -204,7 +203,7 @@ void PlayScene::updateSound() {
 		if (Sound::checkPlaySound(bgm.get())) {
 			Sound::SoundStopWave(bgm.get());
 		} else {
-			Sound::SoundPlayWave(soundBase.get(), bgm.get(), XAUDIO2_LOOP_INFINITE);
+			Sound::SoundPlayWave(bgm.get(), XAUDIO2_LOOP_INFINITE);
 		}
 	}
 }
@@ -397,7 +396,7 @@ void PlayScene::updatePlayerBullet() {
 					createParticle(boss->getPos(), 256U, 64.f, 32.f);
 
 					// SE鳴らす
-					Sound::SoundPlayWave(soundBase.get(), particleSE.get());
+					Sound::SoundPlayWave(particleSE.get());
 
 					// 次のシーンへ
 					changeEndScene();

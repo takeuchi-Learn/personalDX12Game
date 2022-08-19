@@ -39,8 +39,9 @@ public:
 	// @param vel 毎秒進む値
 	void shot(Camera *camera,
 			  ObjModel *model,
-			  float vel = 1.f);
+			  float vel = 1.f,
+			  float bulScale = 10.f);
 
-	void update(Light* light) override;
+	void update(Light *light) override;
 };
 
