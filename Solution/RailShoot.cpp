@@ -69,6 +69,7 @@ RailShoot::RailShoot()
 	for (auto &i : enemy) {
 		i = std::make_unique<Enemy>(camera.get(), enemyModel.get(), enemyPosDef);
 		i->setVel(XMFLOAT3(0, 0, -1.f));
+		i->setPos(XMFLOAT3(0, 0, 100));
 		i->setScale(5.f);
 	}
 
