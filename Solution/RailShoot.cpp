@@ -29,6 +29,7 @@ RailShoot::RailShoot()
 
 	back(std::make_unique<ObjSet>(camera.get(), "Resources/back/", "back", true)),
 	enemyModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
+	enemyBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
 	playerModel(std::make_unique<ObjModel>("Resources/box", "box")),
 
 	playerBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
@@ -67,9 +68,9 @@ RailShoot::RailShoot()
 											  playerStartPos.z + 300.f);
 	enemy.resize(enemyNumDef);
 	for (auto &i : enemy) {
-		i = std::make_unique<Enemy>(camera.get(), enemyModel.get(), enemyPosDef);
+		i = std::make_unique<Enemy>(camera.get(), enemyModel.get(), enemyBulModel.get(), enemyPosDef);
 		i->setVel(XMFLOAT3(0, 0, -1.f));
-		i->setPos(XMFLOAT3(0, 0, 100));
+		i->setPos(XMFLOAT3(0, 0, 500));
 		i->setScale(5.f);
 	}
 
@@ -238,8 +239,7 @@ void RailShoot::update_play() {
 		for (auto &pb : player->getBulArr()) {
 			if (!pb.getAlive()) continue;
 
-			pBulCol.center = XMLoadFloat3(&pb.getPos());
-			pBulCol.radius = pb.getScale();
+			pBulCol = Sphere(XMLoadFloat3(&pb.getPos()), pb.getScale());
 
 			for (auto &e : enemy) {
 				if (e->getAlive()
@@ -255,10 +255,30 @@ void RailShoot::update_play() {
 			}
 		}
 
-		// 死んだ敵は消す
+		// 自機と敵弾の当たり判定
+		if (player->getAlive()) {
+			const Sphere playerCol(XMLoadFloat3(&player->getPos()), player->getScale());
+
+			for (auto &e : enemy) {
+				for (auto &eb : e->getBulList()) {
+					//　存在しない敵弾の処理はしない
+					if (!eb->getAlive()) continue;
+
+					// 自機と敵の弾が当たっていたら
+					if (Collision::CheckHit(playerCol,
+											Sphere(XMLoadFloat3(&eb->getPos()),
+												   eb->getScale()))) {
+						// 次のシーンへ進む(仮)
+						changeNextScene();
+					}
+				}
+			}
+		}
+
+		// 弾がなく、かつ死んだ敵は消す
 		enemy.erase(std::remove_if(enemy.begin(),
 								   enemy.end(),
-								   [](const std::unique_ptr<Enemy> &i) {return !i->getAlive(); }),
+								   [](const std::unique_ptr<Enemy> &i) {return !i->getAlive() && i->bulEmpty(); }),
 					enemy.end());
 
 		// 敵がすべて消えたら次のシーンへ

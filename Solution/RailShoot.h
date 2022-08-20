@@ -48,6 +48,7 @@ class RailShoot
 
 	std::vector<std::unique_ptr<Enemy>> enemy;
 	std::unique_ptr<ObjModel> enemyModel;
+	std::unique_ptr<ObjModel> enemyBulModel;
 
 	std::unique_ptr<Player> player;
 	std::unique_ptr<ObjModel> playerModel;

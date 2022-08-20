@@ -1,6 +1,7 @@
 ﻿#include "Collision.h"
 
 using namespace DirectX;
+using namespace CollisionShape;
 
 float Collision::sqDistanceSegmentSegment(const XMVECTOR &p1, const XMVECTOR &q1,
 										  const XMVECTOR &p2, const XMVECTOR &q2) {

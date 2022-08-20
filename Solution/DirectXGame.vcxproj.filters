@@ -94,6 +94,9 @@
     <Filter Include="GameObject\Enemy">
       <UniqueIdentifier>{e620e69a-57c4-49ab-ae31-2681ad23c6e9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObject\EnemyBullet">
+      <UniqueIdentifier>{aac9f3a1-6240-4294-bc41-a1c8d5bb93b4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="System.cpp">
@@ -205,7 +208,10 @@
       <Filter>GameObject\GameObj</Filter>
     </ClCompile>
     <ClCompile Include="Enemy.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>GameObject\Enemy</Filter>
+    </ClCompile>
+    <ClCompile Include="EnemyBullet.cpp">
+      <Filter>GameObject\EnemyBullet</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -315,7 +321,10 @@
       <Filter>GameObject\GameObj</Filter>
     </ClInclude>
     <ClInclude Include="Enemy.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>GameObject\Enemy</Filter>
+    </ClInclude>
+    <ClInclude Include="EnemyBullet.h">
+      <Filter>GameObject\EnemyBullet</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
