@@ -72,6 +72,7 @@ RailShoot::RailShoot()
 		i->setVel(XMFLOAT3(0, 0, -1.f));
 		i->setPos(XMFLOAT3(0, 0, 500));
 		i->setScale(5.f);
+		enemy.back()->setTargetObj(player.get());
 	}
 
 	// 天球
@@ -180,6 +181,7 @@ void RailShoot::update_play() {
 		enemy.emplace_back(std::make_unique<Enemy>(camera.get(), enemyModel.get(), XMFLOAT3(0, -20, 300)));
 		enemy.back()->setScale(5.f);
 		enemy.back()->setVel(XMFLOAT3(0, 0, -1));
+		enemy.back()->setTargetObj(player.get());
 	}
 
 	const bool hitW = input->hitKey(DIK_W);

@@ -14,12 +14,25 @@ Enemy::Enemy(Camera *camera,
 	obj->rotation.x += 180.f;
 }
 
-void Enemy::shot(float vel, float bulScale) {
+void Enemy::shot(const DirectX::XMFLOAT3 &targetPos,
+				 float vel,
+				 float bulScale) {
 	// C++17から追加した要素の参照が返ってくるようになった
-	std::unique_ptr<EnemyBullet> &i = bul.emplace_front(new EnemyBullet(camera, bulModel.get(), obj->position));
+	std::unique_ptr<EnemyBullet> &i = bul.emplace_front(new EnemyBullet(camera,
+																		bulModel.get(),
+																		obj->position));
 
-	
-	XMFLOAT3 velF3{ 0,0,-2 };
+
+	XMFLOAT3 velF3{
+		targetPos.x - obj->position.x,
+		targetPos.y - obj->position.y,
+		targetPos.z - obj->position.z
+	};
+
+	const XMVECTOR velVec = XMVectorScale(XMVector3Normalize(XMLoadFloat3(&velF3)), vel);
+
+	XMStoreFloat3(&velF3, velVec);
+
 
 	i->setVel(velF3);
 	i->setScale(bulScale);
@@ -32,8 +45,8 @@ void Enemy::phase_Approach() {
 	obj->position.y += vel.y;
 	obj->position.z += vel.z;
 
-	if (shotFrame-- == 0U) {
-		shot(2.f, 2.5f);
+	if (shotFrame-- == 0U && targetObjPt != nullptr) {
+		shot(targetObjPt->getPos(), 2.f, 2.5f);
 		shotFrame = shotFrameMax;
 	}
 
