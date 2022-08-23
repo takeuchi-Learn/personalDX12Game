@@ -269,7 +269,7 @@ void RailShoot::update_play() {
 					// 自機と敵の弾が当たっていたら
 					if (Collision::CheckHit(playerCol,
 											Sphere(XMLoadFloat3(&eb->getPos()),
-												   eb->getScale()))) {
+												   eb->getScaleF3().z))) {
 						// 次のシーンへ進む(仮)
 						changeNextScene();
 					}

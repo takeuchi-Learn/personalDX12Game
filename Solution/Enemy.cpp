@@ -35,7 +35,22 @@ void Enemy::shot(const DirectX::XMFLOAT3 &targetPos,
 
 
 	i->setVel(velF3);
-	i->setScale(bulScale);
+	constexpr float bulScaleZ = 3.f;
+	i->setScaleF3(XMFLOAT3(bulScale,
+						   bulScale,
+						   bulScale * bulScaleZ));
+
+	{
+		// y軸が回転軸の回転角
+		const float rotateY = std::atan2f(velF3.x, velF3.z);
+
+		// x軸が回転軸の回転角
+		const float rotateX = std::atan2f(velF3.y, velF3.z);
+
+		i->setRotation(XMFLOAT3(XMConvertToDegrees(rotateX),
+								XMConvertToDegrees(rotateY),
+								obj->rotation.z));
+	}
 }
 
 #pragma region phase
