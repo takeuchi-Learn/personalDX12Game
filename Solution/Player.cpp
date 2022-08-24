@@ -64,10 +64,12 @@ void Player::shot(Camera *camera,
 	i.setScale(bulScale);
 }
 
-void Player::update(Light *light) {
+void Player::update() {
 	// 死んだ弾は消す
 	bul.remove_if([](PlayerBullet &i) {return !i.getAlive(); });
+}
 
+void Player::additionalDraw(Light *light) {
 	for (auto &i : bul) {
 		i.drawWithUpdate(light);
 	}

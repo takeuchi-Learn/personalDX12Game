@@ -33,7 +33,8 @@ class Enemy
 
 
 
-	void update(Light *light) override;
+	void update() override;
+	void additionalDraw(Light *light) override;
 
 
 

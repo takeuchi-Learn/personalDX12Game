@@ -10,9 +10,11 @@ GameObj::GameObj(Camera *camera,
 }
 
 void GameObj::drawWithUpdate(Light *light) {
-	update(light);
+	update();
 
 	if (alive) {
 		obj->drawWithUpdate(DX12Base::getInstance(), light);
 	}
+
+	additionalDraw(light);
 }

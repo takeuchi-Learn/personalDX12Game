@@ -13,7 +13,7 @@ public:
 	uint8_t age = 0;
 
 private:
-	void update(Light *light) override;
+	void update() override;
 
 public:
 	using GameObj::GameObj;

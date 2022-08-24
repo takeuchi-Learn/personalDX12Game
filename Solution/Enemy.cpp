@@ -89,13 +89,15 @@ void Enemy::phase_Leave() {
 
 #pragma endregion phase
 
-void Enemy::update(Light *light) {
+void Enemy::update() {
 	if (alive) {
 		phase();
 	}
 
 	bul.remove_if([](std::unique_ptr<EnemyBullet> &i) {return !i->getAlive(); });
+}
 
+void Enemy::additionalDraw(Light *light) {
 	for (auto &i : bul) {
 		i->drawWithUpdate(light);
 	}

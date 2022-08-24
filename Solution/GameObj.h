@@ -13,7 +13,9 @@ protected:
 	bool alive = true;
 
 	// drawWithUpdate関数の頭で呼ばれる
-	virtual void update(Light *light = nullptr) {};
+	virtual void update() {};
+
+	virtual void additionalDraw(Light *light) {}
 
 public:
 	inline bool getAlive() const { return alive; }

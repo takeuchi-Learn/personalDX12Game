@@ -42,6 +42,7 @@ public:
 			  float vel = 1.f,
 			  float bulScale = 10.f);
 
-	void update(Light *light) override;
+	void update() override;
+	void additionalDraw(Light *light) override;
 };
 
