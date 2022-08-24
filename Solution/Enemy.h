@@ -35,6 +35,20 @@ class Enemy
 
 	void update(Light *light) override;
 
+
+
+	inline DirectX::XMFLOAT3 calcVel(const DirectX::XMFLOAT3 &targetPos,
+									  const DirectX::XMFLOAT3 &nowPos,
+									  float velScale);
+
+	inline DirectX::XMFLOAT2 calcRotationSyncVelRad(const DirectX::XMFLOAT3 &vel) {
+		return DirectX::XMFLOAT2(std::atan2f(vel.y, vel.z), std::atan2f(vel.x, vel.z));
+	}
+	inline DirectX::XMFLOAT2 calcRotationSyncVelDeg(const DirectX::XMFLOAT3 &vel) {
+		const DirectX::XMFLOAT2 rad = calcRotationSyncVelRad(vel);
+		return DirectX::XMFLOAT2(DirectX::XMConvertToDegrees(rad.x), DirectX::XMConvertToDegrees(rad.y));
+	}
+
 public:
 	using GameObj::GameObj;
 

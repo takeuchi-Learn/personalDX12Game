@@ -14,6 +14,23 @@ Enemy::Enemy(Camera *camera,
 	obj->rotation.x += 180.f;
 }
 
+
+
+inline DirectX::XMFLOAT3 Enemy::calcVel(const DirectX::XMFLOAT3 &targetPos,
+										const DirectX::XMFLOAT3 &nowPos,
+										float velScale) {
+	XMFLOAT3 velF3{
+		targetPos.x - nowPos.x,
+		targetPos.y - nowPos.y,
+		targetPos.z - nowPos.z
+	};
+
+	const XMVECTOR velVec = XMVectorScale(XMVector3Normalize(XMLoadFloat3(&velF3)), velScale);
+
+	XMStoreFloat3(&velF3, velVec);
+	return velF3;
+}
+
 void Enemy::shot(const DirectX::XMFLOAT3 &targetPos,
 				 float vel,
 				 float bulScale) {
@@ -22,33 +39,21 @@ void Enemy::shot(const DirectX::XMFLOAT3 &targetPos,
 																		bulModel.get(),
 																		obj->position));
 
-
-	XMFLOAT3 velF3{
-		targetPos.x - obj->position.x,
-		targetPos.y - obj->position.y,
-		targetPos.z - obj->position.z
-	};
-
-	const XMVECTOR velVec = XMVectorScale(XMVector3Normalize(XMLoadFloat3(&velF3)), vel);
-
-	XMStoreFloat3(&velF3, velVec);
-
-
-	i->setVel(velF3);
+	// わかりやすいように細長くする
 	constexpr float bulScaleZ = 3.f;
 	i->setScaleF3(XMFLOAT3(bulScale,
 						   bulScale,
 						   bulScale * bulScaleZ));
 
+	// 速度を算出
+	const XMFLOAT3 velF3 = calcVel(targetPos, obj->position, vel);
+	i->setVel(velF3);
+
+	// 速度の向きに合わせて回転
 	{
-		// y軸が回転軸の回転角
-		const float rotateY = std::atan2f(velF3.x, velF3.z);
-
-		// x軸が回転軸の回転角
-		const float rotateX = std::atan2f(velF3.y, velF3.z);
-
-		i->setRotation(XMFLOAT3(XMConvertToDegrees(rotateX),
-								XMConvertToDegrees(rotateY),
+		const XMFLOAT2 rota = calcRotationSyncVelDeg(velF3);
+		i->setRotation(XMFLOAT3(rota.x,
+								rota.y,
 								obj->rotation.z));
 	}
 }
