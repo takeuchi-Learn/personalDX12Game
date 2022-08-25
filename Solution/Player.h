@@ -22,6 +22,8 @@ public:
 
 	inline auto &getBulArr() { return bul; }
 
+	inline auto getMatWorld() const { return obj->getMatWorld(); }
+
 	/// <summary>
 	/// 視線方向に前進
 	/// </summary>

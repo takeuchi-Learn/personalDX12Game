@@ -93,7 +93,7 @@ void Object3d::draw(DX12Base *dxBase, Light *light) {
 
 	light->draw(3);
 
-	model->draw(dxBase->getCmdList());
+	if (model != nullptr) model->draw(dxBase->getCmdList());
 }
 
 void Object3d::drawWithUpdate(DX12Base *dxBase, Light *light) {

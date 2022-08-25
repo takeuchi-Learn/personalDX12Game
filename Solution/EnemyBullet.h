@@ -9,8 +9,8 @@ class EnemyBullet
 
 public:
 
-	uint8_t life = 180;
-	uint8_t age = 0;
+	uint16_t life = 240;
+	uint16_t age = 0;
 
 private:
 	void update() override;

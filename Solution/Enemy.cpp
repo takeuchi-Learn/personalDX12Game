@@ -2,33 +2,29 @@
 
 using namespace DirectX;
 
-namespace {
+XMVECTOR Enemy::Slerp(XMVECTOR startVec, XMVECTOR endVec, float raito) {
+	const XMVECTOR start = XMVector3Normalize(startVec);
+	const XMVECTOR end = XMVector3Normalize(endVec);
+
+	float theta = 0.f;
+	XMStoreFloat(&theta, XMVector3Dot(start, end));
+
+	const float sinTheta = DX12Base::getInstance()->nearAcos(DX12Base::getInstance()->nearSin(theta));
+	const float sinThetaFrom = DX12Base::getInstance()->nearSin((1 - raito) * theta);
+	const float sinThetaTo = DX12Base::getInstance()->nearSin(raito * theta);
+
+	float aLen = 0.f;
+	XMStoreFloat(&aLen, XMVector3Length(startVec));
+
+	float bLen = 0.f;
+	XMStoreFloat(&bLen, XMVector3Length(endVec));
 
 
-	XMVECTOR Slerp(XMVECTOR startVec, XMVECTOR endVec, float raito) {
-		const XMVECTOR start = XMVector3Normalize(startVec);
-		const XMVECTOR end = XMVector3Normalize(endVec);
+	const float lerpScale = std::lerp(aLen, bLen, raito);
+	const XMVECTOR slerpVector = (sinThetaFrom * start + sinThetaTo * end) / sinTheta;
 
-		float theta = 0.f;
-		XMStoreFloat(&theta, XMVector3Dot(start, end));
+	return lerpScale * slerpVector;
 
-		const float sinTheta = DX12Base::getInstance()->nearAcos(DX12Base::getInstance()->nearSin(theta));
-		const float sinThetaFrom = DX12Base::getInstance()->nearSin((1 - raito) * theta);
-		const float sinThetaTo = DX12Base::getInstance()->nearSin(raito * theta);
-
-		float aLen = 0.f;
-		XMStoreFloat(&aLen, XMVector3Length(startVec));
-
-		float bLen = 0.f;
-		XMStoreFloat(&bLen, XMVector3Length(endVec));
-
-
-		const float lerpScale = std::lerp(aLen, bLen, raito);
-		const XMVECTOR slerpVector = (sinThetaFrom * start + sinThetaTo * end) / sinTheta;
-
-		return lerpScale * slerpVector;
-
-	}
 }
 
 Enemy::Enemy(Camera *camera,
@@ -44,21 +40,6 @@ Enemy::Enemy(Camera *camera,
 }
 
 
-
-inline DirectX::XMFLOAT3 Enemy::calcVel(const DirectX::XMFLOAT3 &targetPos,
-										const DirectX::XMFLOAT3 &nowPos,
-										float velScale) {
-	XMFLOAT3 velF3{
-		targetPos.x - nowPos.x,
-		targetPos.y - nowPos.y,
-		targetPos.z - nowPos.z
-	};
-
-	const XMVECTOR velVec = XMVectorScale(XMVector3Normalize(XMLoadFloat3(&velF3)), velScale);
-
-	XMStoreFloat3(&velF3, velVec);
-	return velF3;
-}
 
 void Enemy::shot(const DirectX::XMFLOAT3 &targetPos,
 				 float vel,
@@ -124,6 +105,42 @@ void Enemy::update() {
 	}
 
 	bul.remove_if([](std::unique_ptr<EnemyBullet> &i) {return !i->getAlive(); });
+
+	if (targetObjPt != nullptr) {
+
+		// 補間する割合[0~1]
+		// 1だと回避不可能
+		// 調整項目
+		constexpr float raito = 0.02f;
+		for (auto &i : bul) {
+			const XMFLOAT3 nowVel = i->getVel();
+
+			// 速度の差分を取得
+			XMFLOAT3 nextVel = calcVel(targetObjPt->getPos(), i->getPos(), 2.f);
+			nextVel.x -= nowVel.x;
+			nextVel.y -= nowVel.y;
+			nextVel.z -= nowVel.z;
+
+			// 速度の補間の割合を適用
+			nextVel.x *= raito;
+			nextVel.y *= raito;
+			nextVel.z *= raito;
+
+			// 前の速度に速度の差分を加算
+			nextVel.x += nowVel.x;
+			nextVel.y += nowVel.y;
+			nextVel.z += nowVel.z;
+
+			// 求めた速度を適用
+			i->setVel(nextVel);
+
+			// 進む向きに合わせて回転
+			const XMFLOAT2 rota = calcRotationSyncVelDeg(nextVel);
+			i->setRotation(XMFLOAT3(rota.x,
+									rota.y,
+									obj->rotation.z));
+		}
+	}
 }
 
 void Enemy::additionalDraw(Light *light) {
