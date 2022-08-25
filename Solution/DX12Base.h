@@ -76,7 +76,10 @@ private:
 	void ClearDepthBuffer();
 
 public:
-	static DX12Base* getInstance();
+	inline static DX12Base* getInstance() {
+		static DX12Base dxBase{};
+		return &dxBase;
+	}
 
 #pragma region 角度系
 
@@ -92,6 +95,8 @@ public:
 	double near_atan2(double _y, double _x);
 
 	float near_atan2(float y, float x);
+
+	float nearAcos(float x);
 
 #pragma endregion
 

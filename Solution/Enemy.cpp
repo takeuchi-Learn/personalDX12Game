@@ -2,12 +2,41 @@
 
 using namespace DirectX;
 
+namespace {
+
+
+	XMVECTOR Slerp(XMVECTOR startVec, XMVECTOR endVec, float raito) {
+		const XMVECTOR start = XMVector3Normalize(startVec);
+		const XMVECTOR end = XMVector3Normalize(endVec);
+
+		float theta = 0.f;
+		XMStoreFloat(&theta, XMVector3Dot(start, end));
+
+		const float sinTheta = DX12Base::getInstance()->nearAcos(DX12Base::getInstance()->nearSin(theta));
+		const float sinThetaFrom = DX12Base::getInstance()->nearSin((1 - raito) * theta);
+		const float sinThetaTo = DX12Base::getInstance()->nearSin(raito * theta);
+
+		float aLen = 0.f;
+		XMStoreFloat(&aLen, XMVector3Length(startVec));
+
+		float bLen = 0.f;
+		XMStoreFloat(&bLen, XMVector3Length(endVec));
+
+
+		const float lerpScale = std::lerp(aLen, bLen, raito);
+		const XMVECTOR slerpVector = (sinThetaFrom * start + sinThetaTo * end) / sinTheta;
+
+		return lerpScale * slerpVector;
+
+	}
+}
+
 Enemy::Enemy(Camera *camera,
 			 ObjModel *model,
 			 ObjModel *bulModel,
 			 const DirectX::XMFLOAT3 &pos)
 	:GameObj(camera, model, pos),
-	bulModel(new ObjModel("Resources/sphere", "sphere", 0U, false)),
+	bulModel(bulModel),
 	camera(camera),
 	phase(std::bind(&Enemy::phase_Approach, this)) {
 
@@ -36,7 +65,7 @@ void Enemy::shot(const DirectX::XMFLOAT3 &targetPos,
 				 float bulScale) {
 	// C++17から追加した要素の参照が返ってくるようになった
 	std::unique_ptr<EnemyBullet> &i = bul.emplace_front(new EnemyBullet(camera,
-																		bulModel.get(),
+																		bulModel,
 																		obj->position));
 
 	// わかりやすいように細長くする

@@ -635,12 +635,22 @@ float DX12Base::near_atan2(float y, float x) {
 	return (float)near_atan2((double)y, (double)x);
 }
 
-#pragma endregion 角度系関数
-
-DX12Base *DX12Base::getInstance() {
-	static DX12Base dxBase{};
-	return &dxBase;
+float DX12Base::nearAcos(float x) {
+	const float negate = x < 0 ? 1.f : 0.f;
+	x = abs(x);
+	float ret = -0.0187293f;
+	ret = ret * x;
+	ret = ret + 0.0742610f;
+	ret = ret * x;
+	ret = ret - 0.2121144f;
+	ret = ret * x;
+	ret = ret + 1.5707288f;
+	ret = ret * sqrtf(1.f - x);
+	ret = ret * (1.f - 2.f * negate);
+	return negate * XM_PI + ret;
 }
+
+#pragma endregion 角度系関数
 
 
 
