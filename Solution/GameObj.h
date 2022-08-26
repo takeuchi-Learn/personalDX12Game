@@ -22,6 +22,8 @@ public:
 	// aliveをfalseにする
 	inline void kill() { alive = false; }
 
+	inline Object3d *getObj() const { return obj.get(); }
+
 	inline void setPos(const DirectX::XMFLOAT3 &pos) { obj->position = pos; }
 	inline const DirectX::XMFLOAT3 &getPos() const { return obj->position; }
 

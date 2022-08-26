@@ -1,4 +1,5 @@
 ﻿#include "Camera.h"
+#include "Camera.h"
 
 using namespace DirectX;
 
@@ -116,6 +117,26 @@ void Camera::updateProjectionMatrix() {
 	);
 }
 
+void Camera::updateMatrix() {
+	if (viewDirty || projectionDirty) {
+		// 再計算必要なら
+		if (viewDirty) {
+			// ビュー行列更新
+			updateViewMatrix();
+			viewDirty = false;
+		}
+
+		// 再計算必要なら
+		if (projectionDirty) {
+			// ビュー行列更新
+			updateProjectionMatrix();
+			projectionDirty = false;
+		}
+		// ビュープロジェクションの合成
+		matViewProjection = matView * matProjection;
+	}
+}
+
 void Camera::moveEye(const XMFLOAT3& move) {
 	// 視点座標を移動し、反映
 	XMFLOAT3 eye_moved = getEye();
@@ -199,23 +220,9 @@ Camera::~Camera() {
 }
 
 void Camera::update() {
-	if (viewDirty || projectionDirty) {
-		// 再計算必要なら
-		if (viewDirty) {
-			// ビュー行列更新
-			updateViewMatrix();
-			viewDirty = false;
-		}
-
-		// 再計算必要なら
-		if (projectionDirty) {
-			// ビュー行列更新
-			updateProjectionMatrix();
-			projectionDirty = false;
-		}
-		// ビュープロジェクションの合成
-		matViewProjection = matView * matProjection;
-	}
+	preUpdate();
+	updateMatrix();
+	postUpdate();
 }
 
 

@@ -97,6 +97,9 @@
     <Filter Include="GameObject\EnemyBullet">
       <UniqueIdentifier>{aac9f3a1-6240-4294-bc41-a1c8d5bb93b4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Camera\CameraObj">
+      <UniqueIdentifier>{a0ad8bb6-cb47-4acb-aafc-e46f93088766}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="System.cpp">
@@ -213,6 +216,9 @@
     <ClCompile Include="EnemyBullet.cpp">
       <Filter>GameObject\EnemyBullet</Filter>
     </ClCompile>
+    <ClCompile Include="CameraObj.cpp">
+      <Filter>Camera\CameraObj</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -325,6 +331,9 @@
     </ClInclude>
     <ClInclude Include="EnemyBullet.h">
       <Filter>GameObject\EnemyBullet</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraObj.h">
+      <Filter>Camera\CameraObj</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

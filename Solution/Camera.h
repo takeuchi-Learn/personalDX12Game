@@ -5,7 +5,7 @@
 #include "DX12Base.h"
 
 class Camera {
-private:
+protected:
 	// エイリアス
 	// DirectX::を省略
 	using XMFLOAT2 = DirectX::XMFLOAT2;
@@ -54,6 +54,11 @@ private:
 
 	// 射影行列を更新
 	void updateProjectionMatrix();
+
+	void updateMatrix();
+
+	virtual void preUpdate() {};
+	virtual void postUpdate(){};
 
 public:
 	// ビュー行列の取得

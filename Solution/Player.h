@@ -24,6 +24,8 @@ public:
 
 	inline auto getMatWorld() const { return obj->getMatWorld(); }
 
+	inline void setParent(GameObj *parent) { obj->parent = parent->getObj(); }
+
 	/// <summary>
 	/// 視線方向に前進
 	/// </summary>

@@ -20,7 +20,7 @@ RailShoot::RailShoot()
 
 	update_proc(std::bind(&RailShoot::update_start, this)),
 
-	camera(std::make_unique<Camera>(WinAPI::WinAPI::getInstance()->getWindowSize())),
+	camera(std::make_unique<CameraObj>(nullptr)),
 	light(std::make_unique<Light>()),
 
 	timer(std::make_unique<Time>()),
@@ -50,7 +50,7 @@ RailShoot::RailShoot()
 	camera->setEye(XMFLOAT3(0, WinAPI::getInstance()->getWindowSize().y * 0.06f, -180));	// 視点座標
 	camera->setTarget(XMFLOAT3(0, 0, 0));	// 注視点座標
 	camera->setUp(XMFLOAT3(0, 1, 0));		// 上方向
-	camera->update();
+	//camera->update();
 
 	// ライト初期化
 	light->setLightPos(camera->getEye());
@@ -60,6 +60,9 @@ RailShoot::RailShoot()
 	constexpr XMFLOAT3 playerStartPos = XMFLOAT3(0, 0, 0);
 	player = std::make_unique<Player>(camera.get(), playerModel.get(), playerStartPos);
 	player->setScale(10.f);
+
+	camera->setParentObj(player.get());
+	camera->update();
 
 	// 敵初期化
 	constexpr size_t enemyNumDef = 1U;
@@ -222,8 +225,14 @@ void RailShoot::update_play() {
 		// y軸を回転軸とする回転
 		if (hitE) {
 			rota.y += speed;
+			if (rota.y >= 180.f) {
+				rota.y -= 360.f;
+			}
 		} else if (hitQ) {
 			rota.y -= speed;
+			if (rota.y <= 180.f) {
+				rota.y += 360.f;
+			}
 		}
 
 		player->setRotation(rota);
@@ -271,7 +280,7 @@ void RailShoot::update_play() {
 											Sphere(XMLoadFloat3(&eb->getPos()),
 												   eb->getScaleF3().z))) {
 						// 次のシーンへ進む(仮)
-						changeNextScene();
+						//changeNextScene();
 					}
 				}
 			}

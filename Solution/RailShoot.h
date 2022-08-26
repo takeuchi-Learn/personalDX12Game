@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "GameScene.h"
-#include "Camera.h"
+#include "CameraObj.h"
 #include <memory>
 
 #include "Player.h"
@@ -27,7 +27,7 @@ class RailShoot
 	Input *input = nullptr;
 
 
-	std::unique_ptr<Camera> camera;
+	std::unique_ptr<CameraObj> camera;
 
 	std::unique_ptr<Light> light;
 
