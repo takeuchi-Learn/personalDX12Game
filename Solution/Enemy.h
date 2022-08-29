@@ -39,10 +39,6 @@ class Enemy
 	void additionalDraw(Light *light) override;
 
 
-
-	DirectX::XMVECTOR Slerp(DirectX::XMVECTOR startVec, DirectX::XMVECTOR endVec, float raito);
-
-
 	inline DirectX::XMFLOAT3 calcVel(const DirectX::XMFLOAT3 &targetPos,
 									 const DirectX::XMFLOAT3 &nowPos,
 									 float velScale) {
@@ -65,8 +61,6 @@ class Enemy
 	}
 
 public:
-	using GameObj::GameObj;
-
 	Enemy(Camera *camera,
 		  ObjModel *model,
 		  ObjModel *bulModel,

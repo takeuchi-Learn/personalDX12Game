@@ -2,44 +2,16 @@
 
 using namespace DirectX;
 
-XMVECTOR Enemy::Slerp(XMVECTOR startVec, XMVECTOR endVec, float raito) {
-	const XMVECTOR start = XMVector3Normalize(startVec);
-	const XMVECTOR end = XMVector3Normalize(endVec);
-
-	float theta = 0.f;
-	XMStoreFloat(&theta, XMVector3Dot(start, end));
-
-	const float sinTheta = DX12Base::getInstance()->nearAcos(DX12Base::getInstance()->nearSin(theta));
-	const float sinThetaFrom = DX12Base::getInstance()->nearSin((1 - raito) * theta);
-	const float sinThetaTo = DX12Base::getInstance()->nearSin(raito * theta);
-
-	float aLen = 0.f;
-	XMStoreFloat(&aLen, XMVector3Length(startVec));
-
-	float bLen = 0.f;
-	XMStoreFloat(&bLen, XMVector3Length(endVec));
-
-
-	const float lerpScale = std::lerp(aLen, bLen, raito);
-	const XMVECTOR slerpVector = (sinThetaFrom * start + sinThetaTo * end) / sinTheta;
-
-	return lerpScale * slerpVector;
-
-}
-
 Enemy::Enemy(Camera *camera,
 			 ObjModel *model,
 			 ObjModel *bulModel,
 			 const DirectX::XMFLOAT3 &pos)
-	:GameObj(camera, model, pos),
+	: GameObj(camera, model, pos),
 	bulModel(bulModel),
 	camera(camera),
 	phase(std::bind(&Enemy::phase_Approach, this)) {
-
 	obj->rotation.x += 180.f;
 }
-
-
 
 void Enemy::shot(const DirectX::XMFLOAT3 &targetPos,
 				 float vel,
@@ -85,6 +57,11 @@ void Enemy::phase_Leave() {
 	obj->position.x += vel.x;
 	obj->position.y += vel.y;
 	obj->position.z += vel.z;
+
+	if (std::abs(obj->position.x) >= 50.f &&
+		std::abs(obj->position.y) >= 50.f) {
+		kill();
+	}
 }
 
 #pragma endregion phase
@@ -99,7 +76,6 @@ void Enemy::update() {
 	bul.remove_if([](std::unique_ptr<EnemyBullet> &i) {return !i->getAlive(); });
 
 	if (targetObjPt != nullptr) {
-
 		// 補間する割合[0~1]
 		// 1だと回避不可能
 		// 調整項目

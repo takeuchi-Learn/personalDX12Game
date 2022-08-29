@@ -117,7 +117,7 @@ RailShoot::RailShoot()
 		i->setVel(XMFLOAT3(0, 0, -1.f));
 		i->setPos(XMFLOAT3(0, 0, 500));
 		i->setScale(5.f);
-		enemy.back()->setTargetObj(player.get());
+		enemy.front()->setTargetObj(player.get());
 	}
 
 	// 天球
@@ -186,6 +186,13 @@ void RailShoot::createParticle(const DirectX::XMFLOAT3 &pos,
 	}
 }
 
+void RailShoot::addEnemy(const DirectX::XMFLOAT3 &pos, const DirectX::XMFLOAT3 &vel, float scale) {
+	auto &i = enemy.emplace_front(new Enemy(camera.get(), enemyModel.get(), enemyBulModel.get(), pos));
+	i->setScale(scale);
+	i->setVel(vel);
+	i->setTargetObj(player.get());
+}
+
 void RailShoot::changeNextScene() {
 	PostEffect::getInstance()->changePipeLine(0U);
 
@@ -222,10 +229,8 @@ void RailShoot::update_play() {
 	// 敵を増やす
 	const bool triggerEnter = input->triggerKey(DIK_RETURN);
 	if (triggerEnter) {
-		enemy.emplace_back(std::make_unique<Enemy>(camera.get(), enemyModel.get(), XMFLOAT3(0, -20, 300)));
-		enemy.back()->setScale(5.f);
-		enemy.back()->setVel(XMFLOAT3(0, 0, -1));
-		enemy.back()->setTargetObj(player.get());
+		addEnemy(XMFLOAT3(0, 0, 500),
+				 XMFLOAT3(0, 0, -1));
 	}
 
 	const bool hitW = input->hitKey(DIK_W);
@@ -353,19 +358,11 @@ void RailShoot::update_play() {
 		}
 
 		// 弾がなく、かつ死んだ敵は消す
-		enemy.erase(std::remove_if(enemy.begin(),
-								   enemy.end(),
-								   [](const std::unique_ptr<Enemy> &i) {return !i->getAlive() && i->bulEmpty(); }),
-					enemy.end());
+		enemy.remove_if([](const std::unique_ptr<Enemy> &i) {return !i->getAlive() && i->bulEmpty(); });
 
 		// 敵がすべて消えたら次のシーンへ
 		if (enemy.empty()) {
 			changeNextScene();
-		} else {
-			debugText->formatPrint(spriteBase.get(),
-								   0, DebugText::fontHeight * 2.f, 1.f,
-								   { 1,1,1,1 },
-								   "EnemyNum : %u", enemy.size());
 		}
 	}
 

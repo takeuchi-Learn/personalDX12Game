@@ -46,7 +46,7 @@ class RailShoot
 
 	std::unique_ptr<ObjSet> back;
 
-	std::vector<std::unique_ptr<Enemy>> enemy;
+	std::forward_list<std::unique_ptr<Enemy>> enemy;
 	std::unique_ptr<ObjModel> enemyModel;
 	std::unique_ptr<ObjModel> enemyBulModel;
 
@@ -71,6 +71,8 @@ class RailShoot
 						const float startScale = 1.f,
 						const float vel = 5.f);
 
+	void addEnemy(const DirectX::XMFLOAT3 &pos, const DirectX::XMFLOAT3 &vel, float scale = 5.f);
+
 	void changeNextScene();
 
 	// update_何とか関数を格納する
@@ -91,7 +93,7 @@ public:
 	~RailShoot();
 
 	static DirectX::XMVECTOR splinePosition(const std::vector<DirectX::XMVECTOR> &points,
-								   size_t startIndex,
-								   float t);
+											size_t startIndex,
+											float t);
 };
 
