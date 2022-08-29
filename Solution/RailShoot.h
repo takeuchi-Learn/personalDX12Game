@@ -66,6 +66,33 @@ class RailShoot
 
 
 
+	// std::stringの2次元配列(vector)
+	using CSVType = std::vector<std::vector<std::string>>;
+
+	// 敵発生スクリプトのCSVデータ
+	CSVType csvData;
+
+	CSVType loadCsv(const std::string &csvFilePath,
+					bool commentFlag = true,
+					char divChar = ',',
+					const std::string &commentStartStr = "//");
+
+	struct PopEnemyData {
+		UINT popFrame;
+		DirectX::XMFLOAT3 pos;
+		DirectX::XMFLOAT3 vel{ 0,0,-1 };
+		PopEnemyData(UINT popFrame,
+					 const DirectX::XMFLOAT3 &pos,
+					 const DirectX::XMFLOAT3 &vel)
+			: popFrame(popFrame), pos(pos), vel(vel) {
+		}
+	};
+
+	std::forward_list<std::unique_ptr<PopEnemyData>> enemyPopData;
+	UINT nowFrame = 0u;
+
+
+
 	void createParticle(const DirectX::XMFLOAT3 &pos,
 						const UINT particleNum = 10U,
 						const float startScale = 1.f,

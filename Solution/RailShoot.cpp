@@ -10,9 +10,51 @@
 
 #include "RandomNum.h"
 
+#include <fstream>
+
 using namespace DirectX;
 
 const Time::timeType RailShoot::sceneChangeTime = Time::oneSec;
+
+// std::stringの2次元配列(vector)
+using CSVType = std::vector<std::vector<std::string>>;
+// @brief loadCsvの入力をstd::stringにしたもの
+// @return 読み込んだcsvの中身。失敗したらデフォルトコンストラクタで初期化された空のvector2次元配列が返る
+// @param commentFlag //で始まる行を無視するかどうか(trueで無視)
+// @param divChar フィールドの区切り文字
+// @param commentStartStr コメント開始文字
+RailShoot::CSVType RailShoot::loadCsv(const std::string &csvFilePath,
+									  bool commentFlag,
+									  char divChar,
+									  const std::string &commentStartStr) {
+	CSVType csvData{};	// csvの中身を格納
+
+	std::ifstream ifs(csvFilePath);
+	if (!ifs) {
+		return csvData;
+	}
+
+	std::string line{};
+	// 開いたファイルを一行読み込む(カーソルも動く)
+	while (std::getline(ifs, line)) {
+		// コメントが有効かつ行頭が//なら、その行は無視する
+		if (commentFlag && line.find(commentStartStr) == 0U) {
+			continue;
+		}
+
+		// 行数を増やす
+		csvData.emplace_back();
+
+		std::istringstream stream(line);
+		std::string field;
+		// 読み込んだ行を','区切りで分割
+		while (std::getline(stream, field, divChar)) {
+			csvData.back().emplace_back(field);
+		}
+	}
+
+	return csvData;
+}
 
 XMVECTOR RailShoot::splinePosition(const std::vector<XMVECTOR> &points,
 								   size_t startIndex,
@@ -107,22 +149,28 @@ RailShoot::RailShoot()
 	splinePoint.emplace_back(XMVectorSet(0, 100, 800, 1));	// end
 
 	// 敵初期化
-	constexpr size_t enemyNumDef = 1U;
-	constexpr XMFLOAT3 enemyPosDef = XMFLOAT3(playerStartPos.x,
-											  playerStartPos.y - 20.f,
-											  playerStartPos.z + 300.f);
-	enemy.resize(enemyNumDef);
-	for (auto &i : enemy) {
-		i = std::make_unique<Enemy>(camera.get(), enemyModel.get(), enemyBulModel.get(), enemyPosDef);
-		i->setVel(XMFLOAT3(0, 0, -1.f));
-		i->setPos(XMFLOAT3(0, 0, 500));
-		i->setScale(5.f);
-		enemy.front()->setTargetObj(player.get());
-	}
+	enemy.resize(0U);
 
 	// 天球
 	const float backScale = camera->getFarZ() * 0.9f;
 	back->setScale({ backScale, backScale, backScale });
+
+	// 敵発生スクリプト
+	csvData = loadCsv("Resources/enemyScript.csv", true, ',', "//");
+	{
+		UINT waitFrame = 0u;
+		for (auto &y : csvData) {
+			if (y[0] == "WAIT") {
+				waitFrame += (UINT)std::stoi(y[1]);
+			} else if (y[0] == "POP") {
+				enemyPopData.emplace_front(std::make_unique<PopEnemyData>(waitFrame,
+																		  XMFLOAT3(std::stof(y[1]),
+																				   std::stof(y[2]),
+																				   std::stof(y[3])),
+																		  XMFLOAT3(0, 0, -1)));
+			}
+		}
+	}
 
 	WinAPI::getInstance()->setWindowSize(WinAPI::window_width, WinAPI::window_height);
 }
@@ -227,11 +275,12 @@ void RailShoot::update_play() {
 	}
 
 	// 敵を増やす
-	const bool triggerEnter = input->triggerKey(DIK_RETURN);
-	if (triggerEnter) {
-		addEnemy(XMFLOAT3(0, 0, 500),
-				 XMFLOAT3(0, 0, -1));
+	for (auto &i : enemyPopData) {
+		if (nowFrame >= i->popFrame) {
+			addEnemy(i->pos, i->vel);
+		}
 	}
+	enemyPopData.remove_if([&](std::unique_ptr<PopEnemyData> &i) {return nowFrame >= i->popFrame; });
 
 	const bool hitW = input->hitKey(DIK_W);
 	const bool hitA = input->hitKey(DIK_A);
@@ -366,50 +415,9 @@ void RailShoot::update_play() {
 		}
 	}
 
-	// スプライン
-	{
-		float splineRaito = float(splineNowFrame++) / splineFrameMax;
-		if (splineRaito >= 1.f) {
-			if (splineIndex < splinePoint.size() - 3) {
-				++splineIndex;
-				splineRaito -= 1.f;
-				splineNowFrame = 0u;
-			} else {
-				splineRaito = 1.f;
-			}
-		}
-		XMFLOAT3 pos{};
-		XMStoreFloat3(&pos,
-					  splinePosition(splinePoint,
-									 splineIndex,
-									 splineRaito));
-		const XMFLOAT3 oldpos = player->getPos();
-		player->setPos(pos);
-
-		XMFLOAT3 velDiff{
-			pos.x - oldpos.x,
-			pos.y - oldpos.y,
-			pos.z - oldpos.z
-		};
-		XMFLOAT2 rota = GameObj::calcRotationSyncVelDeg(velDiff);
-
-		if (!isfinite(rota.x)) {
-			rota.x = 0.f;
-		}
-		if (!isfinite(rota.y)) {
-			rota.y = 0.f;
-		}
-
-		//player->setRotation(XMFLOAT3(rota.x, rota.y, 0.f));
-
-		debugText->formatPrint(spriteBase.get(),
-							   0, 120, 1.f,
-							   { 1,1,0,1 },
-							   "%u",
-							   splineIndex);
-	}
-
 	light->setLightPos(camera->getEye());
+
+	++nowFrame;
 }
 
 void RailShoot::update_end() {
