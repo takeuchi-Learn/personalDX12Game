@@ -22,6 +22,8 @@ class Enemy
 
 	GameObj *targetObjPt = nullptr;
 
+	UINT nowFrame = 0u;
+
 
 
 	std::function<void()> phase;
@@ -62,16 +64,6 @@ class Enemy
 		return velF3;
 	}
 
-	inline DirectX::XMFLOAT2 calcRotationSyncVelRad(const DirectX::XMFLOAT3 &vel) {
-		return DirectX::XMFLOAT2(DX12Base::getInstance()->near_atan2(-vel.y,
-																	 sqrtf(vel.x * vel.x + vel.z * vel.z)),
-								 DX12Base::getInstance()->near_atan2(vel.x, vel.z));
-	}
-	inline DirectX::XMFLOAT2 calcRotationSyncVelDeg(const DirectX::XMFLOAT3 &vel) {
-		const DirectX::XMFLOAT2 rad = calcRotationSyncVelRad(vel);
-		return DirectX::XMFLOAT2(DirectX::XMConvertToDegrees(rad.x), DirectX::XMConvertToDegrees(rad.y));
-	}
-
 public:
 	using GameObj::GameObj;
 
@@ -96,5 +88,9 @@ public:
 	// @param vel 毎秒進む値
 	inline void setVel(const DirectX::XMFLOAT3 &vel) { this->vel = vel; }
 
+	inline void chansePhase_Leave(const DirectX::XMFLOAT3 &vel) {
+		setVel(vel);
+		phase = std::bind(&Enemy::phase_Leave, this);
+	}
 };
 

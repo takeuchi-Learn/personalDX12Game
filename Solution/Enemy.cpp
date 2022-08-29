@@ -75,14 +75,9 @@ void Enemy::phase_Approach() {
 	obj->position.y += vel.y;
 	obj->position.z += vel.z;
 
-	if (shotFrame-- == 0U && targetObjPt != nullptr) {
+	if (targetObjPt != nullptr && shotFrame-- == 0U) {
 		shot(targetObjPt->getPos(), 2.f, 2.5f);
 		shotFrame = shotFrameMax;
-	}
-
-	if (obj->position.z < 0.f) {
-		vel = DirectX::XMFLOAT3(-1, 1, 0);
-		phase = std::bind(&Enemy::phase_Leave, this);
 	}
 }
 
@@ -90,11 +85,6 @@ void Enemy::phase_Leave() {
 	obj->position.x += vel.x;
 	obj->position.y += vel.y;
 	obj->position.z += vel.z;
-
-	if (std::abs(obj->position.x) > 50.f &&
-		std::abs(obj->position.y) > 50.f) {
-		alive = false;
-	}
 }
 
 #pragma endregion phase
@@ -103,6 +93,8 @@ void Enemy::update() {
 	if (alive) {
 		phase();
 	}
+
+	++nowFrame;
 
 	bul.remove_if([](std::unique_ptr<EnemyBullet> &i) {return !i->getAlive(); });
 

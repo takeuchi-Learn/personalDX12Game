@@ -6,7 +6,6 @@ CameraObj::CameraObj(GameObj *parent)
 	:Camera(WinAPI::window_width,
 			WinAPI::window_height),
 	parentObj(parent) {
-	relativePos = XMFLOAT3(0, 5, -10);
 	relativeRotaDeg = XMFLOAT3(30, 0, 0);
 }
 
@@ -16,24 +15,21 @@ void CameraObj::preUpdate() {
 	// 反転するなら1、しないなら-1
 	constexpr float rotaInvFactor = invCamOperFlag ? 1.f : -1.f;
 
-	// 追従対象基準のカメラの高さ
-	constexpr float obj2Targetheight = 60.f;
 	// 視点から注視点までの距離
 	constexpr float eye2TargetLen = 300.f;
 
 	XMFLOAT3 targetPos = parentObj->getPos();
-	targetPos.y += obj2Targetheight;
 
 	// 親の回転を取得[rad]
-	const XMFLOAT3 parentAngleRad{
-		XMConvertToRadians(rotaInvFactor * parentObj->getRotation().x),
-		XMConvertToRadians(rotaInvFactor * parentObj->getRotation().y),
-		XMConvertToRadians(rotaInvFactor * parentObj->getRotation().z)
+	const XMFLOAT3 rotaAngleRad{
+		XMConvertToRadians(rotaInvFactor * (parentObj->getRotation().x + relativeRotaDeg.x)),
+		XMConvertToRadians(rotaInvFactor * (parentObj->getRotation().y + relativeRotaDeg.y)),
+		XMConvertToRadians(rotaInvFactor * (parentObj->getRotation().z + relativeRotaDeg.z))
 	};
 
 	// 垂直角度を計算
-	float sinT = dxBase->nearSin(parentAngleRad.x);
-	float cosT = dxBase->nearCos(parentAngleRad.x);
+	float sinT = dxBase->nearSin(-rotaAngleRad.x);
+	float cosT = dxBase->nearCos(-rotaAngleRad.x);
 
 	const XMFLOAT3 verticalPos{
 		0.f,
@@ -41,9 +37,9 @@ void CameraObj::preUpdate() {
 		-cosT * eye2TargetLen
 	};
 
-	// 垂直角度を計算
-	sinT = dxBase->nearSin(parentAngleRad.y);
-	cosT = dxBase->nearCos(parentAngleRad.y);
+	// 水平角度を計算
+	sinT = dxBase->nearSin(rotaAngleRad.y);
+	cosT = dxBase->nearCos(rotaAngleRad.y);
 	const XMFLOAT3 horizontalPos{
 		cosT * verticalPos.x - sinT * verticalPos.z,
 		verticalPos.y,
@@ -51,13 +47,31 @@ void CameraObj::preUpdate() {
 	};
 
 	// 計算した座標 + 注視点の位置 = カメラの位置
-	const XMFLOAT3 eye{
+	XMFLOAT3 eye{
 		horizontalPos.x + targetPos.x,
 		horizontalPos.y + targetPos.y,
 		horizontalPos.z + targetPos.z,
 	};
 
+	// 前回のカメラ位置
+	const XMFLOAT3 oldEye = getEye();
+
+	// 補間割合を加味したカメラ移動幅
+	constexpr float raito = 0.1f;
+	eye = {
+		(eye.x - oldEye.x) * raito,
+		(eye.y - oldEye.y) * raito,
+		(eye.z - oldEye.z) * raito
+	};
+
+	// 前回の位置に移動幅を足す
+	eye = {
+		oldEye.x + eye.x,
+		oldEye.y + eye.y,
+		oldEye.z + eye.z
+	};
+
 	setEye(eye);
 	setTarget(targetPos);
-	setUp(XMFLOAT3(0, 1, 0));
+	//setUp(XMFLOAT3(0, 1, 0));
 }

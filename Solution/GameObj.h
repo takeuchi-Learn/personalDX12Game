@@ -18,6 +18,16 @@ protected:
 	virtual void additionalDraw(Light *light) {}
 
 public:
+	inline static DirectX::XMFLOAT2 calcRotationSyncVelRad(const DirectX::XMFLOAT3 &vel) {
+		return DirectX::XMFLOAT2(DX12Base::getInstance()->near_atan2(-vel.y,
+																	 sqrtf(vel.x * vel.x + vel.z * vel.z)),
+								 DX12Base::getInstance()->near_atan2(vel.x, vel.z));
+	}
+	inline static DirectX::XMFLOAT2 calcRotationSyncVelDeg(const DirectX::XMFLOAT3 &vel) {
+		const DirectX::XMFLOAT2 rad = calcRotationSyncVelRad(vel);
+		return DirectX::XMFLOAT2(DirectX::XMConvertToDegrees(rad.x), DirectX::XMConvertToDegrees(rad.y));
+	}
+
 	inline bool getAlive() const { return alive; }
 	// aliveをfalseにする
 	inline void kill() { alive = false; }

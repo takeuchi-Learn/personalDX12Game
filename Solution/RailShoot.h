@@ -90,5 +90,8 @@ public:
 
 	~RailShoot();
 
+	static DirectX::XMVECTOR splinePosition(const std::vector<DirectX::XMVECTOR> &points,
+								   size_t startIndex,
+								   float t);
 };
 

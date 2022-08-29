@@ -14,6 +14,39 @@ using namespace DirectX;
 
 const Time::timeType RailShoot::sceneChangeTime = Time::oneSec;
 
+XMVECTOR RailShoot::splinePosition(const std::vector<XMVECTOR> &points,
+								   size_t startIndex,
+								   float t) {
+	if (startIndex < 1) return points[1];
+
+	{
+		size_t n = points.size() - 2;
+		if (startIndex > n)return points[n];
+	}
+
+	XMVECTOR p0 = points[startIndex - 1];
+	XMVECTOR p1 = points[startIndex];
+	XMVECTOR p2 = points[startIndex + 1];
+	XMVECTOR p3 = points[startIndex + 2];
+
+	XMVECTOR position = {
+		2 * p1 + (-p0 + p2) * t +
+		(2 * p0 - 5 * p1 + 4 * p2 - p3) * (t * t) +
+		(-p0 + 3 * p1 - 3 * p2 + p3) * (t * t * t)
+	};
+	position *= 0.5f;
+
+	return position;
+}
+
+namespace {
+	std::vector<XMVECTOR> splinePoint;
+	UINT splineNowFrame = 0u;
+	constexpr UINT splineFrameMax = 120u;
+	constexpr UINT splineIndexDef = 1u;
+	UINT splineIndex = splineIndexDef;
+}
+
 RailShoot::RailShoot()
 	: dxBase(DX12Base::getInstance()),
 	input(Input::getInstance()),
@@ -55,7 +88,6 @@ RailShoot::RailShoot()
 	// ライト初期化
 	light->setLightPos(camera->getEye());
 
-
 	// 自機初期化
 	constexpr XMFLOAT3 playerStartPos = XMFLOAT3(0, 0, 0);
 	player = std::make_unique<Player>(camera.get(), playerModel.get(), playerStartPos);
@@ -63,6 +95,16 @@ RailShoot::RailShoot()
 
 	camera->setParentObj(player.get());
 	camera->update();
+
+	// スプライン
+	// startとendは2つ必要
+	splinePoint.emplace_back(XMVectorSet(0, 0, 0, 1));		// start
+	splinePoint.emplace_back(XMVectorSet(0, 0, 0, 1));		// start
+	splinePoint.emplace_back(XMVectorSet(0, 0, 200, 1));	// 経由1
+	splinePoint.emplace_back(XMVectorSet(20, 50, 400, 1));	// 経由2
+	splinePoint.emplace_back(XMVectorSet(20, 50, 600, 1));	// 経由3
+	splinePoint.emplace_back(XMVectorSet(0, 100, 800, 1));	// end
+	splinePoint.emplace_back(XMVectorSet(0, 100, 800, 1));	// end
 
 	// 敵初期化
 	constexpr size_t enemyNumDef = 1U;
@@ -115,7 +157,6 @@ void RailShoot::createParticle(const DirectX::XMFLOAT3 &pos,
 							   const float startScale,
 							   const float vel) {
 	for (UINT i = 0U; i < particleNum; ++i) {
-
 		const float theata = RandomNum::getRandf(0, XM_PI);
 		const float phi = RandomNum::getRandf(0, XM_PI * 2.f);
 		const float r = RandomNum::getRandf(0, vel);
@@ -191,8 +232,6 @@ void RailShoot::update_play() {
 	const bool hitA = input->hitKey(DIK_A);
 	const bool hitS = input->hitKey(DIK_S);
 	const bool hitD = input->hitKey(DIK_D);
-	const bool hitE = input->hitKey(DIK_E);
-	const bool hitQ = input->hitKey(DIK_Q);
 
 	// 自機移動
 	if (hitW || hitA || hitS || hitD) {
@@ -216,26 +255,53 @@ void RailShoot::update_play() {
 		}
 		player->setPos(pPos);
 	}
+
 	// 自機回転
-	if (hitE || hitQ) {
-		const float speed = 90.f / dxBase->getFPS();
+	const bool hitUp = input->hitKey(DIK_UP);
+	const bool hitDown = input->hitKey(DIK_DOWN);
+	const bool hitRight = input->hitKey(DIK_RIGHT);
+	const bool hitLeft = input->hitKey(DIK_LEFT);
+
+	if (hitUp || hitDown || hitRight || hitLeft) {
+		const bool speed = 90.f / dxBase->getFPS();
 
 		XMFLOAT3 rota = player->getRotation();
 
-		// y軸を回転軸とする回転
-		if (hitE) {
+		if (hitUp) {
+			rota.x -= speed;
+			if (rota.x <= -360.f) {
+				rota.x += 360.f;
+			}
+		} else if (hitDown) {
+			rota.x += speed;
+			if (rota.x >= 360.f) {
+				rota.x -= 360.f;
+			}
+		}
+
+		if (hitRight) {
 			rota.y += speed;
 			if (rota.y >= 180.f) {
 				rota.y -= 360.f;
 			}
-		} else if (hitQ) {
+		} else if (hitLeft) {
 			rota.y -= speed;
-			if (rota.y <= 180.f) {
+			if (rota.y <= -180.f) {
 				rota.y += 360.f;
 			}
 		}
 
 		player->setRotation(rota);
+
+		debugText->formatPrint(spriteBase.get(), 0, 500, 1.f, { 1,0,1,1 },
+							   "%.3f, %.3f", rota.x, rota.y);
+	}
+
+	// Z座標が0を超えたら退場
+	for (auto &i : enemy) {
+		if (i->getPos().z < 0.f) {
+			i->chansePhase_Leave(DirectX::XMFLOAT3(-1, 1, 0));
+		}
 	}
 
 	// 弾発射
@@ -302,6 +368,51 @@ void RailShoot::update_play() {
 								   "EnemyNum : %u", enemy.size());
 		}
 	}
+
+	// スプライン
+	{
+		float splineRaito = float(splineNowFrame++) / splineFrameMax;
+		if (splineRaito >= 1.f) {
+			if (splineIndex < splinePoint.size() - 3) {
+				++splineIndex;
+				splineRaito -= 1.f;
+				splineNowFrame = 0u;
+			} else {
+				splineRaito = 1.f;
+			}
+		}
+		XMFLOAT3 pos{};
+		XMStoreFloat3(&pos,
+					  splinePosition(splinePoint,
+									 splineIndex,
+									 splineRaito));
+		const XMFLOAT3 oldpos = player->getPos();
+		player->setPos(pos);
+
+		XMFLOAT3 velDiff{
+			pos.x - oldpos.x,
+			pos.y - oldpos.y,
+			pos.z - oldpos.z
+		};
+		XMFLOAT2 rota = GameObj::calcRotationSyncVelDeg(velDiff);
+
+		if (!isfinite(rota.x)) {
+			rota.x = 0.f;
+		}
+		if (!isfinite(rota.y)) {
+			rota.y = 0.f;
+		}
+
+		//player->setRotation(XMFLOAT3(rota.x, rota.y, 0.f));
+
+		debugText->formatPrint(spriteBase.get(),
+							   0, 120, 1.f,
+							   { 1,1,0,1 },
+							   "%u",
+							   splineIndex);
+	}
+
+	light->setLightPos(camera->getEye());
 }
 
 void RailShoot::update_end() {
