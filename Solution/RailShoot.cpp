@@ -162,7 +162,7 @@ RailShoot::RailShoot()
 		for (auto &y : csvData) {
 			if (y[0] == "WAIT") {
 				waitFrame += (UINT)std::stoi(y[1]);
-			} else if (y[0] == "POP") {
+			} else if (y[0] == "PUSH") {
 				enemyPopData.emplace_front(std::make_unique<PopEnemyData>(waitFrame,
 																		  XMFLOAT3(std::stof(y[1]),
 																				   std::stof(y[2]),
