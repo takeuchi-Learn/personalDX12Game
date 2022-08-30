@@ -13,8 +13,11 @@ protected:
 	bool alive = true;
 
 	// drawWithUpdate関数の頭で呼ばれる
-	virtual void update() {};
+	void update();
 
+	void draw(Light *light);
+
+	virtual void additionalUpdate() {};
 	virtual void additionalDraw(Light *light) {}
 
 public:

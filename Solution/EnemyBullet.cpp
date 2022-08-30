@@ -1,6 +1,6 @@
 ﻿#include "EnemyBullet.h"
 
-void EnemyBullet::update() {
+void EnemyBullet::additionalUpdate() {
 	// 寿命が来たら死ぬ
 	if (++age > life) {
 		alive = false;

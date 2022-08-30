@@ -1,6 +1,6 @@
 ﻿#include "PlayerBullet.h"
 
-void PlayerBullet::update() {
+void PlayerBullet::additionalUpdate() {
 	// 寿命が来たら死ぬ
 	if (++age > life) {
 		alive = false;

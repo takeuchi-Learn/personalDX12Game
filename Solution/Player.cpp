@@ -6,7 +6,8 @@ Player::Player(Camera *camera,
 			   ObjModel *model,
 			   const DirectX::XMFLOAT3 &pos)
 	: GameObj(camera, model, pos),
-	aimObjLen(20.f) {
+	aimObjLen(20.f),
+	showAimObjFlag(true) {
 	constexpr size_t aimObjNum = 2U;
 
 	aimObj.resize(aimObjNum);
@@ -85,11 +86,11 @@ void Player::shot(Camera *camera,
 	i.setScale(bulScale);
 }
 
-void Player::update() {
+void Player::additionalUpdate() {
 	// 死んだ弾は消す
 	bul.remove_if([](PlayerBullet &i) {return !i.getAlive(); });
 
-	if (alive) {
+	if (alive && showAimObjFlag) {
 		for (auto &i : aimObj) {
 			i->update();
 		}
@@ -97,7 +98,7 @@ void Player::update() {
 }
 
 void Player::additionalDraw(Light *light) {
-	if (alive) {
+	if (alive && showAimObjFlag) {
 		for (auto &i : aimObj) {
 			i->draw(DX12Base::getInstance(), light);
 		}

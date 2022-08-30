@@ -9,12 +9,24 @@ GameObj::GameObj(Camera *camera,
 	setPos(pos);
 }
 
+void GameObj::update() {
+	additionalUpdate();
+	if (alive) {
+		obj->update();
+	}
+}
+
+void GameObj::draw(Light *light) {
+	if (alive) {
+		obj->draw(DX12Base::getInstance(), light);
+	}
+	additionalDraw(light);
+}
+
 void GameObj::drawWithUpdate(Light *light) {
 	update();
 
-	if (alive) {
-		obj->drawWithUpdate(DX12Base::getInstance(), light);
-	}
+	draw(light);
 
 	additionalDraw(light);
 }

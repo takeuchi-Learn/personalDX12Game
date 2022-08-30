@@ -18,6 +18,8 @@ class Player
 	std::vector<std::unique_ptr<Object3d>> aimObj;
 	const float aimObjLen;
 
+	bool showAimObjFlag;
+
 public:
 	Player(Camera *camera,
 		   ObjModel *model,
@@ -51,7 +53,7 @@ public:
 			  float speed = 1.f,
 			  float bulScale = 10.f);
 
-	void update() override;
+	void additionalUpdate() override;
 	void additionalDraw(Light *light) override;
 };
 

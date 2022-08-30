@@ -13,7 +13,7 @@ public:
 	uint16_t age = 0;
 
 private:
-	void update() override;
+	void additionalUpdate() override;
 
 public:
 	using GameObj::GameObj;

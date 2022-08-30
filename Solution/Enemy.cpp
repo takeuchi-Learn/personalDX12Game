@@ -66,7 +66,7 @@ void Enemy::phase_Leave() {
 
 #pragma endregion phase
 
-void Enemy::update() {
+void Enemy::additionalUpdate() {
 	if (alive) {
 		phase();
 	}
