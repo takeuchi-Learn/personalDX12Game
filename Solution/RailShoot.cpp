@@ -171,8 +171,6 @@ RailShoot::RailShoot()
 			}
 		}
 	}
-
-	WinAPI::getInstance()->setWindowSize(WinAPI::window_width, WinAPI::window_height);
 }
 
 void RailShoot::start() {
@@ -265,22 +263,18 @@ void RailShoot::update_start() {
 }
 
 void RailShoot::update_play() {
-	debugText->Print(spriteBase.get(), "RailShoot", 0, 0);
-	debugText->formatPrint(spriteBase.get(),
-						   0, DebugText::fontHeight, 1.f, { 1,1,0,1 },
-						   "%6.2f FPS", dxBase->getFPS());
-
 	if (input->hitKey(DIK_LSHIFT) && input->hitKey(DIK_SPACE)) {
 		changeNextScene();
 	}
 
 	// 敵を増やす
-	for (auto &i : enemyPopData) {
-		if (nowFrame >= i->popFrame) {
+	// 終わった発生情報は削除
+	enemyPopData.remove_if([&](std::unique_ptr<PopEnemyData> &i) {
+		const bool ended = nowFrame >= i->popFrame;
+		if (ended) {
 			addEnemy(i->pos, i->vel);
 		}
-	}
-	enemyPopData.remove_if([&](std::unique_ptr<PopEnemyData> &i) {return nowFrame >= i->popFrame; });
+		return ended; });
 
 	const bool hitW = input->hitKey(DIK_W);
 	const bool hitA = input->hitKey(DIK_A);
@@ -448,6 +442,36 @@ void RailShoot::drawObj3d() {
 }
 
 void RailShoot::drawFrontSprite() {
+	constexpr ImGuiWindowFlags winFlags =
+		// リサイズ不可
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoResize |
+		// タイトルバー無し
+		//ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar |
+		// 設定を.iniに出力しない
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoSavedSettings |
+		// 移動不可
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove |
+		// スクロールバーを常に表示
+		ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysHorizontalScrollbar |
+		ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar;
+
+	// 最初のウインドウの位置を指定
+	ImGui::SetNextWindowPos(ImVec2((float)WinAPI::window_width * 0.02f,
+								   (float)WinAPI::window_height * 0.02f));
+
+	ImGui::Begin("レールシューティング", nullptr, winFlags);
+	ImGui::Text("スクリプトで指定したとおりに敵が出る");
+	ImGui::Text("敵は一定間隔で弾を発射する");
+	ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x,
+								   ImGui::GetWindowPos().y + ImGui::GetWindowSize().y));
+	ImGui::End();
+
+	ImGui::Begin("情報", nullptr, winFlags);
+	ImGui::Text("FPS : %.3f", dxBase->getFPS());
+	ImGui::Text("敵数 : %u", std::distance(enemy.begin(), enemy.end()));
+	ImGui::Text("経過フレーム : %u", nowFrame);
+	ImGui::End();
+
 	spriteBase->drawStart(dxBase->getCmdList());
 	debugText->DrawAll(dxBase, spriteBase.get());
 }
