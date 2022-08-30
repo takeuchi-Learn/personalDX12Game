@@ -7,8 +7,13 @@ class CameraObj
 private:
 	GameObj *parentObj = nullptr;
 
+
+	// 視点から注視点までの距離
+	float eye2TargetLen = 300.f;
 	// 親を基準とした回転
 	DirectX::XMFLOAT3 relativeRotaDeg{};
+
+	DirectX::XMFLOAT3 eye2TargetOffset = XMFLOAT3(0.f, 50.f, 50.f);
 
 	bool matWorldDirty = false;
 

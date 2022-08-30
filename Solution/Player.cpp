@@ -2,6 +2,24 @@
 #include <DirectXMath.h>
 using namespace DirectX;
 
+Player::Player(Camera *camera,
+			   ObjModel *model,
+			   const DirectX::XMFLOAT3 &pos)
+	: GameObj(camera, model, pos),
+	aimObjLen(20.f) {
+	constexpr size_t aimObjNum = 2U;
+
+	aimObj.resize(aimObjNum);
+
+	for (size_t i = 0u; i < aimObjNum; ++i) {
+		aimObj[i] = std::make_unique<Object3d>(camera, model, 0U);
+		aimObj[i]->position = XMFLOAT3(0, 0, aimObjLen / float(i + 1u));
+		aimObj[i]->parent = obj.get();
+		const float scale = 1.f / float(aimObjNum - i + 1u);
+		aimObj[i]->scale = XMFLOAT3(scale, scale, scale);
+	}
+}
+
 XMVECTOR Player::getLookVec(float len) {
 	return XMVector3Rotate(XMVectorSet(0, 0, len, 1),
 						   XMQuaternionRotationRollPitchYaw(obj->rotation.x,
@@ -50,26 +68,41 @@ void Player::moveRight(float moveVel, bool moveYFlag) {
 
 void Player::shot(Camera *camera,
 				  ObjModel *model,
-				  float vel,
+				  float speed,
 				  float bulScale) {
-
 	// C++17から追加した要素の参照が返ってくるようになった
 	PlayerBullet &i = bul.emplace_front(camera, model, obj->position);
 
-	// Z方向のベクトルを、自機の向いている向きに回転
-	XMFLOAT3 velF3{};
-	XMStoreFloat3(&velF3, XMVector3Transform(XMVectorSet(0, 0, vel, 1), obj->getMatRota()));
+	// 照準のある方向へ、速さvelで飛んでいく
+	XMFLOAT3 vel{};
+	XMStoreFloat3(&vel, XMVector3Transform(XMVectorSet(aimObj[0]->position.x / aimObjLen * speed,
+													   aimObj[0]->position.y / aimObjLen * speed,
+													   aimObj[0]->position.z / aimObjLen * speed,
+													   1),
+										   obj->getMatRota()));
 
-	i.setVel(velF3);
+	i.setVel(vel);
 	i.setScale(bulScale);
 }
 
 void Player::update() {
 	// 死んだ弾は消す
 	bul.remove_if([](PlayerBullet &i) {return !i.getAlive(); });
+
+	if (alive) {
+		for (auto &i : aimObj) {
+			i->update();
+		}
+	}
 }
 
 void Player::additionalDraw(Light *light) {
+	if (alive) {
+		for (auto &i : aimObj) {
+			i->draw(DX12Base::getInstance(), light);
+		}
+	}
+
 	for (auto &i : bul) {
 		i.drawWithUpdate(light);
 	}

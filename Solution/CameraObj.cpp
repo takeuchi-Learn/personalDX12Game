@@ -15,8 +15,6 @@ void CameraObj::preUpdate() {
 	// 反転するなら1、しないなら-1
 	constexpr float rotaInvFactor = invCamOperFlag ? 1.f : -1.f;
 
-	// 視点から注視点までの距離
-	constexpr float eye2TargetLen = 300.f;
 
 	XMFLOAT3 targetPos = parentObj->getPos();
 
@@ -70,6 +68,22 @@ void CameraObj::preUpdate() {
 		oldEye.y + eye.y,
 		oldEye.z + eye.z
 	};
+
+
+	// 注視点の位置を高くする
+	{
+
+		XMFLOAT3 camHeiVec{};
+		XMStoreFloat3(&camHeiVec, XMVector3Transform(XMVectorSet(eye2TargetOffset.x,
+																 eye2TargetOffset.y,
+																 eye2TargetOffset.z,
+																 1),
+													 parentObj->getObj()->getMatRota()));
+		targetPos.x += camHeiVec.x;
+		targetPos.y += camHeiVec.y;
+		targetPos.z += camHeiVec.z;
+	}
+
 
 	setEye(eye);
 	setTarget(targetPos);

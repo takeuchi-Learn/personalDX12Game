@@ -15,8 +15,13 @@ class Player
 
 	std::forward_list<PlayerBullet> bul;
 
+	std::vector<std::unique_ptr<Object3d>> aimObj;
+	const float aimObjLen;
+
 public:
-	using GameObj::GameObj;
+	Player(Camera *camera,
+		   ObjModel *model,
+		   const DirectX::XMFLOAT3 &pos = { 0.f,0.f,0.f });
 
 	XMVECTOR getLookVec(float len = 1.f);
 
@@ -43,7 +48,7 @@ public:
 	// @param vel 毎秒進む値
 	void shot(Camera *camera,
 			  ObjModel *model,
-			  float vel = 1.f,
+			  float speed = 1.f,
 			  float bulScale = 10.f);
 
 	void update() override;
