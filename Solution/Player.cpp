@@ -91,6 +91,19 @@ void Player::additionalUpdate() {
 	bul.remove_if([](PlayerBullet &i) {return !i.getAlive(); });
 
 	if (alive && showAimObjFlag) {
+		{
+			const XMMATRIX matVPV =
+				obj->getCamera()->getViewMatrix() *
+				obj->getCamera()->getProjectionMatrix() *
+				obj->getCamera()->getViewPortMatrix();
+
+			// ベクトルにVPV行列をかけてW除算
+			XMVECTOR aim2DVec = XMVector3Transform(aimObj[0]->getMatWorld().r[3], matVPV);
+			aim2DVec /= XMVectorGetW(aim2DVec);
+
+			// 変数に格納
+			aim2DPos = XMFLOAT2(XMVectorGetX(aim2DVec), XMVectorGetY(aim2DVec));
+		}
 		for (auto &i : aimObj) {
 			i->update();
 		}

@@ -20,6 +20,8 @@ class Player
 
 	bool showAimObjFlag;
 
+	DirectX::XMFLOAT2 aim2DPos{};
+
 public:
 	Player(Camera *camera,
 		   ObjModel *model,
@@ -32,6 +34,8 @@ public:
 	inline auto getMatWorld() const { return obj->getMatWorld(); }
 
 	inline void setParent(GameObj *parent) { obj->parent = parent->getObj(); }
+
+	inline const DirectX::XMFLOAT2 &getAim2DPos() const { return aim2DPos; }
 
 	/// <summary>
 	/// 視線方向に前進

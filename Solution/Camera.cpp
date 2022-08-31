@@ -210,6 +210,12 @@ Camera::Camera(const float window_width, const float window_height) {
 
 	// ビュープロジェクションの合成
 	matViewProjection = matView * matProjection;
+
+	matViewPort = XMMatrixIdentity();
+	matViewPort.r[0].m128_f32[0] = (float)window_width / 2.f;
+	matViewPort.r[1].m128_f32[1] = -1.f - ((float)window_height / 2.f);
+	matViewPort.r[3].m128_f32[0] = matViewPort.r[0].m128_f32[0];
+	matViewPort.r[3].m128_f32[1] = (float)window_height / 2.f;
 }
 
 Camera::~Camera() {

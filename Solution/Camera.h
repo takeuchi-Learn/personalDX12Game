@@ -17,6 +17,7 @@ protected:
 	static DX12Base *dxBase;
 
 private:
+	XMMATRIX matViewPort{};
 	// ビュー行列
 	XMMATRIX matView = DirectX::XMMatrixIdentity();
 	// ビルボード行列
@@ -61,16 +62,18 @@ private:
 	virtual void postUpdate(){};
 
 public:
+	inline const XMMATRIX &getViewPortMatrix() const { return matViewPort; }
+
 	// ビュー行列の取得
 	// @return matView
-	inline const XMMATRIX &getViewMatrix() { return matView; }
+	inline const XMMATRIX &getViewMatrix() const { return matView; }
 
 	// 射影行列の取得
 	// @return matProjection
-	inline const XMMATRIX &getProjectionMatrix() { return matProjection; }
+	inline const XMMATRIX &getProjectionMatrix() const { return matProjection; }
 
 	// ビュー射影行列の取得
-	inline const XMMATRIX &getViewProjectionMatrix() { return matViewProjection; }
+	inline const XMMATRIX &getViewProjectionMatrix() const { return matViewProjection; }
 
 	// ビルボード行列の取得
 	inline const XMMATRIX &getBillboardMatrix() { return matBillboard; }

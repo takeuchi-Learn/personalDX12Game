@@ -39,7 +39,7 @@ class RailShoot
 	std::unique_ptr<SpriteBase> spriteBase;
 	std::unique_ptr<DebugText> debugText;
 
-
+	std::unique_ptr<Sprite> aim2D;
 
 	// 3Dオブジェクト用パイプライン
 	Object3d::PipelineSet backPipelineSet;

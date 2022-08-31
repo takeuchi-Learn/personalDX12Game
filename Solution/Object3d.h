@@ -120,6 +120,8 @@ public:
 	inline const XMMATRIX &getMatScale() const { return matScale; }
 	inline const XMMATRIX &getMatTrans() const { return matTrans; }
 
+	inline const Camera *getCamera() const { return camera; }
+
 
 	// モデルは後から手動で読み込む(deleteも手動)
 	Object3d(Camera *camera);

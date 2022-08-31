@@ -120,6 +120,9 @@ RailShoot::RailShoot()
 	const UINT debugTextTexNumber = spriteBase->loadTexture(L"Resources/debugfont.png");
 	debugText = std::make_unique<DebugText>(debugTextTexNumber, spriteBase.get());
 
+	const UINT aimPosTexNum = spriteBase->loadTexture(L"Resources/aimPos.png");
+	aim2D = std::make_unique<Sprite>(aimPosTexNum, spriteBase.get());
+
 	// カメラ初期化
 	camera->setFarZ(5000.f);
 	camera->setEye(XMFLOAT3(0, WinAPI::getInstance()->getWindowSize().y * 0.06f, -180));	// 視点座標
@@ -473,6 +476,8 @@ void RailShoot::drawFrontSprite() {
 	ImGui::End();
 
 	spriteBase->drawStart(dxBase->getCmdList());
+	aim2D->position = XMFLOAT3(player->getAim2DPos().x, player->getAim2DPos().y, 0.f);
+	aim2D->drawWithUpdate(dxBase, spriteBase.get());
 	debugText->DrawAll(dxBase, spriteBase.get());
 }
 
