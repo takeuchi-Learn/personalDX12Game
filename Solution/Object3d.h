@@ -122,6 +122,8 @@ public:
 
 	inline const Camera *getCamera() const { return camera; }
 
+	XMFLOAT2 calcScreenPos();
+
 
 	// モデルは後から手動で読み込む(deleteも手動)
 	Object3d(Camera *camera);

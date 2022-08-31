@@ -28,6 +28,8 @@ private:
 	XMMATRIX matProjection = DirectX::XMMatrixIdentity();
 	// ビュー射影行列
 	XMMATRIX matViewProjection = DirectX::XMMatrixIdentity();
+	// VPV行列
+	XMMATRIX matVPV = DirectX::XMMatrixIdentity();;
 	// ビュー行列ダーティフラグ
 	bool viewDirty = false;
 	// 射影行列ダーティフラグ
@@ -59,7 +61,7 @@ private:
 	void updateMatrix();
 
 	virtual void preUpdate() {};
-	virtual void postUpdate(){};
+	virtual void postUpdate() {};
 
 public:
 	inline const XMMATRIX &getViewPortMatrix() const { return matViewPort; }
@@ -137,6 +139,8 @@ public:
 	/// <param name="move">移動量</param>
 	void moveCamera(const XMFLOAT3 &move);
 	void moveCamera(const XMVECTOR &move);
+
+	inline const XMMATRIX &getMatVPV() const { return matVPV; }
 
 	Camera(const float window_width, const float window_height);
 

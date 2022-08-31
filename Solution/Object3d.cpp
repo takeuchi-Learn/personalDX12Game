@@ -26,6 +26,16 @@ void Object3d::createTransferBufferB0(ComPtr<ID3D12Resource> &constBuffB0) {
 	);
 }
 
+XMFLOAT2 Object3d::calcScreenPos() {
+	XMVECTOR screenPosVec = XMVector3Transform(matWorld.r[3],
+											   camera->getMatVPV());
+	screenPosVec /= XMVectorGetW(screenPosVec);
+	XMFLOAT2 screenPosF2{};
+	XMStoreFloat2(&screenPosF2, screenPosVec);
+
+	return screenPosF2;
+}
+
 Object3d::Object3d(Camera *camera)
 	: camera(camera), matWorld() {
 

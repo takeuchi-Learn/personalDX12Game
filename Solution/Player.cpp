@@ -8,7 +8,7 @@ Player::Player(Camera *camera,
 	: GameObj(camera, model, pos),
 	aimObjLen(20.f),
 	showAimObjFlag(true) {
-	constexpr size_t aimObjNum = 2U;
+	constexpr size_t aimObjNum = 1;
 
 	aimObj.resize(aimObjNum);
 
@@ -92,32 +92,33 @@ void Player::additionalUpdate() {
 
 	if (alive && showAimObjFlag) {
 		{
-			const XMMATRIX invMatVPV = XMMatrixInverse(nullptr,
-													   obj->getCamera()->getViewMatrix() *
-													   obj->getCamera()->getProjectionMatrix() *
-													   obj->getCamera()->getViewPortMatrix());
+			const XMMATRIX invMatVPV = XMMatrixInverse(nullptr, obj->getCamera()->getMatVPV());
 
 			XMVECTOR nearPos = XMVector3Transform(XMVectorSet(aim2DPos.x,
-																	aim2DPos.y,
-																	0.f,
-																	1.f),
-														invMatVPV);
+															  aim2DPos.y,
+															  0.f,
+															  1.f),
+												  invMatVPV);
 			nearPos /= XMVectorGetW(nearPos);
 
 			XMVECTOR farPos = XMVector3Transform(XMVectorSet(aim2DPos.x,
-																   aim2DPos.y,
-																   1.f,
-																   1.f),
-													   invMatVPV);
+															 aim2DPos.y,
+															 1.f,
+															 1.f),
+												 invMatVPV);
 			farPos /= XMVectorGetW(farPos);
 
 			const XMVECTOR near2Far = farPos - nearPos;
 
-			const XMVECTOR aimObjPos = XMVector3Normalize(near2Far);
+			const XMVECTOR aimObjPos = XMVector3Rotate(
+				XMVector3Normalize(near2Far),
+				XMQuaternionRotationRollPitchYaw(XMConvertToRadians(-obj->rotation.x),
+												 XMConvertToRadians(-obj->rotation.y),
+												 XMConvertToRadians(-obj->rotation.z)));
 			XMFLOAT3 aimObjPosF3{};
 
-			for (UINT i = 0u, len = aimObj.size(); i < len; ++i) {
-				XMStoreFloat3(&aimObjPosF3, aimObjPos * (aimObjLen / float(i + 1u)));
+			for (UINT i = 0u, len = (UINT)aimObj.size(); i < len; ++i) {
+				XMStoreFloat3(&aimObjPosF3, aimObjPos * aimObjLen);
 				aimObj[i]->position = aimObjPosF3;
 			}
 

@@ -134,6 +134,7 @@ void Camera::updateMatrix() {
 		}
 		// ビュープロジェクションの合成
 		matViewProjection = matView * matProjection;
+		matVPV = matViewProjection * matViewPort;
 	}
 }
 
