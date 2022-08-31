@@ -85,14 +85,22 @@ void Enemy::additionalUpdate() {
 
 			// 速度の差分を取得
 			XMFLOAT3 nextVel = calcVel(targetObjPt->getPos(), i->getPos(), 2.f);
+			const float velLen = sqrtf(nextVel.x * nextVel.x +
+									   nextVel.y * nextVel.y +
+									   nextVel.z * nextVel.z);
+
+			nextVel.x /= velLen;
+			nextVel.y /= velLen;
+			nextVel.z /= velLen;
+
 			nextVel.x -= nowVel.x;
 			nextVel.y -= nowVel.y;
 			nextVel.z -= nowVel.z;
 
 			// 速度の補間の割合を適用
-			nextVel.x *= raito;
-			nextVel.y *= raito;
-			nextVel.z *= raito;
+			nextVel.x *= velLen * raito;
+			nextVel.y *= velLen * raito;
+			nextVel.z *= velLen * raito;
 
 			// 前の速度に速度の差分を加算
 			nextVel.x += nowVel.x;
