@@ -36,6 +36,7 @@ public:
 	inline void setParent(GameObj *parent) { obj->parent = parent->getObj(); }
 
 	inline const DirectX::XMFLOAT2 &getAim2DPos() const { return aim2DPos; }
+	inline void setAim2DPos(const DirectX::XMFLOAT2 &screenPos) { aim2DPos = screenPos; }
 
 	/// <summary>
 	/// 視線方向に前進

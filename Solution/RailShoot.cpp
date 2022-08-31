@@ -270,6 +270,11 @@ void RailShoot::update_play() {
 		changeNextScene();
 	}
 
+	player->setAim2DPos(XMFLOAT2(input->getMousePos().x, input->getMousePos().y));
+	debugText->formatPrint(spriteBase.get(), 0, 300, 1.f, { 1,1,1,1 },
+						   "%.2f,%.2f",
+						   player->getAim2DPos().x,player->getAim2DPos().y);
+
 	// 敵を増やす
 	// 終わった発生情報は削除
 	enemyPopData.remove_if([&](std::unique_ptr<PopEnemyData> &i) {

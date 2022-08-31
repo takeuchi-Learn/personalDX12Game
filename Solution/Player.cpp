@@ -92,17 +92,35 @@ void Player::additionalUpdate() {
 
 	if (alive && showAimObjFlag) {
 		{
-			const XMMATRIX matVPV =
-				obj->getCamera()->getViewMatrix() *
-				obj->getCamera()->getProjectionMatrix() *
-				obj->getCamera()->getViewPortMatrix();
+			const XMMATRIX invMatVPV = XMMatrixInverse(nullptr,
+													   obj->getCamera()->getViewMatrix() *
+													   obj->getCamera()->getProjectionMatrix() *
+													   obj->getCamera()->getViewPortMatrix());
 
-			// ベクトルにVPV行列をかけてW除算
-			XMVECTOR aim2DVec = XMVector3Transform(aimObj[0]->getMatWorld().r[3], matVPV);
-			aim2DVec /= XMVectorGetW(aim2DVec);
+			XMVECTOR nearPos = XMVector3Transform(XMVectorSet(aim2DPos.x,
+																	aim2DPos.y,
+																	0.f,
+																	1.f),
+														invMatVPV);
+			nearPos /= XMVectorGetW(nearPos);
 
-			// 変数に格納
-			XMStoreFloat2(&aim2DPos, aim2DVec);
+			XMVECTOR farPos = XMVector3Transform(XMVectorSet(aim2DPos.x,
+																   aim2DPos.y,
+																   1.f,
+																   1.f),
+													   invMatVPV);
+			farPos /= XMVectorGetW(farPos);
+
+			const XMVECTOR near2Far = farPos - nearPos;
+
+			const XMVECTOR aimObjPos = XMVector3Normalize(near2Far);
+			XMFLOAT3 aimObjPosF3{};
+
+			for (UINT i = 0u, len = aimObj.size(); i < len; ++i) {
+				XMStoreFloat3(&aimObjPosF3, aimObjPos * (aimObjLen / float(i + 1u)));
+				aimObj[i]->position = aimObjPosF3;
+			}
+
 		}
 		for (auto &i : aimObj) {
 			i->update();
