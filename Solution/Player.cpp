@@ -102,7 +102,7 @@ void Player::additionalUpdate() {
 			aim2DVec /= XMVectorGetW(aim2DVec);
 
 			// 変数に格納
-			aim2DPos = XMFLOAT2(XMVectorGetX(aim2DVec), XMVectorGetY(aim2DVec));
+			XMStoreFloat2(&aim2DPos, aim2DVec);
 		}
 		for (auto &i : aimObj) {
 			i->update();
