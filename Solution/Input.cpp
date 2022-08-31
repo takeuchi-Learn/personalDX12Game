@@ -13,7 +13,7 @@ Input::Input() {
 Input::~Input() {
 }
 
-Input* Input::getInstance() {
+Input *Input::getInstance() {
 	static Input ip;
 	return &ip;
 }
@@ -23,7 +23,7 @@ void Input::init() {
 	HRESULT result;
 
 	result = DirectInput8Create(
-		WinAPI::getInstance()->getW().hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&dinput, nullptr);
+		WinAPI::getInstance()->getW().hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void **)&dinput, nullptr);
 
 	result = dinput->CreateDevice(GUID_SysKeyboard, &devkeyboard, NULL);
 
@@ -68,29 +68,13 @@ void Input::resetState() {
 	}
 }
 
-bool Input::hitMouseBotton(BYTE keyCode) {
-	return (bool)mouseState.rgbButtons[keyCode];
-}
-
-
-bool Input::hitPreMouseBotton(BYTE keyCode) {
-	return (bool)preMouseState.rgbButtons[keyCode];
-}
-
-bool Input::triggerMouseBotton(BYTE keyCode) {
-	return hitMouseBotton(keyCode) && !hitPreMouseBotton(keyCode);
-}
-
 Input::MouseMove Input::getMouseMove() {
-	MouseMove ret{};
-	ret.x = mouseState.lX;
-	ret.y = mouseState.lY;
-	ret.wheel = mouseState.lZ;
+	MouseMove ret{
+		.x = mouseState.lX,
+		.y = mouseState.lY,
+		.wheel = mouseState.lZ
+	};
 	return ret;
-}
-
-POINT Input::getMousePos() {
-	return mousePos;
 }
 
 bool Input::setMousePos(int x, int y) {

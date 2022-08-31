@@ -307,7 +307,7 @@ void PlayScene::updatePlayer() {
 
 	// 弾発射
 	{
-		const bool shootInput = input->triggerMouseBotton(Input::MOUSE::LEFT)
+		const bool shootInput = input->triggerMouseButton(Input::MOUSE::LEFT)
 			|| input->triggerKey(DIK_SPACE);
 
 		// playerBul.secondは生存フラグ
