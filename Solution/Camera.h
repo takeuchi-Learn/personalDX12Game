@@ -105,8 +105,8 @@ public:
 
 	inline void setFogAngleYRad(const float fogAngleYRad) { this->fogAngleYRad = fogAngleYRad; projectionDirty = true; }
 
-	inline float getNearZ() { return nearZ; }
-	inline float getFarZ() { return farZ; }
+	inline float getNearZ() const { return nearZ; }
+	inline float getFarZ() const { return farZ; }
 
 	inline float getFogAngleYRad() { return fogAngleYRad; }
 

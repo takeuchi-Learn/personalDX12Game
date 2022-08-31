@@ -270,10 +270,8 @@ void RailShoot::update_play() {
 		changeNextScene();
 	}
 
-	player->setAim2DPos(XMFLOAT2(input->getMousePos().x, input->getMousePos().y));
-	debugText->formatPrint(spriteBase.get(), 0, 300, 1.f, { 1,1,1,1 },
-						   "%.2f,%.2f",
-						   player->getAim2DPos().x,player->getAim2DPos().y);
+	player->setAim2DPos(XMFLOAT2((float)input->getMousePos().x,
+								 (float)input->getMousePos().y));
 
 	// 敵を増やす
 	// 終わった発生情報は削除
@@ -348,15 +346,65 @@ void RailShoot::update_play() {
 		}
 
 		player->setRotation(rota);
-
-		debugText->formatPrint(spriteBase.get(), 0, 500, 1.f, { 1,0,1,1 },
-							   "%.3f, %.3f", rota.x, rota.y);
 	}
 
 	// Z座標が0を超えたら退場
 	for (auto &i : enemy) {
 		if (i->getPos().z < 0.f) {
 			i->chansePhase_Leave(DirectX::XMFLOAT3(-1, 1, 0));
+		}
+	}
+
+	// ロックオン
+	{
+		// 照準の範囲
+		const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - aim2D->getSize().x / 2.f,
+										   input->getMousePos().y - aim2D->getSize().y / 2.f);
+		const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + aim2D->getSize().x / 2.f,
+										   input->getMousePos().y + aim2D->getSize().y / 2.f);
+
+		// スクリーン上の敵の位置格納変数
+		XMFLOAT2 screenEnemyPos{};
+
+		float oldEnemyDistance{}, nowEnemyDistance{};
+		Enemy *farthestEnemyPt = nullptr;
+		float farthestEnemyLen = 1.f;
+
+		// 最も近い敵の方へ弾を飛ばす
+		// undone: うまくいかない
+
+		for (auto &i : enemy) {
+			// いない敵は無視
+			if (!i->getAlive()) continue;
+
+			// 敵のスクリーン座標を取得
+			screenEnemyPos = i->getObj()->calcScreenPos();
+
+			// 敵が2D照準の中にいるかどうか
+			if (aim2DMin.x <= screenEnemyPos.x &&
+				aim2DMin.y <= screenEnemyPos.y &&
+				aim2DMax.x >= screenEnemyPos.x &&
+				aim2DMax.y >= screenEnemyPos.y) {
+
+				// 敵との距離を更新
+				oldEnemyDistance = nowEnemyDistance;
+				nowEnemyDistance = sqrtf(
+					powf(i->getPos().x - camera->getEye().x, 2.f) +
+					powf(i->getPos().y - camera->getEye().y, 2.f) +
+					powf(i->getPos().z - camera->getEye().z, 2.f)
+				);
+
+				if (farthestEnemyLen < nowEnemyDistance) {
+					farthestEnemyPt = i.get();
+					farthestEnemyLen = nowEnemyDistance;
+				}
+			}
+		}
+
+		if (farthestEnemyPt != nullptr) {
+			player->setShotTarget(farthestEnemyPt->getObj());
+		} else {
+			player->setShotTarget(nullptr);
 		}
 	}
 

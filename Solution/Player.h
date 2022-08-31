@@ -15,12 +15,9 @@ class Player
 
 	std::forward_list<PlayerBullet> bul;
 
-	std::vector<std::unique_ptr<Object3d>> aimObj;
-	const float aimObjLen;
-
-	bool showAimObjFlag;
-
 	DirectX::XMFLOAT2 aim2DPos{};
+
+	Object3d *shotTargetObjPt = nullptr;
 
 public:
 	Player(Camera *camera,
@@ -28,6 +25,9 @@ public:
 		   const DirectX::XMFLOAT3 &pos = { 0.f,0.f,0.f });
 
 	XMVECTOR getLookVec(float len = 1.f);
+
+	inline bool shotTargetIsEmpty() const { return shotTargetObjPt != nullptr; }
+	inline void setShotTarget(Object3d *targetPt) { shotTargetObjPt = targetPt; }
 
 	inline auto &getBulArr() { return bul; }
 
