@@ -9,7 +9,7 @@ private:
 
 
 	// 視点から注視点までの距離
-	float eye2TargetLen = 300.f;
+	float eye2TargetLen = 150.f;
 	// 親を基準とした回転
 	DirectX::XMFLOAT3 relativeRotaDeg{};
 
