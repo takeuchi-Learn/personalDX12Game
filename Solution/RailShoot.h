@@ -45,6 +45,7 @@ class RailShoot
 	Object3d::PipelineSet backPipelineSet;
 
 	std::unique_ptr<ObjSet> back;
+	std::unique_ptr<ObjSet> ground;
 
 	std::forward_list<std::unique_ptr<Enemy>> enemy;
 	std::unique_ptr<ObjModel> enemyModel;

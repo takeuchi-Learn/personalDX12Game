@@ -7,6 +7,8 @@
 #define DIRECTINPUT_VERSION	0x0800
 #include <dinput.h>
 
+#include <DirectXMath.h>
+
 class Input {
 public:
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
@@ -94,6 +96,7 @@ public:
 
 	// @return POINT型(LONG x とLONG y のみの構造体)
 	inline const POINT &getMousePos() const { return mousePos; };
+	inline DirectX::XMFLOAT2 getMousePosF2() const { return DirectX::XMFLOAT2((float)mousePos.x, (float)mousePos.y); }
 	bool setMousePos(int x, int y);
 
 	/// <summary>

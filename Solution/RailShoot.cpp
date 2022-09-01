@@ -100,14 +100,16 @@ RailShoot::RailShoot()
 
 	timer(std::make_unique<Time>()),
 
-	spriteBase(std::make_unique<SpriteBase>()),
+	spriteBase(std::make_unique<SpriteBase>(SpriteBase::BLEND_MODE::REVERSE)),
 
 	back(std::make_unique<ObjSet>(camera.get(), "Resources/back/", "back", true)),
+	ground(std::make_unique<ObjSet>(camera.get(), "Resources/ground", "ground", false)),
+
 	enemyModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
 	enemyBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
 	playerModel(std::make_unique<ObjModel>("Resources/box", "box")),
 
-	playerHp(50u),
+	playerHp(20u),
 
 	playerBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
 
@@ -118,6 +120,7 @@ RailShoot::RailShoot()
 	backPipelineSet(Object3d::createGraphicsPipeline(Object3d::BLEND_MODE::ALPHA,
 													 L"Resources/Shaders/BackVS.hlsl",
 													 L"Resources/Shaders/BackPS.hlsl")) {
+
 	// スプライト初期化
 	const UINT debugTextTexNumber = spriteBase->loadTexture(L"Resources/debugfont.png");
 	debugText = std::make_unique<DebugText>(debugTextTexNumber, spriteBase.get());
@@ -160,6 +163,12 @@ RailShoot::RailShoot()
 	const float backScale = camera->getFarZ() * 0.9f;
 	back->setScale({ backScale, backScale, backScale });
 
+	// 地面
+	const UINT groundSize = 5000u;
+	ground->setPos(XMFLOAT3(0, -player->getScale(), 0));
+	ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
+	ground->getModelPt()->setTexTilling(XMFLOAT2(groundSize / 32.f, groundSize / 32.f));
+
 	// 敵発生スクリプト
 	csvData = loadCsv("Resources/enemyScript.csv", true, ',', "//");
 	{
@@ -176,6 +185,8 @@ RailShoot::RailShoot()
 			}
 		}
 	}
+
+	input->changeDispMouseCursorFlag(false);
 }
 
 void RailShoot::start() {
@@ -383,6 +394,14 @@ void RailShoot::update_play() {
 		} else {
 			player->setShotTarget(nullptr);
 		}
+
+#ifdef _DEBUG
+		debugText->formatPrint(spriteBase.get(),
+							   300.f, 0.f,
+							   1.f,
+							   { 1,1,1,1 },
+							   "%s", farthestEnemyPt != nullptr ? "IN" : "NO_ENEMY");
+#endif // _DEBUG
 	}
 
 	// 弾発射
@@ -473,6 +492,7 @@ void RailShoot::drawObj3d() {
 	back->drawWithUpdate(light.get());
 
 	Object3d::startDraw();
+	ground->drawWithUpdate(light.get());
 	player->drawWithUpdate(light.get());
 	for (auto &i : enemy) {
 		i->drawWithUpdate(light.get());
