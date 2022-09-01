@@ -48,7 +48,7 @@ void Enemy::phase_Approach() {
 	obj->position.z += vel.z;
 
 	if (targetObjPt != nullptr && shotFrame-- == 0U) {
-		shot(targetObjPt->getPos(), 2.f, 2.5f);
+		shot(targetObjPt->getPos(), 1.f, 2.5f);
 		shotFrame = shotFrameMax;
 	}
 }

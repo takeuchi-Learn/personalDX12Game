@@ -107,6 +107,8 @@ RailShoot::RailShoot()
 	enemyBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
 	playerModel(std::make_unique<ObjModel>("Resources/box", "box")),
 
+	playerHp(50u),
+
 	playerBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
 
 	particleMgr(std::make_unique<ParticleMgr>(L"Resources/effect1.png", camera.get())),
@@ -266,9 +268,13 @@ void RailShoot::update_start() {
 }
 
 void RailShoot::update_play() {
+#ifdef _DEBUG
+
 	if (input->hitKey(DIK_LSHIFT) && input->hitKey(DIK_SPACE)) {
 		changeNextScene();
 	}
+
+#endif // _DEBUG
 
 	player->setAim2DPos(XMFLOAT2((float)input->getMousePos().x,
 								 (float)input->getMousePos().y));
@@ -289,63 +295,34 @@ void RailShoot::update_play() {
 
 	// 自機移動
 	if (hitW || hitA || hitS || hitD) {
-		XMFLOAT3 pPos = player->getPos();
-		const float speed = 60.f / dxBase->getFPS();
+		XMFLOAT3 pRota = player->getRotation();
+
+		const float moveSpeed = 90.f / dxBase->getFPS();
+		const bool rotaSpeed = 10.f / dxBase->getFPS();
 
 		const XMFLOAT2 posSize = XMFLOAT2(WinAPI::getInstance()->getWindowSize().x * 0.12f,
 										  WinAPI::getInstance()->getWindowSize().y * 0.12f);
 
-		// 高さ方向に移動
-		if (hitW && pPos.y < posSize.y) {
-			pPos.y += speed;
-		} else if (hitS && pPos.y > -posSize.y) {
-			pPos.y -= speed;
-		}
-		// 横方向に移動
-		if (hitA && pPos.x > -posSize.x) {
-			pPos.x -= speed;
-		} else if (hitD && pPos.x < posSize.x) {
-			pPos.x += speed;
-		}
-		player->setPos(pPos);
-	}
-
-	// 自機回転
-	const bool hitUp = input->hitKey(DIK_UP);
-	const bool hitDown = input->hitKey(DIK_DOWN);
-	const bool hitRight = input->hitKey(DIK_RIGHT);
-	const bool hitLeft = input->hitKey(DIK_LEFT);
-
-	if (hitUp || hitDown || hitRight || hitLeft) {
-		const bool speed = 90.f / dxBase->getFPS();
-
-		XMFLOAT3 rota = player->getRotation();
-
-		if (hitUp) {
-			rota.x -= speed;
-			if (rota.x <= -360.f) {
-				rota.x += 360.f;
+		// Y軸回転
+		if (hitD) {
+			pRota.y += rotaSpeed;
+			if (pRota.y >= 180.f) {
+				pRota.y -= 360.f;
 			}
-		} else if (hitDown) {
-			rota.x += speed;
-			if (rota.x >= 360.f) {
-				rota.x -= 360.f;
+		} else if (hitA) {
+			pRota.y -= rotaSpeed;
+			if (pRota.y <= -180.f) {
+				pRota.y += 360.f;
 			}
 		}
+		player->setRotation(pRota);
 
-		if (hitRight) {
-			rota.y += speed;
-			if (rota.y >= 180.f) {
-				rota.y -= 360.f;
-			}
-		} else if (hitLeft) {
-			rota.y -= speed;
-			if (rota.y <= -180.f) {
-				rota.y += 360.f;
-			}
+		// 奥方向に移動
+		if (hitW) {
+			player->moveForward(moveSpeed);
+		} else if (hitS) {
+			player->moveForward(-moveSpeed);
 		}
-
-		player->setRotation(rota);
 	}
 
 	// Z座標が0を超えたら退場
@@ -442,6 +419,8 @@ void RailShoot::update_play() {
 
 			for (auto &e : enemy) {
 				for (auto &eb : e->getBulList()) {
+					if (!player->getAlive()) break;
+
 					//　存在しない敵弾の処理はしない
 					if (!eb->getAlive()) continue;
 
@@ -449,8 +428,13 @@ void RailShoot::update_play() {
 					if (Collision::CheckHit(playerCol,
 											Sphere(XMLoadFloat3(&eb->getPos()),
 												   eb->getScaleF3().z))) {
-						// 次のシーンへ進む(仮)
-						//changeNextScene();
+						// 当たった敵弾は消す
+						eb->kill();
+						// HPが無くなったら次のシーンへ進む
+						if (--playerHp <= 0u) {
+							changeNextScene();
+							player->kill();
+						}
 					}
 				}
 			}
@@ -460,7 +444,7 @@ void RailShoot::update_play() {
 		enemy.remove_if([](const std::unique_ptr<Enemy> &i) {return !i->getAlive() && i->bulEmpty(); });
 
 		// 敵がすべて消えたら次のシーンへ
-		if (enemy.empty()) {
+		if (enemy.empty() && enemyPopData.empty()) {
 			changeNextScene();
 		}
 	}
@@ -526,6 +510,7 @@ void RailShoot::drawFrontSprite() {
 	ImGui::Text("FPS : %.3f", dxBase->getFPS());
 	ImGui::Text("敵数 : %u", std::distance(enemy.begin(), enemy.end()));
 	ImGui::Text("経過フレーム : %u", nowFrame);
+	ImGui::Text("自機体力 : %u", playerHp);
 	ImGui::End();
 
 	spriteBase->drawStart(dxBase->getCmdList());

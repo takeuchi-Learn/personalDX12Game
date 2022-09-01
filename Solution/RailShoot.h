@@ -52,6 +52,7 @@ class RailShoot
 
 	std::unique_ptr<Player> player;
 	std::unique_ptr<ObjModel> playerModel;
+	UINT playerHp;
 
 	std::unique_ptr<ObjModel> playerBulModel;
 
