@@ -52,6 +52,15 @@ void Player::moveRight(float moveVel, bool moveYFlag) {
 	obj->position.z += XMVectorGetZ(velVec);
 }
 
+void Player::moveUp(float moveVel) {
+	// Y方向のベクトルを、自機の向いている向きに回転
+	XMVECTOR velVec = XMVector3Transform(XMVectorSet(0, moveVel, 0, 1), obj->getMatRota());
+
+	obj->position.x += XMVectorGetX(velVec);
+	obj->position.y += XMVectorGetY(velVec);
+	obj->position.z += XMVectorGetZ(velVec);
+}
+
 void Player::shot(Camera *camera,
 				  ObjModel *model,
 				  float speed,
@@ -59,6 +68,7 @@ void Player::shot(Camera *camera,
 	// C++17から追加した要素の参照が返ってくるようになった
 	PlayerBullet &i = bul.emplace_front(camera, model, obj->position);
 	i.setScale(bulScale);
+	i.setParent(obj->parent);
 
 	if (shotTargetObjPt == nullptr) {
 		i.setVel(XMFLOAT3(0, 0, speed));

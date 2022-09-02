@@ -20,6 +20,8 @@ void Enemy::shot(const DirectX::XMFLOAT3 &targetPos,
 	std::unique_ptr<EnemyBullet> &i = bul.emplace_front(new EnemyBullet(camera,
 																		bulModel,
 																		obj->position));
+	// 親を設定
+	i->setParent(obj->parent);
 
 	// わかりやすいように細長くする
 	constexpr float bulScaleZ = 3.f;

@@ -12,11 +12,6 @@ protected:
 
 	bool alive = true;
 
-	// drawWithUpdate関数の頭で呼ばれる
-	void update();
-
-	void draw(Light *light);
-
 	virtual void additionalUpdate() {};
 	virtual void additionalDraw(Light *light) {}
 
@@ -30,6 +25,8 @@ public:
 		const DirectX::XMFLOAT2 rad = calcRotationSyncVelRad(vel);
 		return DirectX::XMFLOAT2(DirectX::XMConvertToDegrees(rad.x), DirectX::XMConvertToDegrees(rad.y));
 	}
+
+	inline void setParent(Object3d *parent) { obj->parent = parent; }
 
 	inline bool getAlive() const { return alive; }
 	// aliveをfalseにする
@@ -53,6 +50,13 @@ public:
 	GameObj(Camera *camera,
 			ObjModel *model,
 			const DirectX::XMFLOAT3 &pos = { 0,0,0 });
+
+
+	// drawWithUpdate関数の頭で呼ばれる
+	void update();
+
+	// drawWithUpdate関数で呼ばれる
+	void draw(Light *light);
 
 	void drawWithUpdate(Light *light);
 };

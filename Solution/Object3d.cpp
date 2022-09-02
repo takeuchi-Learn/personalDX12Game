@@ -86,15 +86,6 @@ void Object3d::update() {
 		constMapB0->cameraPos = camera->getEye();
 		constBuffB0->Unmap(0, nullptr);
 	}
-	/*ConstBufferDataB1* constMapB1 = nullptr;
-	HRESULT result = constBuffB1->Map(0, nullptr, (void**)&constMapB1);
-	constMapB1->ambient = material.ambient;
-	constMapB1->diffuse = material.diffuse;
-	constMapB1->specular = material.specular;
-	constMapB1->alpha = material.alpha;
-	constBuffB1->Unmap(0, nullptr);*/
-
-	//model->update(dev);
 }
 
 void Object3d::draw(DX12Base *dxBase, Light *light) {

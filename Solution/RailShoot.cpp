@@ -81,20 +81,18 @@ XMVECTOR RailShoot::splinePosition(const std::vector<XMVECTOR> &points,
 	return position;
 }
 
-namespace {
-	std::vector<XMVECTOR> splinePoint;
-	UINT splineNowFrame = 0u;
-	constexpr UINT splineFrameMax = 120u;
-	constexpr UINT splineIndexDef = 1u;
-	UINT splineIndex = splineIndexDef;
-}
-
 RailShoot::RailShoot()
 	: dxBase(DX12Base::getInstance()),
 	input(Input::getInstance()),
 
+	// --------------------
+	// 更新関数の格納変数
+	// --------------------
 	update_proc(std::bind(&RailShoot::update_start, this)),
 
+	// --------------------
+	// シーンに必要な諸要素
+	// --------------------
 	camera(std::make_unique<CameraObj>(nullptr)),
 	light(std::make_unique<Light>()),
 
@@ -102,17 +100,34 @@ RailShoot::RailShoot()
 
 	spriteBase(std::make_unique<SpriteBase>(SpriteBase::BLEND_MODE::REVERSE)),
 
+	// --------------------
+	// 背景と地面
+	// --------------------
 	back(std::make_unique<ObjSet>(camera.get(), "Resources/back/", "back", true)),
 	ground(std::make_unique<ObjSet>(camera.get(), "Resources/ground", "ground", false)),
 
+	// --------------------
+	// 敵モデル
+	// --------------------
 	enemyModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
 	enemyBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
-	playerModel(std::make_unique<ObjModel>("Resources/box", "box")),
 
+	// --------------------
+	// 自機関連
+	// --------------------
+	playerModel(std::make_unique<ObjModel>("Resources/box", "box")),
+	playerBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
 	playerHp(20u),
 
-	playerBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
 
+	// --------------------
+	// レール現在位置のオブジェクト
+	// --------------------
+	railObj(std::make_unique<GameObj>(camera.get(), nullptr)),
+
+	// --------------------
+	// パーティクル
+	// --------------------
 	particleMgr(std::make_unique<ParticleMgr>(L"Resources/effect1.png", camera.get())),
 
 	startSceneChangeTime(0U),
@@ -120,54 +135,72 @@ RailShoot::RailShoot()
 	backPipelineSet(Object3d::createGraphicsPipeline(Object3d::BLEND_MODE::ALPHA,
 													 L"Resources/Shaders/BackVS.hlsl",
 													 L"Resources/Shaders/BackPS.hlsl")) {
-
+	// --------------------
 	// スプライト初期化
+	// --------------------
 	const UINT debugTextTexNumber = spriteBase->loadTexture(L"Resources/debugfont.png");
 	debugText = std::make_unique<DebugText>(debugTextTexNumber, spriteBase.get());
 
 	const UINT aimPosTexNum = spriteBase->loadTexture(L"Resources/aimPos.png");
 	aim2D = std::make_unique<Sprite>(aimPosTexNum, spriteBase.get());
 
+	// --------------------
 	// カメラ初期化
+	// --------------------
 	camera->setFarZ(5000.f);
 	camera->setEye(XMFLOAT3(0, WinAPI::getInstance()->getWindowSize().y * 0.06f, -180));	// 視点座標
 	camera->setTarget(XMFLOAT3(0, 0, 0));	// 注視点座標
 	camera->setUp(XMFLOAT3(0, 1, 0));		// 上方向
 	//camera->update();
 
+	// --------------------
 	// ライト初期化
+	// --------------------
 	light->setLightPos(camera->getEye());
 
-	// 自機初期化
-	constexpr XMFLOAT3 playerStartPos = XMFLOAT3(0, 0, 0);
-	player = std::make_unique<Player>(camera.get(), playerModel.get(), playerStartPos);
-	player->setScale(10.f);
 
-	camera->setParentObj(player.get());
+	// --------------------
+	// レール現在位置のオブジェクト
+	// --------------------
+	/*railObj->setPos(XMFLOAT3(0, 0, 0));
+	railObj->setScale(1.f);
+	railObj->setRotation(XMFLOAT3(0, 0, 0));*/
+
+	// --------------------
+	// 自機初期化
+	// --------------------
+	player = std::make_unique<Player>(camera.get(), playerModel.get());
+	player->setScale(10.f);
+	player->setParent(railObj.get());
+
+	// カメラをレールに追従させる
+	camera->setParentObj(railObj.get());
 	camera->update();
 
+	// --------------------
 	// スプライン
+	// --------------------
+
 	// startとendは2つ必要
 	splinePoint.emplace_back(XMVectorSet(0, 0, 0, 1));		// start
 	splinePoint.emplace_back(XMVectorSet(0, 0, 0, 1));		// start
 	splinePoint.emplace_back(XMVectorSet(0, 0, 200, 1));	// 経由1
 	splinePoint.emplace_back(XMVectorSet(20, 50, 400, 1));	// 経由2
 	splinePoint.emplace_back(XMVectorSet(20, 50, 600, 1));	// 経由3
-	splinePoint.emplace_back(XMVectorSet(0, 100, 800, 1));	// end
-	splinePoint.emplace_back(XMVectorSet(0, 100, 800, 1));	// end
+	splinePoint.emplace_back(XMVectorSet(20, 50, 800, 1));	// 経由4
+	splinePoint.emplace_back(XMVectorSet(20, 50, 800, 1));	// 経由5
+	splinePoint.emplace_back(XMVectorSet(20, 50, 1000, 1));	// 経由6
+	splinePoint.emplace_back(XMVectorSet(20, 50, 1200, 1));	// 経由7
+	splinePoint.emplace_back(XMVectorSet(20, 50, 1400, 1));	// 経由8
+	splinePoint.emplace_back(XMVectorSet(0, 100, 1600, 1));	// end
+	splinePoint.emplace_back(XMVectorSet(0, 100, 1600, 1));	// end
 
+	// --------------------
 	// 敵初期化
+	// --------------------
+
+	// 敵は最初居ない
 	enemy.resize(0U);
-
-	// 天球
-	const float backScale = camera->getFarZ() * 0.9f;
-	back->setScale({ backScale, backScale, backScale });
-
-	// 地面
-	const UINT groundSize = 5000u;
-	ground->setPos(XMFLOAT3(0, -player->getScale(), 0));
-	ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
-	ground->getModelPt()->setTexTilling(XMFLOAT2(groundSize / 32.f, groundSize / 32.f));
 
 	// 敵発生スクリプト
 	csvData = loadCsv("Resources/enemyScript.csv", true, ',', "//");
@@ -186,6 +219,23 @@ RailShoot::RailShoot()
 		}
 	}
 
+	// --------------------
+	// 背景と地面
+	// --------------------
+
+	// 背景の天球
+	const float backScale = camera->getFarZ() * 0.9f;
+	back->setScale({ backScale, backScale, backScale });
+
+	// 地面
+	const UINT groundSize = 5000u;
+	ground->setPos(XMFLOAT3(0, -player->getScale(), 0));
+	ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
+	ground->getModelPt()->setTexTilling(XMFLOAT2(groundSize / 32.f, groundSize / 32.f));
+
+	// --------------------
+	// マウスカーソルは表示しない
+	// --------------------
 	input->changeDispMouseCursorFlag(false);
 }
 
@@ -208,6 +258,9 @@ void RailShoot::update() {
 
 	// 主な処理
 	update_proc();
+
+	// レールの現在位置オブジェクト更新
+	railObj->update();
 
 	// ライトとカメラの更新
 	light->update();
@@ -239,9 +292,15 @@ void RailShoot::createParticle(const DirectX::XMFLOAT3 &pos,
 		constexpr float endScale = 0.f;
 		constexpr float startRota = 0.f, endRota = 0.f;
 
+		const XMFLOAT3 particlePos{
+			pos.x + railObj->getPos().x,
+			pos.y + railObj->getPos().y,
+			pos.z + railObj->getPos().z
+		};
+
 		// 追加
 		particleMgr->add(std::make_unique<Time>(),
-						 life, pos, vel, acc,
+						 life, particlePos, vel, acc,
 						 startScale, endScale,
 						 startRota, endRota,
 						 startCol, endCol);
@@ -253,6 +312,7 @@ void RailShoot::addEnemy(const DirectX::XMFLOAT3 &pos, const DirectX::XMFLOAT3 &
 	i->setScale(scale);
 	i->setVel(vel);
 	i->setTargetObj(player.get());
+	i->setParent(railObj->getObj());
 }
 
 void RailShoot::changeNextScene() {
@@ -290,7 +350,10 @@ void RailShoot::update_play() {
 	player->setAim2DPos(XMFLOAT2((float)input->getMousePos().x,
 								 (float)input->getMousePos().y));
 
+	// --------------------
 	// 敵を増やす
+	// --------------------
+
 	// 終わった発生情報は削除
 	enemyPopData.remove_if([&](std::unique_ptr<PopEnemyData> &i) {
 		const bool ended = nowFrame >= i->popFrame;
@@ -299,40 +362,55 @@ void RailShoot::update_play() {
 		}
 		return ended; });
 
+	// --------------------
+	// レール現在位置オブジェクト
+	// --------------------
+	{
+		float raito = float(splineNowFrame++) / float(splineFrameMax);
+		if (raito >= 1.f) {
+			if (splineIndex < splinePoint.size() - 3) {
+				++splineIndex;
+				raito -= 1.f;
+				splineNowFrame = 0u;
+			} else {
+				raito = 1.f;
+			}
+		}
+		XMFLOAT3 pos{};
+		XMStoreFloat3(&pos,
+					  splinePosition(splinePoint,
+									 splineIndex,
+									 raito));
+		railObj->setPos(pos);
+	}
+
+	// --------------------
+	// 自機移動
+	// --------------------
 	const bool hitW = input->hitKey(DIK_W);
 	const bool hitA = input->hitKey(DIK_A);
 	const bool hitS = input->hitKey(DIK_S);
 	const bool hitD = input->hitKey(DIK_D);
 
-	// 自機移動
 	if (hitW || hitA || hitS || hitD) {
-		XMFLOAT3 pRota = player->getRotation();
 
 		const float moveSpeed = 90.f / dxBase->getFPS();
-		const bool rotaSpeed = 10.f / dxBase->getFPS();
 
 		const XMFLOAT2 posSize = XMFLOAT2(WinAPI::getInstance()->getWindowSize().x * 0.12f,
 										  WinAPI::getInstance()->getWindowSize().y * 0.12f);
 
-		// Y軸回転
+		// 横移動
 		if (hitD) {
-			pRota.y += rotaSpeed;
-			if (pRota.y >= 180.f) {
-				pRota.y -= 360.f;
-			}
+			player->moveRight(moveSpeed);
 		} else if (hitA) {
-			pRota.y -= rotaSpeed;
-			if (pRota.y <= -180.f) {
-				pRota.y += 360.f;
-			}
+			player->moveRight(-moveSpeed);
 		}
-		player->setRotation(pRota);
 
 		// 奥方向に移動
 		if (hitW) {
-			player->moveForward(moveSpeed);
+			player->moveUp(moveSpeed);
 		} else if (hitS) {
-			player->moveForward(-moveSpeed);
+			player->moveUp(-moveSpeed);
 		}
 	}
 
@@ -343,7 +421,9 @@ void RailShoot::update_play() {
 		}
 	}
 
+	// --------------------
 	// ロックオン
+	// --------------------
 	{
 		// 照準の範囲
 		const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - aim2D->getSize().x / 2.f,
@@ -354,13 +434,12 @@ void RailShoot::update_play() {
 		// スクリーン上の敵の位置格納変数
 		XMFLOAT2 screenEnemyPos{};
 
+		// 遠い敵を調べるためのもの
 		float oldEnemyDistance{}, nowEnemyDistance{};
 		Enemy *farthestEnemyPt = nullptr;
 		float farthestEnemyLen = 1.f;
 
 		// 最も近い敵の方へ弾を飛ばす
-		// undone: うまくいかない
-
 		for (auto &i : enemy) {
 			// いない敵は無視
 			if (!i->getAlive()) continue;
@@ -373,7 +452,6 @@ void RailShoot::update_play() {
 				aim2DMin.y <= screenEnemyPos.y &&
 				aim2DMax.x >= screenEnemyPos.x &&
 				aim2DMax.y >= screenEnemyPos.y) {
-
 				// 敵との距離を更新
 				oldEnemyDistance = nowEnemyDistance;
 				nowEnemyDistance = sqrtf(
@@ -381,7 +459,7 @@ void RailShoot::update_play() {
 					powf(i->getPos().y - camera->getEye().y, 2.f) +
 					powf(i->getPos().z - camera->getEye().z, 2.f)
 				);
-
+				// 照準の中で最も遠い敵なら情報を取っておく
 				if (farthestEnemyLen < nowEnemyDistance) {
 					farthestEnemyPt = i.get();
 					farthestEnemyLen = nowEnemyDistance;
@@ -389,13 +467,15 @@ void RailShoot::update_play() {
 			}
 		}
 
+		// 照準の中に敵がいればそこへ弾を出す
+		// いなければターゲットはいない
 		if (farthestEnemyPt != nullptr) {
 			player->setShotTarget(farthestEnemyPt->getObj());
 		} else {
 			player->setShotTarget(nullptr);
 		}
-
 #ifdef _DEBUG
+		// 照準の中に敵がいるかどうかを表示
 		debugText->formatPrint(spriteBase.get(),
 							   300.f, 0.f,
 							   1.f,
@@ -404,14 +484,21 @@ void RailShoot::update_play() {
 #endif // _DEBUG
 	}
 
+	// --------------------
 	// 弾発射
+	// --------------------
 	if (input->triggerMouseButton(Input::MOUSE::LEFT)) {
 		constexpr float bulSpeed = 8.f;
 		player->shot(camera.get(), playerBulModel.get(), bulSpeed);
 	}
 
-	// 自機弾と敵の当たり判定
+	// --------------------
+	// 当たり判定
+	// --------------------
 	{
+		// --------------------
+		// 自機弾と敵の当たり判定
+		// --------------------
 		Sphere pBulCol{};
 		for (auto &pb : player->getBulArr()) {
 			if (!pb.getAlive()) continue;
@@ -432,7 +519,9 @@ void RailShoot::update_play() {
 			}
 		}
 
+		// --------------------
 		// 自機と敵弾の当たり判定
+		// --------------------
 		if (player->getAlive()) {
 			const Sphere playerCol(XMLoadFloat3(&player->getPos()), player->getScale());
 
@@ -468,8 +557,10 @@ void RailShoot::update_play() {
 		}
 	}
 
+	// ライトはカメラの位置にする
 	light->setLightPos(camera->getEye());
 
+	// 今のフレームを進める
 	++nowFrame;
 }
 

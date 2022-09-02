@@ -10,6 +10,8 @@ CameraObj::CameraObj(GameObj *parent)
 }
 
 void CameraObj::preUpdate() {
+	if (parentObj == nullptr) return;
+
 	// カメラ操作を反転するかどうか
 	constexpr bool invCamOperFlag = false;
 	// 反転するなら1、しないなら-1

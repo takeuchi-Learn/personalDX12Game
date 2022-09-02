@@ -34,37 +34,57 @@ class RailShoot
 	std::unique_ptr<Time> timer;
 
 
-
+	// --------------------
 	// スプライト
+	// --------------------
 	std::unique_ptr<SpriteBase> spriteBase;
 	std::unique_ptr<DebugText> debugText;
 
 	std::unique_ptr<Sprite> aim2D;
 
-	// 3Dオブジェクト用パイプライン
+	// --------------------
+	// 3Dオブジェクト
+	// --------------------
+	// 背景のパイプライン
 	Object3d::PipelineSet backPipelineSet;
 
+	// 背景と地面
 	std::unique_ptr<ObjSet> back;
 	std::unique_ptr<ObjSet> ground;
 
+	// 敵
 	std::forward_list<std::unique_ptr<Enemy>> enemy;
 	std::unique_ptr<ObjModel> enemyModel;
 	std::unique_ptr<ObjModel> enemyBulModel;
 
+	// 自機
 	std::unique_ptr<Player> player;
 	std::unique_ptr<ObjModel> playerModel;
+	std::unique_ptr<ObjModel> playerBulModel;
 	UINT playerHp;
 
-	std::unique_ptr<ObjModel> playerBulModel;
+	// レールの現在位置を示すオブジェクト
+	std::unique_ptr<GameObj> railObj;
 
-
+	// --------------------
+	// パーティクル
+	// --------------------
 	std::unique_ptr<ParticleMgr> particleMgr;
 
-
-
+	// --------------------
+	// シーン遷移
+	// --------------------
 	static const Time::timeType sceneChangeTime;
 
 	Time::timeType startSceneChangeTime{};
+	// --------------------
+	// スプライン補間
+	// --------------------
+	std::vector<DirectX::XMVECTOR> splinePoint;
+	UINT splineNowFrame = 0u;
+	static const UINT splineFrameMax = 120u;
+	static const UINT splineIndexDef = 1u;
+	UINT splineIndex = splineIndexDef;
 
 
 

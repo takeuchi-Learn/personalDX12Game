@@ -52,6 +52,12 @@ public:
 	/// <param name="moveYFlag">Y方向に移動するか</param>
 	void moveRight(float moveVel, bool moveYFlag = false);
 
+	/// <summary>
+	/// 上に移動。前進処理のベクトルを上に90度傾けた移動。
+	/// </summary>
+	/// <param name="moveVel">移動量</param>
+	void moveUp(float moveVel);
+
 	// @param vel 毎秒進む値
 	void shot(Camera *camera,
 			  ObjModel *model,

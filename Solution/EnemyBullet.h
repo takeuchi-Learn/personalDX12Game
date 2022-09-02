@@ -9,7 +9,7 @@ class EnemyBullet
 
 public:
 
-	uint16_t life = 240;
+	uint16_t life = 720;
 	uint16_t age = 0;
 
 private:
