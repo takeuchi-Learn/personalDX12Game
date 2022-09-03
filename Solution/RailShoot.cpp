@@ -98,7 +98,7 @@ RailShoot::RailShoot()
 
 	timer(std::make_unique<Time>()),
 
-	spriteBase(std::make_unique<SpriteBase>(SpriteBase::BLEND_MODE::REVERSE)),
+	spriteBase(std::make_unique<SpriteBase>(SpriteBase::BLEND_MODE::ALPHA)),
 
 	// --------------------
 	// 背景と地面
@@ -118,7 +118,6 @@ RailShoot::RailShoot()
 	playerModel(std::make_unique<ObjModel>("Resources/box", "box")),
 	playerBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
 	playerHp(20u),
-
 
 	// --------------------
 	// レール現在位置のオブジェクト
@@ -157,7 +156,6 @@ RailShoot::RailShoot()
 	// ライト初期化
 	// --------------------
 	light->setLightPos(camera->getEye());
-
 
 	// --------------------
 	// レール現在位置のオブジェクト
@@ -393,11 +391,10 @@ void RailShoot::update_play() {
 	const bool hitD = input->hitKey(DIK_D);
 
 	if (hitW || hitA || hitS || hitD) {
-
 		const float moveSpeed = 90.f / dxBase->getFPS();
 
-		const XMFLOAT2 posSize = XMFLOAT2(WinAPI::getInstance()->getWindowSize().x * 0.12f,
-										  WinAPI::getInstance()->getWindowSize().y * 0.12f);
+		constexpr XMFLOAT2 posSize = XMFLOAT2(WinAPI::window_width * 0.12f,
+											  WinAPI::window_height * 0.12f);
 
 		// 横移動
 		if (hitD) {
@@ -414,7 +411,7 @@ void RailShoot::update_play() {
 		}
 	}
 
-	// Z座標が0を超えたら退場
+	// Z座標が0を超えた敵は退場
 	for (auto &i : enemy) {
 		if (i->getPos().z < 0.f) {
 			i->chansePhase_Leave(DirectX::XMFLOAT3(-1, 1, 0));
@@ -471,8 +468,10 @@ void RailShoot::update_play() {
 		// いなければターゲットはいない
 		if (farthestEnemyPt != nullptr) {
 			player->setShotTarget(farthestEnemyPt->getObj());
+			aim2D->color = XMFLOAT4(1, 0, 0, 1);
 		} else {
 			player->setShotTarget(nullptr);
+			aim2D->color = XMFLOAT4(0, 0, 0, 1);
 		}
 #ifdef _DEBUG
 		// 照準の中に敵がいるかどうかを表示
@@ -487,9 +486,11 @@ void RailShoot::update_play() {
 	// --------------------
 	// 弾発射
 	// --------------------
-	if (input->triggerMouseButton(Input::MOUSE::LEFT)) {
-		constexpr float bulSpeed = 8.f;
-		player->shot(camera.get(), playerBulModel.get(), bulSpeed);
+	if (player->shotTargetIsEmpty()) {
+		if (input->triggerMouseButton(Input::MOUSE::LEFT)) {
+			constexpr float bulSpeed = 8.f;
+			player->shot(camera.get(), playerBulModel.get(), bulSpeed);
+		}
 	}
 
 	// --------------------
