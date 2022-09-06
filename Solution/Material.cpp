@@ -1,7 +1,6 @@
 ﻿#include "Material.h"
 #include <DirectXTex.h>
 #include <cassert>
-#include "SpriteCommon.h"
 
 using namespace DirectX;
 

@@ -334,6 +334,8 @@ void RailShoot::update_start() {
 	const float mosCoe = powf(timeRaito, 5);
 	PostEffect::getInstance()->setMosaicNum(XMFLOAT2(WinAPI::getInstance()->getWindowSize().x * mosCoe,
 													 WinAPI::getInstance()->getWindowSize().y * mosCoe));
+
+	PostEffect::getInstance()->setNoiseIntensity(1.f- timeRaito);
 }
 
 void RailShoot::update_play() {
@@ -577,6 +579,8 @@ void RailShoot::update_end() {
 	const float mosCoe = powf(1.f - timeRaito, 5);
 	PostEffect::getInstance()->setMosaicNum(XMFLOAT2(WinAPI::window_width * mosCoe,
 													 WinAPI::window_height * mosCoe));
+
+	PostEffect::getInstance()->setNoiseIntensity(1.f - timeRaito);
 }
 
 void RailShoot::drawObj3d() {

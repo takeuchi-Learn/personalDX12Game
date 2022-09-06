@@ -1,4 +1,4 @@
-﻿#include "SpriteCommon.h"
+﻿#include "SpriteBase.h"
 
 #pragma comment(lib, "d3d12.lib")
 
@@ -18,8 +18,8 @@ UINT SpriteBase::nowTexNum = 0u;
 
 // スプライト用パイプライン生成
 SpriteBase::PipelineSet SpriteBase::SpriteCreateGraphicsPipeline(ID3D12Device *dev,
-																	 const wchar_t *vsPath, const wchar_t *psPath,
-																	 BLEND_MODE blendMode) {
+																 const wchar_t *vsPath, const wchar_t *psPath,
+																 BLEND_MODE blendMode) {
 	HRESULT result;
 
 	ComPtr<ID3DBlob> vsBlob = nullptr; // 頂点シェーダオブジェクト
@@ -204,6 +204,21 @@ UINT SpriteBase::loadTexture(const wchar_t *filename, DirectX::XMFLOAT2 *pTexSiz
 		WIC_FLAGS_NONE,
 		&metadata, scratchImg);
 
+	ScratchImage mipChain{};
+	// ミップマップ生成
+	result = GenerateMipMaps(
+		scratchImg.GetImages(),
+		scratchImg.GetImageCount(),
+		scratchImg.GetMetadata(),
+		TEX_FILTER_DEFAULT,
+		0,
+		mipChain);
+
+	if (SUCCEEDED(result)) {
+		scratchImg = std::move(mipChain);
+		metadata = scratchImg.GetMetadata();
+	}
+
 	const Image *img = scratchImg.GetImage(0, 0, 0); // 生データ抽出
 
 	// リソース設定
@@ -273,7 +288,7 @@ void SpriteBase::drawStart(ID3D12GraphicsCommandList *cmdList) {
 }
 
 SpriteBase::SpriteBase(BLEND_MODE blendMode,
-						   const wchar_t *vsPath, const wchar_t *psPath) {
+					   const wchar_t *vsPath, const wchar_t *psPath) {
 	// スプライト用パイプライン生成
 	pipelineSet = SpriteCreateGraphicsPipeline(DX12Base::getInstance()->getDev(), vsPath, psPath, blendMode);
 

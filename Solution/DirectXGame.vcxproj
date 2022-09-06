@@ -190,7 +190,7 @@
     <ClCompile Include="PlayerBullet.cpp" />
     <ClCompile Include="RailShoot.cpp" />
     <ClCompile Include="SoundBase.cpp" />
-    <ClCompile Include="SpriteCommon.cpp" />
+    <ClCompile Include="SpriteBase.cpp" />
     <ClCompile Include="Object3d.cpp" />
     <ClCompile Include="ParticleMgr.cpp" />
     <ClCompile Include="PlayScene.cpp" />
@@ -238,7 +238,7 @@
     <ClInclude Include="PlayerBullet.h" />
     <ClInclude Include="RailShoot.h" />
     <ClInclude Include="SoundBase.h" />
-    <ClInclude Include="SpriteCommon.h" />
+    <ClInclude Include="SpriteBase.h" />
     <ClInclude Include="Object3d.h" />
     <ClInclude Include="ParticleMgr.h" />
     <ClInclude Include="PlayScene.h" />

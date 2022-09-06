@@ -141,7 +141,7 @@
     <ClCompile Include="Sprite.cpp">
       <Filter>Object共通\Sprite</Filter>
     </ClCompile>
-    <ClCompile Include="SpriteCommon.cpp">
+    <ClCompile Include="SpriteBase.cpp">
       <Filter>Object共通\Sprite</Filter>
     </ClCompile>
     <ClCompile Include="Light.cpp">
@@ -239,7 +239,7 @@
     <ClInclude Include="Sprite.h">
       <Filter>Object共通\Sprite</Filter>
     </ClInclude>
-    <ClInclude Include="SpriteCommon.h">
+    <ClInclude Include="SpriteBase.h">
       <Filter>Object共通\Sprite</Filter>
     </ClInclude>
     <ClInclude Include="Collision.h">

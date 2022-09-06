@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "SpriteCommon.h"
+#include "SpriteBase.h"
 
 #include "DX12Base.h"
 
