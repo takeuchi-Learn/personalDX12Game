@@ -12,19 +12,22 @@
 
 #include "Light.h"
 
-System::System() {
+System::System()
+{
 }
 
-void System::update() {
-	if (!error) {
+void System::update()
+{
+	if (!error)
+	{
 		// ゲームループ
 		while (!WinAPI::getInstance()->processMessage()
-			   && !Looper::getInstance()->loop()) {
-
+			   && !Looper::getInstance()->loop())
+		{
 		}
 	}
 }
 
-System::~System() {
-
+System::~System()
+{
 }

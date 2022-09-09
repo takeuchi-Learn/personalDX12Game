@@ -9,7 +9,8 @@
 #include "GameObj.h"
 
 class Player
-	: public GameObj {
+	: public GameObj
+{
 	using XMFLOAT3 = DirectX::XMFLOAT3;
 	using XMVECTOR = DirectX::XMVECTOR;
 
@@ -17,26 +18,26 @@ class Player
 
 	DirectX::XMFLOAT2 aim2DPos{};
 
-	Object3d *shotTargetObjPt = nullptr;
+	Object3d* shotTargetObjPt = nullptr;
 
 public:
-	Player(Camera *camera,
-		   ObjModel *model,
-		   const DirectX::XMFLOAT3 &pos = { 0.f,0.f,0.f });
+	Player(Camera* camera,
+		   ObjModel* model,
+		   const DirectX::XMFLOAT3& pos = { 0.f,0.f,0.f });
 
 	XMVECTOR getLookVec(float len = 1.f);
 
 	inline bool shotTargetIsEmpty() const { return shotTargetObjPt != nullptr; }
-	inline void setShotTarget(Object3d *targetPt) { shotTargetObjPt = targetPt; }
+	inline void setShotTarget(Object3d* targetPt) { shotTargetObjPt = targetPt; }
 
-	inline auto &getBulArr() { return bul; }
+	inline auto& getBulArr() { return bul; }
 
 	inline auto getMatWorld() const { return obj->getMatWorld(); }
 
-	inline void setParent(GameObj *parent) { obj->parent = parent->getObj(); }
+	inline void setParent(GameObj* parent) { obj->parent = parent->getObj(); }
 
-	inline const DirectX::XMFLOAT2 &getAim2DPos() const { return aim2DPos; }
-	inline void setAim2DPos(const DirectX::XMFLOAT2 &screenPos) { aim2DPos = screenPos; }
+	inline const DirectX::XMFLOAT2& getAim2DPos() const { return aim2DPos; }
+	inline void setAim2DPos(const DirectX::XMFLOAT2& screenPos) { aim2DPos = screenPos; }
 
 	/// <summary>
 	/// 視線方向に前進
@@ -59,12 +60,11 @@ public:
 	void moveUp(float moveVel);
 
 	// @param vel 毎秒進む値
-	void shot(Camera *camera,
-			  ObjModel *model,
+	void shot(Camera* camera,
+			  ObjModel* model,
 			  float speed = 1.f,
 			  float bulScale = 10.f);
 
 	void additionalUpdate() override;
-	void additionalDraw(Light *light) override;
+	void additionalDraw(Light* light) override;
 };
-

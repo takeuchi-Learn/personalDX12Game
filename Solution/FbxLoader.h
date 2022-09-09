@@ -7,7 +7,8 @@
 
 #include "FbxModel.h"
 
-class FbxLoader {
+class FbxLoader
+{
 public:
 	/// <summary>
 	/// シングルトンインスタンスの取得
@@ -24,8 +25,6 @@ private:
 	FbxLoader(const FbxLoader& obj) = delete;
 	// コピー代入演算子を禁止（シングルトンパターン）
 	void operator=(const FbxLoader& obj) = delete;
-
-
 
 	// 初期化
 	void init();

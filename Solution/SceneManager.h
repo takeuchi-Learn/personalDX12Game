@@ -3,7 +3,8 @@
 #include <memory>
 
 class SceneManager
-	: public GameScene {
+	: public GameScene
+{
 private:
 	SceneManager(const SceneManager& sm) = delete;
 	SceneManager& operator=(const SceneManager& sm) = delete;
@@ -19,7 +20,8 @@ private:
 public:
 	inline UINT getPostEff2Num() { return postEff2Num; }
 
-	inline static SceneManager *getInstange() {
+	inline static SceneManager* getInstange()
+	{
 		static std::unique_ptr<SceneManager> sm(new SceneManager());
 		return sm.get();
 	}
@@ -32,4 +34,3 @@ public:
 
 	void changeScene(GameScene* nextScene);
 };
-

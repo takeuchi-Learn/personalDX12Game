@@ -8,8 +8,8 @@
 #include <memory>
 
 class EndScene :
-    public GameScene {
-
+	public GameScene
+{
 	// --------------------
 	// デバッグテキスト
 	// --------------------
@@ -22,7 +22,6 @@ class EndScene :
 
 public:
 	EndScene();
-    void update() override;
-    void drawFrontSprite() override;
+	void update() override;
+	void drawFrontSprite() override;
 };
-

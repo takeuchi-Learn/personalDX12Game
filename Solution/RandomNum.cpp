@@ -1,14 +1,17 @@
 ﻿#include <random>
 #include "RandomNum.h"
 
-RandomNum* RandomNum::getInstance() {
-    static RandomNum myRand{};
-    return &myRand;
+RandomNum* RandomNum::getInstance()
+{
+	static RandomNum myRand{};
+	return &myRand;
 }
 
-int RandomNum::local_getRand(const int min, const int max) {
+int RandomNum::local_getRand(const int min, const int max)
+{
 	int minLocal = min, maxLocal = max;
-	if (max < min) {
+	if (max < min)
+	{
 		minLocal = max;
 		maxLocal = min;
 	}
@@ -16,9 +19,11 @@ int RandomNum::local_getRand(const int min, const int max) {
 	return myRand(mt);
 }
 
-double RandomNum::local_getRand(const double min, const double max) {
+double RandomNum::local_getRand(const double min, const double max)
+{
 	double minLocal = min, maxLocal = max;
-	if (max < min) {
+	if (max < min)
+	{
 		minLocal = max;
 		maxLocal = min;
 	}
@@ -26,7 +31,8 @@ double RandomNum::local_getRand(const double min, const double max) {
 	return myRand(mt);
 }
 
-double RandomNum::local_getRandNormally(const double center, const double range) {
+double RandomNum::local_getRandNormally(const double center, const double range)
+{
 	double rangeLocal = range;
 	if (range < 0.0) rangeLocal = -rangeLocal;
 	else if (range == 0.0) rangeLocal = 1.f;
@@ -35,22 +41,27 @@ double RandomNum::local_getRandNormally(const double center, const double range)
 	return myRand(mt);
 }
 
-int RandomNum::getRand(const int min, const int max) {
+int RandomNum::getRand(const int min, const int max)
+{
 	return getInstance()->local_getRand(min, max);
 }
 
-double RandomNum::getRand(const double min, const double max) {
+double RandomNum::getRand(const double min, const double max)
+{
 	return getInstance()->local_getRand(min, max);
 }
 
-float RandomNum::getRandf(const float min, const float max) {
+float RandomNum::getRandf(const float min, const float max)
+{
 	return (float)getRand((double)min, (double)max);
 }
 
-double RandomNum::getRandNormally(const double center, const double range) {
+double RandomNum::getRandNormally(const double center, const double range)
+{
 	return getInstance()->local_getRandNormally(center, range);
 }
 
-float RandomNum::getRandNormallyf(const float center, const float range) {
+float RandomNum::getRandNormallyf(const float center, const float range)
+{
 	return (float)getRandNormally((double)center, (double)range);
 }

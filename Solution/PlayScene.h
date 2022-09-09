@@ -33,8 +33,8 @@
 #include <memory>
 
 class PlayScene :
-	public GameScene {
-
+	public GameScene
+{
 #pragma region カメラ
 
 	std::unique_ptr<Camera> camera;
@@ -61,7 +61,6 @@ class PlayScene :
 	// スプライト個別
 	// --------------------
 
-
 	// --------------------
 	// デバッグテキスト
 	// --------------------
@@ -77,7 +76,6 @@ class PlayScene :
 	std::unique_ptr<Light> light;
 
 #pragma endregion ライト
-
 
 #pragma region 3Dオブジェクト
 
@@ -146,15 +144,14 @@ class PlayScene :
 
 #pragma region シングルトンインスタンス
 
-	Input *input = nullptr;
+	Input* input = nullptr;
 
-	DX12Base *dxBase = nullptr;
+	DX12Base* dxBase = nullptr;
 
 #pragma endregion シングルトンインスタンス
 
-
 private:
-	void createParticle(const DirectX::XMFLOAT3 &pos, const UINT particleNum = 10U, const float startScale = 1.f, const float vel = 5.f);
+	void createParticle(const DirectX::XMFLOAT3& pos, const UINT particleNum = 10U, const float startScale = 1.f, const float vel = 5.f);
 	inline ImVec2 getWindowLBPos() { return ImVec2(ImGui::GetWindowPos().x, ImGui::GetWindowPos().y + ImGui::GetWindowSize().y); }
 
 	// update_何とか関数を格納する
@@ -166,10 +163,7 @@ private:
 
 	void changeEndScene();
 
-
-
 	void drawImGui();
-
 
 #pragma region 初期化関数
 
@@ -205,8 +199,6 @@ private:
 
 	void updateSprite();
 
-
-
 	void updatePlayer();
 
 	void updatePlayerBullet();
@@ -214,7 +206,6 @@ private:
 	void updateBoss();
 
 #pragma endregion 更新関数
-
 
 public:
 
@@ -226,4 +217,3 @@ public:
 
 	~PlayScene() override;
 };
-

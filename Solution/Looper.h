@@ -2,7 +2,8 @@
 #include "PostEffect.h"
 #include <memory>
 
-class Looper {
+class Looper
+{
 private:
 	Looper(const Looper& looper) = delete;
 	Looper& operator=(const Looper& looper) = delete;
@@ -17,13 +18,12 @@ private:
 public:
 	~Looper();
 
-	inline static Looper *getInstance() {
+	inline static Looper* getInstance()
+	{
 		static std::unique_ptr<Looper> lp(new Looper());
 		return lp.get();
 	}
 
-
 	// @return 異常の有無(falseで正常)
 	bool loop();
 };
-

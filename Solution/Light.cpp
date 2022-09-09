@@ -4,25 +4,29 @@
 
 using namespace DirectX;
 
-DX12Base *Light::dxBase = DX12Base::getInstance();
+DX12Base* Light::dxBase = DX12Base::getInstance();
 
-Light::Light() {
+Light::Light()
+{
 	init();
 }
 
-void Light::transferConstBuffer() {
+void Light::transferConstBuffer()
+{
 	HRESULT result = S_FALSE;
 	//定数バッファへデータ転送
-	ConstBufferData *constMap = nullptr;
-	result = constBuff->Map(0, nullptr, (void **)&constMap);
-	if (SUCCEEDED(result)) {
+	ConstBufferData* constMap = nullptr;
+	result = constBuff->Map(0, nullptr, (void**)&constMap);
+	if (SUCCEEDED(result))
+	{
 		constMap->lightPos = pos;
 		constMap->lightColor = color;
 		constBuff->Unmap(0, nullptr);
 	}
 }
 
-void Light::init() {
+void Light::init()
+{
 	//定数バッファ生成
 	HRESULT result = dxBase->getDev()->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
@@ -38,24 +42,29 @@ void Light::init() {
 	transferConstBuffer();
 }
 
-void Light::setLightPos(const DirectX::XMFLOAT3 &lightPos) {
+void Light::setLightPos(const DirectX::XMFLOAT3& lightPos)
+{
 	pos = lightPos;
 	dirty = true;
 }
 
-void Light::setLightColor(const DirectX::XMFLOAT3 &lightColor) {
+void Light::setLightColor(const DirectX::XMFLOAT3& lightColor)
+{
 	this->color = lightColor;
 	dirty = true;
 }
 
-void Light::update() {
-	if (dirty) {
+void Light::update()
+{
+	if (dirty)
+	{
 		transferConstBuffer();
 		dirty = false;
 	}
 }
 
-void Light::draw(UINT rootParamIndex) {
+void Light::draw(UINT rootParamIndex)
+{
 	dxBase->getCmdList()->SetGraphicsRootConstantBufferView(rootParamIndex,
-														   constBuff->GetGPUVirtualAddress());
+															constBuff->GetGPUVirtualAddress());
 }

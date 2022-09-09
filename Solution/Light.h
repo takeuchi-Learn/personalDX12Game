@@ -5,19 +5,21 @@
 #include <d3d12.h>
 #include "DX12Base.h"
 
-class Light {
+class Light
+{
 private:
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 public:
-	struct ConstBufferData {
+	struct ConstBufferData
+	{
 		DirectX::XMFLOAT3 lightPos{ 0, 0, 0 };		// ライトの位置(ワールド)
 		float pad{};
 		DirectX::XMFLOAT3 lightColor{ 1, 1, 1 };	// ライト色
 	};
 
 private:
-	static DX12Base *dxBase;
+	static DX12Base* dxBase;
 
 private:
 	ComPtr<ID3D12Resource> constBuff;	// 定数バッファ
@@ -26,7 +28,7 @@ private:
 	bool dirty = false;
 
 public:
-	inline const DirectX::XMFLOAT3 &getPos() { return pos; }
+	inline const DirectX::XMFLOAT3& getPos() { return pos; }
 
 	// 内部でinit関数を呼び出している
 	Light();
@@ -37,12 +39,11 @@ public:
 	void init();
 
 	// 光線の方向をセット
-	void setLightPos(const DirectX::XMFLOAT3 &lightPos);
-	void setLightColor(const DirectX::XMFLOAT3 &lightColor);
+	void setLightPos(const DirectX::XMFLOAT3& lightPos);
+	void setLightColor(const DirectX::XMFLOAT3& lightColor);
 
 	void update();
 
 	// @param rootParamIndex : Object3dクラスのcreateGraphicsPipeline関数内のrootParamsの要素数
 	void draw(UINT rootParamIndex);
 };
-

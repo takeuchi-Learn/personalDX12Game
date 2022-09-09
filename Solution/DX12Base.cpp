@@ -20,7 +20,8 @@ using namespace Microsoft::WRL;
 
 using namespace DirectX;
 
-namespace {
+namespace
+{
 	constexpr ImWchar glyphRangesJapanese[] = {
 	0x0020, 0x007E, 0x00A2, 0x00A3, 0x00A7, 0x00A8, 0x00AC, 0x00AC, 0x00B0, 0x00B1, 0x00B4, 0x00B4, 0x00B6, 0x00B6, 0x00D7, 0x00D7,
 	0x00F7, 0x00F7, 0x0391, 0x03A1, 0x03A3, 0x03A9, 0x03B1, 0x03C1, 0x03C3, 0x03C9, 0x0401, 0x0401, 0x0410, 0x044F, 0x0451, 0x0451,
@@ -543,21 +544,25 @@ namespace {
 
 #pragma region 角度系関数
 
-float DX12Base::angleRoundRad(float rad) {
+float DX12Base::angleRoundRad(float rad)
+{
 	float angle = rad;
 
 	if (angle >= 0.f && angle < XM_2PI) return angle;
 
-	while (angle >= XM_2PI) {
+	while (angle >= XM_2PI)
+	{
 		angle -= XM_2PI;
 	}
-	while (angle < 0) {
+	while (angle < 0)
+	{
 		angle += XM_2PI;
 	}
 	return angle;
 }
 
-float DX12Base::nearSin(float rad) {
+float DX12Base::nearSin(float rad)
+{
 	constexpr float a = +0.005859483f;
 	constexpr float b = +0.005587939f;
 	constexpr float c = -0.171570726f;
@@ -567,29 +572,35 @@ float DX12Base::nearSin(float rad) {
 	float x = angleRoundRad(rad);
 
 	// 0 ~ PI/2がわかれば求められる
-	if (x < XM_PIDIV2) {
+	if (x < XM_PIDIV2)
+	{
 		// そのまま
-	} else if (x >= XM_PIDIV2 && x < XM_PI) {
+	} else if (x >= XM_PIDIV2 && x < XM_PI)
+	{
 		x = XM_PI - x;
-	} else if (x < XM_PI * 1.5f) {
+	} else if (x < XM_PI * 1.5f)
+	{
 		x = -(x - XM_PI);
-	} else if (x < XM_2PI) {
+	} else if (x < XM_2PI)
+	{
 		x = -(XM_2PI - x);
 	}
 
 	return x * (x * (x * (x * (a * x + b) + c) + d) + e);
 }
 
-float DX12Base::nearCos(float rad) {
+float DX12Base::nearCos(float rad)
+{
 	return nearSin(rad + XM_PIDIV2);
 }
 
-float DX12Base::nearTan(float rad) {
+float DX12Base::nearTan(float rad)
+{
 	return nearSin(rad) / nearCos(rad);
 }
 
-double DX12Base::near_atan2(double _y, double _x) {
-
+double DX12Base::near_atan2(double _y, double _x)
+{
 	const double x = abs(_x);
 	const double y = abs(_y);
 
@@ -610,19 +621,25 @@ double DX12Base::near_atan2(double _y, double _x) {
 	constexpr float plane = XM_PI;
 	constexpr float rightAngle = plane / 2.f;	// 直角
 
-	if (bigX) {
-		if (_x > 0) {
+	if (bigX)
+	{
+		if (_x > 0)
+		{
 			if (_y < 0) ret = -ret;
-		} else {
+		} else
+		{
 			if (_y > 0) ret = plane - ret;
 			if (_y < 0) ret = ret - plane;
 		}
-	} else {
-		if (_x > 0) {
+	} else
+	{
+		if (_x > 0)
+		{
 			if (_y > 0) ret = rightAngle - ret;
 			if (_y < 0) ret = ret - rightAngle;
 		}
-		if (_x < 0) {
+		if (_x < 0)
+		{
 			if (_y > 0) ret = ret + rightAngle;
 			if (_y < 0) ret = -ret - rightAngle;
 		}
@@ -631,11 +648,13 @@ double DX12Base::near_atan2(double _y, double _x) {
 	return ret;
 }
 
-float DX12Base::near_atan2(float y, float x) {
+float DX12Base::near_atan2(float y, float x)
+{
 	return (float)near_atan2((double)y, (double)x);
 }
 
-float DX12Base::nearAcos(float x) {
+float DX12Base::nearAcos(float x)
+{
 	const float negate = x < 0 ? 1.f : 0.f;
 	x = abs(x);
 	float ret = -0.0187293f;
@@ -652,16 +671,16 @@ float DX12Base::nearAcos(float x) {
 
 #pragma endregion 角度系関数
 
-
-
-void DX12Base::initDevice() {
+void DX12Base::initDevice()
+{
 	//DXGiファクトリ(デバイス生成後は解放されてよい)
 	//ComPtr<IDXGIFactory6> dxgiFactory;
 
 #ifdef _DEBUG
 	//デバッグレイヤーをオンに
 	ComPtr<ID3D12Debug1> debugController;
-	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController)))) {
+	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
+	{
 		debugController->EnableDebugLayer();
 		debugController->SetEnableGPUBasedValidation(TRUE);
 	}
@@ -675,22 +694,26 @@ void DX12Base::initDevice() {
 	ComPtr<IDXGIAdapter1> tmpAdapter = nullptr;
 	for (UINT i = 0;
 		 dxgiFactory->EnumAdapters1(i, &tmpAdapter) != DXGI_ERROR_NOT_FOUND;
-		 ++i) {
+		 ++i)
+	{
 		adapters.push_back(tmpAdapter); // 動的配列に追加する
 	}
 
-	for (UINT i = 0, len = (UINT)adapters.size(); i < len; ++i) {
+	for (UINT i = 0, len = (UINT)adapters.size(); i < len; ++i)
+	{
 		DXGI_ADAPTER_DESC1 adesc;
 		adapters[i]->GetDesc1(&adesc);  // アダプターの情報を取得
 
 		// ソフトウェアデバイスを回避
-		if (adesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) {
+		if (adesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+		{
 			continue;
 		}
 
 		std::wstring strDesc = adesc.Description;   // アダプター名
 		// Intel UHD Graphics（オンボードグラフィック）を回避
-		if (strDesc.find(L"Intel") == std::wstring::npos) {
+		if (strDesc.find(L"Intel") == std::wstring::npos)
+		{
 			tmpAdapter = adapters[i];   // 採用
 			break;
 		}
@@ -707,10 +730,12 @@ void DX12Base::initDevice() {
 
 	D3D_FEATURE_LEVEL featureLevel;
 
-	for (UINT i = 0, len = _countof(levels); i < len; ++i) {
+	for (UINT i = 0, len = _countof(levels); i < len; ++i)
+	{
 		// 採用したアダプターでデバイスを生成
 		result = D3D12CreateDevice(tmpAdapter.Get(), levels[i], IID_PPV_ARGS(&dev));
-		if (result == S_OK) {
+		if (result == S_OK)
+		{
 			// デバイスを生成できた時点でループを抜ける
 			featureLevel = levels[i];
 			break;
@@ -719,7 +744,8 @@ void DX12Base::initDevice() {
 
 #ifdef _DEBUG
 	ComPtr<ID3D12InfoQueue> infoQueue;
-	if (SUCCEEDED(dev->QueryInterface(IID_PPV_ARGS(&infoQueue)))) {
+	if (SUCCEEDED(dev->QueryInterface(IID_PPV_ARGS(&infoQueue))))
+	{
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_CORRUPTION, true);
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_ERROR, true);
 		infoQueue->SetBreakOnSeverity(D3D12_MESSAGE_SEVERITY_WARNING, true);
@@ -727,7 +753,8 @@ void DX12Base::initDevice() {
 #endif // _DEBUG
 }
 
-void DX12Base::initCommand() {
+void DX12Base::initCommand()
+{
 	// コマンドアロケータを生成
 	HRESULT result = dev->CreateCommandAllocator(
 		D3D12_COMMAND_LIST_TYPE_DIRECT,
@@ -745,7 +772,8 @@ void DX12Base::initCommand() {
 	dev->CreateCommandQueue(&cmdQueueDesc, IID_PPV_ARGS(&cmdQueue));
 }
 
-void DX12Base::initSwapchain() {
+void DX12Base::initSwapchain()
+{
 	// 各種設定をしてスワップチェーンを生成
 	DXGI_SWAP_CHAIN_DESC1 swapchainDesc{};
 	swapchainDesc.Width = 1280;
@@ -772,7 +800,8 @@ void DX12Base::initSwapchain() {
 	swapchain1.As(&swapchain);
 }
 
-void DX12Base::initRTV() {
+void DX12Base::initRTV()
+{
 	// 各種設定をしてデスクリプタヒープを生成
 	D3D12_DESCRIPTOR_HEAP_DESC heapDesc{};
 	heapDesc.Type =
@@ -786,7 +815,8 @@ void DX12Base::initRTV() {
 
 	HRESULT result = S_FALSE;
 
-	for (UINT i = 0; i < backBuffNum; ++i) {
+	for (UINT i = 0; i < backBuffNum; ++i)
+	{
 		// スワップチェーンからバッファを取得
 		result = swapchain->GetBuffer(i, IID_PPV_ARGS(&backBuffers[i]));
 
@@ -803,7 +833,8 @@ void DX12Base::initRTV() {
 	}
 }
 
-void DX12Base::initDepthBuffer() {
+void DX12Base::initDepthBuffer()
+{
 	// 深度バッファリソース設定
 	CD3DX12_RESOURCE_DESC depthResDesc = CD3DX12_RESOURCE_DESC::Tex2D(
 		DXGI_FORMAT_D32_FLOAT,
@@ -838,12 +869,14 @@ void DX12Base::initDepthBuffer() {
 		dsvHeap->GetCPUDescriptorHandleForHeapStart());
 }
 
-void DX12Base::initFence() {
+void DX12Base::initFence()
+{
 	// フェンスの生成
 	HRESULT result = dev->CreateFence(fenceVal, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&fence));
 }
 
-bool DX12Base::InitImgui() {
+bool DX12Base::InitImgui()
+{
 	HRESULT result = S_FALSE;
 
 	// デスクリプタヒープを生成
@@ -852,7 +885,8 @@ bool DX12Base::InitImgui() {
 	heapDesc.NumDescriptors = 1;
 	heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	result = dev->CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(&imguiHeap));
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 		return false;
 	}
@@ -860,16 +894,19 @@ bool DX12Base::InitImgui() {
 	// スワップチェーンの情報を取得
 	DXGI_SWAP_CHAIN_DESC swcDesc = {};
 	result = swapchain->GetDesc(&swcDesc);
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 		return false;
 	}
 
-	if (ImGui::CreateContext() == nullptr) {
+	if (ImGui::CreateContext() == nullptr)
+	{
 		assert(0);
 		return false;
 	}
-	if (!ImGui_ImplWin32_Init(WinAPI::getInstance()->getHwnd())) {
+	if (!ImGui_ImplWin32_Init(WinAPI::getInstance()->getHwnd()))
+	{
 		assert(0);
 		return false;
 	}
@@ -880,12 +917,13 @@ bool DX12Base::InitImgui() {
 		imguiHeap.Get(),
 		imguiHeap->GetCPUDescriptorHandleForHeapStart(),
 		imguiHeap->GetGPUDescriptorHandleForHeapStart()
-	)) {
+	))
+	{
 		assert(0);
 		return false;
 	}
 
-	ImGuiIO &io = ImGui::GetIO();
+	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = NULL;	// iniファイルを生成しない
 	io.Fonts->AddFontFromFileTTF("Resources\\fonts\\ume-pgc4.ttf",
 								 12.f,
@@ -895,7 +933,8 @@ bool DX12Base::InitImgui() {
 	return true;
 }
 
-void DX12Base::ClearRenderTarget(const DirectX::XMFLOAT3 &clearColor) {
+void DX12Base::ClearRenderTarget(const DirectX::XMFLOAT3& clearColor)
+{
 	UINT bbIndex = swapchain->GetCurrentBackBufferIndex();
 
 	// レンダーターゲットビュー用ディスクリプタヒープのハンドルを取得
@@ -906,14 +945,16 @@ void DX12Base::ClearRenderTarget(const DirectX::XMFLOAT3 &clearColor) {
 	cmdList->ClearRenderTargetView(rtvH, clearColorTmp, 0, nullptr);
 }
 
-void DX12Base::ClearDepthBuffer() {
+void DX12Base::ClearDepthBuffer()
+{
 	// 深度ステンシルビュー用デスクリプタヒープのハンドルを取得
 	CD3DX12_CPU_DESCRIPTOR_HANDLE dsvH = CD3DX12_CPU_DESCRIPTOR_HANDLE(dsvHeap->GetCPUDescriptorHandleForHeapStart());
 	// 深度バッファのクリア
 	cmdList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
-DX12Base::DX12Base() {
+DX12Base::DX12Base()
+{
 	this->winapi = WinAPI::getInstance();
 
 	fps = -1.f;
@@ -928,18 +969,21 @@ DX12Base::DX12Base() {
 	initFence();
 
 	// imgui初期化
-	if (!InitImgui()) {
+	if (!InitImgui())
+	{
 		assert(0);
 	}
 }
 
-DX12Base::~DX12Base() {
+DX12Base::~DX12Base()
+{
 	ImGui_ImplDX12_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 }
 
-void DX12Base::startDraw(const DirectX::XMFLOAT3 &clearColor) {
+void DX12Base::startDraw(const DirectX::XMFLOAT3& clearColor)
+{
 	// バックバッファの番号を取得（2つなので0番か1番）
 	UINT bbIndex = swapchain->GetCurrentBackBufferIndex();
 
@@ -975,10 +1019,11 @@ void DX12Base::startDraw(const DirectX::XMFLOAT3 &clearColor) {
 	ImGui::NewFrame();
 }
 
-void DX12Base::endDraw() {
+void DX12Base::endDraw()
+{
 	// imgui描画
 	ImGui::Render();
-	ID3D12DescriptorHeap *ppHeaps[] = { imguiHeap.Get() };
+	ID3D12DescriptorHeap* ppHeaps[] = { imguiHeap.Get() };
 	cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList.Get());
 
@@ -992,7 +1037,7 @@ void DX12Base::endDraw() {
 	// 命令のクローズ
 	cmdList->Close();
 	// コマンドリストの実行
-	ID3D12CommandList *cmdLists[] = { cmdList.Get() }; // コマンドリストの配列
+	ID3D12CommandList* cmdLists[] = { cmdList.Get() }; // コマンドリストの配列
 	cmdQueue->ExecuteCommandLists(1, cmdLists);
 
 	// バッファをフリップ（裏表の入替え）
@@ -1000,7 +1045,8 @@ void DX12Base::endDraw() {
 
 	// コマンドキューの実行完了を待つ
 	cmdQueue->Signal(fence.Get(), ++fenceVal);
-	if (fence->GetCompletedValue() != fenceVal) {
+	if (fence->GetCompletedValue() != fenceVal)
+	{
 		HANDLE event = CreateEvent(nullptr, false, false, nullptr);
 		fence->SetEventOnCompletion(fenceVal, event);
 		WaitForSingleObject(event, INFINITE);
@@ -1014,13 +1060,14 @@ void DX12Base::endDraw() {
 	flipTimeFPS();
 }
 
-
 // --------------------
 // FPS
 // --------------------
 
-void DX12Base::flipTimeFPS() {
-	for (UINT i = divNum - 1; i > 0; i--) {
+void DX12Base::flipTimeFPS()
+{
+	for (UINT i = divNum - 1; i > 0; i--)
+	{
 		fpsTime[i] = fpsTime[i - 1];
 	}
 	fpsTime[0] = std::chrono::duration_cast<Time::timeUnit>(
@@ -1028,9 +1075,11 @@ void DX12Base::flipTimeFPS() {
 		).count();
 }
 
-void DX12Base::updateFPS() {
+void DX12Base::updateFPS()
+{
 	LONGLONG avgDiffTime = 0ll;
-	for (UINT i = 0; i < divNum - 1; ++i) {
+	for (UINT i = 0; i < divNum - 1; ++i)
+	{
 		avgDiffTime += fpsTime[i] - fpsTime[i + 1];
 	}
 	avgDiffTime /= divNum - 1;

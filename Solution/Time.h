@@ -2,10 +2,10 @@
 
 #include <chrono>
 
-class Time {
+class Time
+{
 private:
 	std::chrono::steady_clock::time_point  startTimeDir{};
-
 
 public:
 	using timeUnit = std::chrono::microseconds;

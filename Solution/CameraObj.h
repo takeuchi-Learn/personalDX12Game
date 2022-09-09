@@ -3,10 +3,10 @@
 #include "Camera.h"
 #include <memory>
 class CameraObj
-	: public Camera {
+	: public Camera
+{
 private:
-	GameObj *parentObj = nullptr;
-
+	GameObj* parentObj = nullptr;
 
 	// 視点から注視点までの距離
 	float eye2TargetLen = 150.f;
@@ -20,17 +20,15 @@ private:
 public:
 	using Camera::Camera;
 
-	CameraObj(GameObj *parent);
+	CameraObj(GameObj* parent);
 
-	inline void setParentObj(GameObj *parent) { parentObj = parent; matWorldDirty = true; }
-	inline GameObj *getParentObj() const { return parentObj; }
+	inline void setParentObj(GameObj* parent) { parentObj = parent; matWorldDirty = true; }
+	inline GameObj* getParentObj() const { return parentObj; }
 
-	inline void setRelativeRotaDeg(const DirectX::XMFLOAT3 &rotaDeg) { relativeRotaDeg = rotaDeg; matWorldDirty = true; }
-	inline const DirectX::XMFLOAT3 &getRelativeRotaDeg() const { return relativeRotaDeg; }
+	inline void setRelativeRotaDeg(const DirectX::XMFLOAT3& rotaDeg) { relativeRotaDeg = rotaDeg; matWorldDirty = true; }
+	inline const DirectX::XMFLOAT3& getRelativeRotaDeg() const { return relativeRotaDeg; }
 
 private:
 
 	void preUpdate() override;
-
 };
-

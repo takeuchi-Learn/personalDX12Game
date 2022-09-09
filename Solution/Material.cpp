@@ -6,7 +6,8 @@ using namespace DirectX;
 
 ID3D12Device* Material::dev = nullptr;
 
-void Material::staticInit(ID3D12Device* dev) {
+void Material::staticInit(ID3D12Device* dev)
+{
 	assert(!Material::dev);
 	Material::dev = dev;
 }
@@ -15,15 +16,16 @@ Material::Material()
 	: ambient({ 0.3f,0.3f,0.3f }),
 	diffuse({ 0.f,0.f,0.f }),
 	specular({ 0.f,0.f,0.f }),
-	alpha(1.f) {
+	alpha(1.f)
+{
 	createConstBuff();
 	texbuff.resize(Material::maxTexNum);
 }
 
 void Material::loadTexture(const std::string& directoryPath, UINT texNum,
 						   CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle,
-						   CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle) {
-
+						   CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle)
+{
 	cpuDescHandleSRV = cpuHandle;
 	gpuDescHandleSRV = gpuHandle;
 
@@ -83,16 +85,18 @@ void Material::loadTexture(const std::string& directoryPath, UINT texNum,
 	srvDesc.Texture2D.MipLevels = 1;
 
 	dev->CreateShaderResourceView(texbuff[texNum].Get(), //ビューと関連付けるバッファ
-		&srvDesc, //テクスチャ設定情報
-		cpuDescHandleSRV
+								  &srvDesc, //テクスチャ設定情報
+								  cpuDescHandleSRV
 	);
 }
 
-void Material::update() {
+void Material::update()
+{
 	// 定数バッファへデータ転送
 	ConstBufferDataB1* constMap = nullptr;
 	HRESULT result = constBuff->Map(0, nullptr, (void**)&constMap);
-	if (SUCCEEDED(result)) {
+	if (SUCCEEDED(result))
+	{
 		constMap->ambient = ambient;
 		constMap->diffuse = diffuse;
 		constMap->specular = specular;
@@ -102,7 +106,8 @@ void Material::update() {
 	}
 }
 
-void Material::createConstBuff() {
+void Material::createConstBuff()
+{
 	// 定数バッファの生成
 	HRESULT result = dev->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 	// アップロード可能

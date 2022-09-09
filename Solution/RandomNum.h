@@ -2,7 +2,8 @@
 
 #include<random>
 
-class RandomNum {
+class RandomNum
+{
 private:
 	RandomNum(const RandomNum& mrnd) = delete;
 	RandomNum& operator=(const RandomNum& mrnd) = delete;
@@ -36,4 +37,3 @@ public:
 	// 正規分布乱数_float
 	static float getRandNormallyf(const float center, const float range);
 };
-

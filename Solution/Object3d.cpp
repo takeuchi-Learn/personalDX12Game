@@ -7,14 +7,14 @@
 
 #include "PostEffect.h"
 
-
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-DX12Base *Object3d::dxBase = nullptr;
+DX12Base* Object3d::dxBase = nullptr;
 Object3d::PipelineSet Object3d::ppSetDef{};
 
-void Object3d::createTransferBufferB0(ComPtr<ID3D12Resource> &constBuffB0) {
+void Object3d::createTransferBufferB0(ComPtr<ID3D12Resource>& constBuffB0)
+{
 	// 定数バッファの生成
 	HRESULT result = dxBase->getDev()->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),   // アップロード可能
@@ -26,7 +26,8 @@ void Object3d::createTransferBufferB0(ComPtr<ID3D12Resource> &constBuffB0) {
 	);
 }
 
-XMFLOAT2 Object3d::calcScreenPos() {
+XMFLOAT2 Object3d::calcScreenPos()
+{
 	XMVECTOR screenPosVec = XMVector3Transform(matWorld.r[3],
 											   camera->getMatVPV());
 	screenPosVec /= XMVectorGetW(screenPosVec);
@@ -36,20 +37,21 @@ XMFLOAT2 Object3d::calcScreenPos() {
 	return screenPosF2;
 }
 
-Object3d::Object3d(Camera *camera)
-	: camera(camera), matWorld() {
-
+Object3d::Object3d(Camera* camera)
+	: camera(camera), matWorld()
+{
 	// 定数バッファの生成
 	createTransferBufferB0(constBuffB0);
 }
-Object3d::Object3d(Camera *camera, ObjModel *model, const UINT texNum)
-	: camera(camera), model(model), texNum(texNum), matWorld() {
-
+Object3d::Object3d(Camera* camera, ObjModel* model, const UINT texNum)
+	: camera(camera), model(model), texNum(texNum), matWorld()
+{
 	// 定数バッファの生成
 	createTransferBufferB0(constBuffB0);
 }
 
-void Object3d::update() {
+void Object3d::update()
+{
 	// スケール、回転、平行移動行列の計算
 	matScale = XMMatrixScaling(scale.x, scale.y, scale.z);
 	matRot = XMMatrixIdentity();
@@ -62,24 +64,28 @@ void Object3d::update() {
 	matWorld = XMMatrixIdentity(); // 変形をリセット
 	matWorld *= matScale; // ワールド行列にスケーリングを反映
 	matWorld *= matRot; // ワールド行列に回転を反映
-	if (isBillboard) {
-		const XMMATRIX &matBillBoard = camera->getBillboardMatrix();
+	if (isBillboard)
+	{
+		const XMMATRIX& matBillBoard = camera->getBillboardMatrix();
 		matWorld *= matBillBoard;
-	} else if (isBillBoardY) {
-		const XMMATRIX &matBillBoardY = camera->getBillboardMatrixY();
+	} else if (isBillBoardY)
+	{
+		const XMMATRIX& matBillBoardY = camera->getBillboardMatrixY();
 		matWorld *= matBillBoardY;
 	}
 	matWorld *= matTrans; // ワールド行列に平行移動を反映
 
 	// 親オブジェクトがあれば
-	if (parent != nullptr) {
+	if (parent != nullptr)
+	{
 		// 親オブジェクトのワールド行列を掛ける
 		matWorld *= parent->matWorld;
 	}
 
 	// 定数バッファへデータ転送
-	ConstBufferDataB0 *constMapB0 = nullptr;
-	if (SUCCEEDED(constBuffB0->Map(0, nullptr, (void **)&constMapB0))) {
+	ConstBufferDataB0* constMapB0 = nullptr;
+	if (SUCCEEDED(constBuffB0->Map(0, nullptr, (void**)&constMapB0)))
+	{
 		//constMap->color = color; // RGBA
 		constMapB0->viewProj = camera->getViewProjectionMatrix();
 		constMapB0->world = matWorld;
@@ -88,7 +94,8 @@ void Object3d::update() {
 	}
 }
 
-void Object3d::draw(DX12Base *dxBase, Light *light) {
+void Object3d::draw(DX12Base* dxBase, Light* light)
+{
 	// 定数バッファビューをセット
 	dxBase->getCmdList()->SetGraphicsRootConstantBufferView(0, constBuffB0->GetGPUVirtualAddress());
 
@@ -97,23 +104,24 @@ void Object3d::draw(DX12Base *dxBase, Light *light) {
 	if (model != nullptr) model->draw(dxBase->getCmdList());
 }
 
-void Object3d::drawWithUpdate(DX12Base *dxBase, Light *light) {
+void Object3d::drawWithUpdate(DX12Base* dxBase, Light* light)
+{
 	update();
 	draw(dxBase, light);
 }
 
 Object3d::~Object3d() {}
 
-
-
-void Object3d::startDraw(Object3d::PipelineSet &ppSet, D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology) {
+void Object3d::startDraw(Object3d::PipelineSet& ppSet, D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology)
+{
 	dxBase->getCmdList()->SetPipelineState(ppSet.pipelinestate.Get());
 	dxBase->getCmdList()->SetGraphicsRootSignature(ppSet.rootsignature.Get());
 	//プリミティブ形状を設定
 	dxBase->getCmdList()->IASetPrimitiveTopology(PrimitiveTopology);
 }
 
-void Object3d::staticInit() {
+void Object3d::staticInit()
+{
 	// 再初期化チェック
 	assert(!Object3d::dxBase);
 
@@ -125,8 +133,9 @@ void Object3d::staticInit() {
 }
 
 Object3d::PipelineSet Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
-													   const wchar_t *vsShaderPath,
-													   const wchar_t *psShaderPath) {
+													   const wchar_t* vsShaderPath,
+													   const wchar_t* psShaderPath)
+{
 	HRESULT result = S_FALSE;
 
 	ComPtr<ID3DBlob> vsBlob;	// 頂点シェーダオブジェクト
@@ -143,12 +152,13 @@ Object3d::PipelineSet Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
 		0,
 		&vsBlob, &errorBlob);
 	//エラー表示
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		// errorBlobからエラー内容をstring型にコピー
 		std::string errstr;
 		errstr.resize(errorBlob->GetBufferSize());
 
-		std::copy_n((char *)errorBlob->GetBufferPointer(),
+		std::copy_n((char*)errorBlob->GetBufferPointer(),
 					errorBlob->GetBufferSize(),
 					errstr.begin());
 		errstr += "\n";
@@ -168,12 +178,13 @@ Object3d::PipelineSet Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
 		&psBlob, &errorBlob);
 
 	//エラー表示
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		// errorBlobからエラー内容をstring型にコピー
 		std::string errstr;
 		errstr.resize(errorBlob->GetBufferSize());
 
-		std::copy_n((char *)errorBlob->GetBufferPointer(),
+		std::copy_n((char*)errorBlob->GetBufferPointer(),
 					errorBlob->GetBufferSize(),
 					errstr.begin());
 		errstr += "\n";
@@ -220,7 +231,8 @@ Object3d::PipelineSet Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
 	blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;		//ソースの値を100%使う
 	blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;	//デストの値を0%使う
 
-	switch (blendMode) {
+	switch (blendMode)
+	{
 	case Object3d::BLEND_MODE::ADD:
 		//---加算
 		blenddesc.BlendOp = D3D12_BLEND_OP_ADD;				// 加算
@@ -256,7 +268,8 @@ Object3d::PipelineSet Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
 	// ブレンドステートの設定
 	for (UINT i = 0, maxSize = _countof(gpipeline.BlendState.RenderTarget);
 		 i < PostEffect::renderTargetNum && i < maxSize;
-		 i++) {
+		 i++)
+	{
 		gpipeline.BlendState.RenderTarget[i] = blenddesc;
 	}
 
@@ -272,7 +285,8 @@ Object3d::PipelineSet Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
 
 	for (UINT i = 0, maxSize = _countof(gpipeline.BlendState.RenderTarget);
 		 i < PostEffect::renderTargetNum && i < maxSize;
-		 i++) {
+		 i++)
+	{
 		gpipeline.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM; // 0～255指定のRGBA
 	}
 
@@ -302,7 +316,8 @@ Object3d::PipelineSet Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
 	result = D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &rootSigBlob, &errorBlob);
 	//ルートシグネチャの生成
 	result = dxBase->getDev()->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&pipelineSet.rootsignature));
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 	}
 	// パイプラインにルートシグネチャをセット
@@ -311,7 +326,8 @@ Object3d::PipelineSet Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
 	//パイプラインステートの生成
 	result = dxBase->getDev()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelineSet.pipelinestate));
 
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 	}
 

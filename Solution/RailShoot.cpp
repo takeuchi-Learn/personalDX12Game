@@ -23,22 +23,26 @@ using CSVType = std::vector<std::vector<std::string>>;
 // @param commentFlag //で始まる行を無視するかどうか(trueで無視)
 // @param divChar フィールドの区切り文字
 // @param commentStartStr コメント開始文字
-RailShoot::CSVType RailShoot::loadCsv(const std::string &csvFilePath,
+RailShoot::CSVType RailShoot::loadCsv(const std::string& csvFilePath,
 									  bool commentFlag,
 									  char divChar,
-									  const std::string &commentStartStr) {
+									  const std::string& commentStartStr)
+{
 	CSVType csvData{};	// csvの中身を格納
 
 	std::ifstream ifs(csvFilePath);
-	if (!ifs) {
+	if (!ifs)
+	{
 		return csvData;
 	}
 
 	std::string line{};
 	// 開いたファイルを一行読み込む(カーソルも動く)
-	while (std::getline(ifs, line)) {
+	while (std::getline(ifs, line))
+	{
 		// コメントが有効かつ行頭が//なら、その行は無視する
-		if (commentFlag && line.find(commentStartStr) == 0U) {
+		if (commentFlag && line.find(commentStartStr) == 0U)
+		{
 			continue;
 		}
 
@@ -48,7 +52,8 @@ RailShoot::CSVType RailShoot::loadCsv(const std::string &csvFilePath,
 		std::istringstream stream(line);
 		std::string field;
 		// 読み込んだ行を','区切りで分割
-		while (std::getline(stream, field, divChar)) {
+		while (std::getline(stream, field, divChar))
+		{
 			csvData.back().emplace_back(field);
 		}
 	}
@@ -56,9 +61,10 @@ RailShoot::CSVType RailShoot::loadCsv(const std::string &csvFilePath,
 	return csvData;
 }
 
-XMVECTOR RailShoot::splinePosition(const std::vector<XMVECTOR> &points,
+XMVECTOR RailShoot::splinePosition(const std::vector<XMVECTOR>& points,
 								   size_t startIndex,
-								   float t) {
+								   float t)
+{
 	if (startIndex < 1) return points[1];
 
 	{
@@ -133,7 +139,8 @@ RailShoot::RailShoot()
 
 	backPipelineSet(Object3d::createGraphicsPipeline(Object3d::BLEND_MODE::ALPHA,
 													 L"Resources/Shaders/BackVS.hlsl",
-													 L"Resources/Shaders/BackPS.hlsl")) {
+													 L"Resources/Shaders/BackPS.hlsl"))
+{
 	// --------------------
 	// スプライト初期化
 	// --------------------
@@ -204,10 +211,13 @@ RailShoot::RailShoot()
 	csvData = loadCsv("Resources/enemyScript.csv", true, ',', "//");
 	{
 		UINT waitFrame = 0u;
-		for (auto &y : csvData) {
-			if (y[0] == "WAIT") {
+		for (auto& y : csvData)
+		{
+			if (y[0] == "WAIT")
+			{
 				waitFrame += (UINT)std::stoi(y[1]);
-			} else if (y[0] == "PUSH") {
+			} else if (y[0] == "PUSH")
+			{
 				enemyPopData.emplace_front(std::make_unique<PopEnemyData>(waitFrame,
 																		  XMFLOAT3(std::stof(y[1]),
 																				   std::stof(y[2]),
@@ -237,13 +247,15 @@ RailShoot::RailShoot()
 	input->changeDispMouseCursorFlag(false);
 }
 
-void RailShoot::start() {
+void RailShoot::start()
+{
 	// タイマー開始
 	timer->reset();
 	startSceneChangeTime = timer->getNowTime();
 }
 
-void RailShoot::update() {
+void RailShoot::update()
+{
 	{
 		// シーン遷移中も背景は回す
 		XMFLOAT3 backRota = back->getRotation();
@@ -265,11 +277,13 @@ void RailShoot::update() {
 	camera->update();
 }
 
-void RailShoot::createParticle(const DirectX::XMFLOAT3 &pos,
+void RailShoot::createParticle(const DirectX::XMFLOAT3& pos,
 							   const UINT particleNum,
 							   const float startScale,
-							   const float vel) {
-	for (UINT i = 0U; i < particleNum; ++i) {
+							   const float vel)
+{
+	for (UINT i = 0U; i < particleNum; ++i)
+	{
 		const float theata = RandomNum::getRandf(0, XM_PI);
 		const float phi = RandomNum::getRandf(0, XM_PI * 2.f);
 		const float r = RandomNum::getRandf(0, vel);
@@ -305,24 +319,28 @@ void RailShoot::createParticle(const DirectX::XMFLOAT3 &pos,
 	}
 }
 
-void RailShoot::addEnemy(const DirectX::XMFLOAT3 &pos, const DirectX::XMFLOAT3 &vel, float scale) {
-	auto &i = enemy.emplace_front(new Enemy(camera.get(), enemyModel.get(), enemyBulModel.get(), pos));
+void RailShoot::addEnemy(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& vel, float scale)
+{
+	auto& i = enemy.emplace_front(new Enemy(camera.get(), enemyModel.get(), enemyBulModel.get(), pos));
 	i->setScale(scale);
 	i->setVel(vel);
 	i->setTargetObj(player.get());
 	i->setParent(railObj->getObj());
 }
 
-void RailShoot::changeNextScene() {
+void RailShoot::changeNextScene()
+{
 	PostEffect::getInstance()->changePipeLine(0U);
 
 	update_proc = std::bind(&RailShoot::update_end, this);
 	startSceneChangeTime = timer->getNowTime();
 }
 
-void RailShoot::update_start() {
+void RailShoot::update_start()
+{
 	const Time::timeType nowTime = timer->getNowTime() - startSceneChangeTime;
-	if (nowTime >= sceneChangeTime) {
+	if (nowTime >= sceneChangeTime)
+	{
 		PostEffect::getInstance()->changePipeLine(SceneManager::getInstange()->getPostEff2Num());
 
 		update_proc = std::bind(&RailShoot::update_play, this);
@@ -335,13 +353,15 @@ void RailShoot::update_start() {
 	PostEffect::getInstance()->setMosaicNum(XMFLOAT2(WinAPI::getInstance()->getWindowSize().x * mosCoe,
 													 WinAPI::getInstance()->getWindowSize().y * mosCoe));
 
-	PostEffect::getInstance()->setNoiseIntensity(1.f- timeRaito);
+	PostEffect::getInstance()->setNoiseIntensity(1.f - timeRaito);
 }
 
-void RailShoot::update_play() {
+void RailShoot::update_play()
+{
 #ifdef _DEBUG
 
-	if (input->hitKey(DIK_LSHIFT) && input->hitKey(DIK_SPACE)) {
+	if (input->hitKey(DIK_LSHIFT) && input->hitKey(DIK_SPACE))
+	{
 		changeNextScene();
 	}
 
@@ -355,24 +375,30 @@ void RailShoot::update_play() {
 	// --------------------
 
 	// 終わった発生情報は削除
-	enemyPopData.remove_if([&](std::unique_ptr<PopEnemyData> &i) {
-		const bool ended = nowFrame >= i->popFrame;
-		if (ended) {
-			addEnemy(i->pos, i->vel);
-		}
-		return ended; });
+	enemyPopData.remove_if([&](std::unique_ptr<PopEnemyData>& i)
+						   {
+							   const bool ended = nowFrame >= i->popFrame;
+							   if (ended)
+							   {
+								   addEnemy(i->pos, i->vel);
+							   }
+							   return ended;
+						   });
 
 	// --------------------
 	// レール現在位置オブジェクト
 	// --------------------
 	{
 		float raito = float(splineNowFrame++) / float(splineFrameMax);
-		if (raito >= 1.f) {
-			if (splineIndex < splinePoint.size() - 3) {
+		if (raito >= 1.f)
+		{
+			if (splineIndex < splinePoint.size() - 3)
+			{
 				++splineIndex;
 				raito -= 1.f;
 				splineNowFrame = 0u;
-			} else {
+			} else
+			{
 				raito = 1.f;
 			}
 		}
@@ -392,30 +418,37 @@ void RailShoot::update_play() {
 	const bool hitS = input->hitKey(DIK_S);
 	const bool hitD = input->hitKey(DIK_D);
 
-	if (hitW || hitA || hitS || hitD) {
+	if (hitW || hitA || hitS || hitD)
+	{
 		const float moveSpeed = 90.f / dxBase->getFPS();
 
 		constexpr XMFLOAT2 posSize = XMFLOAT2(WinAPI::window_width * 0.12f,
 											  WinAPI::window_height * 0.12f);
 
 		// 横移動
-		if (hitD) {
+		if (hitD)
+		{
 			player->moveRight(moveSpeed);
-		} else if (hitA) {
+		} else if (hitA)
+		{
 			player->moveRight(-moveSpeed);
 		}
 
 		// 奥方向に移動
-		if (hitW) {
+		if (hitW)
+		{
 			player->moveUp(moveSpeed);
-		} else if (hitS) {
+		} else if (hitS)
+		{
 			player->moveUp(-moveSpeed);
 		}
 	}
 
 	// Z座標が0を超えた敵は退場
-	for (auto &i : enemy) {
-		if (i->getPos().z < 0.f) {
+	for (auto& i : enemy)
+	{
+		if (i->getPos().z < 0.f)
+		{
 			i->chansePhase_Leave(DirectX::XMFLOAT3(-1, 1, 0));
 		}
 	}
@@ -435,11 +468,12 @@ void RailShoot::update_play() {
 
 		// 遠い敵を調べるためのもの
 		float oldEnemyDistance{}, nowEnemyDistance{};
-		Enemy *farthestEnemyPt = nullptr;
+		Enemy* farthestEnemyPt = nullptr;
 		float farthestEnemyLen = 1.f;
 
 		// 最も近い敵の方へ弾を飛ばす
-		for (auto &i : enemy) {
+		for (auto& i : enemy)
+		{
 			// いない敵は無視
 			if (!i->getAlive()) continue;
 
@@ -450,7 +484,8 @@ void RailShoot::update_play() {
 			if (aim2DMin.x <= screenEnemyPos.x &&
 				aim2DMin.y <= screenEnemyPos.y &&
 				aim2DMax.x >= screenEnemyPos.x &&
-				aim2DMax.y >= screenEnemyPos.y) {
+				aim2DMax.y >= screenEnemyPos.y)
+			{
 				// 敵との距離を更新
 				oldEnemyDistance = nowEnemyDistance;
 				nowEnemyDistance = sqrtf(
@@ -459,7 +494,8 @@ void RailShoot::update_play() {
 					powf(i->getPos().z - camera->getEye().z, 2.f)
 				);
 				// 照準の中で最も遠い敵なら情報を取っておく
-				if (farthestEnemyLen < nowEnemyDistance) {
+				if (farthestEnemyLen < nowEnemyDistance)
+				{
 					farthestEnemyPt = i.get();
 					farthestEnemyLen = nowEnemyDistance;
 				}
@@ -468,10 +504,12 @@ void RailShoot::update_play() {
 
 		// 照準の中に敵がいればそこへ弾を出す
 		// いなければターゲットはいない
-		if (farthestEnemyPt != nullptr) {
+		if (farthestEnemyPt != nullptr)
+		{
 			player->setShotTarget(farthestEnemyPt->getObj());
 			aim2D->color = XMFLOAT4(1, 0, 0, 1);
-		} else {
+		} else
+		{
 			player->setShotTarget(nullptr);
 			aim2D->color = XMFLOAT4(0, 0, 0, 1);
 		}
@@ -488,8 +526,10 @@ void RailShoot::update_play() {
 	// --------------------
 	// 弾発射
 	// --------------------
-	if (player->shotTargetIsEmpty()) {
-		if (input->triggerMouseButton(Input::MOUSE::LEFT)) {
+	if (player->shotTargetIsEmpty())
+	{
+		if (input->triggerMouseButton(Input::MOUSE::LEFT))
+		{
 			constexpr float bulSpeed = 8.f;
 			player->shot(camera.get(), playerBulModel.get(), bulSpeed);
 		}
@@ -503,16 +543,19 @@ void RailShoot::update_play() {
 		// 自機弾と敵の当たり判定
 		// --------------------
 		Sphere pBulCol{};
-		for (auto &pb : player->getBulArr()) {
+		for (auto& pb : player->getBulArr())
+		{
 			if (!pb.getAlive()) continue;
 
 			pBulCol = Sphere(XMLoadFloat3(&pb.getPos()), pb.getScale());
 
-			for (auto &e : enemy) {
+			for (auto& e : enemy)
+			{
 				if (e->getAlive()
 					&& Collision::CheckHit(pBulCol,
 										   Sphere(XMLoadFloat3(&e->getPos()),
-												  e->getScale()))) {
+												  e->getScale())))
+				{
 					// パーティクルを生成
 					createParticle(e->getPos(), 98U, 32.f, 16.f);
 					// 敵も自機弾もさよなら
@@ -525,11 +568,14 @@ void RailShoot::update_play() {
 		// --------------------
 		// 自機と敵弾の当たり判定
 		// --------------------
-		if (player->getAlive()) {
+		if (player->getAlive())
+		{
 			const Sphere playerCol(XMLoadFloat3(&player->getPos()), player->getScale());
 
-			for (auto &e : enemy) {
-				for (auto &eb : e->getBulList()) {
+			for (auto& e : enemy)
+			{
+				for (auto& eb : e->getBulList())
+				{
 					if (!player->getAlive()) break;
 
 					//　存在しない敵弾の処理はしない
@@ -538,11 +584,13 @@ void RailShoot::update_play() {
 					// 自機と敵の弾が当たっていたら
 					if (Collision::CheckHit(playerCol,
 											Sphere(XMLoadFloat3(&eb->getPos()),
-												   eb->getScaleF3().z))) {
+												   eb->getScaleF3().z)))
+					{
 						// 当たった敵弾は消す
 						eb->kill();
 						// HPが無くなったら次のシーンへ進む
-						if (--playerHp <= 0u) {
+						if (--playerHp <= 0u)
+						{
 							changeNextScene();
 							player->kill();
 						}
@@ -552,10 +600,11 @@ void RailShoot::update_play() {
 		}
 
 		// 弾がなく、かつ死んだ敵は消す
-		enemy.remove_if([](const std::unique_ptr<Enemy> &i) {return !i->getAlive() && i->bulEmpty(); });
+		enemy.remove_if([](const std::unique_ptr<Enemy>& i) { return !i->getAlive() && i->bulEmpty(); });
 
 		// 敵がすべて消えたら次のシーンへ
-		if (enemy.empty() && enemyPopData.empty()) {
+		if (enemy.empty() && enemyPopData.empty())
+		{
 			changeNextScene();
 		}
 	}
@@ -567,9 +616,11 @@ void RailShoot::update_play() {
 	++nowFrame;
 }
 
-void RailShoot::update_end() {
+void RailShoot::update_end()
+{
 	const Time::timeType nowTime = timer->getNowTime() - startSceneChangeTime;
-	if (nowTime >= sceneChangeTime) {
+	if (nowTime >= sceneChangeTime)
+	{
 		SceneManager::getInstange()->changeScene(new PlayScene());
 	}
 
@@ -583,21 +634,24 @@ void RailShoot::update_end() {
 	PostEffect::getInstance()->setNoiseIntensity(1.f - timeRaito);
 }
 
-void RailShoot::drawObj3d() {
+void RailShoot::drawObj3d()
+{
 	Object3d::startDraw(backPipelineSet);
 	back->drawWithUpdate(light.get());
 
 	Object3d::startDraw();
 	ground->drawWithUpdate(light.get());
 	player->drawWithUpdate(light.get());
-	for (auto &i : enemy) {
+	for (auto& i : enemy)
+	{
 		i->drawWithUpdate(light.get());
 	}
 
 	particleMgr->drawWithUpdate();
 }
 
-void RailShoot::drawFrontSprite() {
+void RailShoot::drawFrontSprite()
+{
 	constexpr ImGuiWindowFlags winFlags =
 		// リサイズ不可
 		ImGuiWindowFlags_::ImGuiWindowFlags_NoResize |
@@ -635,7 +689,8 @@ void RailShoot::drawFrontSprite() {
 	debugText->DrawAll(dxBase, spriteBase.get());
 }
 
-RailShoot::~RailShoot() {
+RailShoot::~RailShoot()
+{
 	PostEffect::getInstance()->setAlpha(1.f);
 	PostEffect::getInstance()->setMosaicNum(XMFLOAT2(WinAPI::window_width,
 													 WinAPI::window_height));

@@ -17,7 +17,8 @@
 
 #include "DX12Base.h"
 
-class FbxModel {
+class FbxModel
+{
 public:
 	friend class FbxLoader;
 
@@ -34,14 +35,11 @@ private:
 
 public:
 
-
-
 	// ボーンインデックスの最大数
 	static const int MAX_BONE_INDICES = 4;
 
-
-
-	struct Node {
+	struct Node
+	{
 		std::string name;
 		// ローカルスケール
 		DirectX::XMVECTOR scaling = { 1,1,1,0 };
@@ -57,7 +55,8 @@ public:
 		Node* parent = nullptr;
 	};
 
-	struct VertexPosNormalUvSkin {
+	struct VertexPosNormalUvSkin
+	{
 		DirectX::XMFLOAT3 pos;
 		DirectX::XMFLOAT3 normal;
 		DirectX::XMFLOAT2 uv;
@@ -66,7 +65,8 @@ public:
 	};
 
 	// ボーンの構造体
-	struct Bone {
+	struct Bone
+	{
 		// 名前
 		std::string name{};
 		// 初期姿勢の逆行列
@@ -78,7 +78,8 @@ public:
 	};
 
 	// 定数バッファ用データ構造体B1
-	struct ConstBufferDataB1 {
+	struct ConstBufferDataB1
+	{
 		DirectX::XMFLOAT3 ambient;	// アンビエント
 		float pad1;		// パディング
 		DirectX::XMFLOAT3 diffuse;	// ディフューズ
@@ -89,7 +90,7 @@ public:
 
 private:
 
-	static DX12Base *dxBase;
+	static DX12Base* dxBase;
 
 	std::string name;
 	std::vector<Node> nodes;
@@ -120,7 +121,6 @@ private:
 	// ボーン配列
 	std::vector<Bone> bones;
 
-
 	// 定数バッファ
 	ComPtr<ID3D12Resource> constBuffB1;
 
@@ -134,9 +134,9 @@ private:
 	void transferConstBuffB1();
 
 public:
-	inline void setAmbient(const DirectX::XMFLOAT3 &ambient) { this->ambient = ambient, materialDirty = true; }
-	inline void setDiffuse(const DirectX::XMFLOAT3 &diffuse) { this->diffuse = diffuse, materialDirty = true; }
-	inline void setSpecular(const DirectX::XMFLOAT3 &specular) { this->specular = specular, materialDirty = true; }
+	inline void setAmbient(const DirectX::XMFLOAT3& ambient) { this->ambient = ambient, materialDirty = true; }
+	inline void setDiffuse(const DirectX::XMFLOAT3& diffuse) { this->diffuse = diffuse, materialDirty = true; }
+	inline void setSpecular(const DirectX::XMFLOAT3& specular) { this->specular = specular, materialDirty = true; }
 	inline void setAlpha(float alpha) { this->alpha = alpha; }
 
 	inline auto getSpecular() { return specular; }
@@ -156,4 +156,3 @@ public:
 
 	std::vector<Bone>& getBones() { return bones; }
 };
-

@@ -6,11 +6,12 @@
 #include <wrl.h>
 #include <string>
 
-class Material {
-
+class Material
+{
 public:
 	// 定数バッファ用データ構造体B1
-	struct ConstBufferDataB1 {
+	struct ConstBufferDataB1
+	{
 		DirectX::XMFLOAT3 ambient;	// アンビエント
 		float pad1;		// パディング
 		DirectX::XMFLOAT3 diffuse;	// ディフューズ
@@ -22,12 +23,10 @@ public:
 
 public:
 	static const uint16_t maxTexNum = 128;
-	static void staticInit(ID3D12Device *dev);
+	static void staticInit(ID3D12Device* dev);
 
 private:
-	static ID3D12Device *dev;
-
-
+	static ID3D12Device* dev;
 
 	// テクスチャバッファ
 	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> texbuff;
@@ -49,16 +48,15 @@ public:
 
 	Material();
 
-	inline ID3D12Resource *getConstBuff() { return constBuff.Get(); }
+	inline ID3D12Resource* getConstBuff() { return constBuff.Get(); }
 
-	void loadTexture(const std::string &directoryPath, UINT texNum, CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle);
+	void loadTexture(const std::string& directoryPath, UINT texNum, CD3DX12_CPU_DESCRIPTOR_HANDLE cpuHandle, CD3DX12_GPU_DESCRIPTOR_HANDLE gpuHandle);
 
 	void update();
 
-	inline const CD3DX12_CPU_DESCRIPTOR_HANDLE &GetCpuHandle() const { return cpuDescHandleSRV; }
-	inline const CD3DX12_GPU_DESCRIPTOR_HANDLE &GetGpuHandle() const { return gpuDescHandleSRV; }
+	inline const CD3DX12_CPU_DESCRIPTOR_HANDLE& GetCpuHandle() const { return cpuDescHandleSRV; }
+	inline const CD3DX12_GPU_DESCRIPTOR_HANDLE& GetGpuHandle() const { return gpuDescHandleSRV; }
 
 private:
 	void createConstBuff();
 };
-

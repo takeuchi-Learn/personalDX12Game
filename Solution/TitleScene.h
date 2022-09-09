@@ -12,8 +12,8 @@
 #include <functional>
 
 class TitleScene :
-	public GameScene {
-
+	public GameScene
+{
 	// --------------------
 	// デバッグテキスト
 	// --------------------

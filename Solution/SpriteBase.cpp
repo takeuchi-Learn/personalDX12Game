@@ -17,9 +17,10 @@ using namespace Microsoft::WRL;
 UINT SpriteBase::nowTexNum = 0u;
 
 // スプライト用パイプライン生成
-SpriteBase::PipelineSet SpriteBase::SpriteCreateGraphicsPipeline(ID3D12Device *dev,
-																 const wchar_t *vsPath, const wchar_t *psPath,
-																 BLEND_MODE blendMode) {
+SpriteBase::PipelineSet SpriteBase::SpriteCreateGraphicsPipeline(ID3D12Device* dev,
+																 const wchar_t* vsPath, const wchar_t* psPath,
+																 BLEND_MODE blendMode)
+{
 	HRESULT result;
 
 	ComPtr<ID3DBlob> vsBlob = nullptr; // 頂点シェーダオブジェクト
@@ -36,12 +37,13 @@ SpriteBase::PipelineSet SpriteBase::SpriteCreateGraphicsPipeline(ID3D12Device *d
 		0,
 		&vsBlob, &errorBlob);
 
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		// errorBlobからエラー内容をstring型にコピー
 		std::string errstr;
 		errstr.resize(errorBlob->GetBufferSize());
 
-		std::copy_n((char *)errorBlob->GetBufferPointer(),
+		std::copy_n((char*)errorBlob->GetBufferPointer(),
 					errorBlob->GetBufferSize(),
 					errstr.begin());
 		errstr += "\n";
@@ -60,12 +62,13 @@ SpriteBase::PipelineSet SpriteBase::SpriteCreateGraphicsPipeline(ID3D12Device *d
 		0,
 		&psBlob, &errorBlob);
 
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		// errorBlobからエラー内容をstring型にコピー
 		std::string errstr;
 		errstr.resize(errorBlob->GetBufferSize());
 
-		std::copy_n((char *)errorBlob->GetBufferPointer(),
+		std::copy_n((char*)errorBlob->GetBufferPointer(),
 					errorBlob->GetBufferSize(),
 					errstr.begin());
 		errstr += "\n";
@@ -100,14 +103,15 @@ SpriteBase::PipelineSet SpriteBase::SpriteCreateGraphicsPipeline(ID3D12Device *d
 	gpipeline.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;              // 背面カリングをしない
 
 	// レンダーターゲットのブレンド設定
-	D3D12_RENDER_TARGET_BLEND_DESC &blenddesc = gpipeline.BlendState.RenderTarget[0];
+	D3D12_RENDER_TARGET_BLEND_DESC& blenddesc = gpipeline.BlendState.RenderTarget[0];
 	blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL; // 標準設定
 	blenddesc.BlendEnable = true;                   // ブレンドを有効にする
 	blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;    // 加算
 	blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;      // ソースの値を100% 使う
 	blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;    // デストの値を   0% 使う
 
-	switch (blendMode) {
+	switch (blendMode)
+	{
 	case SpriteBase::BLEND_MODE::ADD:
 		//---加算
 		blenddesc.BlendOp = D3D12_BLEND_OP_ADD;			//加算
@@ -185,7 +189,8 @@ SpriteBase::PipelineSet SpriteBase::SpriteCreateGraphicsPipeline(ID3D12Device *d
 }
 
 // スプライト共通テクスチャ読み込み
-UINT SpriteBase::loadTexture(const wchar_t *filename, DirectX::XMFLOAT2 *pTexSize) {
+UINT SpriteBase::loadTexture(const wchar_t* filename, DirectX::XMFLOAT2* pTexSize)
+{
 	// 異常な番号の指定を検出
 	assert(nowTexNum + 1 <= SpriteBase::spriteSRVCount - 1);
 
@@ -214,12 +219,13 @@ UINT SpriteBase::loadTexture(const wchar_t *filename, DirectX::XMFLOAT2 *pTexSiz
 		0,
 		mipChain);
 
-	if (SUCCEEDED(result)) {
+	if (SUCCEEDED(result))
+	{
 		scratchImg = std::move(mipChain);
 		metadata = scratchImg.GetMetadata();
 	}
 
-	const Image *img = scratchImg.GetImage(0, 0, 0); // 生データ抽出
+	const Image* img = scratchImg.GetImage(0, 0, 0); // 生データ抽出
 
 	// リソース設定
 	CD3DX12_RESOURCE_DESC texresDesc = CD3DX12_RESOURCE_DESC::Tex2D(
@@ -271,10 +277,9 @@ UINT SpriteBase::loadTexture(const wchar_t *filename, DirectX::XMFLOAT2 *pTexSiz
 	return nowTexNum;
 }
 
-
-
 // スプライト共通グラフィックコマンドのセット
-void SpriteBase::drawStart(ID3D12GraphicsCommandList *cmdList) {
+void SpriteBase::drawStart(ID3D12GraphicsCommandList* cmdList)
+{
 	// パイプラインステートの設定
 	cmdList->SetPipelineState(pipelineSet.pipelinestate.Get());
 	// ルートシグネチャの設定
@@ -283,12 +288,13 @@ void SpriteBase::drawStart(ID3D12GraphicsCommandList *cmdList) {
 	cmdList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP);
 
 	// テクスチャ用デスクリプタヒープの設定
-	ID3D12DescriptorHeap *ppHeaps[] = { descHeap.Get() };
+	ID3D12DescriptorHeap* ppHeaps[] = { descHeap.Get() };
 	cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 }
 
 SpriteBase::SpriteBase(BLEND_MODE blendMode,
-					   const wchar_t *vsPath, const wchar_t *psPath) {
+					   const wchar_t* vsPath, const wchar_t* psPath)
+{
 	// スプライト用パイプライン生成
 	pipelineSet = SpriteCreateGraphicsPipeline(DX12Base::getInstance()->getDev(), vsPath, psPath, blendMode);
 
@@ -296,7 +302,7 @@ SpriteBase::SpriteBase(BLEND_MODE blendMode,
 	matProjection = XMMatrixOrthographicOffCenterLH(
 		0.0f, (float)WinAPI::window_width, (float)WinAPI::window_height, 0.0f, 0.0f, 1.0f);
 
-	// デスクリプタヒープを生成 
+	// デスクリプタヒープを生成
 	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
 	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;

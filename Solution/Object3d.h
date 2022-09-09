@@ -11,7 +11,8 @@
 
 #include "Light.h"
 
-class Object3d {
+class Object3d
+{
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	using XMFLOAT2 = DirectX::XMFLOAT2;
 	using XMFLOAT3 = DirectX::XMFLOAT3;
@@ -19,7 +20,8 @@ class Object3d {
 	using XMMATRIX = DirectX::XMMATRIX;
 
 public:
-	enum class BLEND_MODE : short {
+	enum class BLEND_MODE : short
+	{
 		ALPHA,
 		ADD,
 		SUB,
@@ -27,7 +29,8 @@ public:
 	};
 
 	//パイプラインセット
-	struct PipelineSet {
+	struct PipelineSet
+	{
 		//パイプラインステートオブジェクト
 		ComPtr<ID3D12PipelineState> pipelinestate;
 		//ルートシグネチャ
@@ -42,7 +45,8 @@ public:
 	//};
 
 	// 定数バッファ用データ構造体B0
-	struct ConstBufferDataB0 {
+	struct ConstBufferDataB0
+	{
 		XMMATRIX viewProj;
 		XMMATRIX world;	// ワールド行列
 		XMFLOAT3 cameraPos;	// カメラ位置(ワールド座標)
@@ -52,13 +56,14 @@ public:
 	// staticメンバ
 	// --------------------
 private:
-	static DX12Base *dxBase;
+	static DX12Base* dxBase;
 	static PipelineSet ppSetDef;
-	Camera *camera;
+	Camera* camera;
 
-	static void createTransferBufferB0(ComPtr<ID3D12Resource> &constBuff);
+	static void createTransferBufferB0(ComPtr<ID3D12Resource>& constBuff);
 
-	inline XMFLOAT3 subFloat3(const XMFLOAT3 &left, const XMFLOAT3 &right) {
+	inline XMFLOAT3 subFloat3(const XMFLOAT3& left, const XMFLOAT3& right)
+	{
 		return XMFLOAT3(left.x - right.x,
 						left.y - right.y,
 						left.z - right.z);
@@ -68,9 +73,9 @@ public:
 	// 頂点バッファの最大数
 	static const int constantBufferNum = 128;
 
-	static inline PipelineSet &getGraphicsPipeline() { return ppSetDef; }
+	static inline PipelineSet& getGraphicsPipeline() { return ppSetDef; }
 
-	static void startDraw(Object3d::PipelineSet &ppSet = getGraphicsPipeline(),
+	static void startDraw(Object3d::PipelineSet& ppSet = getGraphicsPipeline(),
 						  D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	static void staticInit();
@@ -78,8 +83,8 @@ public:
 	//3Dオブジェクト用パイプライン生成
 	// シェーダーモデル指定は "*s_5_0"
 	static Object3d::PipelineSet createGraphicsPipeline(BLEND_MODE blendMode = BLEND_MODE::ALPHA,
-														const wchar_t *vsShaderPath = L"Resources/Shaders/BasicVS.hlsl",
-														const wchar_t *psShaderPath = L"Resources/Shaders/BasicPS.hlsl");
+														const wchar_t* vsShaderPath = L"Resources/Shaders/BasicVS.hlsl",
+														const wchar_t* psShaderPath = L"Resources/Shaders/BasicPS.hlsl");
 
 	// --------------------
 	// (動的)メンバ
@@ -104,40 +109,37 @@ public:
 	XMFLOAT3 rotation = { 0,0,0 };
 	XMFLOAT3 position = { 0,0,0 };
 	// 親オブジェクトへのポインタ
-	Object3d *parent = nullptr;
+	Object3d* parent = nullptr;
 
 	//モデルデータ
-	ObjModel *model = nullptr;
+	ObjModel* model = nullptr;
 
 	bool isBillboard = false;
 	bool isBillBoardY = false;// isBillboardがfalseの場合のみ機能する
 
-	inline const XMMATRIX &getMatWorld() const { return matWorld; }
+	inline const XMMATRIX& getMatWorld() const { return matWorld; }
 
 	//void setTexture(ID3D12Device* dev, const UINT newTexNum);
 
-	inline const XMMATRIX &getMatRota() const { return matRot; }
-	inline const XMMATRIX &getMatScale() const { return matScale; }
-	inline const XMMATRIX &getMatTrans() const { return matTrans; }
+	inline const XMMATRIX& getMatRota() const { return matRot; }
+	inline const XMMATRIX& getMatScale() const { return matScale; }
+	inline const XMMATRIX& getMatTrans() const { return matTrans; }
 
-	inline const Camera *getCamera() const { return camera; }
+	inline const Camera* getCamera() const { return camera; }
 
 	XMFLOAT2 calcScreenPos();
 
-
 	// モデルは後から手動で読み込む(deleteも手動)
-	Object3d(Camera *camera);
+	Object3d(Camera* camera);
 
 	// モデルデータもここで渡す(deleteは手動)
-	Object3d(Camera *camera, ObjModel *model, const UINT texNum);
+	Object3d(Camera* camera, ObjModel* model, const UINT texNum);
 
 	void update();
 
-	void draw(DX12Base *dxCom, Light *light);
+	void draw(DX12Base* dxCom, Light* light);
 
-	void drawWithUpdate(DX12Base *dxCom, Light *light);
-
+	void drawWithUpdate(DX12Base* dxCom, Light* light);
 
 	~Object3d();
 };
-

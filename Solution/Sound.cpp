@@ -8,7 +8,8 @@
 #include <fstream>
 #include <cassert>
 
-Sound::Sound(const char* filename) {
+Sound::Sound(const char* filename)
+{
 	//1.ファイルオープン
 	//ファイル入力ストリームのインスタンス
 	std::ifstream file;
@@ -22,18 +23,21 @@ Sound::Sound(const char* filename) {
 	RiffHeader riff{};
 	file.read((char*)&riff, sizeof(riff));
 	//ファイルがRIFFかチェック
-	if (strncmp(riff.chunk.id, "RIFF", 4) != 0) {
+	if (strncmp(riff.chunk.id, "RIFF", 4) != 0)
+	{
 		assert(0);
 	}
 	//タイプがWAVEかチェック
-	if (strncmp(riff.type, "WAVE", 4) != 0) {
+	if (strncmp(riff.type, "WAVE", 4) != 0)
+	{
 		assert(0);
 	}
 	//Formatチャンクの読み込み
 	FormatChunk format = {};
 	//チャンクヘッダーの確認
 	file.read((char*)&format, sizeof(ChunkHeader));
-	if (strncmp(format.chunk.id, "fmt ", 4) != 0) {
+	if (strncmp(format.chunk.id, "fmt ", 4) != 0)
+	{
 		assert(0);
 	}
 	//チャンク本体の読み込み
@@ -43,13 +47,15 @@ Sound::Sound(const char* filename) {
 	ChunkHeader data{};
 	file.read((char*)&data, sizeof(data));
 	//JUNKチャンクを検出した場合
-	if (strncmp(data.id, "JUNK", 4) == 0) {
+	if (strncmp(data.id, "JUNK", 4) == 0)
+	{
 		//読み取り位置をJUNKチャンクの終わりまで進める
 		file.seekg(data.size, std::ios_base::cur);
 		//再読み込み
 		file.read((char*)&data, sizeof(data));
 	}
-	if (strncmp(data.id, "data", 4) != 0) {
+	if (strncmp(data.id, "data", 4) != 0)
+	{
 		assert(0);
 	}
 	//Dataチャンクデータの一部（波形データ）の読み込み
@@ -69,10 +75,12 @@ Sound::Sound(const char* filename) {
 	createSourceVoice(this);
 }
 
-Sound::~Sound() {
+Sound::~Sound()
+{
 	SoundStopWave(this);
 
-	if (this->pSourceVoice != nullptr) {
+	if (this->pSourceVoice != nullptr)
+	{
 		this->pSourceVoice->DestroyVoice();
 	}
 
@@ -84,13 +92,15 @@ Sound::~Sound() {
 	this->wfex = {};
 }
 
-void Sound::createSourceVoice(Sound* soundData) {
+void Sound::createSourceVoice(Sound* soundData)
+{
 	//波形フォーマットをもとにSourceVoiceの生成
 	HRESULT result = SoundBase::getInstange()->xAudio2->CreateSourceVoice(&soundData->pSourceVoice, &soundData->wfex);
 	assert(SUCCEEDED(result));
 }
 
-void Sound::SoundStopWave(Sound* soundData) {
+void Sound::SoundStopWave(Sound* soundData)
+{
 	HRESULT result = soundData->pSourceVoice->Stop();
 	assert(SUCCEEDED(result));
 
@@ -101,7 +111,8 @@ void Sound::SoundStopWave(Sound* soundData) {
 	result = soundData.pSourceVoice->SubmitSourceBuffer(&buf);*/
 }
 
-void Sound::SoundPlayWave(Sound* soundData, int loopCount, float volume) {
+void Sound::SoundPlayWave(Sound* soundData, int loopCount, float volume)
+{
 	//波形フォーマットをもとにSourceVoiceの生成
 	createSourceVoice(soundData);
 
@@ -122,14 +133,15 @@ void Sound::SoundPlayWave(Sound* soundData, int loopCount, float volume) {
 	result = soundData->pSourceVoice->Start();
 }
 
-bool Sound::checkPlaySound(Sound* soundData) {
-
+bool Sound::checkPlaySound(Sound* soundData)
+{
 	if (soundData == nullptr ||
 		soundData->pSourceVoice == nullptr) return false;
 
 	XAUDIO2_VOICE_STATE tmp{};
 	soundData->pSourceVoice->GetState(&tmp);
-	if (tmp.BuffersQueued == 0U) {
+	if (tmp.BuffersQueued == 0U)
+	{
 		return false;
 	}
 	return true;

@@ -2,44 +2,52 @@
 
 #include <DirectXMath.h>
 
-DebugText::DebugText(UINT texNum, const SpriteBase *spriteCommon, UINT tabSize) {
+DebugText::DebugText(UINT texNum, const SpriteBase* spriteCommon, UINT tabSize)
+{
 	Initialize(texNum, spriteCommon, tabSize);
 }
 
-void DebugText::Initialize(UINT texnumber, const SpriteBase *spriteCommon,
-						   UINT tabSize) {
+void DebugText::Initialize(UINT texnumber, const SpriteBase* spriteCommon,
+						   UINT tabSize)
+{
 	this->tabSize = tabSize;
 	// 全てのスプライトデータについて
-	for (UINT i = 0, len = _countof(sprites); i < len; ++i) {
+	for (UINT i = 0, len = _countof(sprites); i < len; ++i)
+	{
 		// スプライトを生成する
 		sprites[i] = Sprite(texnumber, spriteCommon, { 0, 0 });
 	}
 }
 
-void DebugText::Print(const SpriteBase *spriteCommon, const std::string &text,
+void DebugText::Print(const SpriteBase* spriteCommon, const std::string& text,
 					  const float x, const float y, const float scale,
-					  DirectX::XMFLOAT4 color) {
+					  DirectX::XMFLOAT4 color)
+{
 	std::string textLocal = text;
 
 	int posNumX = 0, posNumY = 0;
 
 	// 全ての文字について
-	for (UINT i = 0, len = (UINT)text.size(); i < len; ++i, ++posNumX) {
-
+	for (UINT i = 0, len = (UINT)text.size(); i < len; ++i, ++posNumX)
+	{
 		// 最大文字数超過
-		if (spriteIndex >= maxCharCount) {
+		if (spriteIndex >= maxCharCount)
+		{
 			break;
 		}
 
 		auto drawCol = color;
 
-		if (i < maxCharCount - 1) {
-			if (strncmp(&textLocal[i], "\n", 1) == 0) {
+		if (i < maxCharCount - 1)
+		{
+			if (strncmp(&textLocal[i], "\n", 1) == 0)
+			{
 				posNumX = -1;
 				posNumY++;
 				textLocal[i] = ' ';
 				drawCol.w = 0.f;
-			}  if (strncmp(&textLocal[i], "\t", 1) == 0) {
+			}  if (strncmp(&textLocal[i], "\t", 1) == 0)
+			{
 				posNumX += tabSize - 1;
 				textLocal[i] = ' ';
 				drawCol.w = 0.f;
@@ -47,11 +55,12 @@ void DebugText::Print(const SpriteBase *spriteCommon, const std::string &text,
 		}
 
 		// 1文字取り出す(※ASCIIコードでしか成り立たない)
-		const unsigned char &character = textLocal[i];
+		const unsigned char& character = textLocal[i];
 
 		// ASCIIコードの2段分飛ばした番号を計算
 		int fontIndex = character - 32;
-		if (character >= 0x7f) {
+		if (character >= 0x7f)
+		{
 			fontIndex = 0;
 		}
 
@@ -72,10 +81,10 @@ void DebugText::Print(const SpriteBase *spriteCommon, const std::string &text,
 	}
 }
 
-int DebugText::formatPrint(const SpriteBase *spriteCommon,
+int DebugText::formatPrint(const SpriteBase* spriteCommon,
 						   const float x, const float y, const float scale,
-						   DirectX::XMFLOAT4 color, const char *fmt, ...) {
-
+						   DirectX::XMFLOAT4 color, const char* fmt, ...)
+{
 	char outStrChar[maxCharCount]{};
 
 	constexpr size_t bufferCount = size_t(maxCharCount - 1);
@@ -92,9 +101,11 @@ int DebugText::formatPrint(const SpriteBase *spriteCommon,
 }
 
 // まとめて描画
-void DebugText::DrawAll(DX12Base *dxBase, const SpriteBase *spriteCommon) {
+void DebugText::DrawAll(DX12Base* dxBase, const SpriteBase* spriteCommon)
+{
 	// 全ての文字のスプライトについて
-	for (UINT i = 0; i < (UINT)spriteIndex; ++i) {
+	for (UINT i = 0; i < (UINT)spriteIndex; ++i)
+	{
 		// スプライト描画
 		sprites[i].draw(dxBase->getCmdList(), spriteCommon, dxBase->getDev());
 	}

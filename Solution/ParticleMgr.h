@@ -11,7 +11,8 @@
 
 #include "Object3d.h"
 
-class ParticleMgr {
+class ParticleMgr
+{
 private:
 	// エイリアス
    // Microsoft::WRL::を省略
@@ -25,20 +26,23 @@ private:
 	// サブクラス
 public:
 	// 頂点データ構造体
-	struct VertexPos {
+	struct VertexPos
+	{
 		XMFLOAT3 pos; // xyz座標
 		float scale; // スケール
 		XMFLOAT3 color;
 	};
 
 	// 定数バッファ用データ構造体
-	struct ConstBufferData {
+	struct ConstBufferData
+	{
 		XMMATRIX mat;	// ビュープロジェクション行列
 		XMMATRIX matBillboard;	// ビルボード行列
 	};
 
 	// パーティクル1粒
-	class Particle {
+	class Particle
+	{
 		// Microsoft::WRL::を省略
 		template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 		// DirectX::を省略
@@ -80,7 +84,7 @@ public:
 
 	// 定数
 private:
-	static DX12Base *dxBase;
+	static DX12Base* dxBase;
 
 	static const int vertexCount = 0x10000;
 
@@ -108,7 +112,7 @@ private:
 	ComPtr<ID3D12Resource> constBuff;
 	// パーティクル配列
 	std::forward_list<Particle> particles;
-	Camera *camera = nullptr;
+	Camera* camera = nullptr;
 
 	// メンバ関数
 public:
@@ -116,15 +120,15 @@ public:
 	// テクスチャは1x1白で初期化
 	ParticleMgr();
 
-	ParticleMgr(const wchar_t *texFilePath, Camera *camera);
+	ParticleMgr(const wchar_t* texFilePath, Camera* camera);
 
-	void init(const wchar_t *texFilePath);
+	void init(const wchar_t* texFilePath);
 	void update();
 	void draw();
 
 	void drawWithUpdate();
 
-	inline void setCamera(Camera *camera) { this->camera = camera; }
+	inline void setCamera(Camera* camera) { this->camera = camera; }
 
 	/// <summary>
 	/// パーティクルの追加
@@ -137,10 +141,10 @@ public:
 	/// <param name="end_scale">終了時スケール</param>
 	void add(std::unique_ptr<Time> timer,
 			 int life,
-			 const XMFLOAT3 &position, const XMFLOAT3 &velocity, const XMFLOAT3 &accel,
+			 const XMFLOAT3& position, const XMFLOAT3& velocity, const XMFLOAT3& accel,
 			 float start_scale, float end_scale,
 			 float start_rotation, float end_rotation,
-			 const XMFLOAT3 &start_color, const XMFLOAT3 &end_color);
+			 const XMFLOAT3& start_color, const XMFLOAT3& end_color);
 
 	/// <summary>
 	/// デスクリプタヒープの初期化
@@ -158,11 +162,10 @@ public:
 	/// テクスチャ読み込み
 	/// </summary>
 	/// <returns>成否</returns>
-	void LoadTexture(const wchar_t *filePath);
+	void LoadTexture(const wchar_t* filePath);
 
 	/// <summary>
 	/// モデル作成
 	/// </summary>
 	void CreateModel();
 };
-

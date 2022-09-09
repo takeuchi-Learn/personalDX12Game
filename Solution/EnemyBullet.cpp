@@ -1,12 +1,15 @@
 ﻿#include "EnemyBullet.h"
 
-void EnemyBullet::additionalUpdate() {
+void EnemyBullet::additionalUpdate()
+{
 	// 寿命が来たら死ぬ
-	if (++age > life) {
+	if (++age > life)
+	{
 		alive = false;
 	}
 
-	if (alive) {
+	if (alive)
+	{
 		obj->position.x += vel.x;
 		obj->position.y += vel.y;
 		obj->position.z += vel.z;

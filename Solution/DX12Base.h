@@ -11,7 +11,8 @@
 
 #include <imgui.h>
 
-class DX12Base {
+class DX12Base
+{
 	DX12Base(const DX12Base& dxBase) = delete;
 	DX12Base& operator=(const DX12Base& dxBase) = delete;
 
@@ -76,7 +77,8 @@ private:
 	void ClearDepthBuffer();
 
 public:
-	inline static DX12Base* getInstance() {
+	inline static DX12Base* getInstance()
+	{
 		static DX12Base dxBase{};
 		return &dxBase;
 	}
@@ -104,7 +106,6 @@ public:
 	void startDraw(const DirectX::XMFLOAT3& clearColor = DirectX::XMFLOAT3(0.5f, 0.5f, 0.f));
 	void endDraw();
 
-	inline ID3D12Device *getDev() { return dev.Get(); };
-	inline ID3D12GraphicsCommandList *getCmdList() { return cmdList.Get(); };
+	inline ID3D12Device* getDev() { return dev.Get(); };
+	inline ID3D12GraphicsCommandList* getCmdList() { return cmdList.Get(); };
 };
-

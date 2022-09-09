@@ -1,8 +1,8 @@
 ﻿#include "SoundBase.h"
 #include <cassert>
 
-
-SoundBase::SoundBase() {
+SoundBase::SoundBase()
+{
 	// XAudioエンジンのインスタンスを生成
 	HRESULT result = XAudio2Create(&xAudio2, 0, XAUDIO2_DEFAULT_PROCESSOR);
 	assert(SUCCEEDED(result));
@@ -12,7 +12,8 @@ SoundBase::SoundBase() {
 	assert(SUCCEEDED(result));
 }
 
-SoundBase::~SoundBase() {
+SoundBase::~SoundBase()
+{
 	masterVoice->DestroyVoice();
 	this->xAudio2.Reset();
 }

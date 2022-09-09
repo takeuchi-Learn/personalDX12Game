@@ -1,5 +1,6 @@
 ﻿#pragma once
-class System {
+class System
+{
 	bool error = false;
 
 public:
@@ -8,6 +9,4 @@ public:
 	void update();
 
 	~System();
-
 };
-

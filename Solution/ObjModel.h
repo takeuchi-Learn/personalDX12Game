@@ -7,7 +7,8 @@
 #include "Mesh.h"
 #include "DX12Base.h"
 
-class ObjModel {
+class ObjModel
+{
 	// Microsoft::WRL::を省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	// DirectX::を省略
@@ -22,7 +23,7 @@ class ObjModel {
 public:
 
 private:
-	static DX12Base *dxBase;
+	static DX12Base* dxBase;
 	// デスクリプタサイズ
 	static UINT descriptorHandleIncrementSize;
 
@@ -68,10 +69,9 @@ public:
 	// 静的初期化
 	static void staticInit();
 
-
 	// メンバ
 
-	inline void setTexTilling(const DirectX::XMFLOAT2 &tillingNum) { texTilling = tillingNum; materialDirty = true; }
+	inline void setTexTilling(const DirectX::XMFLOAT2& tillingNum) { texTilling = tillingNum; materialDirty = true; }
 
 	// @param dirPath : objファイルのある場所のパス(例 : Resources/player/)
 	// @param objModelName : objファイルのファイル名(拡張子なし。例 : player.obj -> player)
@@ -91,4 +91,3 @@ public:
 	/// <param name="cmdList">命令発行先コマンドリスト</param>
 	void draw(ID3D12GraphicsCommandList* cmdList);
 };
-

@@ -1,25 +1,28 @@
 ﻿#include "FbxModel.h"
 #include "DX12Base.h"
 
-DX12Base *FbxModel::dxBase = DX12Base::getInstance();
+DX12Base* FbxModel::dxBase = DX12Base::getInstance();
 
-void FbxModel::createConstBuffB1() {
+void FbxModel::createConstBuffB1()
+{
 	// 定数バッファの生成
 	HRESULT result = DX12Base::getInstance()->getDev()->CreateCommittedResource(
-			&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 	// アップロード可能
-			D3D12_HEAP_FLAG_NONE,
-			&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataB1) + 0xff) & ~0xff),
-			D3D12_RESOURCE_STATE_GENERIC_READ,
-			nullptr,
-			IID_PPV_ARGS(&constBuffB1));
+		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 	// アップロード可能
+		D3D12_HEAP_FLAG_NONE,
+		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataB1) + 0xff) & ~0xff),
+		D3D12_RESOURCE_STATE_GENERIC_READ,
+		nullptr,
+		IID_PPV_ARGS(&constBuffB1));
 	assert(SUCCEEDED(result));
 }
 
-void FbxModel::transferConstBuffB1() {
+void FbxModel::transferConstBuffB1()
+{
 	// 定数バッファへデータ転送
-	ConstBufferDataB1 *constMap = nullptr;
-	HRESULT result = constBuffB1->Map(0, nullptr, (void **)&constMap);
-	if (SUCCEEDED(result)) {
+	ConstBufferDataB1* constMap = nullptr;
+	HRESULT result = constBuffB1->Map(0, nullptr, (void**)&constMap);
+	if (SUCCEEDED(result))
+	{
 		constMap->ambient = ambient;
 		constMap->diffuse = diffuse;
 		constMap->specular = specular;
@@ -28,17 +31,20 @@ void FbxModel::transferConstBuffB1() {
 	}
 }
 
-FbxModel::FbxModel() {
+FbxModel::FbxModel()
+{
 	createConstBuffB1();
 	transferConstBuffB1();
 }
 
-FbxModel::~FbxModel() {
+FbxModel::~FbxModel()
+{
 	// FBXシーンの開放
 	fbxScene->Destroy();
 }
 
-void FbxModel::createBuffers() {
+void FbxModel::createBuffers()
+{
 	// 頂点データ全体のサイズ
 	UINT sizeVB = static_cast<UINT>(sizeof(VertexPosNormalUvSkin) * vertices.size());
 	// 頂点バッファ生成
@@ -53,7 +59,8 @@ void FbxModel::createBuffers() {
 	// 頂点バッファへのデータ転送
 	VertexPosNormalUvSkin* vertMap = nullptr;
 	result = vertBuff->Map(0, nullptr, (void**)&vertMap);
-	if (SUCCEEDED(result)) {
+	if (SUCCEEDED(result))
+	{
 		std::copy(vertices.begin(), vertices.end(), vertMap);
 		vertBuff->Unmap(0, nullptr);
 	}
@@ -77,7 +84,8 @@ void FbxModel::createBuffers() {
 	// インデックスバッファへのデータ転送
 	unsigned short* indexMap = nullptr;
 	result = indexBuff->Map(0, nullptr, (void**)&indexMap);
-	if (SUCCEEDED(result)) {
+	if (SUCCEEDED(result))
+	{
 		std::copy(indices.begin(), indices.end(), indexMap);
 		indexBuff->Unmap(0, nullptr);
 	}
@@ -130,12 +138,14 @@ void FbxModel::createBuffers() {
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = 1;
 	dxBase->getDev()->CreateShaderResourceView(texBuff.Get(),
-								  &srvDesc,
-								  descHeapSRV->GetCPUDescriptorHandleForHeapStart());
+											   &srvDesc,
+											   descHeapSRV->GetCPUDescriptorHandleForHeapStart());
 }
 
-void FbxModel::draw() {
-	if (materialDirty) {
+void FbxModel::draw()
+{
+	if (materialDirty)
+	{
 		transferConstBuffB1();
 		materialDirty = false;
 	}
@@ -145,7 +155,7 @@ void FbxModel::draw() {
 	// インデックスバッファをセット(IBV)
 	dxBase->getCmdList()->IASetIndexBuffer(&ibView);
 	// デスクリプタヒープをセット
-	ID3D12DescriptorHeap *ppHeaps[] = { descHeapSRV.Get() };
+	ID3D12DescriptorHeap* ppHeaps[] = { descHeapSRV.Get() };
 	dxBase->getCmdList()->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 	// シェーダーリソースビューをセット
 	dxBase->getCmdList()->SetGraphicsRootDescriptorTable(1, descHeapSRV->GetGPUDescriptorHandleForHeapStart());

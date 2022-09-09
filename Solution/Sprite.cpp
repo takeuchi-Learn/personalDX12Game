@@ -12,16 +12,9 @@ using namespace Microsoft::WRL;
 
 #include <DirectXTex.h>
 
-
-
-
-
-
-
-
-
 // スプライト単体頂点バッファの転送
-void Sprite::SpriteTransferVertexBuffer(const SpriteBase* spriteCommon) {
+void Sprite::SpriteTransferVertexBuffer(const SpriteBase* spriteCommon)
+{
 	HRESULT result = S_FALSE;
 
 	// 頂点データ
@@ -41,12 +34,14 @@ void Sprite::SpriteTransferVertexBuffer(const SpriteBase* spriteCommon) {
 	float top = (0.0f - anchorpoint.y) * size.y;
 	float bottom = (1.0f - anchorpoint.y) * size.y;
 
-	if (isFlipX) {// 左右入れ替え
+	if (isFlipX)
+	{// 左右入れ替え
 		left = -left;
 		right = -right;
 	}
 
-	if (isFlipY) {// 上下入れ替え
+	if (isFlipY)
+	{// 上下入れ替え
 		top = -top;
 		bottom = -bottom;
 	}
@@ -57,7 +52,8 @@ void Sprite::SpriteTransferVertexBuffer(const SpriteBase* spriteCommon) {
 	vertices[RT].pos = { right, top,    0.0f }; // 右上
 
 	// 指定番号の画像が読み込み済みなら
-	if (spriteCommon->texBuff[texNumber]) {
+	if (spriteCommon->texBuff[texNumber])
+	{
 		// テクスチャ情報取得
 		D3D12_RESOURCE_DESC resDesc = spriteCommon->texBuff[texNumber]->GetDesc();
 
@@ -82,7 +78,8 @@ void Sprite::SpriteTransferVertexBuffer(const SpriteBase* spriteCommon) {
 Sprite::Sprite(UINT texNumber,
 			   const SpriteBase* spriteCommon,
 			   XMFLOAT2 anchorpoint,
-			   bool isFlipX, bool isFlipY) {
+			   bool isFlipX, bool isFlipY)
+{
 	create(DX12Base::getInstance()->getDev(),
 		   WinAPI::window_width, WinAPI::window_height,
 		   texNumber,
@@ -94,7 +91,8 @@ Sprite::Sprite(UINT texNumber,
 // スプライト生成
 void Sprite::create(ID3D12Device* dev, int window_width, int window_height,
 					UINT texNumber, const SpriteBase* spriteCommon, XMFLOAT2 anchorpoint,
-					bool isFlipX, bool isFlipY) {
+					bool isFlipX, bool isFlipY)
+{
 	HRESULT result = S_FALSE;
 
 	// テクスチャ番号をコピー
@@ -111,7 +109,8 @@ void Sprite::create(ID3D12Device* dev, int window_width, int window_height,
 	VertexPosUv vertices[4]{};
 
 	// 指定番号の画像が読み込み済みなら
-	if (spriteCommon->texBuff[texNumber]) {
+	if (spriteCommon->texBuff[texNumber])
+	{
 		// テクスチャ情報取得
 		D3D12_RESOURCE_DESC resDesc = spriteCommon->texBuff[texNumber]->GetDesc();
 
@@ -149,14 +148,15 @@ void Sprite::create(ID3D12Device* dev, int window_width, int window_height,
 	result = constBuff->Map(0, nullptr, (void**)&constMap);
 	constMap->color = XMFLOAT4(1, 1, 1, 1); // 色指定（RGBA）
 	constMap->mat = XMMatrixOrthographicOffCenterLH(
-		0.0f, (float)window_width, (float)window_height, 0.0f, 0.0f, 1.0f);   // 平行投影行列の合成    
+		0.0f, (float)window_width, (float)window_height, 0.0f, 0.0f, 1.0f);   // 平行投影行列の合成
 	constBuff->Unmap(0, nullptr);
-
 }
 
 // スプライト単体更新
-void Sprite::update(const SpriteBase* spriteCommon) {
-	if (dirty) {
+void Sprite::update(const SpriteBase* spriteCommon)
+{
+	if (dirty)
+	{
 		SpriteTransferVertexBuffer(spriteCommon);
 		dirty = false;
 	}
@@ -177,8 +177,10 @@ void Sprite::update(const SpriteBase* spriteCommon) {
 }
 
 // スプライト単体描画
-void Sprite::draw(ID3D12GraphicsCommandList* cmdList, const SpriteBase* spriteCommon, ID3D12Device* dev) {
-	if (isInvisible) {
+void Sprite::draw(ID3D12GraphicsCommandList* cmdList, const SpriteBase* spriteCommon, ID3D12Device* dev)
+{
+	if (isInvisible)
+	{
 		return;
 	}
 
@@ -204,7 +206,8 @@ void Sprite::draw(ID3D12GraphicsCommandList* cmdList, const SpriteBase* spriteCo
 
 // 更新と描画を同時に行う
 void Sprite::drawWithUpdate(DX12Base* dxBase,
-							const SpriteBase* spriteCommon) {
+							const SpriteBase* spriteCommon)
+{
 	update(spriteCommon);
 	draw(dxBase->getCmdList(), spriteCommon, dxBase->getDev());
 }

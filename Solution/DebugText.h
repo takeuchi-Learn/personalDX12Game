@@ -5,8 +5,9 @@
 
 #include <DirectXMath.h>
 
-class DebugText {
-public: // 定数の宣言    
+class DebugText
+{
+public: // 定数の宣言
 	static const int maxCharCount = 256;    // 最大文字数
 	// 画像サイズに合わせて変えたい(fontWidth, fontHeight)
 	static const int fontWidth = 9 * 2;         // フォント画像内1文字分の横幅
@@ -36,7 +37,7 @@ public:
 
 	void DrawAll(DX12Base* dxBase, const SpriteBase* spriteCommon);
 
-private: // メンバ変数     
+private: // メンバ変数
 	// スプライトデータの配列
 	Sprite sprites[maxCharCount];
 	// スプライトデータ配列の添え字番号

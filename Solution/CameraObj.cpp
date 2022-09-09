@@ -2,21 +2,22 @@
 
 using namespace DirectX;
 
-CameraObj::CameraObj(GameObj *parent)
+CameraObj::CameraObj(GameObj* parent)
 	:Camera(WinAPI::window_width,
 			WinAPI::window_height),
-	parentObj(parent) {
+	parentObj(parent)
+{
 	relativeRotaDeg = XMFLOAT3(30, 0, 0);
 }
 
-void CameraObj::preUpdate() {
+void CameraObj::preUpdate()
+{
 	if (parentObj == nullptr) return;
 
 	// カメラ操作を反転するかどうか
 	constexpr bool invCamOperFlag = false;
 	// 反転するなら1、しないなら-1
 	constexpr float rotaInvFactor = invCamOperFlag ? 1.f : -1.f;
-
 
 	XMFLOAT3 targetPos = parentObj->getPos();
 
@@ -71,10 +72,8 @@ void CameraObj::preUpdate() {
 		oldEye.z + eye.z
 	};
 
-
 	// 注視点の位置を高くする
 	{
-
 		XMFLOAT3 camHeiVec{};
 		XMStoreFloat3(&camHeiVec, XMVector3Transform(XMVectorSet(eye2TargetOffset.x,
 																 eye2TargetOffset.y,
@@ -85,7 +84,6 @@ void CameraObj::preUpdate() {
 		targetPos.y += camHeiVec.y;
 		targetPos.z += camHeiVec.z;
 	}
-
 
 	setEye(eye);
 	setTarget(targetPos);

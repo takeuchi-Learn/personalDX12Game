@@ -11,7 +11,8 @@ using namespace DirectX;
 /// </summary>
 ID3D12Device* Mesh::dev = nullptr;
 
-void Mesh::staticInit(ID3D12Device* dev) {
+void Mesh::staticInit(ID3D12Device* dev)
+{
 	// 再初期化チェック
 	assert(!Mesh::dev);
 
@@ -21,23 +22,28 @@ void Mesh::staticInit(ID3D12Device* dev) {
 	Material::staticInit(dev);
 }
 
-void Mesh::setName(const std::string& name) {
+void Mesh::setName(const std::string& name)
+{
 	this->name = name;
 }
 
-void Mesh::addVertex(const VertexPosNormalUv& vertex) {
+void Mesh::addVertex(const VertexPosNormalUv& vertex)
+{
 	vertices.emplace_back(vertex);
 }
 
-void Mesh::addIndex(unsigned short index) {
+void Mesh::addIndex(unsigned short index)
+{
 	indices.emplace_back(index);
 }
 
-void Mesh::setMaterial(Material* material) {
+void Mesh::setMaterial(Material* material)
+{
 	this->material = material;
 }
 
-void Mesh::createBuffers() {
+void Mesh::createBuffers()
+{
 	HRESULT result;
 
 	UINT sizeVB = static_cast<UINT>(sizeof(VertexPosNormalUv) * vertices.size());
@@ -53,7 +59,8 @@ void Mesh::createBuffers() {
 	// 頂点バッファへのデータ転送
 	VertexPosNormalUv* vertMap = nullptr;
 	result = vertBuff->Map(0, nullptr, (void**)&vertMap);
-	if (SUCCEEDED(result)) {
+	if (SUCCEEDED(result))
+	{
 		std::copy(vertices.begin(), vertices.end(), vertMap);
 		vertBuff->Unmap(0, nullptr);
 	}
@@ -63,7 +70,8 @@ void Mesh::createBuffers() {
 	vbView.SizeInBytes = sizeVB;
 	vbView.StrideInBytes = sizeof(vertices[0]);
 
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 		return;
 	}
@@ -77,7 +85,8 @@ void Mesh::createBuffers() {
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(&indexBuff));
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 		return;
 	}
@@ -85,7 +94,8 @@ void Mesh::createBuffers() {
 	// インデックスバッファへのデータ転送
 	unsigned short* indexMap = nullptr;
 	result = indexBuff->Map(0, nullptr, (void**)&indexMap);
-	if (SUCCEEDED(result)) {
+	if (SUCCEEDED(result))
+	{
 		std::copy(indices.begin(), indices.end(), indexMap);
 		indexBuff->Unmap(0, nullptr);
 	}
@@ -96,7 +106,8 @@ void Mesh::createBuffers() {
 	ibView.SizeInBytes = sizeIB;
 }
 
-void Mesh::draw(ID3D12GraphicsCommandList* cmdList) {
+void Mesh::draw(ID3D12GraphicsCommandList* cmdList)
+{
 	// 頂点バッファをセット
 	cmdList->IASetVertexBuffers(0, 1, &vbView);
 	// インデックスバッファをセット
@@ -112,18 +123,22 @@ void Mesh::draw(ID3D12GraphicsCommandList* cmdList) {
 	cmdList->DrawIndexedInstanced((UINT)indices.size(), 1, 0, 0, 0);
 }
 
-void Mesh::addSmoothData(unsigned short indexPosition, unsigned short indexVertex) {
+void Mesh::addSmoothData(unsigned short indexPosition, unsigned short indexVertex)
+{
 	smoothData[indexPosition].emplace_back(indexVertex);
 }
 
-void Mesh::calculateSmoothedVertexNormals() {
+void Mesh::calculateSmoothedVertexNormals()
+{
 	auto it = smoothData.begin();
-	for (; it != smoothData.end(); ++it) {
+	for (; it != smoothData.end(); ++it)
+	{
 		// 各面用の共通頂点コレクション
 		std::vector<unsigned short>& v = it->second;
 		// 全頂点の法線を平均する
 		XMVECTOR normal{};
-		for (unsigned short index : v) {
+		for (unsigned short index : v)
+		{
 			normal += XMVectorSet(vertices[index].normal.x,
 								  vertices[index].normal.y,
 								  vertices[index].normal.z,
@@ -131,7 +146,8 @@ void Mesh::calculateSmoothedVertexNormals() {
 		}
 		normal = XMVector3Normalize(normal / (float)v.size());
 		// 共通法線を使用する全頂点データに書き込む
-		for (unsigned short index : v) {
+		for (unsigned short index : v)
+		{
 			vertices[index].normal = {
 				normal.m128_f32[0], normal.m128_f32[1], normal.m128_f32[2]
 			};

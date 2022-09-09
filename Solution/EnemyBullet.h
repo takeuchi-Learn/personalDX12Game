@@ -3,8 +3,8 @@
 #include "GameObj.h"
 
 class EnemyBullet
-	: public GameObj {
-
+	: public GameObj
+{
 	DirectX::XMFLOAT3 vel{ 0,0,-2 };
 
 public:
@@ -19,8 +19,7 @@ public:
 	using GameObj::GameObj;
 
 	// @return 毎秒進む値
-	inline const DirectX::XMFLOAT3 &getVel() { return vel; }
+	inline const DirectX::XMFLOAT3& getVel() { return vel; }
 	// @param vel 毎秒進む値
-	inline void setVel(const DirectX::XMFLOAT3 &vel) { this->vel = vel; }
+	inline void setVel(const DirectX::XMFLOAT3& vel) { this->vel = vel; }
 };
-

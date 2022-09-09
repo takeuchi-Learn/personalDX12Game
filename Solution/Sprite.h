@@ -4,7 +4,8 @@
 
 #include "DX12Base.h"
 
-class Sprite {
+class Sprite
+{
 private:
 	using XMFLOAT4 = DirectX::XMFLOAT4;
 	using XMFLOAT3 = DirectX::XMFLOAT3;
@@ -14,13 +15,15 @@ private:
 
 public:
 	// 定数バッファ用データ構造体
-	struct ConstBufferData {
+	struct ConstBufferData
+	{
 		XMFLOAT4 color; // 色 (RGBA)
 		XMMATRIX mat;   // ３Ｄ変換行列
 	};
 
 	// 頂点データ
-	struct VertexPosUv {
+	struct VertexPosUv
+	{
 		XMFLOAT3 pos; // xyz座標
 		XMFLOAT2 uv;  // uv座標
 	};
@@ -97,7 +100,6 @@ public:
 protected:
 	// スプライト単体頂点バッファの転送
 	void SpriteTransferVertexBuffer(const SpriteBase* spriteCommon);
-
 
 	// スプライト生成
 	void create(ID3D12Device* dev, int window_width, int window_height,

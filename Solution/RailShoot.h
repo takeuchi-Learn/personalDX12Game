@@ -21,18 +21,16 @@
 #include "ParticleMgr.h"
 
 class RailShoot
-	: public GameScene {
-
-	DX12Base *dxBase = nullptr;
-	Input *input = nullptr;
-
+	: public GameScene
+{
+	DX12Base* dxBase = nullptr;
+	Input* input = nullptr;
 
 	std::unique_ptr<CameraObj> camera;
 
 	std::unique_ptr<Light> light;
 
 	std::unique_ptr<Time> timer;
-
 
 	// --------------------
 	// スプライト
@@ -86,41 +84,39 @@ class RailShoot
 	static const UINT splineIndexDef = 1u;
 	UINT splineIndex = splineIndexDef;
 
-
-
 	// std::stringの2次元配列(vector)
 	using CSVType = std::vector<std::vector<std::string>>;
 
 	// 敵発生スクリプトのCSVデータ
 	CSVType csvData;
 
-	CSVType loadCsv(const std::string &csvFilePath,
+	CSVType loadCsv(const std::string& csvFilePath,
 					bool commentFlag = true,
 					char divChar = ',',
-					const std::string &commentStartStr = "//");
+					const std::string& commentStartStr = "//");
 
-	struct PopEnemyData {
+	struct PopEnemyData
+	{
 		UINT popFrame;
 		DirectX::XMFLOAT3 pos;
 		DirectX::XMFLOAT3 vel{ 0,0,-1 };
 		PopEnemyData(UINT popFrame,
-					 const DirectX::XMFLOAT3 &pos,
-					 const DirectX::XMFLOAT3 &vel)
-			: popFrame(popFrame), pos(pos), vel(vel) {
+					 const DirectX::XMFLOAT3& pos,
+					 const DirectX::XMFLOAT3& vel)
+			: popFrame(popFrame), pos(pos), vel(vel)
+		{
 		}
 	};
 
 	std::forward_list<std::unique_ptr<PopEnemyData>> enemyPopData;
 	UINT nowFrame = 0u;
 
-
-
-	void createParticle(const DirectX::XMFLOAT3 &pos,
+	void createParticle(const DirectX::XMFLOAT3& pos,
 						const UINT particleNum = 10U,
 						const float startScale = 1.f,
 						const float vel = 5.f);
 
-	void addEnemy(const DirectX::XMFLOAT3 &pos, const DirectX::XMFLOAT3 &vel, float scale = 5.f);
+	void addEnemy(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& vel, float scale = 5.f);
 
 	void changeNextScene();
 
@@ -141,8 +137,7 @@ public:
 
 	~RailShoot();
 
-	static DirectX::XMVECTOR splinePosition(const std::vector<DirectX::XMVECTOR> &points,
+	static DirectX::XMVECTOR splinePosition(const std::vector<DirectX::XMVECTOR>& points,
 											size_t startIndex,
 											float t);
 };
-

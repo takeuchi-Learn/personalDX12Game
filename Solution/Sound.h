@@ -3,23 +3,27 @@
 #include <cstdint>
 #include <wrl.h>
 
-class Sound {
+class Sound
+{
 public:
 #pragma region チャンク
 	// チャンクヘッダ
-	struct ChunkHeader {
+	struct ChunkHeader
+	{
 		char id[4]; // チャンク毎のID
 		int32_t size;  // チャンクサイズ
 	};
 
 	// RIFFヘッダチャンク
-	struct RiffHeader {
+	struct RiffHeader
+	{
 		ChunkHeader chunk;   // "RIFF"
 		char type[4]; // "WAVE"
 	};
 
 	// FMTチャンク
-	struct FormatChunk {
+	struct FormatChunk
+	{
 		ChunkHeader chunk; // "fmt "
 		WAVEFORMATEX fmt; // 波形フォーマット
 	};
@@ -32,45 +36,40 @@ private:
 	//波形フォーマット
 	WAVEFORMATEX wfex;
 	//バッファの先頭アドレス
-	BYTE *pBuffer;
+	BYTE* pBuffer;
 	//バッファのサイズ
 	unsigned int bufferSize;
 
-	IXAudio2SourceVoice *pSourceVoice = nullptr;
-
-
+	IXAudio2SourceVoice* pSourceVoice = nullptr;
 
 	// --------------------
 	// メンバ関数
 	// --------------------
 public:
 	// 音声データの読み込み
-	Sound(const char *filename);
+	Sound(const char* filename);
 
 	// 音声データの解放
 	~Sound();
-
-
 
 	// --------------------
 	// static関数
 	// --------------------
 private:
-	static void createSourceVoice(Sound *soundData);
+	static void createSourceVoice(Sound* soundData);
 
 public:
 	// 音声再生停止
-	static void SoundStopWave(Sound *soundData);
+	static void SoundStopWave(Sound* soundData);
 
 	/// <summary>
 	/// 音声再生
 	/// </summary>
 	/// <param name="loopCount">0で繰り返し無し、XAUDIO2_LOOP_INFINITEで永遠</param>
 	/// <param name="volume">0 ~ 1</param>
-	static void SoundPlayWave(Sound *soundData,
+	static void SoundPlayWave(Sound* soundData,
 							  int loopCount = 0, float volume = 0.2);
 
 	//再生状態の確認
-	static bool checkPlaySound(Sound *soundData);
+	static bool checkPlaySound(Sound* soundData);
 };
-

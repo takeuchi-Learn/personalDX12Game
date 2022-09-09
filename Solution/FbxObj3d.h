@@ -14,7 +14,8 @@
 
 #include <vector>
 
-class FbxObj3d {
+class FbxObj3d
+{
 protected:
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 	using XMFLOAT2 = DirectX::XMFLOAT2;
@@ -26,13 +27,15 @@ public:
 	// ボーンの最大数(hlslの定数と合わせる)
 	static const int MAX_BONES = 32;
 
-	struct ConstBufferDataTransform {
+	struct ConstBufferDataTransform
+	{
 		XMMATRIX viewproj;
 		XMMATRIX world;
 		XMFLOAT3 cameraPos;
 	};
 
-	struct ConstBufferDataSkin {
+	struct ConstBufferDataSkin
+	{
 		XMMATRIX bones[MAX_BONES];
 	};
 
@@ -40,7 +43,7 @@ public:
 	static void setCamera(Camera* camera) { FbxObj3d::camera = camera; }
 
 	static uint8_t createGraphicsPipeline(const wchar_t* vsPath = L"Resources/shaders/FBXVS.hlsl",
-									   const wchar_t* psPath = L"Resources/shaders/FBXPS.hlsl");
+										  const wchar_t* psPath = L"Resources/shaders/FBXPS.hlsl");
 
 private:
 	static DX12Base* dxBase;
@@ -57,7 +60,6 @@ public:
 	// モデル読み込む
 	FbxObj3d(FbxModel* model, bool animLoop = true);
 
-
 	void init();	// コンストラクタ内で呼び出している
 	void update();
 	void draw(Light* light);
@@ -66,10 +68,10 @@ public:
 
 	inline void setModel(FbxModel* model) { this->model = model; }
 
-	inline const DirectX::XMFLOAT3 &getScale() { return scale; }
+	inline const DirectX::XMFLOAT3& getScale() { return scale; }
 	inline void setScale(const XMFLOAT3& scale) { this->scale = scale; }
 
-	inline const DirectX::XMFLOAT3 &getPosition() { return position; }
+	inline const DirectX::XMFLOAT3& getPosition() { return position; }
 	inline void setPosition(const XMFLOAT3& position) { this->position = position; }
 
 	inline void setRotation(const XMFLOAT3& rotation) { this->rotation = rotation; }
@@ -97,4 +99,3 @@ protected:
 
 	bool animLoop = true;
 };
-

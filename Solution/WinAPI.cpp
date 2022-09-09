@@ -9,7 +9,8 @@ const DWORD	WinAPI::windowStyle = WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME;
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 WinAPI::WinAPI()
-	: windowSize({ window_width, window_height }) {
+	: windowSize({ window_width, window_height })
+{
 	// 初期状態のウィンドウタイトル
 	constexpr wchar_t winTitleDef[] = L"DX12Game (SE : OtoLogic)";
 
@@ -42,16 +43,19 @@ WinAPI::WinAPI()
 	ShowWindow(hwnd, SW_SHOW);
 }
 
-bool WinAPI::setWindowSize(int sizeX, int sizeY, const POINT *pos, bool bRepaint) {
+bool WinAPI::setWindowSize(int sizeX, int sizeY, const POINT* pos, bool bRepaint)
+{
 	POINT winPos{};
 
-	if (pos == nullptr) {
+	if (pos == nullptr)
+	{
 		WINDOWINFO wInfo{};
 		GetWindowInfo(hwnd, &wInfo);
 
 		winPos.x = wInfo.rcWindow.left;
 		winPos.y = wInfo.rcWindow.top;
-	} else {
+	} else
+	{
 		winPos = *pos;
 	}
 
@@ -73,30 +77,36 @@ bool WinAPI::setWindowSize(int sizeX, int sizeY, const POINT *pos, bool bRepaint
 	return ret;
 }
 
-bool WinAPI::setWindowWidth(int sizeX) {
+bool WinAPI::setWindowWidth(int sizeX)
+{
 	const float raito = (float)windowSize.y / (float)windowSize.x;
 
 	return setWindowSize(sizeX, (int)std::round(sizeX * raito));
 }
 
-bool WinAPI::setWindowHeight(int sizeY) {
+bool WinAPI::setWindowHeight(int sizeY)
+{
 	const float raito = (float)windowSize.x / (float)windowSize.y;
 
 	return setWindowSize((int)std::roundf(sizeY * raito), sizeY);
 }
 
-WinAPI::~WinAPI() {
+WinAPI::~WinAPI()
+{
 	// ウィンドウクラスを登録解除
 	UnregisterClass(w.lpszClassName, w.hInstance);
 }
 
-LRESULT WinAPI::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
-	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam)) {
+LRESULT WinAPI::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+{
+	if (ImGui_ImplWin32_WndProcHandler(hwnd, msg, wparam, lparam))
+	{
 		return 1;
 	}
 
 	// メッセージで分岐
-	switch (msg) {
+	switch (msg)
+	{
 	case WM_DESTROY: // ウィンドウが破棄された
 		PostQuitMessage(0); // OSに対して、アプリの終了を伝える
 		return 0;
@@ -104,7 +114,8 @@ LRESULT WinAPI::WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam) {
 	return DefWindowProc(hwnd, msg, wparam, lparam); // 標準の処理を行う
 }
 
-WinAPI *WinAPI::getInstance() {
+WinAPI* WinAPI::getInstance()
+{
 	static WinAPI winApi{};
 	return &winApi;
 }
@@ -112,21 +123,25 @@ WinAPI *WinAPI::getInstance() {
 HWND WinAPI::getHwnd() { return hwnd; }
 WNDCLASSEX WinAPI::getW() { return w; }
 
-void WinAPI::setWindowText(const LPCSTR window_title) {
+void WinAPI::setWindowText(const LPCSTR window_title)
+{
 	SetWindowTextA(hwnd, window_title);
 }
 
-bool WinAPI::processMessage() {
+bool WinAPI::processMessage()
+{
 	MSG msg{};  // メッセージ
 
 	// メッセージがある？
-	if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE)) {
+	if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+	{
 		TranslateMessage(&msg); // キー入力メッセージの処理
 		DispatchMessage(&msg); // プロシージャにメッセージを送る
 	}
 
 	// ×ボタンで終了メッセージが来たらゲームループを抜ける
-	if (msg.message == WM_QUIT) {
+	if (msg.message == WM_QUIT)
+	{
 		return true;
 	}
 	return false;

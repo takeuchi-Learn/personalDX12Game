@@ -2,22 +2,24 @@
 
 using namespace DirectX;
 
-Enemy::Enemy(Camera *camera,
-			 ObjModel *model,
-			 ObjModel *bulModel,
-			 const DirectX::XMFLOAT3 &pos)
+Enemy::Enemy(Camera* camera,
+			 ObjModel* model,
+			 ObjModel* bulModel,
+			 const DirectX::XMFLOAT3& pos)
 	: GameObj(camera, model, pos),
 	bulModel(bulModel),
 	camera(camera),
-	phase(std::bind(&Enemy::phase_Approach, this)) {
+	phase(std::bind(&Enemy::phase_Approach, this))
+{
 	obj->rotation.x += 180.f;
 }
 
-void Enemy::shot(const DirectX::XMFLOAT3 &targetPos,
+void Enemy::shot(const DirectX::XMFLOAT3& targetPos,
 				 float vel,
-				 float bulScale) {
+				 float bulScale)
+{
 	// C++17から追加した要素の参照が返ってくるようになった
-	std::unique_ptr<EnemyBullet> &i = bul.emplace_front(new EnemyBullet(camera,
+	std::unique_ptr<EnemyBullet>& i = bul.emplace_front(new EnemyBullet(camera,
 																		bulModel,
 																		obj->position));
 	// 親を設定
@@ -44,45 +46,53 @@ void Enemy::shot(const DirectX::XMFLOAT3 &targetPos,
 
 #pragma region phase
 
-void Enemy::phase_Approach() {
+void Enemy::phase_Approach()
+{
 	obj->position.x += vel.x;
 	obj->position.y += vel.y;
 	obj->position.z += vel.z;
 
-	if (targetObjPt != nullptr && shotFrame-- == 0U) {
+	if (targetObjPt != nullptr && shotFrame-- == 0U)
+	{
 		shot(targetObjPt->getPos(), 1.f, 2.5f);
 		shotFrame = shotFrameMax;
 	}
 }
 
-void Enemy::phase_Leave() {
+void Enemy::phase_Leave()
+{
 	obj->position.x += vel.x;
 	obj->position.y += vel.y;
 	obj->position.z += vel.z;
 
 	if (std::abs(obj->position.x) >= 50.f &&
-		std::abs(obj->position.y) >= 50.f) {
+		std::abs(obj->position.y) >= 50.f)
+	{
 		kill();
 	}
 }
 
 #pragma endregion phase
 
-void Enemy::additionalUpdate() {
-	if (alive) {
+void Enemy::additionalUpdate()
+{
+	if (alive)
+	{
 		phase();
 	}
 
 	++nowFrame;
 
-	bul.remove_if([](std::unique_ptr<EnemyBullet> &i) {return !i->getAlive(); });
+	bul.remove_if([](std::unique_ptr<EnemyBullet>& i) { return !i->getAlive(); });
 
-	if (targetObjPt != nullptr) {
+	if (targetObjPt != nullptr)
+	{
 		// 補間する割合[0~1]
 		// 1だと回避不可能
 		// 調整項目
 		constexpr float raito = 0.02f;
-		for (auto &i : bul) {
+		for (auto& i : bul)
+		{
 			const XMFLOAT3 nowVel = i->getVel();
 
 			// 速度の差分を取得
@@ -121,8 +131,10 @@ void Enemy::additionalUpdate() {
 	}
 }
 
-void Enemy::additionalDraw(Light *light) {
-	for (auto &i : bul) {
+void Enemy::additionalDraw(Light* light)
+{
+	for (auto& i : bul)
+	{
 		i->drawWithUpdate(light);
 	}
 }

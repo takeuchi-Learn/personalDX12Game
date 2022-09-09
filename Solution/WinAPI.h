@@ -1,10 +1,11 @@
 ﻿#pragma once
 #include <Windows.h>
 
-class WinAPI {
+class WinAPI
+{
 private:
-	WinAPI(const WinAPI &winapi) = delete;
-	WinAPI &operator=(const WinAPI &winapi) = delete;
+	WinAPI(const WinAPI& winapi) = delete;
+	WinAPI& operator=(const WinAPI& winapi) = delete;
 
 	WinAPI();
 	~WinAPI();
@@ -19,9 +20,8 @@ private:
 	//ウィンドウプロシージャ
 	static LRESULT WindowProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 
-
 public:
-	bool setWindowSize(int sizeX, int sizeY, const POINT *pos = nullptr, bool bRepaint = true);
+	bool setWindowSize(int sizeX, int sizeY, const POINT* pos = nullptr, bool bRepaint = true);
 
 public:
 	const static int window_width = 1280;
@@ -32,9 +32,9 @@ public:
 	// アスペクト比固定でウィンドウサイズを変更
 	bool setWindowHeight(int sizeY);
 
-	inline const POINT &getWindowSize() const { return windowSize; }
+	inline const POINT& getWindowSize() const { return windowSize; }
 
-	static WinAPI *getInstance();
+	static WinAPI* getInstance();
 
 	HWND getHwnd();
 	WNDCLASSEX getW();
@@ -45,4 +45,3 @@ public:
 	//@return 異常の有無をbool型で返す(true == 異常 , false == 正常)
 	bool processMessage();
 };
-

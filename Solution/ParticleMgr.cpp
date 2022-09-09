@@ -10,9 +10,10 @@
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
-DX12Base *ParticleMgr::dxBase = DX12Base::getInstance();
+DX12Base* ParticleMgr::dxBase = DX12Base::getInstance();
 
-static const DirectX::XMFLOAT3 operator+(const DirectX::XMFLOAT3 &lhs, const DirectX::XMFLOAT3 &rhs) {
+static const DirectX::XMFLOAT3 operator+(const DirectX::XMFLOAT3& lhs, const DirectX::XMFLOAT3& rhs)
+{
 	XMFLOAT3 result;
 	result.x = lhs.x + rhs.x;
 	result.y = lhs.y + rhs.y;
@@ -20,7 +21,8 @@ static const DirectX::XMFLOAT3 operator+(const DirectX::XMFLOAT3 &lhs, const Dir
 	return result;
 }
 
-static const DirectX::XMFLOAT3 operator-(const DirectX::XMFLOAT3 &lhs, const DirectX::XMFLOAT3 &rhs) {
+static const DirectX::XMFLOAT3 operator-(const DirectX::XMFLOAT3& lhs, const DirectX::XMFLOAT3& rhs)
+{
 	XMFLOAT3 result;
 	result.x = lhs.x - rhs.x;
 	result.y = lhs.y - rhs.y;
@@ -28,7 +30,8 @@ static const DirectX::XMFLOAT3 operator-(const DirectX::XMFLOAT3 &lhs, const Dir
 	return result;
 }
 
-const DirectX::XMFLOAT3 operator/(const DirectX::XMFLOAT3 &lhs, const float rhs) {
+const DirectX::XMFLOAT3 operator/(const DirectX::XMFLOAT3& lhs, const float rhs)
+{
 	XMFLOAT3 result;
 	result.x = lhs.x / rhs;
 	result.y = lhs.y / rhs;
@@ -36,7 +39,8 @@ const DirectX::XMFLOAT3 operator/(const DirectX::XMFLOAT3 &lhs, const float rhs)
 	return result;
 }
 
-void ParticleMgr::init(const wchar_t *texFilePath) {
+void ParticleMgr::init(const wchar_t* texFilePath)
+{
 	// デスクリプタヒープの初期化
 	InitializeDescriptorHeap();
 
@@ -57,27 +61,31 @@ void ParticleMgr::init(const wchar_t *texFilePath) {
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(&constBuff));
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 	}
 }
 
-ParticleMgr::ParticleMgr() {
+ParticleMgr::ParticleMgr()
+{
 	init(L"Resources/white.png");
 }
 
-ParticleMgr::ParticleMgr(const wchar_t *texFilePath,
-						 Camera *camera) {
+ParticleMgr::ParticleMgr(const wchar_t* texFilePath,
+						 Camera* camera)
+{
 	init(texFilePath);
 	setCamera(camera);
 }
 
-void ParticleMgr::update() {
+void ParticleMgr::update()
+{
 	// 全パーティクル更新
 	for (std::forward_list<Particle>::iterator it = particles.begin();
 		 it != particles.end();
-		 it++) {
-
+		 it++)
+	{
 		// 経過時間を更新
 		it->nowTime = it->timer->getNowTime() - it->startTime;
 		// 進行度を0～1の範囲に換算
@@ -105,17 +113,19 @@ void ParticleMgr::update() {
 	}
 
 	// 寿命が尽きたパーティクルを全削除
-	particles.remove_if([](Particle &x) { return x.nowTime >= x.life; });
+	particles.remove_if([](Particle& x) { return x.nowTime >= x.life; });
 
 	// 頂点バッファへデータ転送
-	VertexPos *vertMap = nullptr;
-	HRESULT result = vertBuff->Map(0, nullptr, (void **)&vertMap);
-	if (SUCCEEDED(result)) {
+	VertexPos* vertMap = nullptr;
+	HRESULT result = vertBuff->Map(0, nullptr, (void**)&vertMap);
+	if (SUCCEEDED(result))
+	{
 		int vertCount = 0;
 		// パーティクルの情報を1つずつ反映
 		for (std::forward_list<Particle>::iterator it = particles.begin();
 			 it != particles.end();
-			 it++) {
+			 it++)
+		{
 			// 座標
 			vertMap->pos = it->position;
 			// スケール
@@ -123,7 +133,8 @@ void ParticleMgr::update() {
 			vertMap->color = it->color;
 			// 次の頂点へ
 			vertMap++;
-			if (++vertCount >= vertexCount) {
+			if (++vertCount >= vertexCount)
+			{
 				break;
 			}
 		}
@@ -131,21 +142,24 @@ void ParticleMgr::update() {
 	}
 
 	// 定数バッファへデータ転送
-	ConstBufferData *constMap = nullptr;
-	result = constBuff->Map(0, nullptr, (void **)&constMap);
+	ConstBufferData* constMap = nullptr;
+	result = constBuff->Map(0, nullptr, (void**)&constMap);
 	constMap->mat = camera->getViewProjectionMatrix();
 	constMap->matBillboard = camera->getBillboardMatrix();
 	constBuff->Unmap(0, nullptr);
 }
 
-void ParticleMgr::draw() {
+void ParticleMgr::draw()
+{
 	UINT drawNum = (UINT)std::distance(particles.begin(), particles.end());
-	if (drawNum > vertexCount) {
+	if (drawNum > vertexCount)
+	{
 		drawNum = vertexCount;
 	}
 
 	// パーティクルが1つもない場合
-	if (drawNum == 0) {
+	if (drawNum == 0)
+	{
 		return;
 	}
 
@@ -160,7 +174,7 @@ void ParticleMgr::draw() {
 	dxBase->getCmdList()->IASetVertexBuffers(0, 1, &vbView);
 
 	// デスクリプタヒープの配列
-	ID3D12DescriptorHeap *ppHeaps[] = { descHeap.Get() };
+	ID3D12DescriptorHeap* ppHeaps[] = { descHeap.Get() };
 	dxBase->getCmdList()->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
 
 	// 定数バッファビューをセット
@@ -171,20 +185,22 @@ void ParticleMgr::draw() {
 	dxBase->getCmdList()->DrawInstanced(drawNum, 1, 0, 0);
 }
 
-void ParticleMgr::drawWithUpdate() {
+void ParticleMgr::drawWithUpdate()
+{
 	update();
 	draw();
 }
 
 void ParticleMgr::add(std::unique_ptr<Time> timer,
 					  int life,
-					  const XMFLOAT3 &position, const XMFLOAT3 &velocity, const XMFLOAT3 &accel,
+					  const XMFLOAT3& position, const XMFLOAT3& velocity, const XMFLOAT3& accel,
 					  float start_scale, float end_scale,
 					  float start_rotation, float end_rotation,
-					  const  XMFLOAT3 &start_color, const  XMFLOAT3 &end_color) {
+					  const  XMFLOAT3& start_color, const  XMFLOAT3& end_color)
+{
 	// リストに要素を追加
 	// C++17からは追加した要素の参照が返ってくる
-	Particle &p = particles.emplace_front();
+	Particle& p = particles.emplace_front();
 	p.position = position;
 	p.velocity = velocity;
 	p.accel = accel;
@@ -204,16 +220,18 @@ void ParticleMgr::add(std::unique_ptr<Time> timer,
 	p.startTime = p.timer->getNowTime();
 }
 
-void ParticleMgr::InitializeDescriptorHeap() {
+void ParticleMgr::InitializeDescriptorHeap()
+{
 	HRESULT result = S_FALSE;
 
-	// デスクリプタヒープを生成	
+	// デスクリプタヒープを生成
 	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
 	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 	descHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;//シェーダから見えるように
 	descHeapDesc.NumDescriptors = 1; // シェーダーリソースビュー1つ
 	result = dxBase->getDev()->CreateDescriptorHeap(&descHeapDesc, IID_PPV_ARGS(&descHeap));//生成
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 	}
 
@@ -221,7 +239,8 @@ void ParticleMgr::InitializeDescriptorHeap() {
 	descriptorHandleIncrementSize = dxBase->getDev()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 }
 
-void ParticleMgr::InitializeGraphicsPipeline() {
+void ParticleMgr::InitializeGraphicsPipeline()
+{
 	HRESULT result = S_FALSE;
 	ComPtr<ID3DBlob> vsBlob; // 頂点シェーダオブジェクト
 	ComPtr<ID3DBlob> psBlob;	// ピクセルシェーダオブジェクト
@@ -237,12 +256,13 @@ void ParticleMgr::InitializeGraphicsPipeline() {
 		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
 		0,
 		&vsBlob, &errorBlob);
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		// errorBlobからエラー内容をstring型にコピー
 		std::string errstr;
 		errstr.resize(errorBlob->GetBufferSize());
 
-		std::copy_n((char *)errorBlob->GetBufferPointer(),
+		std::copy_n((char*)errorBlob->GetBufferPointer(),
 					errorBlob->GetBufferSize(),
 					errstr.begin());
 		errstr += "\n";
@@ -260,12 +280,13 @@ void ParticleMgr::InitializeGraphicsPipeline() {
 		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
 		0,
 		&psBlob, &errorBlob);
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		// errorBlobからエラー内容をstring型にコピー
 		std::string errstr;
 		errstr.resize(errorBlob->GetBufferSize());
 
-		std::copy_n((char *)errorBlob->GetBufferPointer(),
+		std::copy_n((char*)errorBlob->GetBufferPointer(),
 					errorBlob->GetBufferSize(),
 					errstr.begin());
 		errstr += "\n";
@@ -283,12 +304,13 @@ void ParticleMgr::InitializeGraphicsPipeline() {
 		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
 		0,
 		&gsBlob, &errorBlob);
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		// errorBlobからエラー内容をstring型にコピー
 		std::string errstr;
 		errstr.resize(errorBlob->GetBufferSize());
 
-		std::copy_n((char *)errorBlob->GetBufferPointer(),
+		std::copy_n((char*)errorBlob->GetBufferPointer(),
 					errorBlob->GetBufferSize(),
 					errstr.begin());
 		errstr += "\n";
@@ -359,7 +381,8 @@ void ParticleMgr::InitializeGraphicsPipeline() {
 	constexpr UINT renderTargetNum = min(PostEffect::renderTargetNum, _countof(gpipeline.BlendState.RenderTarget));
 
 	// ブレンドステートの設定
-	for (UINT i = 0u; i < renderTargetNum; ++i) {
+	for (UINT i = 0u; i < renderTargetNum; ++i)
+	{
 		gpipeline.BlendState.RenderTarget[i] = blenddesc;
 	}
 
@@ -374,7 +397,8 @@ void ParticleMgr::InitializeGraphicsPipeline() {
 	gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
 
 	gpipeline.NumRenderTargets = renderTargetNum;	// 描画対象の数
-	for (UINT i = 0u; i < renderTargetNum; ++i) {
+	for (UINT i = 0u; i < renderTargetNum; ++i)
+	{
 		gpipeline.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM; // 0～255指定のRGBA
 	}
 	gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
@@ -402,7 +426,8 @@ void ParticleMgr::InitializeGraphicsPipeline() {
 	result = D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &rootSigBlob, &errorBlob);
 	// ルートシグネチャの生成
 	result = dxBase->getDev()->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&rootsignature));
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 	}
 
@@ -411,12 +436,14 @@ void ParticleMgr::InitializeGraphicsPipeline() {
 	// グラフィックスパイプラインの生成
 	result = dxBase->getDev()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate));
 
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 	}
 }
 
-void ParticleMgr::LoadTexture(const wchar_t *filePath) {
+void ParticleMgr::LoadTexture(const wchar_t* filePath)
+{
 	HRESULT result = S_FALSE;
 
 	// WICテクスチャのロード
@@ -426,11 +453,12 @@ void ParticleMgr::LoadTexture(const wchar_t *filePath) {
 	result = LoadFromWICFile(
 		filePath, WIC_FLAGS_NONE,
 		&metadata, scratchImg);
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 	}
 
-	const Image *img = scratchImg.GetImage(0, 0, 0); // 生データ抽出
+	const Image* img = scratchImg.GetImage(0, 0, 0); // 生データ抽出
 
 	// リソース設定
 	CD3DX12_RESOURCE_DESC texresDesc = CD3DX12_RESOURCE_DESC::Tex2D(
@@ -449,7 +477,8 @@ void ParticleMgr::LoadTexture(const wchar_t *filePath) {
 		D3D12_RESOURCE_STATE_GENERIC_READ, // テクスチャ用指定
 		nullptr,
 		IID_PPV_ARGS(&texbuff));
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 	}
 
@@ -461,7 +490,8 @@ void ParticleMgr::LoadTexture(const wchar_t *filePath) {
 		(UINT)img->rowPitch,  // 1ラインサイズ
 		(UINT)img->slicePitch // 1枚サイズ
 	);
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 	}
 
@@ -483,7 +513,8 @@ void ParticleMgr::LoadTexture(const wchar_t *filePath) {
 	);
 }
 
-void ParticleMgr::CreateModel() {
+void ParticleMgr::CreateModel()
+{
 	HRESULT result = S_FALSE;
 
 	// 頂点バッファ生成
@@ -494,7 +525,8 @@ void ParticleMgr::CreateModel() {
 		D3D12_RESOURCE_STATE_GENERIC_READ,
 		nullptr,
 		IID_PPV_ARGS(&vertBuff));
-	if (FAILED(result)) {
+	if (FAILED(result))
+	{
 		assert(0);
 		return;
 	}

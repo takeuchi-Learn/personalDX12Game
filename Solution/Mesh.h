@@ -13,7 +13,8 @@
 /// <summary>
 /// 形状データ
 /// </summary>
-class Mesh {
+class Mesh
+{
 private: // エイリアス
 	// Microsoft::WRL::を省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
@@ -25,7 +26,8 @@ private: // エイリアス
 
 public: // サブクラス
 	// 頂点データ構造体（テクスチャあり）
-	struct VertexPosNormalUv {
+	struct VertexPosNormalUv
+	{
 		XMFLOAT3 pos; // xyz座標
 		XMFLOAT3 normal; // 法線ベクトル
 		XMFLOAT2 uv;  // uv座標
@@ -139,4 +141,3 @@ private: // メンバ変数
 	Material* material = nullptr;
 	std::unordered_map<unsigned short, std::vector<unsigned short>> smoothData;
 };
-

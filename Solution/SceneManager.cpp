@@ -7,20 +7,19 @@
 #include "SoundBase.h"
 
 SceneManager::SceneManager()
-	: nextScene(nullptr) {
-	
+	: nextScene(nullptr)
+{
 	postEff2Num = (UINT)PostEffect::getInstance()->addPipeLine(L"Resources/Shaders/PostEffectPS_2.hlsl");
 
-	nowScene = (GameScene *)new TitleScene();
+	nowScene = (GameScene*)new TitleScene();
 	nowScene->start();
 }
 
-
-void SceneManager::update() {
-
+void SceneManager::update()
+{
 	// 次のシーンがあったら
-	if (nextScene != nullptr) {
-
+	if (nextScene != nullptr)
+	{
 		// 今のシーンを削除し、次のシーンに入れ替える
 		delete nowScene;
 		nowScene = nextScene;
@@ -35,21 +34,26 @@ void SceneManager::update() {
 	nowScene->update();
 }
 
-void SceneManager::drawObj3d() {
+void SceneManager::drawObj3d()
+{
 	nowScene->drawObj3d();
 }
 
-void SceneManager::drawFrontSprite() {
+void SceneManager::drawFrontSprite()
+{
 	nowScene->drawFrontSprite();
 }
 
-SceneManager::~SceneManager() {
-	if (nowScene != nullptr) {
+SceneManager::~SceneManager()
+{
+	if (nowScene != nullptr)
+	{
 		delete nowScene;
 		nowScene = nullptr;
 	}
 }
 
-void SceneManager::changeScene(GameScene* nextScene) {
+void SceneManager::changeScene(GameScene* nextScene)
+{
 	this->nextScene = nextScene;
 }

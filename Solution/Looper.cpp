@@ -14,18 +14,20 @@
 #include "Light.h"
 #include "SoundBase.h"
 
-Looper::Looper() {
-
+Looper::Looper()
+{
 	Object3d::staticInit();
 
 	// Soundのクラスより先に消えないようにここで生成しておく
 	SoundBase::getInstange();
 }
 
-Looper::~Looper() {
+Looper::~Looper()
+{
 }
 
-bool Looper::loopUpdate() {
+bool Looper::loopUpdate()
+{
 	// 入力情報の更新
 	Input::getInstance()->update();
 
@@ -40,7 +42,8 @@ bool Looper::loopUpdate() {
 	return false;
 }
 
-bool Looper::loopDraw() {
+bool Looper::loopDraw()
+{
 	// --------------------
 	// シーンマネージャーの描画
 	// --------------------
@@ -53,7 +56,6 @@ bool Looper::loopDraw() {
 
 	PostEffect::getInstance()->draw(DX12Base::getInstance());
 
-
 	SceneManager::getInstange()->drawFrontSprite();
 
 	DX12Base::getInstance()->endDraw();
@@ -61,7 +63,8 @@ bool Looper::loopDraw() {
 	return false;
 }
 
-bool Looper::loop() {
+bool Looper::loop()
+{
 	if (loopUpdate()) return true;
 
 	if (loopDraw()) return true;
