@@ -82,26 +82,18 @@ class PlayScene :
 	// 3Dオブジェクト用パイプライン
 	Object3d::PipelineSet backPipelineSet;
 
-	/// <summary>
-	///  天球
-	/// </summary>
+	/// @brief 天球
 	std::unique_ptr<ObjSet> back;
 
-	/// <summary>
-	///  地面(背景)
-	/// </summary>
+	/// @brief 地面(背景)
 	std::unique_ptr<ObjSet> ground;
 
-	/// <summary>
-	/// ボス
-	/// </summary>
+	/// @brief ボス
 	std::unique_ptr<ObjSet> boss;
 	std::unique_ptr<Time::timeType> bossStartTime;
 	bool bossAlive = true;
 
-	/// <summary>
-	/// 自機
-	/// </summary>
+	/// @brief 自機
 	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<Player> player;
 	std::pair<std::unique_ptr<ObjSet>, bool> playerBul;	// second : 生存フラグ
@@ -109,23 +101,17 @@ class PlayScene :
 	std::unique_ptr<Time::timeType> playerBulStartTime;
 	DirectX::XMFLOAT2 playerRota{};
 
-	/// <summary>
-	/// パーティクル
-	/// </summary>
+	/// @brief パーティクル
 	std::unique_ptr<ParticleMgr> particleMgr;
 
 #pragma endregion 3Dオブジェクト
 
 #pragma region シーン全体設定
 
-	/// <summary>
-	/// 時間
-	/// </summary>
+	/// @brief 時間
 	std::unique_ptr<Time> timer;
 
-	/// <summary>
-	/// GUI
-	/// </summary>
+	/// @brief GUI
 	bool guiWinAlive = true;
 
 	uint8_t fbxPhongNum;

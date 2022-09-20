@@ -130,15 +130,18 @@ public:
 
 	inline void setCamera(Camera* camera) { this->camera = camera; }
 
-	/// <summary>
-	/// パーティクルの追加
-	/// </summary>
-	/// <param name="life">生存時間</param>
-	/// <param name="position">初期座標</param>
-	/// <param name="velocity">速度</param>
-	/// <param name="accel">加速度</param>
-	/// <param name="start_scale">開始時スケール</param>
-	/// <param name="end_scale">終了時スケール</param>
+	/// @brief パーティクルの追加
+	/// @param timer 経過時間をはかるタイマー
+	/// @param life 生存時間
+	/// @param position 初期座標
+	/// @param velocity 速度
+	/// @param accel 加速度
+	/// @param start_scale 開始時スケール
+	/// @param end_scale 終了時スケール
+	/// @param start_rotation 開始時の回転
+	/// @param end_rotation 終了時の回転
+	/// @param start_color 開始時の色
+	/// @param end_color 終了時の色
 	void add(std::unique_ptr<Time> timer,
 			 int life,
 			 const XMFLOAT3& position, const XMFLOAT3& velocity, const XMFLOAT3& accel,
@@ -146,26 +149,16 @@ public:
 			 float start_rotation, float end_rotation,
 			 const XMFLOAT3& start_color, const XMFLOAT3& end_color);
 
-	/// <summary>
-	/// デスクリプタヒープの初期化
-	/// </summary>
-	/// <returns></returns>
+	/// @brief デスクリプタヒープの初期化
 	void InitializeDescriptorHeap();
 
-	/// <summary>
-	/// グラフィックパイプライン生成
-	/// </summary>
-	/// <returns>成否</returns>
+	/// @brief グラフィックパイプライン生成
 	void InitializeGraphicsPipeline();
 
-	/// <summary>
-	/// テクスチャ読み込み
-	/// </summary>
-	/// <returns>成否</returns>
+	/// @brief テクスチャ読み込み
+	/// @param filePath テクスチャファイルのパス
 	void LoadTexture(const wchar_t* filePath);
 
-	/// <summary>
-	/// モデル作成
-	/// </summary>
+	/// @brief モデル作成
 	void CreateModel();
 };

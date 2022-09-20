@@ -10,9 +10,7 @@
 
 #include <unordered_map>
 
-/// <summary>
-/// 形状データ
-/// </summary>
+/// @brief 形状データ
 class Mesh
 {
 private: // エイリアス
@@ -35,10 +33,8 @@ public: // サブクラス
 
 public: // 静的メンバ関数
 
-	/// <summary>
-	/// 静的初期化
-	/// </summary>
-	/// <param name="dev">デバイス</param>
+	/// @brief 静的初期化
+	/// @param dev デバイス
 	static void staticInit(ID3D12Device* dev);
 
 private: // 静的メンバ変数
@@ -53,76 +49,52 @@ public: // メンバ関数
 	/// @brief indicesのゲッター 
 	inline const std::vector<unsigned short>& getIndices() const { return indices; }
 
-	/// <summary>
-	/// 名前を取得
-	/// </summary>
-	/// <returns>名前</returns>
+	/// @brief 名前を取得
+	/// @return 名前
 	const std::string& getName() { return name; }
 
-	/// <summary>
-	/// 名前をセット
-	/// </summary>
-	/// <param name="name">名前</param>
+	/// @brief 名前をセット
+	/// @param name 名前
 	void setName(const std::string& name);
 
-	/// <summary>
-	/// 頂点データの追加
-	/// </summary>
-	/// <param name="vertex">頂点データ</param>
+	/// @brief 頂点データの追加
+	/// @param vertex 頂点データ
 	void addVertex(const VertexPosNormalUv& vertex);
 
-	/// <summary>
-	/// 頂点インデックスの追加
-	/// </summary>
-	/// <param name="index">インデックス</param>
+	/// @brief 頂点インデックスの追加
+	/// @param vertex 頂点インデックス
 	void addIndex(unsigned short index);
 
-	/// <summary>
-	/// 頂点データの数を取得
-	/// </summary>
-	/// <returns>頂点データの数</returns>
+	/// @brief 頂点データの数を取得
+	/// @return 頂点データの数
 	inline size_t getVertexCount() { return vertices.size(); }
 
-	/// <summary>
-	/// マテリアルの取得
-	/// </summary>
-	/// <returns>マテリアル</returns>
+	/// @brief マテリアルの取得
+	/// @return マテリアル
 	Material* getMaterial() { return material; }
 
-	/// <summary>
-	/// マテリアルの割り当て
-	/// </summary>
-	/// <param name="material">マテリアル</param>
+	/// @brief マテリアルの割り当て
+	/// @param material	マテリアル
 	void setMaterial(Material* material);
 
-	/// <summary>
-	/// バッファの生成
-	/// </summary>
+	/// @brief バッファの生成
 	void createBuffers();
 
-	/// <summary>
-	/// 頂点バッファ取得
-	/// </summary>
-	/// <returns>頂点バッファ</returns>
+	/// @brief 頂点バッファを取得
+	/// @return 頂点バッファ
 	const D3D12_VERTEX_BUFFER_VIEW& getVBView() { return vbView; }
 
-	/// <summary>
-	/// インデックスバッファ取得
-	/// </summary>
-	/// <returns>インデックスバッファ</returns>
+	/// @brief インデックスバッファを取得
+	/// @return インデックスバッファ
 	const D3D12_INDEX_BUFFER_VIEW& getIBView() { return ibView; }
 
-	/// <summary>
-	/// 描画
-	/// </summary>
-	/// <param name="cmdList">命令発行先コマンドリスト</param>
+	/// @brief 描画
+	/// @param cmdList 命令発行先コマンドリスト
 	void draw(ID3D12GraphicsCommandList* cmdList);
 
-	/// <summary>
-	/// エッジ平滑化データ追加
-	/// </summary>
-	/// <param name="indexPosition">座標インデックス</param>
-	/// <param name="indexVertex">頂点インデックス</param>
+	/// @brief エッジ平滑化データ追加
+	/// @param indexPosition 座標インデックス
+	/// @param indexVertex 頂点インデックス
 	void addSmoothData(unsigned short indexPosition, unsigned short indexVertex);
 
 	// 平滑化された頂点法線の計算

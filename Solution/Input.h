@@ -77,21 +77,17 @@ public:
 		return (bool)preMouseState.rgbButtons[keyCode];
 	}
 
-	/// <summary>
-	/// マウスのボタンを押した瞬間を検知
-	/// </summary>
-	/// <param name="keyCode">Input::MOUSE::なんとか、rgbButtons配列の添え字</param>
-	/// <returns>を押した瞬間ならtrue</returns>
+	/// @brief マウスのボタンを押した瞬間を検知
+	/// @param keyCode Input::MOUSE::なんとか、rgbButtons配列の添え字
+	/// @return 押した瞬間ならtrue
 	inline bool triggerMouseButton(_In_ BYTE keyCode)
 	{
 		return hitMouseButton(keyCode) && !hitPreMouseButton(keyCode);
 	}
 
-	/// <summary>
-	/// マウスのボタンを離した瞬間を検知
-	/// </summary>
-	/// <param name="keyCode">Input::MOUSE::なんとか、rgbButtons配列の添え字</param>
-	/// <returns>離した瞬間ならtrue</returns>
+	/// @brief マウスのボタンを離した瞬間を検知
+	/// @param keyCode Input::MOUSE::なんとか、rgbButtons配列の添え字
+	/// @return 離した瞬間ならtrue
 	inline bool releaseTriggerMouseButton(_In_ BYTE keyCode)
 	{
 		return !hitMouseButton(keyCode) && hitPreMouseButton(keyCode);
@@ -106,9 +102,7 @@ public:
 	inline DirectX::XMFLOAT2 getMousePosF2() const { return DirectX::XMFLOAT2((float)mousePos.x, (float)mousePos.y); }
 	bool setMousePos(int x, int y);
 
-	/// <summary>
-	/// マウスカーソルを表示するかどうかを設定
-	/// </summary>
-	/// <param name="dispFlag">trueで表示、falseで非表示</param>
+	/// @brief マウスカーソルを表示するかどうかを設定
+	/// @param dispFlag trueで表示、falseで非表示
 	void changeDispMouseCursorFlag(bool dispFlag);
 };

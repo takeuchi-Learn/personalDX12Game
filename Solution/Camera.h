@@ -113,12 +113,10 @@ public:
 
 	XMFLOAT3 getLook() const;
 
-	/// <summary>
-	/// カメラを回転
-	/// </summary>
-	/// <param name="targetlength">カメラから注視点までの距離</param>
-	/// <param name="angleX">X軸周りの回転角(-PI/2 ~ PI/2の範囲で送る)</param>
-	/// <param name="angleY">Y軸周りの回転角(0 ~ 2PIの範囲で送る)</param>
+	/// @brief カメラを回転
+	/// @param targetlength カメラから注視点までの距離
+	/// @param angleX X軸周りの回転角(-PI/2 ~ PI/2の範囲で送る)
+	/// @param angleY Y軸周りの回転角(0 ~ 2PIの範囲で送る)
 	void rotation(const float targetlength,
 				  const float angleX, const float angleY);
 
@@ -126,17 +124,13 @@ public:
 
 	void moveRight(const float speed);
 
-	/// <summary>
-	/// ベクトルによる視点移動(eyeのみの移動、targetは変わらない)
-	/// </summary>
-	/// <param name="move">移動量</param>
+	/// @brief ベクトルによるカメラ移動(eyeのみの移動、targetは変わらない)
+	/// @param move 移動量
 	void moveEye(const XMFLOAT3& move);
 	void moveEye(const XMVECTOR& move);
 
-	/// <summary>
-	/// ベクトルによる移動(eyeとtargetを移動)
-	/// </summary>
-	/// <param name="move">移動量</param>
+	/// @brief ベクトルによる移動(eyeとtargetを移動)
+	/// @param 移動量
 	void moveCamera(const XMFLOAT3& move);
 	void moveCamera(const XMVECTOR& move);
 

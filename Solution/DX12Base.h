@@ -65,10 +65,8 @@ private:
 	void initDepthBuffer();
 	void initFence();
 
-	/// <summary>
-	/// imgui初期化
-	/// </summary>
-	/// <returns>成否</returns>
+	/// @brief ImGui初期化
+	/// @return 成否
 	bool InitImgui();
 
 	// 全画面クリア

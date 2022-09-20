@@ -41,24 +41,16 @@ private:
 	DirectX::XMFLOAT2 texTilling{ 1, 1 };
 	bool materialDirty = false;
 
-	/// <summary>
-	/// マテリアル読み込み
-	/// </summary>
+	/// @brief マテリアル読み込み
 	void loadMaterial(const std::string& directoryPath, const std::string& filename);
 
-	/// <summary>
-	/// マテリアル登録
-	/// </summary>
+	/// @brief マテリアル登録
 	void addMaterial(Material* material);
 
-	/// <summary>
-	/// デスクリプタヒープの生成
-	/// </summary>
+	/// @brief デスクリプタヒープの生成
 	void createDescriptorHeap();
 
-	/// <summary>
-	/// テクスチャ読み込み
-	/// </summary>
+	/// @brief テクスチャ読み込み
 	void loadTextures(const std::string& dirPath, UINT texNum);
 
 public:
@@ -84,16 +76,14 @@ public:
 	ObjModel(const std::string& dirPath, const std::string& objModelName, UINT texNum = 0u, bool smoothing = false);
 	~ObjModel();
 
-	/// <summary>
-	/// 初期化
-	/// </summary>
-	/// <param name="dirPath">モデルファイルのあるパス</param>
-	/// <param name="modelname">モデル名(例 : Resources/player.obj)</param>
+	/// @brief 初期化
+	/// @param dirPath モデルファイルのあるファイルパス
+	/// @param modelname モデル名
+	/// @param texNum テクスチャの識別番号
+	/// @param smoothing スムースシェーディングにするかどうか
 	void init(const std::string& dirPath, const std::string& modelname, UINT texNum = 0u, bool smoothing = false);
 
-	/// <summary>
-	/// 描画
-	/// </summary>
-	/// <param name="cmdList">命令発行先コマンドリスト</param>
+	/// @brief 描画
+	/// @param cmdLst 命令発行先コマンドリスト
 	void draw(ID3D12GraphicsCommandList* cmdList);
 };

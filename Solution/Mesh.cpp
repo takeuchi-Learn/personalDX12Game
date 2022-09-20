@@ -6,9 +6,7 @@
 
 using namespace DirectX;
 
-/// <summary>
-/// 静的メンバ変数の実体
-/// </summary>
+// 静的メンバ変数の実体
 ID3D12Device* Mesh::dev = nullptr;
 
 void Mesh::staticInit(ID3D12Device* dev)

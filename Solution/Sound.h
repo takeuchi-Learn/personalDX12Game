@@ -62,11 +62,10 @@ public:
 	// 音声再生停止
 	static void SoundStopWave(Sound* soundData);
 
-	/// <summary>
-	/// 音声再生
-	/// </summary>
-	/// <param name="loopCount">0で繰り返し無し、XAUDIO2_LOOP_INFINITEで永遠</param>
-	/// <param name="volume">0 ~ 1</param>
+	/// @brief 音声再生
+	/// @param soundData 再生するサウンドデータオブジェクト
+	/// @param loopCount 0で繰り返し無し、XAUDIO2_LOOP_INFINITEで永遠
+	/// @param volume 0 ~ 1
 	static void SoundPlayWave(Sound* soundData,
 							  int loopCount = 0, float volume = 0.2);
 

@@ -39,27 +39,25 @@ public:
 	inline const DirectX::XMFLOAT2& getAim2DPos() const { return aim2DPos; }
 	inline void setAim2DPos(const DirectX::XMFLOAT2& screenPos) { aim2DPos = screenPos; }
 
-	/// <summary>
-	/// 視線方向に前進
-	/// </summary>
-	/// <param name="moveVel">移動量</param>
-	/// <param name="moveYFlag">Y方向に移動するか</param>
+	/// @brief 視線方向に前進
+	/// @param moveVel 移動量
+	/// @param moveYFlag Y方向に移動するか
 	void moveForward(float moveVel, bool moveYFlag = false);
 
-	/// <summary>
-	/// 右に移動。前進処理のベクトルを右に90度傾けた移動。
-	/// </summary>
-	/// <param name="moveVel">移動量</param>
-	/// <param name="moveYFlag">Y方向に移動するか</param>
+	/// @brief 右に移動。前進処理のベクトルを右に90度傾けた移動。
+	/// @param moveVel 移動量
+	/// @param moveYFlag Y方向に移動するか
 	void moveRight(float moveVel, bool moveYFlag = false);
 
-	/// <summary>
-	/// 上に移動。前進処理のベクトルを上に90度傾けた移動。
-	/// </summary>
-	/// <param name="moveVel">移動量</param>
+	/// @brief 上に移動。前進処理のベクトルを上に90度傾けた移動。
+	/// @param moveVel 移動量
 	void moveUp(float moveVel);
 
-	// @param vel 毎秒進む値
+	/// @brief 弾発射
+	/// @param camera カメラオブジェクトのポインタ
+	/// @param model 弾のモデル
+	/// @param speed 速度
+	/// @param bulScale 弾の大きさ
 	void shot(Camera* camera,
 			  ObjModel* model,
 			  float speed = 1.f,

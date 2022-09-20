@@ -114,23 +114,17 @@ public:
 	inline void setAlpha(float alpha) { this->alpha = alpha; }
 	inline float getAlpha() const { return alpha; }
 
-	/// <summary>
-	/// グラフィックスパイプラインを追加
-	/// </summary>
-	/// <param name="psPath">ピクセルシェーダーファイルのパス</param>
-	/// <returns>識別番号</returns>
+	/// @brief グラフィックスパイプラインを追加
+	/// @param psPath ピクセルシェーダーファイルのパス
+	/// @return 識別番号
 	size_t addPipeLine(const wchar_t* psPath);
 
-	/// <summary>
-	/// グラフィックスパイプラインの切り替え
-	/// </summary>
-	/// <param name="GPPNum">識別番号</param>
+	/// @brief グラフィックスパイプラインの切り替え
+	/// @param GPPNum 識別番号
 	inline void changePipeLine(UINT GPPNum) { nowPPSet = GPPNum; }
 
-	/// <summary>
-	/// 現在のグラフィックスパイプラインの識別番号を取得
-	/// </summary>
-	/// <returns>識別番号</returns>
+	/// @brief 現在のグラフィックスパイプラインの識別番号を取得
+	/// @return 識別番号
 	inline const UINT getPipeLineNum() { return nowPPSet; }
 
 	void draw(DX12Base* dxCom);

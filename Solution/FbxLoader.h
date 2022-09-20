@@ -10,10 +10,8 @@
 class FbxLoader
 {
 public:
-	/// <summary>
-	/// シングルトンインスタンスの取得
-	/// </summary>
-	/// <returns>インスタンス</returns>
+	/// @brief シングルトンインスタンスの取得
+	/// @return インスタンス
 	static FbxLoader* GetInstance();
 
 private:
@@ -50,18 +48,14 @@ private:
 	// テクスチャがない場合の標準テクスチャファイル名
 	static const std::string defaultTextureFileName;
 
-	/// <summary>
-	/// 再帰的にノード構成を解析
-	/// </summary>
-	/// <param name="model">読み込み先のモデルオブジェクト</param>
-	/// <param name="fbxNode">解析対象のノード</param>
+	/// @brief 再帰的にノード構成を解析
+	/// @param model 読み込み先のモデルオブジェクト
+	/// @param fbxNode 解析対象のノード
 	void parseNodeRecursive(FbxModel* model, FbxNode* fbxNode, FbxModel::Node* parent = nullptr);
 
-	/// <summary>
-	/// メッシュの読み取り
-	/// </summary>
-	/// <param name="model">読み込み先のモデルオブジェクト</param>
-	/// <param name="fbxNode">解析対象のノード</param>
+	/// @brief メッシュの読み取り
+	/// @param model 読み込み先のモデルオブジェクト
+	/// @param fbxNode 解析対象のノード
 	void parseMesh(FbxModel* model, FbxNode* fbxNode);
 
 	// 頂点座標
