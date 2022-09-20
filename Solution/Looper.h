@@ -15,6 +15,9 @@ private:
 	// @return 異常の有無(異常があればtrue)
 	bool loopDraw();
 
+	void pushImGuiCol();
+	void popImGuiCol();
+
 public:
 	~Looper();
 

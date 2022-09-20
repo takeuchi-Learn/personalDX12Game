@@ -666,8 +666,10 @@ void RailShoot::drawFrontSprite()
 		ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar;
 
 	// 最初のウインドウの位置を指定
-	ImGui::SetNextWindowPos(ImVec2((float)WinAPI::window_width * 0.02f,
-								   (float)WinAPI::window_height * 0.02f));
+	constexpr XMFLOAT2 fstWinPos = XMFLOAT2((float)WinAPI::window_width * 0.02f,
+											(float)WinAPI::window_height * 0.02f);
+	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x,
+								   fstWinPos.y));
 
 	ImGui::Begin("レールシューティング", nullptr, winFlags);
 	ImGui::Text("スクリプトで指定したとおりに敵が出る");
