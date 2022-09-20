@@ -47,6 +47,12 @@ private: // 静的メンバ変数
 
 public: // メンバ関数
 
+	/// @brief verticesのゲッター 
+	inline const std::vector<VertexPosNormalUv>& getVertices() const { return vertices; }
+
+	/// @brief indicesのゲッター 
+	inline const std::vector<unsigned short>& getIndices() const { return indices; }
+
 	/// <summary>
 	/// 名前を取得
 	/// </summary>

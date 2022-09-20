@@ -60,6 +60,60 @@ float Collision::sqDistanceSegmentSegment(const XMVECTOR& p1, const XMVECTOR& q1
 	return vec3Dot(vlen, vlen);	// vlen・vlen <- 各要素をそれぞれ掛けて全て足す
 }
 
+void Collision::calcMeshTrlangles(const Object3d* obj, std::vector<Triangle>* pPolygons)
+{
+	// todo アフィン変換情報が反映されていないので反映させる
+
+	// 出力変数が無ければ何もせずに終了
+	if (pPolygons == nullptr) { return; }
+
+	std::vector<Triangle>& triangles = *pPolygons;
+
+	const std::vector<Mesh*>& mesh = obj->model->getMesh();
+
+	for (auto& i : mesh)
+	{
+		const std::vector<Mesh::VertexPosNormalUv>& vertices = i->getVertices();
+		const std::vector<unsigned short>& indices = i->getIndices();
+
+		const size_t triNum = indices.size() / 3u;
+
+		triangles.resize(triangles.size() + triNum);
+
+
+		for (UINT i = 0u; i < triNum; ++i)
+		{
+			Triangle& tri = triangles[i];
+			unsigned short ind0 = indices[(size_t)i * 3];
+			unsigned short ind1 = indices[(size_t)i * 3 + 1];
+			unsigned short ind2 = indices[(size_t)i * 3 + 2];
+
+			tri.p0 = {
+				vertices[ind0].pos.x,
+				vertices[ind0].pos.y,
+				vertices[ind0].pos.z,
+				1
+			};
+
+			tri.p1 = {
+				vertices[ind1].pos.x,
+				vertices[ind1].pos.y,
+				vertices[ind1].pos.z,
+				1
+			};
+
+			tri.p2 = {
+				vertices[ind2].pos.x,
+				vertices[ind2].pos.y,
+				vertices[ind2].pos.z,
+				1
+			};
+
+			tri.ComputeNormal();
+		}
+	}
+}
+
 bool Collision::CheckSphere2Plane(const Sphere& sphere, const Plane& plane, DirectX::XMVECTOR* inter)
 {
 	//座標系の原点から球の中心への座標
