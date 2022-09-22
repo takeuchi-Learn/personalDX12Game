@@ -17,10 +17,14 @@ private:
 
 	bool matWorldDirty = false;
 
+	DirectX::XMMATRIX matWorld{};
+
 public:
 	using Camera::Camera;
 
 	CameraObj(GameObj* parent);
+
+	inline const DirectX::XMMATRIX& getMatWorld() const { return matWorld; }
 
 	inline void setParentObj(GameObj* parent) { parentObj = parent; matWorldDirty = true; }
 	inline GameObj* getParentObj() const { return parentObj; }
@@ -29,6 +33,7 @@ public:
 	inline const DirectX::XMFLOAT3& getRelativeRotaDeg() const { return relativeRotaDeg; }
 
 private:
+	void updateMatWorld();
 
 	void preUpdate() override;
 };

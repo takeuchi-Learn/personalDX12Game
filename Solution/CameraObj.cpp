@@ -10,6 +10,31 @@ CameraObj::CameraObj(GameObj* parent)
 	relativeRotaDeg = XMFLOAT3(30, 0, 0);
 }
 
+void CameraObj::updateMatWorld()
+{
+	XMFLOAT3 distance{}, rota{};
+	XMMATRIX matRot, matTrans;
+
+	XMFLOAT3 eye = getEye(), target = getTarget();
+
+	distance = XMFLOAT3(target.x - eye.x,
+						target.y - eye.y,
+						target.z - eye.z);
+
+	rota = parentObj->getRotation();
+
+	matRot = XMMatrixIdentity();
+	matRot *= XMMatrixRotationZ(XMConvertToRadians(rota.z));
+	matRot *= XMMatrixRotationX(XMConvertToRadians(rota.x));
+	matRot *= XMMatrixRotationY(XMConvertToRadians(rota.y));
+
+	matTrans = XMMatrixTranslation(eye.x, eye.y, eye.z);
+
+	matWorld = XMMatrixIdentity();
+	matWorld *= matRot;
+	matWorld *= matTrans;
+}
+
 void CameraObj::preUpdate()
 {
 	if (parentObj == nullptr) return;
@@ -89,14 +114,17 @@ void CameraObj::preUpdate()
 	setTarget(targetPos);
 	//setUp(XMFLOAT3(0, 1, 0));
 
+	updateMatWorld();
+
 	{
-		const XMVECTOR up = XMVectorSet(getViewMatrix().r[1].m128_f32[0],
-										getViewMatrix().r[1].m128_f32[1],
-										getViewMatrix().r[1].m128_f32[2],
-										getViewMatrix().r[1].m128_f32[3]);
+		const XMVECTOR up = XMVectorSet(matWorld.r[1].m128_f32[0],
+										matWorld.r[1].m128_f32[1],
+										matWorld.r[1].m128_f32[2],
+										matWorld.r[1].m128_f32[3]);
 
 		XMFLOAT3 upF3{};
 		XMStoreFloat3(&upF3, up);
 		setUp(upF3);
 	}
+
 }
