@@ -48,6 +48,9 @@ public:
 	inline void setRotation(const DirectX::XMFLOAT3& rota) { obj->rotation = rota; }
 
 	inline const DirectX::XMMATRIX& getMatWorld() const { return obj->getMatWorld(); }
+	inline const DirectX::XMMATRIX& getMatRota() const { return obj->getMatRota(); }
+	inline const DirectX::XMMATRIX& getMatScale() const { return obj->getMatScale(); }
+	inline const DirectX::XMMATRIX& getMatTrans() const { return obj->getMatTrans(); }
 
 	GameObj(Camera* camera,
 			ObjModel* model,

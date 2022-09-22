@@ -71,7 +71,7 @@ public:
 		return (bool)mouseState.rgbButtons[keyCode];
 	}
 
-	// @param keyCode Input::MOUSE::なんとか、rgbButtons配列の添え字
+	// @param keyCode Input::MOUSE::なんとか、rgbButtons配列の添え
 	inline bool hitPreMouseButton(_In_ BYTE keyCode)
 	{
 		return (bool)preMouseState.rgbButtons[keyCode];

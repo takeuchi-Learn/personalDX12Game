@@ -660,10 +660,10 @@ void RailShoot::drawFrontSprite()
 		// 設定を.iniに出力しない
 		ImGuiWindowFlags_::ImGuiWindowFlags_NoSavedSettings |
 		// 移動不可
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove |
-		// スクロールバーを常に表示
-		ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysHorizontalScrollbar |
-		ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar;
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove;
+		//// スクロールバーを常に表示
+		//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysHorizontalScrollbar |
+		//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar;
 
 	// 最初のウインドウの位置を指定
 	constexpr XMFLOAT2 fstWinPos = XMFLOAT2((float)WinAPI::window_width * 0.02f,

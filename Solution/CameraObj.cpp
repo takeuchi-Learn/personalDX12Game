@@ -88,4 +88,15 @@ void CameraObj::preUpdate()
 	setEye(eye);
 	setTarget(targetPos);
 	//setUp(XMFLOAT3(0, 1, 0));
+
+	{
+		const XMVECTOR up = XMVectorSet(getViewMatrix().r[1].m128_f32[0],
+										getViewMatrix().r[1].m128_f32[1],
+										getViewMatrix().r[1].m128_f32[2],
+										getViewMatrix().r[1].m128_f32[3]);
+
+		XMFLOAT3 upF3{};
+		XMStoreFloat3(&upF3, up);
+		setUp(upF3);
+	}
 }
