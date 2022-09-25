@@ -10,7 +10,7 @@
 
 #include <DirectXMath.h>
 
-#include "Camera.h"
+#include "CameraObj.h"
 
 #include "ParticleMgr.h"
 
@@ -37,7 +37,7 @@ class PlayScene :
 {
 #pragma region カメラ
 
-	std::unique_ptr<Camera> camera;
+	std::unique_ptr<CameraObj> camera;
 	DirectX::XMFLOAT2 cameraMoveVel{};
 
 #pragma endregion カメラ

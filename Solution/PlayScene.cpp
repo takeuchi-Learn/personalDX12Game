@@ -24,12 +24,13 @@ using namespace DirectX;
 
 void PlayScene::cameraInit()
 {
-	camera.reset(new Camera(WinAPI::window_width, WinAPI::window_height));
+	camera.reset(new CameraObj({ .x = WinAPI::window_width, .y = WinAPI::window_height }));
 	camera->setFarZ(5000.f);
 	camera->setEye(XMFLOAT3(0, 0, -175));	// 視点座標
 	camera->setTarget(XMFLOAT3(0, 0, 0));	// 注視点座標
 	camera->setUp(XMFLOAT3(0, 1, 0));		// 上方向
 	camera->update();
+	camera->setRelativeRotaDeg(XMFLOAT3(30, 0, 0));	// 視点座標の角度
 }
 
 void PlayScene::lightInit()
@@ -151,6 +152,8 @@ void PlayScene::playerInit()
 	playerModel = std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true);
 	player = std::make_unique<Player>(camera.get(), playerModel.get(), XMFLOAT3(0, 10, -300));
 	player->setScale(10.f);
+
+	camera->setParentObj(player.get());
 }
 
 void PlayScene::timerInit()
@@ -248,31 +251,6 @@ void PlayScene::updateCamera()
 
 		player->setRotation(rota);
 	}
-	const XMVECTOR& look = player->getLookVec();
-
-	// 自機->カメラのベクトル
-	const XMVECTOR player2cam = XMVectorAdd(XMVectorScale(look, -camLen),
-											XMVectorSet(0, camHeight, 0, 1));
-
-	// カメラの位置
-	{
-		const XMVECTOR pos = XMVectorAdd(XMLoadFloat3(&player->getPos()), player2cam);
-
-		XMFLOAT3 camPos{};
-		XMStoreFloat3(&camPos, pos);
-
-		camera->setEye(camPos);
-	}
-
-	// 注視点設定
-	{
-		const XMVECTOR targetPos = XMVectorAdd(XMVectorScale(look, player2targetLen),
-											   XMLoadFloat3(&player->getPos()));
-		XMFLOAT3 targetF3{};
-		XMStoreFloat3(&targetF3, targetPos);
-
-		camera->setTarget(targetF3);
-	}
 }
 
 void PlayScene::updateLight()
@@ -291,11 +269,9 @@ void PlayScene::updatePlayer()
 	// 移動
 	{
 		const bool hitW = input->hitKey(DIK_W);
-		const bool hitA = input->hitKey(DIK_A);
 		const bool hitS = input->hitKey(DIK_S);
-		const bool hitD = input->hitKey(DIK_D);
 
-		if (hitW || hitA || hitS || hitD)
+		if (hitW || hitS)
 		{
 			// 移動速度は毎秒256.f
 			const float moveVel = 256.f / dxBase->getFPS();
@@ -307,14 +283,28 @@ void PlayScene::updatePlayer()
 			{
 				player->moveForward(-moveVel);
 			}
+		}
+	}
+
+	{
+		const bool hitA = input->hitKey(DIK_A);
+		const bool hitD = input->hitKey(DIK_D);
+
+		if (hitA || hitD)
+		{
+			const float speed = 90.f / dxBase->getFPS();
+
+			XMFLOAT3 rota = player->getRotation();
 
 			if (hitA)
 			{
-				player->moveRight(-moveVel);
+				rota.y -= speed;
 			} else if (hitD)
 			{
-				player->moveRight(moveVel);
+				rota.y += speed;
 			}
+
+			player->setRotation(rota);
 		}
 	}
 
@@ -328,12 +318,10 @@ void PlayScene::updatePlayer()
 		if (shootInput && !playerBul.second)
 		{
 			playerBul.second = true;
-			playerBul.first->setPos(camera->getEye());
-			// todo 自機から出るようにする
-			//playerBul.first->setPos(player->getPosF3());
+			// 自機から出るようにする
+			playerBul.first->setPos(player->getPos());
 
 			playerBulVel = camera->getLook();
-			//XMStoreFloat3(&playerBulVel, player->getLookVec());
 
 			playerBulStartTime.reset(new Time::timeType());
 			*playerBulStartTime = timer->getNowTime();

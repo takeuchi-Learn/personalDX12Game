@@ -24,6 +24,9 @@ public:
 
 	CameraObj(GameObj* parent);
 
+	inline void setEye2TargetLen(float eye2TargetLen) { this->eye2TargetLen = eye2TargetLen; }
+	inline float getEye2TargetLen() const { return eye2TargetLen; }
+
 	inline const DirectX::XMMATRIX& getMatWorld() const { return matWorld; }
 
 	inline void setParentObj(GameObj* parent) { parentObj = parent; matWorldDirty = true; }
