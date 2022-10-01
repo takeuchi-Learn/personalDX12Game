@@ -16,6 +16,7 @@ PostEffect::PostEffect()
 	vignIntensity(0.25f),
 	noiseIntensity(0.f),
 	alpha(1.f),
+	rgbShiftNum({0.f,0.f}),
 	timer(new Time()),
 	dev(DX12Base::getInstance()->getDev()),
 	cmdList(DX12Base::getInstance()->getCmdList())
@@ -36,15 +37,10 @@ void PostEffect::transferConstBuff(float nowTime, float oneSec)
 	constMap->mosaicNum = mosaicNum;
 	constMap->vignIntensity = vignIntensity;
 	constMap->alpha = alpha;
+	constMap->rgbShiftNum = rgbShiftNum;
 	constBuff->Unmap(0, nullptr);
 
 	assert(SUCCEEDED(result));
-}
-
-PostEffect* PostEffect::getInstance()
-{
-	static PostEffect ps{};
-	return &ps;
 }
 
 void PostEffect::initBuffer()

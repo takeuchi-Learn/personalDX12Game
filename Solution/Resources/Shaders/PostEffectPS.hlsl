@@ -55,20 +55,13 @@ float4 main(VSOutput input) : SV_TARGET
 	uv = slUv;
 
 	// rgb‚¸‚ç‚µ
-	float shiftRaito = fmod(time, 1.f);
-	float rgbUvNum = 0.005f * sin(shiftRaito * PI2);
 	float4 texColor0;
-	texColor0.r = tex0.Sample(smp, uv + float2(rgbUvNum, 0.f)).r;
-	texColor0.gba = tex0.Sample(smp, uv).gba;
-	float4 texColor1 = tex1.Sample(smp, uv);
-	texColor1.r = tex1.Sample(smp, uv + float2(rgbUvNum, 0.f)).r;
-
-	// tex0‚Ætex1‚Ì‰¡ŽÈ‚É‚È‚é‚æ‚¤‚É•`‰æ
-	float4 col = lerp(texColor0, texColor1, step(0.05f, fmod(input.uv.y, 0.1f)));
+	texColor0.g = tex0.Sample(smp, uv + rgbShiftNum).g;
+	texColor0.rba = tex0.Sample(smp, uv).rba;
 
 	float noiseNum = noise(input.uv, time);
 
-	float4 drawCol = float4(col.rgb + sLineNum + vignNum + noiseNum, alpha);
+	float4 drawCol = float4(texColor0.rgb + sLineNum + vignNum + noiseNum, alpha);
 
 	return drawCol;
 }

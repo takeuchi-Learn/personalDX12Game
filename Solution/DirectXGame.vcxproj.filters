@@ -391,6 +391,9 @@
     <FxCompile Include="Resources\Shaders\FBXLambertPS.hlsl">
       <Filter>シェーダーファイル\FBX</Filter>
     </FxCompile>
+    <FxCompile Include="Resources\Shaders\PostEffect_OnlyRGBShift.hlsl">
+      <Filter>シェーダーファイル\PostEffect</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\Shaders\Basic.hlsli">

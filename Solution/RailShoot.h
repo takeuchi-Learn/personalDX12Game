@@ -70,9 +70,17 @@ class RailShoot
 	std::unique_ptr<ParticleMgr> particleMgr;
 
 	// --------------------
+	// RGBずらし
+	// --------------------
+	static const Time::timeType rgbShiftTimeMax = Time::oneSec / 2;
+	Time::timeType nowRgbShiftTime = 0;
+	Time::timeType startRgbShiftTime = 0;
+	bool rgbShiftFlag = false;
+
+	// --------------------
 	// シーン遷移
 	// --------------------
-	static const Time::timeType sceneChangeTime;
+	static const Time::timeType sceneChangeTime = Time::oneSec;
 
 	Time::timeType startSceneChangeTime{};
 	// --------------------
@@ -115,6 +123,9 @@ class RailShoot
 						const UINT particleNum = 10U,
 						const float startScale = 1.f,
 						const float vel = 5.f);
+
+	void startRgbShift();
+	void updateRgbShift();
 
 	void addEnemy(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& vel, float scale = 5.f);
 

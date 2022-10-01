@@ -7,6 +7,7 @@ cbuffer cbuff0 : register(b0)
 	float2 mosaicNum;       // モザイクの分割数
 	float vignIntensity;    // ビネッタ係数
 	float alpha;			// 不透明度(通常は1)
+	float2 rgbShiftNum;
 };
 
 // 頂点シェーダーからピクセルシェーダーへのやり取りに使用する構造体

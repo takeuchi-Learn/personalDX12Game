@@ -18,7 +18,11 @@ public:
 	// シェーダーに合わせる
 	static const UINT renderTargetNum = 2;
 
-	static PostEffect* getInstance();
+	inline static PostEffect* getInstance()
+	{
+		static PostEffect ps{};
+		return &ps;
+	}
 
 private:
 	template<class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
@@ -40,6 +44,7 @@ private:
 		DirectX::XMFLOAT2 mosaicNum;
 		float vignIntensity;
 		float alpha;	// 不透明度(通常は1)
+		DirectX::XMFLOAT2 rgbShiftNum;
 	};
 
 	// パイプラインセット
@@ -86,6 +91,7 @@ private:
 	DirectX::XMFLOAT2 mosaicNum;
 	float vignIntensity;
 	float alpha;
+	DirectX::XMFLOAT2 rgbShiftNum;
 
 	ID3D12Device* dev;
 	ID3D12GraphicsCommandList* cmdList;
@@ -110,6 +116,9 @@ public:
 
 	inline void setMosaicNum(const DirectX::XMFLOAT2& mosaicNum) { this->mosaicNum = mosaicNum; }
 	inline DirectX::XMFLOAT2 getMosaicNum() const { return mosaicNum; }
+
+	inline void setRgbShiftNum(const DirectX::XMFLOAT2& shiftNum) { this->rgbShiftNum = shiftNum; }
+	inline const DirectX::XMFLOAT2& getRgbShiftNum() const { return rgbShiftNum; }
 
 	inline void setAlpha(float alpha) { this->alpha = alpha; }
 	inline float getAlpha() const { return alpha; }

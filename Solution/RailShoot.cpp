@@ -14,8 +14,6 @@
 
 using namespace DirectX;
 
-const Time::timeType RailShoot::sceneChangeTime = Time::oneSec;
-
 // std::stringの2次元配列(vector)
 using CSVType = std::vector<std::vector<std::string>>;
 // @brief loadCsvの入力をstd::stringにしたもの
@@ -322,6 +320,37 @@ void RailShoot::createParticle(const DirectX::XMFLOAT3& pos,
 	}
 }
 
+void RailShoot::startRgbShift()
+{
+	rgbShiftFlag = true;
+	nowRgbShiftTime = 0;
+	startRgbShiftTime = timer->getNowTime();
+}
+
+void RailShoot::updateRgbShift()
+{
+	if (rgbShiftFlag)
+	{
+		nowRgbShiftTime = timer->getNowTime() - startRgbShiftTime;
+
+		const float raito = (float)nowRgbShiftTime / (float)rgbShiftTimeMax;
+		if (raito > 1.f)
+		{
+			PostEffect::getInstance()->setRgbShiftNum({ 0.f, 0.f });
+			rgbShiftFlag = false;
+			return;
+		}
+
+		constexpr float rgbShiftMumMax = 1.f / 16.f;
+
+		constexpr float  c4 = 2.f * XM_PI / 3.f;
+		const float easeRate = -powf(2.f, 10.f * (1.f - raito) - 10.f) *
+			dxBase->nearSin((raito * 10.f - 10.75f) * c4);
+
+		PostEffect::getInstance()->setRgbShiftNum({ easeRate * rgbShiftMumMax, 0.f });
+	}
+}
+
 void RailShoot::addEnemy(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& vel, float scale)
 {
 	auto& i = enemy.emplace_front(new Enemy(camera.get(), enemyModel.get(), enemyBulModel.get(), pos));
@@ -344,7 +373,7 @@ void RailShoot::update_start()
 	const Time::timeType nowTime = timer->getNowTime() - startSceneChangeTime;
 	if (nowTime >= sceneChangeTime)
 	{
-		PostEffect::getInstance()->changePipeLine(SceneManager::getInstange()->getPostEff2Num());
+		//PostEffect::getInstance()->changePipeLine(SceneManager::getInstange()->getPostEff2Num());
 
 		update_proc = std::bind(&RailShoot::update_play, this);
 	}
@@ -593,6 +622,10 @@ void RailShoot::update_play()
 						{
 							changeNextScene();
 							player->kill();
+						} else
+						{
+							// 演出開始
+							startRgbShift();
 						}
 					}
 				}
@@ -614,6 +647,8 @@ void RailShoot::update_play()
 
 	// 今のフレームを進める
 	++nowFrame;
+
+	updateRgbShift();
 }
 
 void RailShoot::update_end()
@@ -661,11 +696,11 @@ void RailShoot::drawFrontSprite()
 		ImGuiWindowFlags_::ImGuiWindowFlags_NoSavedSettings |
 		// 移動不可
 		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove;
-		//// スクロールバーを常に表示
-		//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysHorizontalScrollbar |
-		//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar;
+	//// スクロールバーを常に表示
+	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysHorizontalScrollbar |
+	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar;
 
-	// 最初のウインドウの位置を指定
+// 最初のウインドウの位置を指定
 	constexpr XMFLOAT2 fstWinPos = XMFLOAT2((float)WinAPI::window_width * 0.02f,
 											(float)WinAPI::window_height * 0.02f);
 	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x,
@@ -696,5 +731,6 @@ RailShoot::~RailShoot()
 	PostEffect::getInstance()->setAlpha(1.f);
 	PostEffect::getInstance()->setMosaicNum(XMFLOAT2(WinAPI::window_width,
 													 WinAPI::window_height));
+	PostEffect::getInstance()->setRgbShiftNum({ 0.f, 0.f });
 	PostEffect::getInstance()->changePipeLine(0U);
 }

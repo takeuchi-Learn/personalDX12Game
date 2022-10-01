@@ -18,14 +18,20 @@ public:
 
 	Time();
 
-	// 一拍の時間を取得
+	/// @brief 一拍の時間を取得
+	/// @param bpm 一分間の拍数
+	/// @return 一拍の時間
 	inline static timeType getOneBeatTime(const float bpm) { return timeType(std::chrono::duration_cast<timeUnit>(std::chrono::seconds(60ll)).count() / bpm); };
 
 	// 現在までの時間を取得
 	// reset()最後に実行した時間が起点
 	// 実行していなければクラス生成時の時間が起点
+
+	/// @brief reset()最後に実行した時間が起点
+	/// @brief 実行していなければクラス生成時の時間が起点
+	/// @return 現在までの時間
 	timeType getNowTime();
 
-	// 現在を0とする
+	/// @brief 現在を0とする
 	void reset();
 };

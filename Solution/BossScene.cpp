@@ -2,6 +2,7 @@
 #include "WinAPI.h"
 #include "EndScene.h"
 #include "SceneManager.h"
+#include "PostEffect.h"
 
 #include <DirectXMath.h>
 #include <imgui.h>
@@ -13,6 +14,8 @@ BossScene::BossScene() :
 	// シングルトンインスタンス
 	// --------------------
 	input(Input::getInstance()),
+
+	timer(new Time()),
 
 	// --------------------
 	// カメラとライト
@@ -71,6 +74,12 @@ void BossScene::update_play()
 		update_proc = std::bind(&BossScene::update_end, this);
 	}
 
+	if (Input::getInstance()->triggerKey(DIK_R))
+	{
+		startRgbShift();
+	}
+	updateRgbShift();
+
 	// 移動
 	{
 		const bool hitW = input->hitKey(DIK_W);
@@ -78,7 +87,11 @@ void BossScene::update_play()
 
 		if (hitW || hitS)
 		{
-			const float moveSpeed = 90.f / DX12Base::ins()->getFPS();
+			float moveSpeed = 90.f / DX12Base::ins()->getFPS();
+			if (input->hitKey(DIK_LCONTROL))
+			{
+				moveSpeed /= 2.f;
+			} else if (input->hitKey(DIK_LSHIFT)) { moveSpeed *= 2.f; }
 
 			if (hitW)
 			{
@@ -97,7 +110,11 @@ void BossScene::update_play()
 
 		if (hitA || hitD)
 		{
-			const float speed = 90.f / DX12Base::ins()->getFPS();
+			float speed = 90.f / DX12Base::ins()->getFPS();
+			if (input->hitKey(DIK_LCONTROL))
+			{
+				speed /= 2.f;
+			} else if (input->hitKey(DIK_LSHIFT)) { speed *= 2.f; }
 
 			XMFLOAT3 rota = player->getRotation();
 
@@ -119,6 +136,11 @@ void BossScene::update_end()
 	SceneManager::getInstange()->changeScene(new EndScene());
 }
 
+
+void BossScene::start()
+{
+	timer->reset();
+}
 
 void BossScene::update()
 {
@@ -144,6 +166,40 @@ void BossScene::update()
 	}
 	light->update();
 	camera->update();
+}
+
+
+void BossScene::startRgbShift()
+{
+	rgbShiftFlag = true;
+	nowRgbShiftTime = 0;
+	startRgbShiftTime = timer->getNowTime();
+}
+
+void BossScene::updateRgbShift()
+{
+	if (rgbShiftFlag)
+	{
+		nowRgbShiftTime = timer->getNowTime() - startRgbShiftTime;
+
+		const float raito = (float)nowRgbShiftTime / (float)rgbShiftTimeMax;
+		if (raito > 1.f)
+		{
+			PostEffect::getInstance()->setRgbShiftNum({ 0.f, 0.f });
+			rgbShiftFlag = false;
+			return;
+		}
+
+		// ずらす最大値
+		constexpr float rgbShiftMumMax = 1.f / 16.f;
+
+		// イージングを加味した進行割合
+		constexpr float  c4 = 2.f * XM_PI / 3.f;
+		const float easeRate = -powf(2.f, 10.f * (1.f - raito) - 10.f) *
+			DX12Base::ins()->nearSin((raito * 10.f - 10.75f) * c4);
+
+		PostEffect::getInstance()->setRgbShiftNum({ easeRate * rgbShiftMumMax, 0.f });
+	}
 }
 
 void BossScene::drawObj3d()

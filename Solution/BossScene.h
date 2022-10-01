@@ -5,6 +5,7 @@
 #include "ObjModel.h"
 #include "Player.h"
 #include "Input.h"
+#include "Time.h"
 
 #include <functional>
 #include <memory>
@@ -14,6 +15,8 @@ class BossScene :
 {
 private:
 	Input* input = nullptr;
+
+	std::unique_ptr<Time> timer;
 
 	// 背景のパイプライン
 	Object3d::PipelineSet backPipelineSet;
@@ -29,6 +32,18 @@ private:
 	std::unique_ptr<ObjModel> playerBulModel;
 	std::unique_ptr<Player> player;
 
+
+	// --------------------
+	// RGBずらし
+	// --------------------
+	static const Time::timeType rgbShiftTimeMax = Time::oneSec / 2;
+	Time::timeType nowRgbShiftTime = 0;
+	Time::timeType startRgbShiftTime = 0;
+	bool rgbShiftFlag = false;
+
+	void startRgbShift();
+	void updateRgbShift();
+
 	// update_何とか関数を格納する
 	std::function<void()> update_proc;
 	void update_start();
@@ -38,6 +53,7 @@ private:
 public:
 	BossScene();
 
+	void start() override;
 	void update() override;
 	void drawObj3d() override;
 	void drawFrontSprite() override;
