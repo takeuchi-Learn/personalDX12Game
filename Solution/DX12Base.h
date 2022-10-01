@@ -81,6 +81,9 @@ public:
 		return &dxBase;
 	}
 
+	// getInstance()と同義
+	inline static DX12Base* ins() { return getInstance(); }
+
 #pragma region 角度系
 
 	// @return 0 <= ret[rad] < 2PI

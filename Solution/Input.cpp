@@ -15,12 +15,6 @@ Input::~Input()
 {
 }
 
-Input* Input::getInstance()
-{
-	static Input ip;
-	return &ip;
-}
-
 void Input::init()
 {
 	HRESULT result;
@@ -56,11 +50,6 @@ void Input::update()
 	GetCursorPos(&mousePos);
 	ScreenToClient(WinAPI::getInstance()->getHwnd(), &mousePos);
 }
-
-bool Input::hitKey(BYTE keyCode) { return (bool)key[keyCode]; }
-bool Input::hitPreKey(BYTE keyCode) { return (bool)preKey[keyCode]; }
-
-bool Input::triggerKey(BYTE keyCode) { return (bool)(key[keyCode] && preKey[keyCode] == false); }
 
 void Input::resetState()
 {

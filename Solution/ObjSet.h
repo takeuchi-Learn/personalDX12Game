@@ -15,6 +15,8 @@ class ObjSet
 public:
 	ObjSet(Camera* camera, const std::string& dirPath, const std::string& name, bool smoothing = false);
 
+	inline const Camera* getCamera(UINT num = 0u) const { return obj[num].getCamera(); }
+
 	inline ObjModel* getModelPt() { return model.get(); }
 
 	inline void addObj(Camera* camera) { obj.emplace_back(camera, model.get(), 0U); }

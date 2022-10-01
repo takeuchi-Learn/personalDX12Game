@@ -20,8 +20,6 @@ private:
 	DirectX::XMMATRIX matWorld{};
 
 public:
-	using Camera::Camera;
-
 	CameraObj(GameObj* parent);
 
 	inline void setEye2TargetLen(float eye2TargetLen) { this->eye2TargetLen = eye2TargetLen; }

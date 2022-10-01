@@ -42,14 +42,19 @@ private:
 	ComPtr<IDirectInput8> dinput;
 
 public:
-	static Input* getInstance();
+	inline static Input* getInstance()
+	{
+		static Input input{};
+		return &input;
+	}
 
 	void init();
 	void update();
 
-	bool hitKey(BYTE keyCode);
-	bool hitPreKey(BYTE keyCode);
-	bool triggerKey(BYTE keyCode);
+	inline bool hitKey(BYTE keyCode) const { return (bool)key[keyCode]; }
+	inline bool hitPreKey(BYTE keyCode) const { return (bool)preKey[keyCode]; }
+
+	inline bool triggerKey(BYTE keyCode) const { return (bool)(key[keyCode] && preKey[keyCode] == false); }
 
 	void resetState();
 

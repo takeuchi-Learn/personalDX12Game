@@ -236,7 +236,7 @@ RailShoot::RailShoot()
 	back->setScale({ backScale, backScale, backScale });
 
 	// 地面
-	const UINT groundSize = 5000u;
+	constexpr UINT groundSize = 5000u;
 	ground->setPos(XMFLOAT3(0, -player->getScale(), 0));
 	ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
 	ground->getModelPt()->setTexTilling(XMFLOAT2(groundSize / 32.f, groundSize / 32.f));
@@ -258,9 +258,12 @@ void RailShoot::update()
 {
 	{
 		// シーン遷移中も背景は回す
-		XMFLOAT3 backRota = back->getRotation();
-		backRota.y += 6.f / dxBase->getFPS();
-		back->setRotation(backRota);
+		XMFLOAT2 shiftUv = back->getModelPt()->getShiftUv();
+		constexpr float shiftSpeed = 0.01f;
+
+		shiftUv.x += shiftSpeed / DX12Base::getInstance()->getFPS();
+
+		back->getModelPt()->setShivtUv(shiftUv);
 	}
 
 	// 背景オブジェクトの中心をカメラにする
@@ -421,9 +424,6 @@ void RailShoot::update_play()
 	if (hitW || hitA || hitS || hitD)
 	{
 		const float moveSpeed = 90.f / dxBase->getFPS();
-
-		constexpr XMFLOAT2 posSize = XMFLOAT2(WinAPI::window_width * 0.12f,
-											  WinAPI::window_height * 0.12f);
 
 		// 横移動
 		if (hitD)

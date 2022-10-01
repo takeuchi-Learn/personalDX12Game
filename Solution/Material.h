@@ -19,6 +19,8 @@ public:
 		DirectX::XMFLOAT3 specular;	// スペキュラー
 		float alpha;	// アルファ
 		DirectX::XMFLOAT2 texTilling;	// タイリング
+		DirectX::XMFLOAT2 pad3;	// パディング
+		DirectX::XMFLOAT2 shiftUv;	// タイリング
 	};
 
 public:
@@ -45,6 +47,7 @@ public:
 	float alpha;
 	std::string texFileName;	// テクスチャファイル名
 	DirectX::XMFLOAT2 texTilling = { 1, 1 };	// タイリング
+	DirectX::XMFLOAT2 shiftUv = { 0, 0 };	// UVシフト
 
 	Material();
 

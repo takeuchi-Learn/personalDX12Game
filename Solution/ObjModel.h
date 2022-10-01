@@ -39,6 +39,7 @@ private:
 	// デスクリプタヒープ
 	ComPtr<ID3D12DescriptorHeap> descHeap;
 	DirectX::XMFLOAT2 texTilling{ 1, 1 };
+	DirectX::XMFLOAT2 shiftUv{ 0, 0 };
 	bool materialDirty = false;
 
 	/// @brief マテリアル読み込み
@@ -70,6 +71,10 @@ public:
 	/// @brief テクスチャのタイリングを設定
 	/// @param tillingNum タイリングの数
 	inline void setTexTilling(const DirectX::XMFLOAT2& tillingNum) { texTilling = tillingNum; materialDirty = true; }
+	inline const DirectX::XMFLOAT2& getTexTilling() const { return texTilling; }
+
+	inline void setShivtUv(const DirectX::XMFLOAT2& shiftNum) { shiftUv = shiftNum; materialDirty = true; }
+	inline const DirectX::XMFLOAT2& getShiftUv() const { return shiftUv; }
 
 	/// @param dirPath : objファイルのある場所のパス(例 : Resources/player/)
 	/// @param objModelName : objファイルのファイル名(拡張子なし。例 : player.obj -> player)

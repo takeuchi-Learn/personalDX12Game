@@ -488,6 +488,7 @@ void ObjModel::draw(ID3D12GraphicsCommandList* cmdList)
 		for (auto& m : materials)
 		{
 			m.second->texTilling = texTilling;
+			m.second->shiftUv = shiftUv;
 			m.second->update();
 		}
 		materialDirty = false;

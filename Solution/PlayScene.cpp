@@ -24,7 +24,7 @@ using namespace DirectX;
 
 void PlayScene::cameraInit()
 {
-	camera.reset(new CameraObj({ .x = WinAPI::window_width, .y = WinAPI::window_height }));
+	camera.reset(new CameraObj(nullptr));
 	camera->setFarZ(5000.f);
 	camera->setEye(XMFLOAT3(0, 0, -175));	// 視点座標
 	camera->setTarget(XMFLOAT3(0, 0, 0));	// 注視点座標

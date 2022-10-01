@@ -12,6 +12,7 @@ cbuffer cbuff1 : register(b1) {
 	float3 m_specular : packoffset(c2); // ディフューズ係数
 	float m_alpha : packoffset(c2.w);   // アルファ
 	float2 texTilling : packoffset(c3);
+	float2 shiftUv : packoffset(c4);
 }
 
 cbuffer cbuff2 : register(b2) {
