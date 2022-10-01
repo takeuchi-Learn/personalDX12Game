@@ -2,7 +2,7 @@
 #include <DirectXMath.h>
 
 #include "SceneManager.h"
-#include "PlayScene.h"
+#include "BossScene.h"
 
 #include "PostEffect.h"
 
@@ -621,7 +621,7 @@ void RailShoot::update_end()
 	const Time::timeType nowTime = timer->getNowTime() - startSceneChangeTime;
 	if (nowTime >= sceneChangeTime)
 	{
-		SceneManager::getInstange()->changeScene(new PlayScene());
+		SceneManager::getInstange()->changeScene(new BossScene());
 	}
 
 	const float timeRaito = (float)nowTime / sceneChangeTime;

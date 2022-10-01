@@ -164,6 +164,7 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BossScene.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CameraObj.cpp" />
     <ClCompile Include="Collision.cpp" />
@@ -213,6 +214,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="BossScene.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraObj.h" />
     <ClInclude Include="Collision.h" />

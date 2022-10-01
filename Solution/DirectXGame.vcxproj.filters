@@ -100,6 +100,9 @@
     <Filter Include="Camera\CameraObj">
       <UniqueIdentifier>{a0ad8bb6-cb47-4acb-aafc-e46f93088766}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene\BossScene">
+      <UniqueIdentifier>{935b8486-a01e-4866-9a73-4e18f3119326}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="System.cpp">
@@ -219,6 +222,9 @@
     <ClCompile Include="CameraObj.cpp">
       <Filter>Camera\CameraObj</Filter>
     </ClCompile>
+    <ClCompile Include="BossScene.cpp">
+      <Filter>Scene\BossScene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h">
@@ -334,6 +340,9 @@
     </ClInclude>
     <ClInclude Include="CameraObj.h">
       <Filter>Camera\CameraObj</Filter>
+    </ClInclude>
+    <ClInclude Include="BossScene.h">
+      <Filter>Scene\BossScene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
