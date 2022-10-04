@@ -123,6 +123,9 @@ public:
 	inline void setAlpha(float alpha) { this->alpha = alpha; }
 	inline float getAlpha() const { return alpha; }
 
+	inline void setVignIntensity(float num) { vignIntensity = num; }
+	inline float getVignIntensity() const { return vignIntensity; }
+
 	/// @brief グラフィックスパイプラインを追加
 	/// @param psPath ピクセルシェーダーファイルのパス
 	/// @return 識別番号

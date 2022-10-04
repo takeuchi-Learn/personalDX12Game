@@ -113,7 +113,7 @@ RailShoot::RailShoot()
 	// --------------------
 	// 敵モデル
 	// --------------------
-	enemyModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
+	enemyModel(std::make_unique<ObjModel>("Resources/enemy", "enemy", 0U, true)),
 	enemyBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
 
 	// --------------------
@@ -121,7 +121,8 @@ RailShoot::RailShoot()
 	// --------------------
 	playerModel(std::make_unique<ObjModel>("Resources/box", "box")),
 	playerBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
-	playerHp(20u),
+	playerHpMax(20u),
+	playerHp(playerHpMax),
 
 	// --------------------
 	// レール現在位置のオブジェクト
@@ -137,22 +138,38 @@ RailShoot::RailShoot()
 
 	backPipelineSet(Object3d::createGraphicsPipeline(Object3d::BLEND_MODE::ALPHA,
 													 L"Resources/Shaders/BackVS.hlsl",
-													 L"Resources/Shaders/BackPS.hlsl"))
-{
+													 L"Resources/Shaders/BackPS.hlsl")),
+
 	// --------------------
 	// スプライト初期化
 	// --------------------
-	const UINT debugTextTexNumber = spriteBase->loadTexture(L"Resources/debugfont.png");
-	debugText = std::make_unique<DebugText>(debugTextTexNumber, spriteBase.get());
+	debugText(new DebugText(spriteBase->loadTexture(L"Resources/debugfont.png"),
+							spriteBase.get())),
 
-	const UINT aimPosTexNum = spriteBase->loadTexture(L"Resources/aimPos.png");
-	aim2D = std::make_unique<Sprite>(aimPosTexNum, spriteBase.get());
+	aim2D(new Sprite(spriteBase->loadTexture(L"Resources/aimPos.png"),
+					 spriteBase.get())),
+
+	hpBar(new Sprite(spriteBase->loadTexture(L"Resources/hpBar.png"),
+					 spriteBase.get(),
+					 XMFLOAT2(0.5f, 1.f))),
+	hpBarWidMax(WinAPI::window_width * 0.75f)
+{
+
+	hpBar->position = XMFLOAT3(WinAPI::window_width / 2.f, WinAPI::window_height, 0.f);
+	{
+		XMFLOAT2 size = hpBar->getSize();
+		size.x = hpBarWidMax;
+		size.y = (float)WinAPI::window_height / 32.f;
+		hpBar->setSize(size);
+
+		hpBar->position.y -= size.y;
+	}
 
 	// --------------------
 	// カメラ初期化
 	// --------------------
 	camera->setFarZ(5000.f);
-	camera->setEye(XMFLOAT3(0, WinAPI::getInstance()->getWindowSize().y * 0.06f, -180));	// 視点座標
+	camera->setEye(XMFLOAT3(0, WinAPI::getInstance()->getWindowSize().y * 0.06f, -180.f));	// 視点座標
 	camera->setTarget(XMFLOAT3(0, 0, 0));	// 注視点座標
 	camera->setUp(XMFLOAT3(0, 1, 0));		// 上方向
 	//camera->update();
@@ -373,8 +390,6 @@ void RailShoot::update_start()
 	const Time::timeType nowTime = timer->getNowTime() - startSceneChangeTime;
 	if (nowTime >= sceneChangeTime)
 	{
-		//PostEffect::getInstance()->changePipeLine(SceneManager::getInstange()->getPostEff2Num());
-
 		update_proc = std::bind(&RailShoot::update_play, this);
 	}
 
@@ -386,6 +401,9 @@ void RailShoot::update_start()
 													 WinAPI::getInstance()->getWindowSize().y * mosCoe));
 
 	PostEffect::getInstance()->setNoiseIntensity(1.f - timeRaito);
+
+	constexpr float vignNum = 0.5f;
+	PostEffect::getInstance()->setVignIntensity(vignNum);
 }
 
 void RailShoot::update_play()
@@ -721,8 +739,14 @@ void RailShoot::drawFrontSprite()
 	ImGui::End();
 
 	spriteBase->drawStart(dxBase->getCmdList());
+
+	hpBar->setSize(XMFLOAT2((float)playerHp / (float)playerHpMax * hpBarWidMax,
+							hpBar->getSize().y));
+	hpBar->drawWithUpdate(dxBase, spriteBase.get());
+
 	aim2D->position = XMFLOAT3(player->getAim2DPos().x, player->getAim2DPos().y, 0.f);
 	aim2D->drawWithUpdate(dxBase, spriteBase.get());
+
 	debugText->DrawAll(dxBase, spriteBase.get());
 }
 
@@ -732,5 +756,7 @@ RailShoot::~RailShoot()
 	PostEffect::getInstance()->setMosaicNum(XMFLOAT2(WinAPI::window_width,
 													 WinAPI::window_height));
 	PostEffect::getInstance()->setRgbShiftNum({ 0.f, 0.f });
+
+	PostEffect::getInstance()->setVignIntensity(0.25f);
 	PostEffect::getInstance()->changePipeLine(0U);
 }

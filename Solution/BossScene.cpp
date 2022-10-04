@@ -38,6 +38,13 @@ BossScene::BossScene() :
 													 L"Resources/Shaders/BackPS.hlsl")),
 
 	// --------------------
+	// スプライト
+	// --------------------
+	spBase(new SpriteBase()),
+	aim2D(new Sprite(spBase->loadTexture(L"Resources/aimPos.png"),
+					 spBase.get())),
+
+	// --------------------
 	// 更新関数
 	// --------------------
 	update_proc(std::bind(&BossScene::update_start, this))
@@ -59,7 +66,13 @@ BossScene::BossScene() :
 	constexpr float groundSize = farZ * 2.f;
 	ground->setPos(XMFLOAT3(0, -player->getScale(), 0));
 	ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
-	ground->getModelPt()->setTexTilling(XMFLOAT2(groundSize / 32.f, groundSize / 32.f));
+
+	constexpr float tillingNum = groundSize / 32.f;
+	ground->getModelPt()->setTexTilling(XMFLOAT2(tillingNum, tillingNum));
+
+	// スプライト読み込み
+	aim2D = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/aimPos.png"),
+									 spBase.get());
 }
 
 void BossScene::update_start()
@@ -91,7 +104,10 @@ void BossScene::update_play()
 			if (input->hitKey(DIK_LCONTROL))
 			{
 				moveSpeed /= 2.f;
-			} else if (input->hitKey(DIK_LSHIFT)) { moveSpeed *= 2.f; }
+			} else if (input->hitKey(DIK_LSHIFT))
+			{
+				moveSpeed *= 2.f;
+			}
 
 			if (hitW)
 			{
@@ -107,23 +123,47 @@ void BossScene::update_play()
 	{
 		const bool hitA = input->hitKey(DIK_A);
 		const bool hitD = input->hitKey(DIK_D);
+		const bool triggerE = input->triggerKey(DIK_E);
 
-		if (hitA || hitD)
+		if (hitA || hitD || triggerE)
 		{
-			float speed = 90.f / DX12Base::ins()->getFPS();
-			if (input->hitKey(DIK_LCONTROL))
-			{
-				speed /= 2.f;
-			} else if (input->hitKey(DIK_LSHIFT)) { speed *= 2.f; }
+
 
 			XMFLOAT3 rota = player->getRotation();
 
-			if (hitA)
+			// 上向きか否かの切り替え
+			if (triggerE)
 			{
-				rota.y -= speed;
-			} else if (hitD)
+				constexpr float angle = 20.f;
+				rota.x += playerUpTurn ? angle : -angle;
+
+				playerUpTurn = !playerUpTurn;
+
+				player->setRotation(rota);
+			}
+
+			// 左右の回転
+			if (hitA || hitD)
 			{
-				rota.y += speed;
+				float speed = 45.f / DX12Base::ins()->getFPS();
+
+				// 左シフトと左コントロールで速度変更
+				if (input->hitKey(DIK_LCONTROL))
+				{
+					speed /= 2.f;
+				} else if (input->hitKey(DIK_LSHIFT))
+				{
+					speed *= 2.f;
+				}
+
+				// 回転させる
+				if (hitA)
+				{
+					rota.y -= speed;
+				} else if (hitD)
+				{
+					rota.y += speed;
+				}
 			}
 
 			player->setRotation(rota);
@@ -152,6 +192,13 @@ void BossScene::update()
 		shiftUv.x += shiftSpeed / DX12Base::getInstance()->getFPS();
 
 		back->getModelPt()->setShivtUv(shiftUv);
+	}
+
+	{
+		aim2D->position.x =
+			input->getMousePos().x;
+		aim2D->position.y =
+			input->getMousePos().y;
 	}
 
 	update_proc();
@@ -218,6 +265,10 @@ void BossScene::drawObj3d()
 
 void BossScene::drawFrontSprite()
 {
+	spBase->drawStart(DX12Base::ins()->getCmdList());
+	aim2D->drawWithUpdate(DX12Base::ins(), spBase.get());
+
+
 	constexpr ImGuiWindowFlags winFlags =
 		// リサイズ不可
 		ImGuiWindowFlags_::ImGuiWindowFlags_NoResize |

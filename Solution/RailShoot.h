@@ -39,6 +39,8 @@ class RailShoot
 	std::unique_ptr<DebugText> debugText;
 
 	std::unique_ptr<Sprite> aim2D;
+	std::unique_ptr<Sprite> hpBar;
+	float hpBarWidMax;
 
 	// --------------------
 	// 3Dオブジェクト
@@ -59,6 +61,7 @@ class RailShoot
 	std::unique_ptr<Player> player;
 	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<ObjModel> playerBulModel;
+	UINT playerHpMax;
 	UINT playerHp;
 
 	// レールの現在位置を示すオブジェクト

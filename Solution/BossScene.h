@@ -7,6 +7,9 @@
 #include "Input.h"
 #include "Time.h"
 
+#include "Sprite.h"
+#include "SpriteBase.h"
+
 #include <functional>
 #include <memory>
 
@@ -25,17 +28,21 @@ private:
 	std::unique_ptr<ObjSet> back;
 	std::unique_ptr<ObjSet> ground;
 
+	// カメラとライト
 	std::unique_ptr<CameraObj> camera;
 	std::unique_ptr<Light> light;
 
+	// ゲームオブジェクト
 	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<ObjModel> playerBulModel;
 	std::unique_ptr<Player> player;
+	bool playerUpTurn = false;
 
+	// スプライト
+	std::unique_ptr<SpriteBase> spBase;
+	std::unique_ptr <Sprite> aim2D;
 
-	// --------------------
 	// RGBずらし
-	// --------------------
 	static const Time::timeType rgbShiftTimeMax = Time::oneSec / 2;
 	Time::timeType nowRgbShiftTime = 0;
 	Time::timeType startRgbShiftTime = 0;
