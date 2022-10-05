@@ -127,19 +127,18 @@ void BossScene::update_play()
 
 		if (hitA || hitD || triggerE)
 		{
-
-
-			XMFLOAT3 rota = player->getRotation();
-
 			// 上向きか否かの切り替え
 			if (triggerE)
 			{
+				XMFLOAT3 camRrota = camera->getRelativeRotaDeg();
+
 				constexpr float angle = 20.f;
-				rota.x += playerUpTurn ? angle : -angle;
+				camRrota.x += playerUpTurn ? angle : -angle;
 
 				playerUpTurn = !playerUpTurn;
 
-				player->setRotation(rota);
+				//player->setRotation(rota);
+				camera->setRelativeRotaDeg(camRrota);
 			}
 
 			// 左右の回転
@@ -156,6 +155,8 @@ void BossScene::update_play()
 					speed *= 2.f;
 				}
 
+				XMFLOAT3 rota = player->getRotation();
+
 				// 回転させる
 				if (hitA)
 				{
@@ -164,9 +165,10 @@ void BossScene::update_play()
 				{
 					rota.y += speed;
 				}
+
+				player->setRotation(rota);
 			}
 
-			player->setRotation(rota);
 		}
 	}
 }
@@ -292,6 +294,7 @@ void BossScene::drawFrontSprite()
 
 	ImGui::Begin("ボス戦", nullptr, winFlags);
 	ImGui::Text("未実装\nスペースで次のシーンへ進む");
+	ImGui::Text("E : %sを向く", playerUpTurn ? "上" : "前");
 	ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x,
 								   ImGui::GetWindowPos().y + ImGui::GetWindowSize().y));
 	ImGui::End();

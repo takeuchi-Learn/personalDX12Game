@@ -41,13 +41,13 @@ float4 main(VSOutput input) : SV_TARGET
 	static float slnDivLevel = 96.f;
 	static float slnPower = 24.f;
 	float sinNum = uv.y * slnDivLevel + time * slnSpeed;
-	float sLineNum = fracNoise(float2(time, uv.y)) * sin(sinNum) * sin(sinNum + 0.75f) + 1;
+	float sLineNum = fracNoise(float2(time, uv.y)) * sin(sinNum) * sin(sinNum + 0.75f) + 1.f;
 	sLineNum /= -slnPower;
 
 	// ëñç∏ê¸
-	static float slSpeed = 0.25f;
-	static float slSize = 0.03125f;
-	static float slPower = 0.0625f;
+	static float slSpeed = 1.f / 4.f;
+	static float slSize = 1.f / 64.f;
+	static float slPower = 1.f / 16.f;
 	float sbTime = frac(time * slSpeed);
 	float seTime = sbTime + slSize;
 	
@@ -61,7 +61,8 @@ float4 main(VSOutput input) : SV_TARGET
 	// rgbÇ∏ÇÁÇµ
 	float4 texColor0 = tex0.Sample(smp, uv);
 	texColor0.g = tex0.Sample(smp, uv + rgbShiftNum).g;
-	texColor0 = pow(texColor0, 1.f / 2.2f);
+	static float gamma = 1.f / 2.2f;
+	texColor0 = pow(texColor0, gamma);
 
 	float noiseNum = noise(input.uv, time);
 
