@@ -13,8 +13,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <tuple>
 
-#ifndef WIN32
+#ifndef _WIN32
 #include <cstdlib>
 
 struct aligned_deleter { void operator()(void* p) noexcept { free(p); } };
@@ -28,7 +29,7 @@ inline ScopedAlignedArrayFloat make_AlignedArrayFloat(uint64_t count)
     if (size > static_cast<uint64_t>(UINT32_MAX))
         return nullptr;
 
-    auto ptr = aligned_alloc(16, static_cast<size_t>(size)      );
+    auto ptr = aligned_alloc(16, static_cast<size_t>(size));
     return ScopedAlignedArrayFloat(static_cast<float*>(ptr));
 }
 
@@ -53,7 +54,7 @@ using ScopedAlignedArrayFloat = std::unique_ptr<float[], aligned_deleter>;
 
 inline ScopedAlignedArrayFloat make_AlignedArrayFloat(uint64_t count)
 {
-    uint64_t size = sizeof(float) * count;
+    const uint64_t size = sizeof(float) * count;
     if (size > static_cast<uint64_t>(UINT32_MAX))
         return nullptr;
     auto ptr = _aligned_malloc(static_cast<size_t>(size), 16);
@@ -64,7 +65,7 @@ using ScopedAlignedArrayXMVECTOR = std::unique_ptr<DirectX::XMVECTOR[], aligned_
 
 inline ScopedAlignedArrayXMVECTOR make_AlignedArrayXMVECTOR(uint64_t count)
 {
-    uint64_t size = sizeof(DirectX::XMVECTOR) * count;
+    const uint64_t size = sizeof(DirectX::XMVECTOR) * count;
     if (size > static_cast<uint64_t>(UINT32_MAX))
         return nullptr;
     auto ptr = _aligned_malloc(static_cast<size_t>(size), 16);
@@ -98,7 +99,7 @@ public:
         {
             FILE_DISPOSITION_INFO info = {};
             info.DeleteFile = TRUE;
-            (void)SetFileInformationByHandle(m_handle, FileDispositionInfo, &info, sizeof(info));
+            std::ignore = SetFileInformationByHandle(m_handle, FileDispositionInfo, &info, sizeof(info));
         }
     }
 

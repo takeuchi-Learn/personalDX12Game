@@ -95,6 +95,11 @@ class RailShoot
 	static const UINT splineIndexDef = 1u;
 	UINT splineIndex = splineIndexDef;
 
+
+	// --------------------
+	// 敵発生関連
+	// --------------------
+
 	// std::stringの2次元配列(vector)
 	using CSVType = std::vector<std::vector<std::string>>;
 
