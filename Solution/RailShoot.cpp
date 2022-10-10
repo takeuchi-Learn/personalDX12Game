@@ -201,19 +201,27 @@ RailShoot::RailShoot()
 	// スプライン
 	// --------------------
 
-	// startとendは2つ必要
-	splinePoint.emplace_back(XMVectorSet(0, 0, 0, 1));		// start
-	splinePoint.emplace_back(XMVectorSet(0, 0, 0, 1));		// start
-	splinePoint.emplace_back(XMVectorSet(0, 0, 200, 1));	// 経由1
-	splinePoint.emplace_back(XMVectorSet(20, 50, 400, 1));	// 経由2
-	splinePoint.emplace_back(XMVectorSet(20, 50, 600, 1));	// 経由3
-	splinePoint.emplace_back(XMVectorSet(20, 50, 800, 1));	// 経由4
-	splinePoint.emplace_back(XMVectorSet(20, 50, 800, 1));	// 経由5
-	splinePoint.emplace_back(XMVectorSet(20, 50, 1000, 1));	// 経由6
-	splinePoint.emplace_back(XMVectorSet(20, 50, 1200, 1));	// 経由7
-	splinePoint.emplace_back(XMVectorSet(20, 50, 1400, 1));	// 経由8
-	splinePoint.emplace_back(XMVectorSet(0, 100, 1600, 1));	// end
-	splinePoint.emplace_back(XMVectorSet(0, 100, 1600, 1));	// end
+	{
+		csvData = loadCsv("Resources/splinePos.csv", true, ',', "//");
+
+		// startは2つ必要
+		splinePoint.emplace_back(XMVectorSet(std::stof(csvData[0][0]),
+											 std::stof(csvData[0][1]),
+											 std::stof(csvData[0][2]),
+											 1));
+
+		for (auto& y : csvData)
+		{
+			splinePoint.emplace_back(XMVectorSet(std::stof(y[0]),
+												 std::stof(y[1]),
+												 std::stof(y[2]),
+												 1));
+		}
+
+		// endも2つ必要
+		splinePoint.emplace_back(splinePoint.back());
+	}
+
 
 	// --------------------
 	// 敵初期化
@@ -252,7 +260,7 @@ RailShoot::RailShoot()
 
 	// 地面
 	constexpr UINT groundSize = 5000u;
-	ground->setPos(XMFLOAT3(0, -player->getScale(), 0));
+	ground->setPos(XMFLOAT3(0, -player->getScale(), (float)groundSize));
 	ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
 	ground->getModelPt()->setTexTilling(XMFLOAT2(groundSize / 32.f, groundSize / 32.f));
 
@@ -439,58 +447,10 @@ void RailShoot::update_play()
 	// --------------------
 	// レール現在位置オブジェクト
 	// --------------------
-	{
-		float raito = float(splineNowFrame++) / float(splineFrameMax);
-		if (raito >= 1.f)
-		{
-			if (splineIndex < splinePoint.size() - 3)
-			{
-				++splineIndex;
-				raito -= 1.f;
-				splineNowFrame = 0u;
-			} else
-			{
-				raito = 1.f;
-			}
-		}
-		XMFLOAT3 pos{};
-		XMStoreFloat3(&pos,
-					  splinePosition(splinePoint,
-									 splineIndex,
-									 raito));
-		railObj->setPos(pos);
-	}
+	updateRailPos();
 
-	// --------------------
-	// 自機移動
-	// --------------------
-	const bool hitW = input->hitKey(DIK_W);
-	const bool hitA = input->hitKey(DIK_A);
-	const bool hitS = input->hitKey(DIK_S);
-	const bool hitD = input->hitKey(DIK_D);
-
-	if (hitW || hitA || hitS || hitD)
-	{
-		const float moveSpeed = 90.f / dxBase->getFPS();
-
-		// 横移動
-		if (hitD)
-		{
-			player->moveRight(moveSpeed);
-		} else if (hitA)
-		{
-			player->moveRight(-moveSpeed);
-		}
-
-		// 奥方向に移動
-		if (hitW)
-		{
-			player->moveUp(moveSpeed);
-		} else if (hitS)
-		{
-			player->moveUp(-moveSpeed);
-		}
-	}
+	// 自機移動回転
+	movePlayer();
 
 	// Z座標が0を超えた敵は退場
 	for (auto& i : enemy)
@@ -502,74 +462,9 @@ void RailShoot::update_play()
 	}
 
 	// --------------------
-	// ロックオン
+	// 自機の弾発射
 	// --------------------
-	{
-		// 照準の範囲
-		const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - aim2D->getSize().x / 2.f,
-										   input->getMousePos().y - aim2D->getSize().y / 2.f);
-		const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + aim2D->getSize().x / 2.f,
-										   input->getMousePos().y + aim2D->getSize().y / 2.f);
-
-		// スクリーン上の敵の位置格納変数
-		XMFLOAT2 screenEnemyPos{};
-
-		// 遠い敵を調べるためのもの
-		float oldEnemyDistance{}, nowEnemyDistance{};
-		Enemy* farthestEnemyPt = nullptr;
-		float farthestEnemyLen = 1.f;
-
-		// 最も近い敵の方へ弾を飛ばす
-		for (auto& i : enemy)
-		{
-			// いない敵は無視
-			if (!i->getAlive()) continue;
-
-			// 敵のスクリーン座標を取得
-			screenEnemyPos = i->getObj()->calcScreenPos();
-
-			// 敵が2D照準の中にいるかどうか
-			if (aim2DMin.x <= screenEnemyPos.x &&
-				aim2DMin.y <= screenEnemyPos.y &&
-				aim2DMax.x >= screenEnemyPos.x &&
-				aim2DMax.y >= screenEnemyPos.y)
-			{
-				// 敵との距離を更新
-				oldEnemyDistance = nowEnemyDistance;
-				nowEnemyDistance = sqrtf(
-					powf(i->getPos().x - camera->getEye().x, 2.f) +
-					powf(i->getPos().y - camera->getEye().y, 2.f) +
-					powf(i->getPos().z - camera->getEye().z, 2.f)
-				);
-				// 照準の中で最も遠い敵なら情報を取っておく
-				if (farthestEnemyLen < nowEnemyDistance)
-				{
-					farthestEnemyPt = i.get();
-					farthestEnemyLen = nowEnemyDistance;
-				}
-			}
-		}
-
-		// 照準の中に敵がいればそこへ弾を出す
-		// いなければターゲットはいない
-		if (farthestEnemyPt != nullptr)
-		{
-			player->setShotTarget(farthestEnemyPt->getObj());
-			aim2D->color = XMFLOAT4(1, 0, 0, 1);
-		} else
-		{
-			player->setShotTarget(nullptr);
-			aim2D->color = XMFLOAT4(0, 0, 0, 1);
-		}
-#ifdef _DEBUG
-		// 照準の中に敵がいるかどうかを表示
-		debugText->formatPrint(spriteBase.get(),
-							   300.f, 0.f,
-							   1.f,
-							   { 1,1,1,1 },
-							   "%s", farthestEnemyPt != nullptr ? "IN" : "NO_ENEMY");
-#endif // _DEBUG
-	}
+	playerShot();
 
 	// --------------------
 	// 弾発射
@@ -673,10 +568,16 @@ void RailShoot::update_play()
 void RailShoot::update_end()
 {
 	const Time::timeType nowTime = timer->getNowTime() - startSceneChangeTime;
+
+	// 時間が来たら次のシーンへ進む
 	if (nowTime >= sceneChangeTime)
 	{
 		SceneManager::getInstange()->changeScene(new BossScene());
 	}
+
+	// --------------------
+	// 進行度に合わせてポストエフェクトをかける
+	// --------------------
 
 	const float timeRaito = (float)nowTime / sceneChangeTime;
 	PostEffect::getInstance()->setAlpha(1.f - timeRaito);
@@ -686,6 +587,131 @@ void RailShoot::update_end()
 													 WinAPI::window_height * mosCoe));
 
 	PostEffect::getInstance()->setNoiseIntensity(1.f - timeRaito);
+}
+
+void RailShoot::updateRailPos()
+{
+	float raito = float(splineNowFrame++) / float(splineFrameMax);
+	if (raito >= 1.f)
+	{
+		if (splineIndex < splinePoint.size() - 3)
+		{
+			++splineIndex;
+			raito -= 1.f;
+			splineNowFrame = 0u;
+		} else
+		{
+			raito = 1.f;
+		}
+	}
+	XMFLOAT3 pos{};
+	XMStoreFloat3(&pos,
+				  splinePosition(splinePoint,
+								 splineIndex,
+								 raito));
+	railObj->setPos(pos);
+}
+
+// --------------------
+// 自機移動回転
+// --------------------
+void RailShoot::movePlayer()
+{
+	const bool hitW = input->hitKey(DIK_W);
+	const bool hitA = input->hitKey(DIK_A);
+	const bool hitS = input->hitKey(DIK_S);
+	const bool hitD = input->hitKey(DIK_D);
+
+	if (hitW || hitA || hitS || hitD)
+	{
+		const float moveSpeed = 90.f / dxBase->getFPS();
+
+		// 横移動
+		if (hitD)
+		{
+			player->moveRight(moveSpeed);
+		} else if (hitA)
+		{
+			player->moveRight(-moveSpeed);
+		}
+
+		// 奥方向に移動
+		if (hitW)
+		{
+			player->moveUp(moveSpeed);
+		} else if (hitS)
+		{
+			player->moveUp(-moveSpeed);
+		}
+	}
+}
+
+void RailShoot::playerShot()
+{
+	// 照準の範囲
+	const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - aim2D->getSize().x / 2.f,
+									   input->getMousePos().y - aim2D->getSize().y / 2.f);
+	const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + aim2D->getSize().x / 2.f,
+									   input->getMousePos().y + aim2D->getSize().y / 2.f);
+
+	// スクリーン上の敵の位置格納変数
+	XMFLOAT2 screenEnemyPos{};
+
+	// 遠い敵を調べるためのもの
+	float oldEnemyDistance{}, nowEnemyDistance{};
+	Enemy* farthestEnemyPt = nullptr;
+	float farthestEnemyLen = 1.f;
+
+	// 最も近い敵の方へ弾を飛ばす
+	for (auto& i : enemy)
+	{
+		// いない敵は無視
+		if (!i->getAlive()) continue;
+
+		// 敵のスクリーン座標を取得
+		screenEnemyPos = i->getObj()->calcScreenPos();
+
+		// 敵が2D照準の中にいるかどうか
+		if (aim2DMin.x <= screenEnemyPos.x &&
+			aim2DMin.y <= screenEnemyPos.y &&
+			aim2DMax.x >= screenEnemyPos.x &&
+			aim2DMax.y >= screenEnemyPos.y)
+		{
+			// 敵との距離を更新
+			oldEnemyDistance = nowEnemyDistance;
+			nowEnemyDistance = sqrtf(
+				powf(i->getPos().x - camera->getEye().x, 2.f) +
+				powf(i->getPos().y - camera->getEye().y, 2.f) +
+				powf(i->getPos().z - camera->getEye().z, 2.f)
+			);
+			// 照準の中で最も遠い敵なら情報を取っておく
+			if (farthestEnemyLen < nowEnemyDistance)
+			{
+				farthestEnemyPt = i.get();
+				farthestEnemyLen = nowEnemyDistance;
+			}
+		}
+	}
+
+	// 照準の中に敵がいればそこへ弾を出す
+	// いなければターゲットはいない
+	if (farthestEnemyPt != nullptr)
+	{
+		player->setShotTarget(farthestEnemyPt->getObj());
+		aim2D->color = XMFLOAT4(1, 0, 0, 1);
+	} else
+	{
+		player->setShotTarget(nullptr);
+		aim2D->color = XMFLOAT4(0, 0, 0, 1);
+	}
+#ifdef _DEBUG
+	// 照準の中に敵がいるかどうかを表示
+	debugText->formatPrint(spriteBase.get(),
+						   300.f, 0.f,
+						   1.f,
+						   { 1,1,1,1 },
+						   "%s", farthestEnemyPt != nullptr ? "IN" : "NO_ENEMY");
+#endif // _DEBUG
 }
 
 void RailShoot::drawObj3d()

@@ -141,10 +141,13 @@ class RailShoot
 
 	// update_何とか関数を格納する
 	std::function<void()> update_proc;
-
 	void update_start();
 	void update_play();
 	void update_end();
+
+	void updateRailPos();
+	void movePlayer();
+	void playerShot();
 
 public:
 	RailShoot();
