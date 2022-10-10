@@ -198,9 +198,9 @@ void BossScene::update()
 
 	{
 		aim2D->position.x =
-			input->getMousePos().x;
+			(float)input->getMousePos().x;
 		aim2D->position.y =
-			input->getMousePos().y;
+			(float)input->getMousePos().y;
 	}
 
 	update_proc();

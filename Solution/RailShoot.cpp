@@ -60,14 +60,14 @@ RailShoot::CSVType RailShoot::loadCsv(const std::string& csvFilePath,
 }
 
 XMVECTOR RailShoot::splinePosition(const std::vector<XMVECTOR>& points,
-								   size_t startIndex,
+								   const size_t& startIndex,
 								   float t)
 {
-	if (startIndex < 1) return points[1];
+	if (startIndex < 1) { return points[1]; }
 
 	{
 		size_t n = points.size() - 2;
-		if (startIndex > n)return points[n];
+		if (startIndex > n) { return points[n]; }
 	}
 
 	XMVECTOR p0 = points[startIndex - 1];
@@ -417,6 +417,7 @@ void RailShoot::update_play()
 
 #endif // _DEBUG
 
+	// 照準の位置をマウスカーソルに合わせる
 	player->setAim2DPos(XMFLOAT2((float)input->getMousePos().x,
 								 (float)input->getMousePos().y));
 
