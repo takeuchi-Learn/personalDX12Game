@@ -104,12 +104,6 @@ void Material::update()
 		constMap->texTilling = texTilling;
 		constMap->shiftUv = shiftUv;
 		constBuff->Unmap(0, nullptr);
-
-		{
-			char tmp[32]{};
-			snprintf(tmp, 32, "%.2f,%.2f\n", shiftUv.x, shiftUv.y);
-			OutputDebugStringA(tmp);
-		}
 	}
 }
 
