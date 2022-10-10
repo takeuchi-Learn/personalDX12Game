@@ -26,7 +26,7 @@ BossScene::BossScene() :
 	// --------------------
 	// モデルとオブジェクト
 	// --------------------
-	playerModel(new ObjModel("Resources/box", "box")),
+	playerModel(new ObjModel("Resources/player", "player")),
 	playerBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
 	player(new Player(camera.get(), playerModel.get())),
 

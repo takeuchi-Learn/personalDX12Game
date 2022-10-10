@@ -103,6 +103,11 @@ float4 main(VSOutput input) : SV_TARGET
 	// ’†S‚É‹ß‚¢‚Ù‚ÇF‚ğ”–‚­‚·‚é
 	speedLineNum *= distance(float2(0.5f, 0.5f), input.uv);
 
+	
+	// --------------------
+	// ‡‚í‚¹‚é
+	// --------------------
+	
 	float4 drawCol = float4(texColor0.rgb + sLineNum + vignNum + noiseNum + speedLineNum, alpha);
 
 	return drawCol;
