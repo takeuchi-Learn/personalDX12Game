@@ -99,7 +99,7 @@ float4 main(VSOutput input) : SV_TARGET
 	// --------------------
 	
 	// ŠÔ‚Å“®‚¢‚Ä‚Ù‚µ‚¢‚Ì‚Åseed‚É‚ÍŠÔ‚ğ“ü‚ê‚é
-	float speedLineNum = speedLine(input.uv, fmod(nowTime / oneSec, 1.f), 0.125f);
+	float speedLineNum = speedLine(input.uv, fmod(nowTime / oneSec, 1.f), speedLineIntensity);
 	// ’†S‚É‹ß‚¢‚Ù‚ÇF‚ğ”–‚­‚·‚é
 	speedLineNum *= distance(float2(0.5f, 0.5f), input.uv);
 

@@ -413,8 +413,11 @@ void RailShoot::update_start()
 
 	PostEffect::getInstance()->setNoiseIntensity(1.f - timeRaito);
 
-	constexpr float vignNum = 0.5f;
+	const float vignNum = 0.5f * timeRaito;
 	PostEffect::getInstance()->setVignIntensity(vignNum);
+
+	const float speedLineIntensity = 0.125f * timeRaito;
+	PostEffect::getInstance()->setSpeedLineIntensity(speedLineIntensity);
 }
 
 void RailShoot::update_play()
@@ -786,6 +789,7 @@ RailShoot::~RailShoot()
 	PostEffect::getInstance()->setMosaicNum(XMFLOAT2(WinAPI::window_width,
 													 WinAPI::window_height));
 	PostEffect::getInstance()->setRgbShiftNum({ 0.f, 0.f });
+	PostEffect::getInstance()->setSpeedLineIntensity(0.f);
 
 	PostEffect::getInstance()->setVignIntensity(0.25f);
 	PostEffect::getInstance()->changePipeLine(0U);

@@ -45,6 +45,7 @@ private:
 		float vignIntensity;
 		float alpha;	// 不透明度(通常は1)
 		DirectX::XMFLOAT2 rgbShiftNum;
+		float speedLineIntensity;
 	};
 
 	// パイプラインセット
@@ -92,6 +93,7 @@ private:
 	float vignIntensity;
 	float alpha;
 	DirectX::XMFLOAT2 rgbShiftNum;
+	float speedLineIntensity;
 
 	ID3D12Device* dev;
 	ID3D12GraphicsCommandList* cmdList;
@@ -125,6 +127,9 @@ public:
 
 	inline void setVignIntensity(float num) { vignIntensity = num; }
 	inline float getVignIntensity() const { return vignIntensity; }
+
+	inline void setSpeedLineIntensity(float num) { this->speedLineIntensity = num; }
+	inline float getSpeedLineIntensity() const { return speedLineIntensity; }
 
 	/// @brief グラフィックスパイプラインを追加
 	/// @param psPath ピクセルシェーダーファイルのパス
