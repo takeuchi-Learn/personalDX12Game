@@ -50,7 +50,7 @@ private:
 
 public:
 	/// @brief メッシュデータをポリゴン情報に変換
-	/// @param mesh 元となるメッシュ
+	/// @param obj 元となるメッシュのオブジェクト
 	/// @param pPolygons ポリゴン情報を出力する変数のポインタ
 	static void calcMeshTrlangles(const Object3d* obj, std::vector<Triangle>* pPolygons);
 
