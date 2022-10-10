@@ -645,7 +645,7 @@ void RailShoot::movePlayer()
 		if (hitW && player->getPos().y < 110.f)
 		{
 			player->moveUp(moveSpeed);
-		} else if (hitS && player->getPos().y > 10.f)
+		} else if (hitS && player->getPos().y > 5.f)
 		{
 			player->moveUp(-moveSpeed);
 		}
