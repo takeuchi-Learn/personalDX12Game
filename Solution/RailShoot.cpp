@@ -154,7 +154,7 @@ RailShoot::RailShoot()
 					 XMFLOAT2(0.5f, 1.f))),
 	hpBarWidMax(WinAPI::window_width * 0.75f)
 {
-
+	hpBar->color = XMFLOAT4(1, 1, 1, 0.75f);
 	hpBar->position = XMFLOAT3(WinAPI::window_width / 2.f, WinAPI::window_height, 0.f);
 	{
 		XMFLOAT2 size = hpBar->getSize();
@@ -192,6 +192,7 @@ RailShoot::RailShoot()
 	player = std::make_unique<Player>(camera.get(), playerModel.get());
 	player->setScale(10.f);
 	player->setParent(railObj.get());
+	player->setPos(XMFLOAT3(0, 12.f, 0));
 
 	// カメラをレールに追従させる
 	camera->setParentObj(railObj.get());
@@ -202,6 +203,7 @@ RailShoot::RailShoot()
 	// --------------------
 
 	{
+		// 制御点の情報はCSVから読み込む
 		csvData = loadCsv("Resources/splinePos.csv", true, ',', "//");
 
 		// startは2つ必要
@@ -210,6 +212,7 @@ RailShoot::RailShoot()
 											 std::stof(csvData[0][2]),
 											 1));
 
+		// CSVの内容を配列に格納
 		for (auto& y : csvData)
 		{
 			splinePoint.emplace_back(XMVectorSet(std::stof(y[0]),
@@ -627,19 +630,19 @@ void RailShoot::movePlayer()
 		const float moveSpeed = 90.f / dxBase->getFPS();
 
 		// 横移動
-		if (hitD)
+		if (hitD && player->getPos().x < 110.f)
 		{
 			player->moveRight(moveSpeed);
-		} else if (hitA)
+		} else if (hitA && player->getPos().x > -110.f)
 		{
 			player->moveRight(-moveSpeed);
 		}
 
-		// 奥方向に移動
-		if (hitW)
+		// 高さ方向に移動
+		if (hitW && player->getPos().y < 110.f)
 		{
 			player->moveUp(moveSpeed);
-		} else if (hitS)
+		} else if (hitS && player->getPos().y > 10.f)
 		{
 			player->moveUp(-moveSpeed);
 		}
