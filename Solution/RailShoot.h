@@ -95,7 +95,6 @@ class RailShoot
 	static const UINT splineIndexDef = 1u;
 	UINT splineIndex = splineIndexDef;
 
-
 	// --------------------
 	// 敵発生関連
 	// --------------------

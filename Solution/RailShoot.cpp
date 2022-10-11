@@ -225,7 +225,6 @@ RailShoot::RailShoot()
 		splinePoint.emplace_back(splinePoint.back());
 	}
 
-
 	// --------------------
 	// 敵初期化
 	// --------------------

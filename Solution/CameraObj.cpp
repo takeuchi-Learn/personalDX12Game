@@ -126,5 +126,4 @@ void CameraObj::preUpdate()
 		XMStoreFloat3(&upF3, up);
 		setUp(upF3);
 	}
-
 }

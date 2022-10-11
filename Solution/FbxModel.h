@@ -139,7 +139,7 @@ public:
 	inline void setSpecular(const DirectX::XMFLOAT3& specular) { this->specular = specular, materialDirty = true; }
 	inline void setAlpha(float alpha) { this->alpha = alpha; }
 
-	inline auto getSpecular() { return specular; }
+	inline const DirectX::XMFLOAT3& getSpecular() const { return specular; }
 
 	inline ID3D12Resource* getConstBuffB1() { return constBuffB1.Get(); }
 

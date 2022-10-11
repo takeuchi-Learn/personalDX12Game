@@ -65,4 +65,3 @@ public:
 	void drawObj3d() override;
 	void drawFrontSprite() override;
 };
-

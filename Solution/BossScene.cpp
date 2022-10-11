@@ -168,7 +168,6 @@ void BossScene::update_play()
 
 				player->setRotation(rota);
 			}
-
 		}
 	}
 }
@@ -177,7 +176,6 @@ void BossScene::update_end()
 {
 	SceneManager::getInstange()->changeScene(new EndScene());
 }
-
 
 void BossScene::start()
 {
@@ -216,7 +214,6 @@ void BossScene::update()
 	light->update();
 	camera->update();
 }
-
 
 void BossScene::startRgbShift()
 {
@@ -269,7 +266,6 @@ void BossScene::drawFrontSprite()
 {
 	spBase->drawStart(DX12Base::ins()->getCmdList());
 	aim2D->drawWithUpdate(DX12Base::ins(), spBase.get());
-
 
 	constexpr ImGuiWindowFlags winFlags =
 		// リサイズ不可
