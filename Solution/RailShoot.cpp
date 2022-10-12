@@ -609,12 +609,38 @@ void RailShoot::updateRailPos()
 			raito = 1.f;
 		}
 	}
+	// 更新前の位置を記憶
+	const XMFLOAT3 prePos = railObj->getPos();
+
+	// 更新後の位置を算出
 	XMFLOAT3 pos{};
 	XMStoreFloat3(&pos,
 				  splinePosition(splinePoint,
 								 splineIndex,
 								 raito));
+	// 位置を反映
 	railObj->setPos(pos);
+
+	// 移動速度を算出
+	const XMFLOAT3 vel = XMFLOAT3(pos.x - prePos.x,
+								  pos.y - prePos.y,
+								  pos.z - prePos.z);
+
+	// 移動方向への回転角
+	XMFLOAT2 rota = GameObj::calcRotationSyncVelDeg(vel);
+
+	// 異常な値は0にする
+	if (!isfinite(rota.x))
+	{
+		rota.x = 0.f;
+	}
+	if (!isfinite(rota.y))
+	{
+		rota.y = 0.f;
+	}
+
+	// 回転を反映
+	railObj->setRotation(XMFLOAT3(rota.x, rota.y, 0.f));
 }
 
 // --------------------
