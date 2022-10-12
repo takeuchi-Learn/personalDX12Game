@@ -1,24 +1,25 @@
 #include "FBX.hlsli"
 
-Texture2D<float4> tex : register(t0);  	// 0”ÔƒXƒƒbƒg‚Éİ’è‚³‚ê‚½ƒeƒNƒXƒ`ƒƒ
-SamplerState smp : register(s0);      	// 0”ÔƒXƒƒbƒg‚Éİ’è‚³‚ê‚½ƒTƒ“ƒvƒ‰[
+Texture2D<float4> tex : register(t0); // 0ç•ªã‚¹ãƒ­ãƒƒãƒˆã«è¨­å®šã•ã‚ŒãŸãƒ†ã‚¯ã‚¹ãƒãƒ£
+SamplerState smp : register(s0); // 0ç•ªã‚¹ãƒ­ãƒƒãƒˆã«è¨­å®šã•ã‚ŒãŸã‚µãƒ³ãƒ—ãƒ©ãƒ¼
 
-PSOutput main(VSOutput input) {
+PSOutput main(VSOutput input)
+{
 	PSOutput output;
 
-	float3 eyeDir = normalize(cameraPos - input.worldPos.xyz);   // ’¸“_->‹“_ƒxƒNƒgƒ‹
+	float3 eyeDir = normalize(cameraPos - input.worldPos.xyz); // é ‚ç‚¹->è¦–ç‚¹ãƒ™ã‚¯ãƒˆãƒ«
 
-	const float shininess = 4.f;    // Œõ‘ò
+	const float shininess = 4.f; // å…‰æ²¢
 
 	float3 dir2Light = normalize(lightPos - input.worldPos.xyz);
 
 	float3 dir2LightDotNormal = dot(dir2Light, input.normal);
 
-	float3 reflect = normalize(-dir2Light + 2 * dir2LightDotNormal * input.normal); // ”½ËŒõ
+	float3 reflect = normalize(-dir2Light + 2 * dir2LightDotNormal * input.normal); // åå°„å…‰
 
 	float3 ambient = m_ambient;
 	float3 diffuse = dir2LightDotNormal * m_diffuse;
-	float3 specular = pow(saturate(dot(reflect, eyeDir)), shininess) * m_specular;  // ‹¾–Ê”½ËŒõ
+	float3 specular = pow(saturate(dot(reflect, eyeDir)), shininess) * m_specular; // é¡é¢åå°„å…‰
 
 	float4 shadeColor;
 	shadeColor.rgb = (ambient + diffuse + specular) * lightColor;
@@ -26,7 +27,7 @@ PSOutput main(VSOutput input) {
 
 	float4 texcolor = float4(tex.Sample(smp, input.uv));
 	output.target0 = shadeColor * texcolor;
-	// target1‚ğ”½“]F‚É‚·‚é
+	// target1ã‚’åè»¢è‰²ã«ã™ã‚‹
 	output.target1 = output.target0;
 
 	return output;

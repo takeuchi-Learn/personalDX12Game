@@ -1,8 +1,8 @@
 #include "PostEffect.hlsli"
 
-Texture2D<float4> tex0 : register(t0); // 0”ÔƒXƒƒbƒg‚Éİ’è‚³‚ê‚½ƒeƒNƒXƒ`ƒƒ
-Texture2D<float4> tex1 : register(t1); // 1”ÔƒXƒƒbƒg‚Éİ’è‚³‚ê‚½ƒeƒNƒXƒ`ƒƒ
-SamplerState smp : register(s0); // 0”ÔƒXƒƒbƒg‚Éİ’è‚³‚ê‚½ƒTƒ“ƒvƒ‰[
+Texture2D<float4> tex0 : register(t0); // 0ç•ªã‚¹ãƒ­ãƒƒãƒˆã«è¨­å®šã•ã‚ŒãŸãƒ†ã‚¯ã‚¹ãƒãƒ£
+Texture2D<float4> tex1 : register(t1); // 1ç•ªã‚¹ãƒ­ãƒƒãƒˆã«è¨­å®šã•ã‚ŒãŸãƒ†ã‚¯ã‚¹ãƒãƒ£
+SamplerState smp : register(s0); // 0ç•ªã‚¹ãƒ­ãƒƒãƒˆã«è¨­å®šã•ã‚ŒãŸã‚µãƒ³ãƒ—ãƒ©ãƒ¼
 
 float fracNoise(float2 coord)
 {
@@ -11,7 +11,7 @@ float fracNoise(float2 coord)
 
 float vignatte(float2 uv)
 {
-	// UV’l‚Ì’†S‚©‚ç‚Ì‹——£(‘å‚«‚³)
+	// UVå€¤ã®ä¸­å¿ƒã‹ã‚‰ã®è·é›¢(å¤§ãã•)
 	float len = distance(uv, 0.5f);
 
 	return -len * vignIntensity;
@@ -25,17 +25,17 @@ float noise(float2 uv, float time)
 
 float speedLine(float2 uv, float seed, float colourIntensity = 0.125f)
 {
-	// uvÀ•W‚ğ-1 ~ +1‚É•ÏŠ·
+	// uvåº§æ¨™ã‚’-1 ~ +1ã«å¤‰æ›
 	float2 pos = (uv - 0.5f) * 2.f;
 
-	// 0 ~ 1‚ÌŠp“x
+	// 0 ~ 1ã®è§’åº¦
 	float angle = ((atan2(pos.r, pos.g) / 3.141592653589793f) + 1.f) / 2.f;
 
-	// Šp“x‚Ì’l‚ğ’iŠK“I‚É‚·‚é
+	// è§’åº¦ã®å€¤ã‚’æ®µéšçš„ã«ã™ã‚‹
 	static float divNum = 1024;
 	float floorAngle = floor(angle * divNum) / divNum * seed;
 
-	// (’iŠK“I‚È)Šp“x‚ğQl‚ÉƒmƒCƒY‚ğ•Ô‚·
+	// (æ®µéšçš„ãª)è§’åº¦ã‚’å‚è€ƒã«ãƒã‚¤ã‚ºã‚’è¿”ã™
 	return saturate(fracNoise(float2(floorAngle, floorAngle))) * colourIntensity;
 }
 
@@ -45,21 +45,21 @@ float4 main(VSOutput input) : SV_TARGET
 	static float PI2 = 6.283185307179586f;
 	
 	// --------------------
-	// ƒ‚ƒUƒCƒN
+	// ãƒ¢ã‚¶ã‚¤ã‚¯
 	// --------------------
 	
-	// ‰æ–Ê‚ğ¶‰E‚»‚ê‚¼‚êmosaicNum•ªŠ„‚µ‚½‘å‚«‚³‚Ìƒ‚ƒUƒCƒN‚É‚È‚é
+	// ç”»é¢ã‚’å·¦å³ãã‚Œãã‚ŒmosaicNumåˆ†å‰²ã—ãŸå¤§ãã•ã®ãƒ¢ã‚¶ã‚¤ã‚¯ã«ãªã‚‹
 	float2 uv = floor(input.uv * mosaicNum) / mosaicNum;
-	// ŠÔ[s]
+	// æ™‚é–“[s]
 	float time = nowTime / oneSec;
 
 	// --------------------
-	// ƒrƒlƒbƒ^
+	// ãƒ“ãƒãƒƒã‚¿
 	// --------------------
 	float vignNum = vignatte(uv);
 
 	// --------------------
-	// ‘–¸ü‚Ì‚æ‚¤‚È‚à‚Ì
+	// èµ°æŸ»ç·šã®ã‚ˆã†ãªã‚‚ã®
 	// --------------------
 	static float slnSpeed = 8.f;
 	static float slnDivLevel = 96.f;
@@ -69,7 +69,7 @@ float4 main(VSOutput input) : SV_TARGET
 	sLineNum /= -slnPower;
 
 	// --------------------
-	// ‘–¸ü
+	// èµ°æŸ»ç·š
 	// --------------------
 	static float slSpeed = 1.f / 4.f;
 	static float slSize = 1.f / 64.f;
@@ -85,7 +85,7 @@ float4 main(VSOutput input) : SV_TARGET
 	uv = slUv;
 
 	// --------------------
-	// rgb‚¸‚ç‚µ
+	// rgbãšã‚‰ã—
 	// --------------------
 	float4 texColor0 = tex0.Sample(smp, uv);
 	texColor0.g = tex0.Sample(smp, uv + rgbShiftNum).g;
@@ -95,17 +95,17 @@ float4 main(VSOutput input) : SV_TARGET
 	float noiseNum = noise(input.uv, time);
 	
 	// --------------------
-	// W’†ü
+	// é›†ä¸­ç·š
 	// --------------------
 	
-	// ŠÔ‚Å“®‚¢‚Ä‚Ù‚µ‚¢‚Ì‚Åseed‚É‚ÍŠÔ‚ğ“ü‚ê‚é
+	// æ™‚é–“ã§å‹•ã„ã¦ã»ã—ã„ã®ã§seedã«ã¯æ™‚é–“ã‚’å…¥ã‚Œã‚‹
 	float speedLineNum = speedLine(input.uv, fmod(nowTime / oneSec, 1.f), speedLineIntensity);
-	// ’†S‚É‹ß‚¢‚Ù‚ÇF‚ğ”–‚­‚·‚é
+	// ä¸­å¿ƒã«è¿‘ã„ã»ã©è‰²ã‚’è–„ãã™ã‚‹
 	speedLineNum *= distance(float2(0.5f, 0.5f), input.uv);
 
 	
 	// --------------------
-	// ‡‚í‚¹‚é
+	// åˆã‚ã›ã‚‹
 	// --------------------
 	
 	float4 drawCol = float4(texColor0.rgb + sLineNum + vignNum + noiseNum + speedLineNum, alpha);

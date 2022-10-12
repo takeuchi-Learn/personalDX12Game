@@ -1,13 +1,13 @@
 #include "PostEffect.hlsli"
 
-Texture2D<float4> tex0 : register(t0);	// 0”ÔƒXƒƒbƒg‚Éİ’è‚³‚ê‚½ƒeƒNƒXƒ`ƒƒ
-Texture2D<float4> tex1 : register(t1);	// 1”ÔƒXƒƒbƒg‚Éİ’è‚³‚ê‚½ƒeƒNƒXƒ`ƒƒ
-SamplerState smp : register(s0);		// 0”ÔƒXƒƒbƒg‚Éİ’è‚³‚ê‚½ƒTƒ“ƒvƒ‰[
+Texture2D<float4> tex0 : register(t0); // 0ç•ªã‚¹ãƒ­ãƒƒãƒˆã«è¨­å®šã•ã‚ŒãŸãƒ†ã‚¯ã‚¹ãƒãƒ£
+Texture2D<float4> tex1 : register(t1); // 1ç•ªã‚¹ãƒ­ãƒƒãƒˆã«è¨­å®šã•ã‚ŒãŸãƒ†ã‚¯ã‚¹ãƒãƒ£
+SamplerState smp : register(s0); // 0ç•ªã‚¹ãƒ­ãƒƒãƒˆã«è¨­å®šã•ã‚ŒãŸã‚µãƒ³ãƒ—ãƒ©ãƒ¼
 
 float4 main(VSOutput input) : SV_TARGET
 {
 
-	// rgb‚¸‚ç‚µ
+	// rgbãšã‚‰ã—
 	float4 texColor0;
 	
 	texColor0.g = tex0.Sample(smp, input.uv + rgbShiftNum).g;
