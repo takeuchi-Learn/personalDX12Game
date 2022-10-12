@@ -630,17 +630,11 @@ void RailShoot::updateRailPos()
 	XMFLOAT2 rota = GameObj::calcRotationSyncVelDeg(vel);
 
 	// 異常な値は0にする
-	if (!isfinite(rota.x))
-	{
-		rota.x = 0.f;
-	}
-	if (!isfinite(rota.y))
-	{
-		rota.y = 0.f;
-	}
+	if (!isfinite(rota.x)) { rota.x = 0.f; }
+	if (!isfinite(rota.y)) { rota.y = 0.f; }
 
 	// 回転を反映
-	railObj->setRotation(XMFLOAT3(rota.x, rota.y, 0.f));
+	railObj->setRotation(XMFLOAT3(rota.x, rota.y, railObj->getRotation().z));
 }
 
 // --------------------
