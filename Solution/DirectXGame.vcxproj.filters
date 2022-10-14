@@ -105,243 +105,243 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="System.cpp">
+    <ClCompile Include="Engine\System\System.cpp">
       <Filter>System</Filter>
     </ClCompile>
-    <ClCompile Include="WinAPI.cpp">
+    <ClCompile Include="Engine\System\WinAPI.cpp">
       <Filter>System</Filter>
     </ClCompile>
-    <ClCompile Include="DX12Base.cpp">
+    <ClCompile Include="Engine\System\DX12Base.cpp">
       <Filter>System</Filter>
     </ClCompile>
-    <ClCompile Include="Collision.cpp">
+    <ClCompile Include="Engine\Collision\Collision.cpp">
       <Filter>Collision</Filter>
     </ClCompile>
-    <ClCompile Include="CollisionShape.cpp">
+    <ClCompile Include="Engine\Collision\CollisionShape.cpp">
       <Filter>Collision</Filter>
     </ClCompile>
-    <ClCompile Include="GameScene.cpp">
+    <ClCompile Include="Engine\System\GameScene.cpp">
       <Filter>System</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="Engine\System\main.cpp">
       <Filter>System</Filter>
     </ClCompile>
-    <ClCompile Include="Camera.cpp">
+    <ClCompile Include="Engine\Camera\Camera.cpp">
       <Filter>Camera</Filter>
     </ClCompile>
-    <ClCompile Include="EndScene.cpp">
+    <ClCompile Include="App\Scene\EndScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="PlayScene.cpp">
+    <ClCompile Include="App\Scene\PlayScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="TitleScene.cpp">
+    <ClCompile Include="App\Scene\TitleScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="RandomNum.cpp">
+    <ClCompile Include="Engine\Util\RandomNum.cpp">
       <Filter>RandomNum</Filter>
     </ClCompile>
-    <ClCompile Include="Sprite.cpp">
+    <ClCompile Include="Engine\2D\Sprite.cpp">
       <Filter>Object共通\Sprite</Filter>
     </ClCompile>
-    <ClCompile Include="SpriteBase.cpp">
+    <ClCompile Include="Engine\2D\SpriteBase.cpp">
       <Filter>Object共通\Sprite</Filter>
     </ClCompile>
-    <ClCompile Include="Light.cpp">
+    <ClCompile Include="Engine\3D\Light.cpp">
       <Filter>Light</Filter>
     </ClCompile>
-    <ClCompile Include="Looper.cpp">
+    <ClCompile Include="Engine\System\Looper.cpp">
       <Filter>System</Filter>
     </ClCompile>
-    <ClCompile Include="ParticleMgr.cpp">
+    <ClCompile Include="Engine\3D\ParticleMgr.cpp">
       <Filter>Object共通</Filter>
     </ClCompile>
-    <ClCompile Include="SceneManager.cpp">
+    <ClCompile Include="Engine\System\SceneManager.cpp">
       <Filter>System</Filter>
     </ClCompile>
-    <ClCompile Include="DebugText.cpp">
+    <ClCompile Include="Engine\2D\DebugText.cpp">
       <Filter>Object共通\Sprite</Filter>
     </ClCompile>
-    <ClCompile Include="Input.cpp">
+    <ClCompile Include="Engine\Input\Input.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="Sound.cpp">
+    <ClCompile Include="Engine\Sound\Sound.cpp">
       <Filter>Sound</Filter>
     </ClCompile>
-    <ClCompile Include="Time.cpp">
+    <ClCompile Include="Engine\Util\Timer.cpp">
       <Filter>Time</Filter>
     </ClCompile>
-    <ClCompile Include="PostEffect.cpp">
+    <ClCompile Include="Engine\System\PostEffect.cpp">
       <Filter>PostEffect</Filter>
     </ClCompile>
-    <ClCompile Include="Object3d.cpp">
+    <ClCompile Include="Engine\3D\Obj\Object3d.cpp">
       <Filter>Object共通\3Dオブジェクト\obj</Filter>
     </ClCompile>
-    <ClCompile Include="ObjModel.cpp">
+    <ClCompile Include="Engine\3D\Obj\ObjModel.cpp">
       <Filter>Object共通\3Dオブジェクト\obj</Filter>
     </ClCompile>
-    <ClCompile Include="Mesh.cpp">
+    <ClCompile Include="Engine\3D\Obj\Mesh.cpp">
       <Filter>Object共通\3Dオブジェクト\obj</Filter>
     </ClCompile>
-    <ClCompile Include="Material.cpp">
+    <ClCompile Include="Engine\3D\Obj\Material.cpp">
       <Filter>Object共通\3Dオブジェクト\obj</Filter>
     </ClCompile>
-    <ClCompile Include="FbxLoader.cpp">
+    <ClCompile Include="Engine\3D\Fbx\FbxLoader.cpp">
       <Filter>Object共通\3Dオブジェクト\fbx</Filter>
     </ClCompile>
-    <ClCompile Include="FbxModel.cpp">
+    <ClCompile Include="Engine\3D\Fbx\FbxModel.cpp">
       <Filter>Object共通\3Dオブジェクト\fbx</Filter>
     </ClCompile>
-    <ClCompile Include="FbxObj3d.cpp">
+    <ClCompile Include="Engine\3D\Fbx\FbxObj3d.cpp">
       <Filter>Object共通\3Dオブジェクト\fbx</Filter>
     </ClCompile>
-    <ClCompile Include="SoundBase.cpp">
+    <ClCompile Include="Engine\Sound\SoundBase.cpp">
       <Filter>Sound</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
+    <ClCompile Include="App\GameObject\Player.cpp">
       <Filter>GameObject\Player</Filter>
     </ClCompile>
-    <ClCompile Include="ObjSet.cpp">
+    <ClCompile Include="Engine\3D\Obj\ObjSet.cpp">
       <Filter>Object共通\3Dオブジェクト</Filter>
     </ClCompile>
-    <ClCompile Include="RailShoot.cpp">
+    <ClCompile Include="App\Scene\RailShoot.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="PlayerBullet.cpp">
+    <ClCompile Include="App\GameObject\PlayerBullet.cpp">
       <Filter>GameObject\PlayerBullet</Filter>
     </ClCompile>
-    <ClCompile Include="GameObj.cpp">
+    <ClCompile Include="App\GameObject\GameObj.cpp">
       <Filter>GameObject\GameObj</Filter>
     </ClCompile>
-    <ClCompile Include="Enemy.cpp">
+    <ClCompile Include="App\GameObject\Enemy.cpp">
       <Filter>GameObject\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="EnemyBullet.cpp">
+    <ClCompile Include="App\GameObject\EnemyBullet.cpp">
       <Filter>GameObject\EnemyBullet</Filter>
     </ClCompile>
-    <ClCompile Include="CameraObj.cpp">
+    <ClCompile Include="Engine\Camera\CameraObj.cpp">
       <Filter>Camera\CameraObj</Filter>
     </ClCompile>
-    <ClCompile Include="BossScene.cpp">
+    <ClCompile Include="App\Scene\BossScene.cpp">
       <Filter>Scene\BossScene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera.h">
+    <ClInclude Include="Engine\Camera\Camera.h">
       <Filter>Camera</Filter>
     </ClInclude>
-    <ClInclude Include="EndScene.h">
+    <ClInclude Include="App\Scene\EndScene.h">
       <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="PlayScene.h">
+    <ClInclude Include="App\Scene\PlayScene.h">
       <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="TitleScene.h">
+    <ClInclude Include="App\Scene\TitleScene.h">
       <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="RandomNum.h">
+    <ClInclude Include="Engine\Util\RandomNum.h">
       <Filter>RandomNum</Filter>
     </ClInclude>
-    <ClInclude Include="Sprite.h">
+    <ClInclude Include="Engine\2D\Sprite.h">
       <Filter>Object共通\Sprite</Filter>
     </ClInclude>
-    <ClInclude Include="SpriteBase.h">
+    <ClInclude Include="Engine\2D\SpriteBase.h">
       <Filter>Object共通\Sprite</Filter>
     </ClInclude>
-    <ClInclude Include="Collision.h">
+    <ClInclude Include="Engine\Collision\Collision.h">
       <Filter>Collision</Filter>
     </ClInclude>
-    <ClInclude Include="CollisionShape.h">
+    <ClInclude Include="Engine\Collision\CollisionShape.h">
       <Filter>Collision</Filter>
     </ClInclude>
-    <ClInclude Include="DX12Base.h">
+    <ClInclude Include="Engine\System\DX12Base.h">
       <Filter>System</Filter>
     </ClInclude>
-    <ClInclude Include="GameScene.h">
+    <ClInclude Include="Engine\System\GameScene.h">
       <Filter>System</Filter>
     </ClInclude>
-    <ClInclude Include="System.h">
+    <ClInclude Include="Engine\System\System.h">
       <Filter>System</Filter>
     </ClInclude>
-    <ClInclude Include="WinAPI.h">
+    <ClInclude Include="Engine\System\WinAPI.h">
       <Filter>System</Filter>
     </ClInclude>
-    <ClInclude Include="Light.h">
+    <ClInclude Include="Engine\3D\Light.h">
       <Filter>Light</Filter>
     </ClInclude>
-    <ClInclude Include="Looper.h">
+    <ClInclude Include="Engine\System\Looper.h">
       <Filter>System</Filter>
     </ClInclude>
-    <ClInclude Include="ParticleMgr.h">
+    <ClInclude Include="Engine\3D\ParticleMgr.h">
       <Filter>Object共通</Filter>
     </ClInclude>
-    <ClInclude Include="SceneManager.h">
+    <ClInclude Include="Engine\System\SceneManager.h">
       <Filter>System</Filter>
     </ClInclude>
-    <ClInclude Include="DebugText.h">
+    <ClInclude Include="Engine\2D\DebugText.h">
       <Filter>Object共通\Sprite</Filter>
     </ClInclude>
-    <ClInclude Include="Input.h">
+    <ClInclude Include="Engine\Input\Input.h">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="Sound.h">
+    <ClInclude Include="Engine\Sound\Sound.h">
       <Filter>Sound</Filter>
     </ClInclude>
-    <ClInclude Include="Time.h">
+    <ClInclude Include="Engine\Util\Timer.h">
       <Filter>Time</Filter>
     </ClInclude>
-    <ClInclude Include="PostEffect.h">
+    <ClInclude Include="Engine\System\PostEffect.h">
       <Filter>PostEffect</Filter>
     </ClInclude>
-    <ClInclude Include="Object3d.h">
+    <ClInclude Include="Engine\3D\Obj\Object3d.h">
       <Filter>Object共通\3Dオブジェクト\obj</Filter>
     </ClInclude>
-    <ClInclude Include="ObjModel.h">
+    <ClInclude Include="Engine\3D\Obj\ObjModel.h">
       <Filter>Object共通\3Dオブジェクト\obj</Filter>
     </ClInclude>
-    <ClInclude Include="Mesh.h">
+    <ClInclude Include="Engine\3D\Obj\Mesh.h">
       <Filter>Object共通\3Dオブジェクト\obj</Filter>
     </ClInclude>
-    <ClInclude Include="Material.h">
+    <ClInclude Include="Engine\3D\Obj\Material.h">
       <Filter>Object共通\3Dオブジェクト\obj</Filter>
     </ClInclude>
-    <ClInclude Include="FbxObj3d.h">
+    <ClInclude Include="Engine\3D\Fbx\FbxObj3d.h">
       <Filter>Object共通\3Dオブジェクト\fbx</Filter>
     </ClInclude>
-    <ClInclude Include="FbxLoader.h">
+    <ClInclude Include="Engine\3D\Fbx\FbxLoader.h">
       <Filter>Object共通\3Dオブジェクト\fbx</Filter>
     </ClInclude>
-    <ClInclude Include="FbxModel.h">
+    <ClInclude Include="Engine\3D\Fbx\FbxModel.h">
       <Filter>Object共通\3Dオブジェクト\fbx</Filter>
     </ClInclude>
-    <ClInclude Include="SoundBase.h">
+    <ClInclude Include="Engine\Sound\SoundBase.h">
       <Filter>Sound</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h">
+    <ClInclude Include="App\GameObject\Player.h">
       <Filter>GameObject\Player</Filter>
     </ClInclude>
-    <ClInclude Include="ObjSet.h">
+    <ClInclude Include="Engine\3D\Obj\ObjSet.h">
       <Filter>Object共通\3Dオブジェクト</Filter>
     </ClInclude>
-    <ClInclude Include="RailShoot.h">
+    <ClInclude Include="App\Scene\RailShoot.h">
       <Filter>Scene</Filter>
     </ClInclude>
-    <ClInclude Include="PlayerBullet.h">
+    <ClInclude Include="App\GameObject\PlayerBullet.h">
       <Filter>GameObject\PlayerBullet</Filter>
     </ClInclude>
-    <ClInclude Include="GameObj.h">
+    <ClInclude Include="App\GameObject\GameObj.h">
       <Filter>GameObject\GameObj</Filter>
     </ClInclude>
-    <ClInclude Include="Enemy.h">
+    <ClInclude Include="App\GameObject\Enemy.h">
       <Filter>GameObject\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="EnemyBullet.h">
+    <ClInclude Include="App\GameObject\EnemyBullet.h">
       <Filter>GameObject\EnemyBullet</Filter>
     </ClInclude>
-    <ClInclude Include="CameraObj.h">
+    <ClInclude Include="Engine\Camera\CameraObj.h">
       <Filter>Camera\CameraObj</Filter>
     </ClInclude>
-    <ClInclude Include="BossScene.h">
+    <ClInclude Include="App\Scene\BossScene.h">
       <Filter>Scene\BossScene</Filter>
     </ClInclude>
   </ItemGroup>

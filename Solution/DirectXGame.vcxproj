@@ -80,11 +80,15 @@
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(ProjectDir)lib\fbx_sdk\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)lib\fbx_sdk\lib;$(LibraryPath)</LibraryPath>
+    <PublicIncludeDirectories>
+    </PublicIncludeDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(ProjectDir)lib\fbx_sdk\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)lib\fbx_sdk\lib;$(LibraryPath)</LibraryPath>
+    <PublicIncludeDirectories>
+    </PublicIncludeDirectories>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -164,46 +168,46 @@
     </FxCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="BossScene.cpp" />
-    <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="CameraObj.cpp" />
-    <ClCompile Include="Collision.cpp" />
-    <ClCompile Include="CollisionShape.cpp" />
-    <ClCompile Include="DebugText.cpp" />
-    <ClCompile Include="DX12Base.cpp" />
-    <ClCompile Include="EndScene.cpp" />
-    <ClCompile Include="Enemy.cpp" />
-    <ClCompile Include="EnemyBullet.cpp" />
-    <ClCompile Include="GameObj.cpp" />
-    <ClCompile Include="FbxLoader.cpp" />
-    <ClCompile Include="FbxModel.cpp" />
-    <ClCompile Include="FbxObj3d.cpp" />
-    <ClCompile Include="GameScene.cpp" />
-    <ClCompile Include="Input.cpp" />
-    <ClCompile Include="Light.cpp" />
-    <ClCompile Include="Looper.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="Material.cpp" />
-    <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="ObjModel.cpp" />
-    <ClCompile Include="ObjSet.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="PlayerBullet.cpp" />
-    <ClCompile Include="RailShoot.cpp" />
-    <ClCompile Include="SoundBase.cpp" />
-    <ClCompile Include="SpriteBase.cpp" />
-    <ClCompile Include="Object3d.cpp" />
-    <ClCompile Include="ParticleMgr.cpp" />
-    <ClCompile Include="PlayScene.cpp" />
-    <ClCompile Include="PostEffect.cpp" />
-    <ClCompile Include="RandomNum.cpp" />
-    <ClCompile Include="SceneManager.cpp" />
-    <ClCompile Include="Sound.cpp" />
-    <ClCompile Include="Sprite.cpp" />
-    <ClCompile Include="System.cpp" />
-    <ClCompile Include="Time.cpp" />
-    <ClCompile Include="TitleScene.cpp" />
-    <ClCompile Include="WinAPI.cpp" />
+    <ClCompile Include="App\Scene\BossScene.cpp" />
+    <ClCompile Include="Engine\Camera\Camera.cpp" />
+    <ClCompile Include="Engine\Camera\CameraObj.cpp" />
+    <ClCompile Include="Engine\Collision\Collision.cpp" />
+    <ClCompile Include="Engine\Collision\CollisionShape.cpp" />
+    <ClCompile Include="Engine\2D\DebugText.cpp" />
+    <ClCompile Include="Engine\System\DX12Base.cpp" />
+    <ClCompile Include="App\Scene\EndScene.cpp" />
+    <ClCompile Include="App\GameObject\Enemy.cpp" />
+    <ClCompile Include="App\GameObject\EnemyBullet.cpp" />
+    <ClCompile Include="App\GameObject\GameObj.cpp" />
+    <ClCompile Include="Engine\3D\Fbx\FbxLoader.cpp" />
+    <ClCompile Include="Engine\3D\Fbx\FbxModel.cpp" />
+    <ClCompile Include="Engine\3D\Fbx\FbxObj3d.cpp" />
+    <ClCompile Include="Engine\System\GameScene.cpp" />
+    <ClCompile Include="Engine\Input\Input.cpp" />
+    <ClCompile Include="Engine\3D\Light.cpp" />
+    <ClCompile Include="Engine\System\Looper.cpp" />
+    <ClCompile Include="Engine\System\main.cpp" />
+    <ClCompile Include="Engine\3D\Obj\Material.cpp" />
+    <ClCompile Include="Engine\3D\Obj\Mesh.cpp" />
+    <ClCompile Include="Engine\3D\Obj\ObjModel.cpp" />
+    <ClCompile Include="Engine\3D\Obj\ObjSet.cpp" />
+    <ClCompile Include="App\GameObject\Player.cpp" />
+    <ClCompile Include="App\GameObject\PlayerBullet.cpp" />
+    <ClCompile Include="App\Scene\RailShoot.cpp" />
+    <ClCompile Include="Engine\Sound\SoundBase.cpp" />
+    <ClCompile Include="Engine\2D\SpriteBase.cpp" />
+    <ClCompile Include="Engine\3D\Obj\Object3d.cpp" />
+    <ClCompile Include="Engine\3D\ParticleMgr.cpp" />
+    <ClCompile Include="App\Scene\PlayScene.cpp" />
+    <ClCompile Include="Engine\System\PostEffect.cpp" />
+    <ClCompile Include="Engine\Util\RandomNum.cpp" />
+    <ClCompile Include="Engine\System\SceneManager.cpp" />
+    <ClCompile Include="Engine\Sound\Sound.cpp" />
+    <ClCompile Include="Engine\2D\Sprite.cpp" />
+    <ClCompile Include="Engine\System\System.cpp" />
+    <ClCompile Include="Engine\Util\Timer.cpp" />
+    <ClCompile Include="App\Scene\TitleScene.cpp" />
+    <ClCompile Include="Engine\System\WinAPI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="DirectXTex\DirectXTex_Desktop_2022_Win10.vcxproj">
@@ -214,45 +218,45 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="BossScene.h" />
-    <ClInclude Include="Camera.h" />
-    <ClInclude Include="CameraObj.h" />
-    <ClInclude Include="Collision.h" />
-    <ClInclude Include="CollisionShape.h" />
-    <ClInclude Include="DebugText.h" />
-    <ClInclude Include="DX12Base.h" />
-    <ClInclude Include="EndScene.h" />
-    <ClInclude Include="Enemy.h" />
-    <ClInclude Include="EnemyBullet.h" />
-    <ClInclude Include="GameObj.h" />
-    <ClInclude Include="FbxLoader.h" />
-    <ClInclude Include="FbxModel.h" />
-    <ClInclude Include="FbxObj3d.h" />
-    <ClInclude Include="GameScene.h" />
-    <ClInclude Include="Input.h" />
-    <ClInclude Include="Light.h" />
-    <ClInclude Include="Looper.h" />
-    <ClInclude Include="Material.h" />
-    <ClInclude Include="Mesh.h" />
-    <ClInclude Include="ObjModel.h" />
-    <ClInclude Include="ObjSet.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="PlayerBullet.h" />
-    <ClInclude Include="RailShoot.h" />
-    <ClInclude Include="SoundBase.h" />
-    <ClInclude Include="SpriteBase.h" />
-    <ClInclude Include="Object3d.h" />
-    <ClInclude Include="ParticleMgr.h" />
-    <ClInclude Include="PlayScene.h" />
-    <ClInclude Include="PostEffect.h" />
-    <ClInclude Include="RandomNum.h" />
-    <ClInclude Include="SceneManager.h" />
-    <ClInclude Include="Sound.h" />
-    <ClInclude Include="Sprite.h" />
-    <ClInclude Include="System.h" />
-    <ClInclude Include="Time.h" />
-    <ClInclude Include="TitleScene.h" />
-    <ClInclude Include="WinAPI.h" />
+    <ClInclude Include="App\Scene\BossScene.h" />
+    <ClInclude Include="Engine\Camera\Camera.h" />
+    <ClInclude Include="Engine\Camera\CameraObj.h" />
+    <ClInclude Include="Engine\Collision\Collision.h" />
+    <ClInclude Include="Engine\Collision\CollisionShape.h" />
+    <ClInclude Include="Engine\2D\DebugText.h" />
+    <ClInclude Include="Engine\System\DX12Base.h" />
+    <ClInclude Include="App\Scene\EndScene.h" />
+    <ClInclude Include="App\GameObject\Enemy.h" />
+    <ClInclude Include="App\GameObject\EnemyBullet.h" />
+    <ClInclude Include="App\GameObject\GameObj.h" />
+    <ClInclude Include="Engine\3D\Fbx\FbxLoader.h" />
+    <ClInclude Include="Engine\3D\Fbx\FbxModel.h" />
+    <ClInclude Include="Engine\3D\Fbx\FbxObj3d.h" />
+    <ClInclude Include="Engine\System\GameScene.h" />
+    <ClInclude Include="Engine\Input\Input.h" />
+    <ClInclude Include="Engine\3D\Light.h" />
+    <ClInclude Include="Engine\System\Looper.h" />
+    <ClInclude Include="Engine\3D\Obj\Material.h" />
+    <ClInclude Include="Engine\3D\Obj\Mesh.h" />
+    <ClInclude Include="Engine\3D\Obj\ObjModel.h" />
+    <ClInclude Include="Engine\3D\Obj\ObjSet.h" />
+    <ClInclude Include="App\GameObject\Player.h" />
+    <ClInclude Include="App\GameObject\PlayerBullet.h" />
+    <ClInclude Include="App\Scene\RailShoot.h" />
+    <ClInclude Include="Engine\Sound\SoundBase.h" />
+    <ClInclude Include="Engine\2D\SpriteBase.h" />
+    <ClInclude Include="Engine\3D\Obj\Object3d.h" />
+    <ClInclude Include="Engine\3D\ParticleMgr.h" />
+    <ClInclude Include="App\Scene\PlayScene.h" />
+    <ClInclude Include="Engine\System\PostEffect.h" />
+    <ClInclude Include="Engine\Util\RandomNum.h" />
+    <ClInclude Include="Engine\System\SceneManager.h" />
+    <ClInclude Include="Engine\Sound\Sound.h" />
+    <ClInclude Include="Engine\2D\Sprite.h" />
+    <ClInclude Include="Engine\System\System.h" />
+    <ClInclude Include="Engine\Util\Timer.h" />
+    <ClInclude Include="App\Scene\TitleScene.h" />
+    <ClInclude Include="Engine\System\WinAPI.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\BackPS.hlsl">
