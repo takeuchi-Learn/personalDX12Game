@@ -5,37 +5,85 @@
 #include <d3dcompiler.h>
 #pragma comment(lib, "d3dcompiler.lib")
 
-#include "DX12Base.h"
+#include "../System/DX12Base.h"
 
 #include <d3dx12.h>
 
 #include <DirectXTex.h>
+
+#include <fstream>
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
 UINT SpriteBase::nowTexNum = 0u;
 
+namespace
+{
+	void deleteU8Bom(std::string& strWithU8Bom)
+	{
+		if (strWithU8Bom.size() >= 3u)
+		{
+			constexpr char u8Bom[] = { 0xEF, 0xBB, 0xBF };
+			constexpr size_t u8BomLen = _countof(u8Bom);
+
+			if (strWithU8Bom[0] == u8Bom[0] &&
+				strWithU8Bom[1] == u8Bom[1] &&
+				strWithU8Bom[2] == u8Bom[2])
+			{
+				strWithU8Bom.erase(0, u8BomLen);
+			}
+		}
+	}
+}
+
 // スプライト用パイプライン生成
 SpriteBase::PipelineSet SpriteBase::SpriteCreateGraphicsPipeline(ID3D12Device* dev,
 																 const wchar_t* vsPath, const wchar_t* psPath,
 																 BLEND_MODE blendMode)
 {
-	HRESULT result;
+	std::string hlslData{};
+	{
+		std::ifstream ifs(vsPath);
+		assert(ifs);
+
+		std::string line{};
+		// 開いたファイルを一行読み込む(カーソルも動く)
+		while (std::getline(ifs, line))
+		{
+			hlslData += line + "\n";
+		}
+		const size_t hlslDataLen = hlslData.size();
+
+		// UTF8のボム削除
+		deleteU8Bom(hlslData);
+	}
 
 	ComPtr<ID3DBlob> vsBlob = nullptr; // 頂点シェーダオブジェクト
 	ComPtr<ID3DBlob> psBlob = nullptr; // ピクセルシェーダオブジェクト
 	ComPtr<ID3DBlob> errorBlob = nullptr; // エラーオブジェクト
 
 	// 頂点シェーダの読み込みとコンパイル
-	result = D3DCompileFromFile(
-		vsPath,  // シェーダファイル名
-		nullptr,
-		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
-		"main", "vs_5_0", // エントリーポイント名、シェーダーモデル指定
-		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
-		0,
-		&vsBlob, &errorBlob);
+	//HRESULT result = D3DCompileFromFile(
+	//	vsPath,  // シェーダファイル名
+	//	nullptr,
+	//	D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
+	//	"main", "vs_5_0", // エントリーポイント名、シェーダーモデル指定
+	//	D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
+	//	0,
+	//	&vsBlob, &errorBlob);
+
+	HRESULT result = D3DCompile(hlslData.c_str(),
+								hlslData.size(),
+								"Resources/Shaders/",
+								nullptr,
+								D3D_COMPILE_STANDARD_FILE_INCLUDE,
+								"main",
+								"vs_5_0",
+								0,
+								0,
+								&vsBlob,
+								&errorBlob);
 
 	if (FAILED(result))
 	{
