@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "GameScene.h"
+#include "../Engine/System/GameScene.h"
 
 #include <memory>
 #include <DirectXMath.h>

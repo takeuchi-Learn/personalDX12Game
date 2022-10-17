@@ -199,6 +199,8 @@ RailShoot::RailShoot()
 	// スプライン
 	// --------------------
 
+	// レールの情報読み込み
+	/// todo 関数化
 	{
 		// 制御点の情報はCSVから読み込む
 		csvData = loadCsv("Resources/splinePos.csv", true, ',', "//");
@@ -230,6 +232,7 @@ RailShoot::RailShoot()
 	enemy.resize(0U);
 
 	// 敵発生スクリプト
+	// todo 関数化
 	csvData = loadCsv("Resources/enemyScript.csv", true, ',', "//");
 	{
 		UINT waitFrame = 0u;
