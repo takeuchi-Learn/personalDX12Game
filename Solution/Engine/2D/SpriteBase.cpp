@@ -5,11 +5,10 @@
 #include <d3dcompiler.h>
 #pragma comment(lib, "d3dcompiler.lib")
 
-#include "DX12Base.h"
-
 #include <d3dx12.h>
 
 #include <DirectXTex.h>
+#include "../System/DX12Base.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
