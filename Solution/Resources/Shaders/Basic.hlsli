@@ -30,7 +30,6 @@ struct VSOutput
 	float4 worldPos : POSITION;
 	float3 normal : NORMAL;
 	float2 uv : TEXCOORD; // uv値
-	float2 texTilling : TILLING;
 };
 
 // レンダーターゲットの数は2つ
