@@ -109,6 +109,10 @@ float4 main(VSOutput input) : SV_TARGET
 	// --------------------
 	
 	float4 drawCol = float4(texColor0.rgb + sLineNum + vignNum + noiseNum + speedLineNum, alpha);
+	
+	// 色数を減らす
+	static float colourNum = 8.f;
+	drawCol.rgb = floor(drawCol.rgb * colourNum) / colourNum;
 
 	return drawCol;
 }
