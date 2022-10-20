@@ -224,32 +224,34 @@ RailShoot::RailShoot()
 		splinePoint.emplace_back(splinePoint.back());
 	}
 	{
-		const size_t splinePointNum = splinePoint.size();
-
-		laneWall.resize(splinePointNum);
-
+		// モデルを読み込む
 		constexpr UINT wallModelTexNum = 0u;
 		wallModel.reset(new ObjModel("Resources/sphere", "sphere", wallModelTexNum));
+
+		// 制御点の数だけオブジェクトを置く
+		const size_t splinePointNum = splinePoint.size();
+		laneWall.resize(splinePointNum);
 
 		XMFLOAT3 dest{};
 		for (UINT y = 0u; y < splinePointNum; ++y)
 		{
-			laneWall[y].resize(2u);
+			laneWall[y].first.reset(new Object3d(camera.get(), wallModel.get(), wallModelTexNum));
+			laneWall[y].second.reset(new Object3d(camera.get(), wallModel.get(), wallModelTexNum));
+
+			// レーンの位置にする
 			XMStoreFloat3(&dest, splinePoint[y]);
+			laneWall[y].first->position = dest;
+			laneWall[y].second->position = laneWall[y].first->position;
 
-			for (UINT x = 0u; x < 2u; ++x)
-			{
-				laneWall[y][x].reset(new Object3d(camera.get(), wallModel.get(), wallModelTexNum));
+			// レーンの左右に配置する
+			constexpr float laneR = 128.f;
+			laneWall[y].first->position.x += laneR;
+			laneWall[y].second->position.x -= laneWall[y].first->position.x;
 
-				laneWall[y][x]->position = dest;
-
-				constexpr float scale = 16.f;
-				laneWall[y][x]->scale = XMFLOAT3(scale, scale, scale);
-			}
-
-			constexpr float laneR = 100.f;
-			laneWall[y][0]->position.x += laneR;
-			laneWall[y][1]->position.x -= laneR;
+			// オブジェクトの大きさを変更
+			constexpr float scale = 16.f;
+			laneWall[y].first->scale = XMFLOAT3(scale, scale, scale);
+			laneWall[y].second->scale = laneWall[y].first->scale;
 		}
 	}
 
@@ -783,10 +785,8 @@ void RailShoot::drawObj3d()
 
 	for (auto& y : laneWall)
 	{
-		for (auto& x : y)
-		{
-			x->drawWithUpdate(DX12Base::ins(), light.get());
-		}
+		y.first->drawWithUpdate(DX12Base::ins(), light.get());
+		y.second->drawWithUpdate(DX12Base::ins(), light.get());
 	}
 
 	particleMgr->drawWithUpdate();
