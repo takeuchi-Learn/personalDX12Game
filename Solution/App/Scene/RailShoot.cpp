@@ -4,10 +4,10 @@
 #include "BossScene.h"
 
 #include <fstream>
-#include "../../Engine/Util/RandomNum.h"
-#include "../../Engine/System/PostEffect.h"
-#include "../../Engine/Collision/Collision.h"
-#include "../../Engine/System/SceneManager.h"
+#include "../Engine/Util/RandomNum.h"
+#include "../Engine/System/PostEffect.h"
+#include "../Engine/Collision/Collision.h"
+#include "../Engine/System/SceneManager.h"
 
 using namespace DirectX;
 
@@ -222,6 +222,35 @@ RailShoot::RailShoot()
 
 		// endも2つ必要
 		splinePoint.emplace_back(splinePoint.back());
+	}
+	{
+		const size_t splinePointNum = splinePoint.size();
+
+		laneWall.resize(splinePointNum);
+
+		constexpr UINT wallModelTexNum = 0u;
+		wallModel.reset(new ObjModel("Resources/sphere", "sphere", wallModelTexNum));
+
+		XMFLOAT3 dest{};
+		for (UINT y = 0u; y < splinePointNum; ++y)
+		{
+			laneWall[y].resize(2u);
+			XMStoreFloat3(&dest, splinePoint[y]);
+
+			for (UINT x = 0u; x < 2u; ++x)
+			{
+				laneWall[y][x].reset(new Object3d(camera.get(), wallModel.get(), wallModelTexNum));
+
+				laneWall[y][x]->position = dest;
+
+				constexpr float scale = 16.f;
+				laneWall[y][x]->scale = XMFLOAT3(scale, scale, scale);
+			}
+
+			constexpr float laneR = 100.f;
+			laneWall[y][0]->position.x += laneR;
+			laneWall[y][1]->position.x -= laneR;
+		}
 	}
 
 	// --------------------
@@ -750,6 +779,14 @@ void RailShoot::drawObj3d()
 	for (auto& i : enemy)
 	{
 		i->drawWithUpdate(light.get());
+	}
+
+	for (auto& y : laneWall)
+	{
+		for (auto& x : y)
+		{
+			x->drawWithUpdate(DX12Base::ins(), light.get());
+		}
 	}
 
 	particleMgr->drawWithUpdate();

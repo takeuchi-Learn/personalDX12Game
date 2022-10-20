@@ -243,7 +243,7 @@ void Camera::update()
 	postUpdate();
 }
 
-XMFLOAT3 Camera::getLook() const
+XMFLOAT3 Camera::calcLook() const
 {
 	// 視線ベクトル
 	XMFLOAT3 look = target - eye;
@@ -258,7 +258,7 @@ XMFLOAT3 Camera::getLook() const
 void Camera::rotation(const float targetlength, const float angleX, const float angleY)
 {
 	// 視線ベクトル
-	const XMFLOAT3& look = getLook();
+	const XMFLOAT3& look = calcLook();
 
 	constexpr float lookLen = 50.f;
 	XMFLOAT3 newTarget = eye;
@@ -271,14 +271,14 @@ void Camera::rotation(const float targetlength, const float angleX, const float 
 
 void Camera::moveForward(const float speed)
 {
-	const XMFLOAT3 moveVal = getLook() * speed;
+	const XMFLOAT3 moveVal = calcLook() * speed;
 
 	moveCamera(moveVal);
 }
 
 void Camera::moveRight(const float speed)
 {
-	const XMFLOAT3 moveVal = getLook() * speed;
+	const XMFLOAT3 moveVal = calcLook() * speed;
 
 	const XMFLOAT3 val{ moveVal.z, /*moveVal.y*/0, -moveVal.x };
 

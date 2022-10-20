@@ -79,25 +79,25 @@ public:
 	inline const XMMATRIX& getViewProjectionMatrix() const { return matViewProjection; }
 
 	// ビルボード行列の取得
-	inline const XMMATRIX& getBillboardMatrix() { return matBillboard; }
+	inline const XMMATRIX& getBillboardMatrix() const { return matBillboard; }
 
 	// Y軸固定ビルボード行列の取得
-	inline const XMMATRIX& getBillboardMatrixY() { return matBillboardY; }
+	inline const XMMATRIX& getBillboardMatrixY() const { return matBillboardY; }
 
 	// 視点座標の取得
-	inline const XMFLOAT3& getEye() { return eye; }
+	inline const XMFLOAT3& getEye() const { return eye; }
 
 	// 視点座標の設定
 	inline void setEye(const XMFLOAT3& eye) { this->eye = eye; viewDirty = true; }
 
 	// 注視点座標の取得
-	inline const XMFLOAT3& getTarget() { return target; }
+	inline const XMFLOAT3& getTarget() const { return target; }
 
 	// 注視点座標の設定
 	inline void setTarget(const XMFLOAT3& target) { this->target = target; viewDirty = true; }
 
 	// 上方向ベクトルの取得
-	inline const XMFLOAT3& getUp() { return up; }
+	inline const XMFLOAT3& getUp() const { return up; }
 	// 上方向ベクトルの設定
 	inline void setUp(const XMFLOAT3& up) { this->up = up; viewDirty = true; }
 
@@ -109,9 +109,9 @@ public:
 	inline float getNearZ() const { return nearZ; }
 	inline float getFarZ() const { return farZ; }
 
-	inline float getFogAngleYRad() { return fogAngleYRad; }
+	inline float getFogAngleYRad() const { return fogAngleYRad; }
 
-	XMFLOAT3 getLook() const;
+	XMFLOAT3 calcLook() const;
 
 	/// @brief カメラを回転
 	/// @param targetlength カメラから注視点までの距離

@@ -314,7 +314,7 @@ void PlayScene::updatePlayer()
 			// 自機から出るようにする
 			playerBul.first->setPos(player->getPos());
 
-			playerBulVel = camera->getLook();
+			playerBulVel = camera->calcLook();
 
 			playerBulStartTime.reset(new Timer::timeType());
 			*playerBulStartTime = timer->getNowTime();

@@ -52,6 +52,8 @@ public:
 	inline const DirectX::XMMATRIX& getMatScale() const { return obj->getMatScale(); }
 	inline const DirectX::XMMATRIX& getMatTrans() const { return obj->getMatTrans(); }
 
+	DirectX::XMFLOAT3 calcWorldPos() const;
+
 	GameObj(Camera* camera,
 			ObjModel* model,
 			const DirectX::XMFLOAT3& pos = { 0,0,0 });

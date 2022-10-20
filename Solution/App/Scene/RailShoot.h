@@ -87,6 +87,9 @@ class RailShoot
 	static const UINT splineIndexDef = 1u;
 	UINT splineIndex = splineIndexDef;
 
+	std::unique_ptr<ObjModel> wallModel;
+	std::vector<std::vector<std::unique_ptr<Object3d>>> laneWall;
+
 	// --------------------
 	// 敵発生関連
 	// --------------------
