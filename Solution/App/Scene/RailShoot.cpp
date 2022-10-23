@@ -2,6 +2,7 @@
 #include <DirectXMath.h>
 
 #include "BossScene.h"
+#include "EndScene.h"
 
 #include <fstream>
 #include "../Engine/Util/RandomNum.h"
@@ -110,14 +111,14 @@ RailShoot::RailShoot()
 	// --------------------
 	// 敵モデル
 	// --------------------
-	enemyModel(std::make_unique<ObjModel>("Resources/enemy", "enemy", 0U, true)),
-	enemyBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
+	enemyModel(std::make_unique<ObjModel>("Resources/tori", "tori", 0U, true)),
+	enemyBulModel(std::make_unique<ObjModel>("Resources/bullet", "bullet", 0U, true)),
 
 	// --------------------
 	// 自機関連
 	// --------------------
-	playerModel(std::make_unique<ObjModel>("Resources/player", "player")),
-	playerBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
+	playerModel(std::make_unique<ObjModel>("Resources/tori", "tori")),
+	playerBulModel(std::make_unique<ObjModel>("Resources/bullet", "bullet", 0U, true)),
 	playerHpMax(20u),
 	playerHp(playerHpMax),
 
@@ -187,7 +188,7 @@ RailShoot::RailShoot()
 	// 自機初期化
 	// --------------------
 	player = std::make_unique<Player>(camera.get(), playerModel.get());
-	player->setScale(10.f);
+	player->setScale(16.f);
 	player->setParent(railObj.get());
 	player->setPos(XMFLOAT3(0, 12.f, 0));
 
@@ -608,7 +609,7 @@ void RailShoot::update_end()
 	// 時間が来たら次のシーンへ進む
 	if (nowTime >= sceneChangeTime)
 	{
-		SceneManager::getInstange()->changeScene(new BossScene());
+		SceneManager::getInstange()->changeScene(new EndScene());
 	}
 
 	// --------------------

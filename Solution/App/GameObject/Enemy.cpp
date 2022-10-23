@@ -11,7 +11,7 @@ Enemy::Enemy(Camera* camera,
 	camera(camera),
 	phase(std::bind(&Enemy::phase_Approach, this))
 {
-	obj->rotation.x += 180.f;
+	obj->rotation.y += 180.f;
 }
 
 void Enemy::shot(const DirectX::XMFLOAT3& targetPos,
@@ -25,11 +25,9 @@ void Enemy::shot(const DirectX::XMFLOAT3& targetPos,
 	// 親を設定
 	i->setParent(obj->parent);
 
-	// わかりやすいように細長くする
-	constexpr float bulScaleZ = 3.f;
 	i->setScaleF3(XMFLOAT3(bulScale,
 						   bulScale,
-						   bulScale * bulScaleZ));
+						   bulScale));
 
 	// 速度を算出
 	const XMFLOAT3 velF3 = calcVel(targetPos, obj->position, vel);
