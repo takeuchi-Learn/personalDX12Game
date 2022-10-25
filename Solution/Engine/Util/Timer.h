@@ -1,17 +1,27 @@
-﻿#pragma once
+﻿/**
+ * @file Timer.h
+ * @brief 時間取得クラス
+ */
+
+#pragma once
 
 #include <chrono>
 
+/// @brief 時間取得クラス
 class Timer
 {
 private:
 	std::chrono::steady_clock::time_point  startTimeDir{};
 
 public:
+	/// @brief 時間の単位
 	using timeUnit = std::chrono::microseconds;
+	/// @brief 時間を格納する型
 	using timeType = long long;
 
+	/// @brief 一秒
 	static constexpr timeType oneSec = std::chrono::duration_cast<timeUnit>(std::chrono::seconds(1)).count();
+	/// @brief 一秒float型
 	static constexpr float oneSecF = static_cast<float>(oneSec);
 
 	~Timer();

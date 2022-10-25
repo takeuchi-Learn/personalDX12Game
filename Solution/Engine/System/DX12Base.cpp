@@ -946,9 +946,13 @@ bool DX12Base::InitImgui()
 	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = NULL;	// iniファイルを生成しない
 	io.Fonts->AddFontFromFileTTF("Resources\\fonts\\ume-pgc4.ttf",
-								 12.f,
+								 18.f,
 								 nullptr,
 								 glyphRangesJapanese);
+	bigImFont = io.Fonts->AddFontFromFileTTF("Resources\\fonts\\ume-pgc4.ttf",
+											 36.f,
+											 nullptr,
+											 glyphRangesJapanese);
 
 	// 四角くする
 	ImGuiStyle& st = ImGui::GetStyle();

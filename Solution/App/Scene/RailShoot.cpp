@@ -795,33 +795,21 @@ void RailShoot::drawObj3d()
 
 void RailShoot::drawFrontSprite()
 {
-	constexpr ImGuiWindowFlags winFlags =
-		// リサイズ不可
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoResize |
-		// タイトルバー無し
-		//ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar |
-		// 設定を.iniに出力しない
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoSavedSettings |
-		// 移動不可
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove;
-	//// スクロールバーを常に表示
-	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysHorizontalScrollbar |
-	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar;
-
-// 最初のウインドウの位置を指定
+	// 最初のウインドウの位置を指定
 	constexpr XMFLOAT2 fstWinPos = XMFLOAT2((float)WinAPI::window_width * 0.02f,
 											(float)WinAPI::window_height * 0.02f);
 	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x,
 								   fstWinPos.y));
 
-	ImGui::Begin("レールシューティング", nullptr, winFlags);
+	ImGui::Begin("レールシューティング", nullptr, DX12Base::imGuiWinFlagsDef);
 	ImGui::Text("スクリプトで指定したとおりに敵が出る");
 	ImGui::Text("敵は一定間隔で弾を発射する");
 	ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x,
 								   ImGui::GetWindowPos().y + ImGui::GetWindowSize().y));
+	ImGui::SetNextWindowSize(ImVec2(ImGui::GetWindowWidth(), 150));
 	ImGui::End();
 
-	ImGui::Begin("情報", nullptr, winFlags);
+	ImGui::Begin("情報", nullptr, DX12Base::imGuiWinFlagsDef);
 	ImGui::Text("FPS : %.3f", dxBase->getFPS());
 	ImGui::Text("敵数 : %u", std::distance(enemy.begin(), enemy.end()));
 	ImGui::Text("経過フレーム : %u", nowFrame);

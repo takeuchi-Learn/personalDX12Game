@@ -1,4 +1,9 @@
-﻿#include "Timer.h"
+﻿/**
+ * @file Timer.cpp
+ * @brief 時間取得クラス
+ */
+
+#include "Timer.h"
 
 using namespace std::chrono;
 

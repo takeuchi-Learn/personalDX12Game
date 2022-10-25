@@ -40,7 +40,18 @@ class DX12Base
 
 	WinAPI* winapi = nullptr;
 
+	ImFont* bigImFont = nullptr;
+
 #pragma endregion
+
+public:
+	static const ImGuiWindowFlags imGuiWinFlagsDef =
+		// リサイズ不可
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoResize |
+		// 設定を.iniに出力しない
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoSavedSettings |
+		// 移動不可
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove;
 
 #pragma region FPS
 private:
@@ -109,4 +120,6 @@ public:
 
 	inline ID3D12Device* getDev() { return dev.Get(); };
 	inline ID3D12GraphicsCommandList* getCmdList() { return cmdList.Get(); };
+
+	inline ImFont* getBigImFont() const { return bigImFont; }
 };
