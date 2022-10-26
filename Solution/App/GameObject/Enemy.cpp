@@ -6,12 +6,12 @@ Enemy::Enemy(Camera* camera,
 			 ObjModel* model,
 			 ObjModel* bulModel,
 			 const DirectX::XMFLOAT3& pos)
-	: GameObj(camera, model, pos),
+	: BaseEnemy(camera, model, pos),
 	bulModel(bulModel),
-	camera(camera),
-	phase(std::bind(&Enemy::phase_Approach, this))
+	camera(camera)
 {
 	obj->rotation.y += 180.f;
+	phase = std::bind(&Enemy::phase_Approach, this);
 }
 
 void Enemy::shot(const DirectX::XMFLOAT3& targetPos,
@@ -72,26 +72,30 @@ void Enemy::phase_Leave()
 
 #pragma endregion phase
 
-void Enemy::additionalUpdate()
+void Enemy::afterUpdate()
 {
-	if (alive)
-	{
-		phase();
-	}
-
 	++nowFrame;
 
 	bul.remove_if([](std::unique_ptr<EnemyBullet>& i) { return !i->getAlive(); });
 
-	if (targetObjPt != nullptr)
+	if (!targetObjPt)
 	{
-		// 補間する割合[0~1]
-		// 1だと回避不可能
-		// 調整項目
-		constexpr float raito = 0.02f;
 		for (auto& i : bul)
 		{
-			const XMFLOAT3 nowVel = i->getVel();
+			i->setVel(XMFLOAT3(0, 0, -1));
+
+			i->setRotation(XMFLOAT3(0, 180, 0));
+		}
+	} else
+	{
+		for (auto& i : bul)
+		{
+			// 補間する割合[0~1]
+			// 1だと回避不可能
+			// 調整項目
+			constexpr float raito = 0.02f;
+
+			const XMFLOAT3& nowVel = i->getVel();
 
 			// 速度の差分を取得
 			XMFLOAT3 nextVel = calcVel(targetObjPt->getPos(), i->getPos(), 2.f);
@@ -99,15 +103,17 @@ void Enemy::additionalUpdate()
 									   nextVel.y * nextVel.y +
 									   nextVel.z * nextVel.z);
 
+			// 大きさを1にする
 			nextVel.x /= velLen;
 			nextVel.y /= velLen;
 			nextVel.z /= velLen;
 
+			// 差分を取得
 			nextVel.x -= nowVel.x;
 			nextVel.y -= nowVel.y;
 			nextVel.z -= nowVel.z;
 
-			// 速度の補間の割合を適用
+			// 差分に速度の補間の割合を適用
 			nextVel.x *= velLen * raito;
 			nextVel.y *= velLen * raito;
 			nextVel.z *= velLen * raito;

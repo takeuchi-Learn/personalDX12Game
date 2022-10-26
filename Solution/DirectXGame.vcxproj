@@ -173,6 +173,7 @@
   <ItemGroup>
     <ClCompile Include="App\Scene\BossScene.cpp" />
     <ClCompile Include="App\Scene\BaseStage.cpp" />
+    <ClCompile Include="App\GameObject\BaseEnemy.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Camera\CameraObj.cpp" />
     <ClCompile Include="Engine\Collision\Collision.cpp" />
@@ -224,6 +225,7 @@
   <ItemGroup>
     <ClInclude Include="App\Scene\BossScene.h" />
     <ClInclude Include="App\Scene\BaseStage.h" />
+    <ClInclude Include="App\GameObject\BaseEnemy.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
     <ClInclude Include="Engine\Camera\CameraObj.h" />
     <ClInclude Include="Engine\Collision\Collision.h" />

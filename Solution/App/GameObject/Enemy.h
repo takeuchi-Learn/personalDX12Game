@@ -1,13 +1,13 @@
 ﻿#pragma once
 
-#include "GameObj.h"
+#include "BaseEnemy.h"
 #include "EnemyBullet.h"
 
 #include <functional>
 #include <forward_list>
 
 class Enemy
-	: public GameObj
+	: public BaseEnemy
 {
 	DirectX::XMFLOAT3 vel{};
 
@@ -24,14 +24,12 @@ class Enemy
 
 	UINT nowFrame = 0u;
 
-	std::function<void()> phase;
-
 	// 接近フェーズ
 	void phase_Approach();
 	// 離脱フェーズ
 	void phase_Leave();
 
-	void additionalUpdate() override;
+	void afterUpdate() override;
 	void additionalDraw(Light* light) override;
 
 	inline DirectX::XMFLOAT3 calcVel(const DirectX::XMFLOAT3& targetPos,

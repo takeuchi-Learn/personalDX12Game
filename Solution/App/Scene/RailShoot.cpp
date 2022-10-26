@@ -2,7 +2,6 @@
 #include <DirectXMath.h>
 
 #include "BossScene.h"
-#include "EndScene.h"
 
 #include <fstream>
 #include "../Engine/Util/RandomNum.h"
@@ -609,7 +608,7 @@ void RailShoot::update_end()
 	// 時間が来たら次のシーンへ進む
 	if (nowTime >= sceneChangeTime)
 	{
-		SceneManager::getInstange()->changeScene(new EndScene());
+		SceneManager::getInstange()->changeScene(new BossScene());
 	}
 
 	// --------------------

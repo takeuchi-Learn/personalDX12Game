@@ -228,6 +228,9 @@
     <ClCompile Include="App\Scene\BaseStage.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="App\GameObject\BaseEnemy.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Camera\Camera.h">
@@ -348,6 +351,9 @@
       <Filter>Scene\BossScene</Filter>
     </ClInclude>
     <ClInclude Include="App\Scene\BaseStage.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="App\GameObject\BaseEnemy.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
