@@ -290,17 +290,17 @@ void PostEffect::init()
 
 		{
 			// 画素数
-			const UINT pixelCount = WinAPI::window_width * WinAPI::window_height;
+			constexpr UINT pixelCount = WinAPI::window_width * WinAPI::window_height;
 			// 一行分のデータサイズ
-			const UINT rowPitch = sizeof(UINT) * WinAPI::window_width;
+			constexpr UINT rowPitch = sizeof(UINT) * WinAPI::window_width;
 			// 画像全体のデータサイズ
-			const UINT depthPitch = rowPitch * WinAPI::window_height;
+			constexpr UINT depthPitch = rowPitch * WinAPI::window_height;
 			// 画像イメージ
 			UINT* img = new UINT[pixelCount]{};
 			// 0xrrggbbaaの色にする
 			for (UINT j = 0; j < pixelCount; j++)
 			{
-				img[j] = 0xff0000ff;
+				img[j] = 0xffffffff;
 			}
 			// テクスチャバッファにデータ転送
 			result = texbuff[i]->WriteToSubresource(0, nullptr, img, rowPitch, depthPitch);
