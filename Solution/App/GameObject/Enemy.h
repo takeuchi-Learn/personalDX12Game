@@ -79,6 +79,6 @@ public:
 	inline void chansePhase_Leave(const DirectX::XMFLOAT3& vel)
 	{
 		setVel(vel);
-		phase = std::bind(&Enemy::phase_Leave, this);
+		setPhase(std::bind(&Enemy::phase_Leave, this));
 	}
 };

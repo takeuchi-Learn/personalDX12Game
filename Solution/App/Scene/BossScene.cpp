@@ -3,8 +3,8 @@
 
 #include <DirectXMath.h>
 #include <imgui.h>
-#include "../../Engine/System/SceneManager.h"
-#include "../../Engine/System/PostEffect.h"
+#include "../Engine/System/SceneManager.h"
+#include "../Engine/System/PostEffect.h"
 
 using namespace DirectX;
 

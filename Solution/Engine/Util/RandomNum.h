@@ -7,7 +7,7 @@
 
 #include<random>
 
-/// @brief 乱数生成クラス
+ /// @brief 乱数生成クラス
 class RandomNum
 {
 private:

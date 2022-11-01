@@ -255,7 +255,7 @@ RailShoot::RailShoot()
 
 			// 全体の割合(0 ~ 制御点の数)
 			float startIndexRaito = allRaito * (float)splinePointNum;
-			
+
 			// 制御点間の割合とインデックスを取得
 			float startIndex = 0.f;
 			startIndexRaito = modf(startIndexRaito, &startIndex);

@@ -50,7 +50,6 @@ protected:
 
 #pragma endregion 3Dオブジェクト
 
-
 	// 敵発生スクリプトのCSVデータ
 	CSVType csvData;
 
@@ -82,4 +81,3 @@ public:
 
 	~BaseStage();
 };
-
