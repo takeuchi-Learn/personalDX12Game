@@ -14,8 +14,6 @@ void BaseStage::update_start()
 void BaseStage::update_play()
 {
 	movePlayer();
-
-	additionalUpdate_play();
 }
 
 void BaseStage::update_end()
@@ -231,10 +229,11 @@ void BaseStage::update()
 
 	// 背景オブジェクトの中心をカメラにする
 	back->setPos(camera->getEye());
-	// ライトはカメラの位置にする
-	light->setLightPos(camera->getEye());
 
 	update_proc();
+
+	// ライトはカメラの位置にする
+	light->setLightPos(camera->getEye());
 
 	// ライトとカメラの更新
 	light->update();

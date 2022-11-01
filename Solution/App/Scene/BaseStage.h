@@ -60,8 +60,6 @@ protected:
 	virtual void update_play();
 	virtual void update_end();
 
-	virtual void additionalUpdate_play() {};
-
 	virtual void movePlayer();
 
 protected:
