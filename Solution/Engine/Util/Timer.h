@@ -37,9 +37,9 @@ public:
 	/// @return 起点時間から現在までの時間
 	inline timeType getNowTime()
 	{
-		return duration_cast<timeUnit>(steady_clock::now() - startTimeDir).count();
+		return std::chrono::duration_cast<timeUnit>(std::chrono::steady_clock::now() - startTimeDir).count();
 	}
 
 	/// @brief 現在を起点時間とする(現在を0とする)
-	inline void reset() { startTimeDir = steady_clock::now(); }
+	inline void reset() { startTimeDir = std::chrono::steady_clock::now(); }
 };
