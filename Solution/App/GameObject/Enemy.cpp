@@ -50,10 +50,15 @@ void Enemy::phase_Approach()
 	obj->position.y += vel.y;
 	obj->position.z += vel.z;
 
-	if (targetObjPt != nullptr && shotFrame-- == 0U)
+	if (targetObjPt && shotFrame-- == 0U)
 	{
 		shot(targetObjPt->getPos(), 1.f, 2.5f);
 		shotFrame = shotFrameMax;
+	}
+
+	if (getPos().z < 0.f)
+	{
+		phase = std::bind(&Enemy::phase_Leave, this);
 	}
 }
 

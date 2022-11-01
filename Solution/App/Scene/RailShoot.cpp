@@ -507,15 +507,6 @@ void RailShoot::update_play()
 	// 自機移動回転
 	movePlayer();
 
-	// Z座標が0を超えた敵は退場
-	for (auto& i : enemy)
-	{
-		if (i->getPos().z < 0.f)
-		{
-			i->chansePhase_Leave(DirectX::XMFLOAT3(-1, 1, 0));
-		}
-	}
-
 	// --------------------
 	// 自機の弾発射
 	// --------------------
