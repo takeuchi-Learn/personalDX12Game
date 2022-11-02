@@ -10,6 +10,7 @@
 #include "../GameObject/Player.h"
 #include "../Engine/3D/Obj/Object3d.h"
 #include "../Engine/3D/Obj/ObjSet.h"
+#include "../GameObject/BaseEnemy.h"
 
 class BossScene :
 	public GameScene
@@ -35,6 +36,9 @@ private:
 	std::unique_ptr<ObjModel> playerBulModel;
 	std::unique_ptr<Player> player;
 	bool playerUpTurn = false;
+
+	std::unique_ptr<ObjModel> bossModel;
+	std::unique_ptr<BaseEnemy> boss;
 
 	// スプライト
 	std::unique_ptr<SpriteBase> spBase;

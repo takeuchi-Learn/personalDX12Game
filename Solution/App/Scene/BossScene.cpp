@@ -29,6 +29,9 @@ BossScene::BossScene() :
 	playerBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
 	player(new Player(camera.get(), playerModel.get())),
 
+	bossModel(new ObjModel("Resources/tori", "tori")),
+	boss(std::make_unique<BaseEnemy>(camera.get(), bossModel.get())),
+
 	// --------------------
 	// 背景パイプライン
 	// --------------------
@@ -53,7 +56,32 @@ BossScene::BossScene() :
 	camera->setParentObj(player.get());
 	camera->setFarZ(farZ);
 
+	// ゲームオブジェクト
 	player->setScale(10.f);
+
+	boss->setScale(100.f);
+	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 300));
+	boss->setRotation(XMFLOAT3(0, 180.f, 0));
+	boss->setPhase([&]
+				   {
+					   XMVECTOR velVec = XMLoadFloat3(&player->getPos()) - XMLoadFloat3(&boss->getPos());
+					   velVec = XMVectorSetY(velVec, 0.f);
+					   if (XMVectorGetX(XMVector3Length(velVec)) < boss->getScale())
+					   {
+						   return;
+					   }
+
+					   constexpr float speed = 2.f;
+					   velVec = XMVector3Normalize(velVec) * 2.f;
+
+					   XMFLOAT3 vel{ };
+					   XMStoreFloat3(&vel, velVec);
+
+					   boss->move(vel);
+
+					   const XMFLOAT2 rotaDeg = GameObj::calcRotationSyncVelDeg(vel);
+					   boss->setRotation(XMFLOAT3(rotaDeg.x, rotaDeg.y, 0.f));
+				   });
 
 	// 背景オブジェクト
 	constexpr float backScale = farZ * 0.9f;
@@ -255,6 +283,8 @@ void BossScene::drawObj3d()
 	Object3d::startDraw();
 	ground->drawWithUpdate(light.get());
 
+	boss->drawWithUpdate(light.get());
+
 	if (player->getAlive())
 	{
 		player->drawWithUpdate(light.get());
@@ -285,11 +315,14 @@ void BossScene::drawFrontSprite()
 
 	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x,
 								   fstWinPos.y));
-	ImGui::SetNextWindowSize(ImVec2(200.f, 100.f));
+	ImGui::SetNextWindowSize(ImVec2(200.f, 200.f));
 
 	ImGui::Begin("ボス戦", nullptr, winFlags);
 	ImGui::Text("未実装\nスペースで次のシーンへ進む");
-	ImGui::Text("E : %sを向く", playerUpTurn ? "上" : "前");
+	ImGui::Text("WS : 移動");
+	ImGui::Text("AD : 回転");
+	ImGui::Text("左シフト : ダッシュ");
+	ImGui::Text("E : カメラ位置変更");
 	ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x,
 								   ImGui::GetWindowPos().y + ImGui::GetWindowSize().y));
 	ImGui::End();
