@@ -53,8 +53,8 @@ class RailShoot
 	std::unique_ptr<Player> player;
 	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<ObjModel> playerBulModel;
-	UINT playerHpMax;
-	UINT playerHp;
+	uint16_t playerHpMax;
+	uint16_t playerHp;
 
 	// レールの現在位置を示すオブジェクト
 	std::unique_ptr<GameObj> railObj;
@@ -82,10 +82,10 @@ class RailShoot
 	// スプライン補間
 	// --------------------
 	std::vector<DirectX::XMVECTOR> splinePoint;
-	UINT splineNowFrame = 0u;
-	static const UINT splineFrameMax = 120u;
-	static const UINT splineIndexDef = 1u;
-	UINT splineIndex = splineIndexDef;
+	uint16_t splineNowFrame = 0u;
+	static const uint16_t splineFrameMax = 120u;
+	static const uint16_t splineIndexDef = 1u;
+	uint16_t splineIndex = splineIndexDef;
 
 	std::unique_ptr<ObjModel> wallModel;
 	std::vector <std::pair<std::unique_ptr<Object3d>, std::unique_ptr<Object3d>>> laneWall;
@@ -107,10 +107,10 @@ class RailShoot
 
 	struct PopEnemyData
 	{
-		UINT popFrame;
+		uint16_t popFrame;
 		DirectX::XMFLOAT3 pos;
 		DirectX::XMFLOAT3 vel{ 0,0,-1 };
-		PopEnemyData(UINT popFrame,
+		PopEnemyData(uint16_t popFrame,
 					 const DirectX::XMFLOAT3& pos,
 					 const DirectX::XMFLOAT3& vel)
 			: popFrame(popFrame), pos(pos), vel(vel)
@@ -119,10 +119,10 @@ class RailShoot
 	};
 
 	std::forward_list<std::unique_ptr<PopEnemyData>> enemyPopData;
-	UINT nowFrame = 0u;
+	uint16_t nowFrame = 0u;
 
 	void createParticle(const DirectX::XMFLOAT3& pos,
-						const UINT particleNum = 10U,
+						const uint16_t particleNum = 10U,
 						const float startScale = 1.f,
 						const float vel = 5.f);
 

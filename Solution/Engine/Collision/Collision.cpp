@@ -80,7 +80,7 @@ void Collision::calcMeshTrlangles(const Object3d* obj, std::vector<Triangle>* pP
 
 		triangles.resize(triangles.size() + triNum);
 
-		for (UINT i = 0u; i < triNum; ++i)
+		for (size_t i = 0u; i < triNum; ++i)
 		{
 			Triangle& tri = triangles[i];
 			unsigned short ind0 = indices[(size_t)i * 3];

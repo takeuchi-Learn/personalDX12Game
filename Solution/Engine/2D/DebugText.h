@@ -15,15 +15,15 @@ public: // 定数の宣言
 	static const int fontLineCount = 14;    // フォント画像内1行分の文字数
 
 public:
-	UINT tabSize = 4;	// 初期値はSPACE4つ分
+	uint8_t tabSize = 4;	// 初期値はSPACE4つ分
 
 private:
 	// メンバ関数
-	void Initialize(UINT texnumber, const SpriteBase* spriteCommon, UINT tabSIze = 4);
+	void Initialize(UINT texnumber, const SpriteBase* spriteCommon, uint8_t tabSIze = 4);
 
 public:
 	// 内部でinitializeを呼び出している
-	DebugText(UINT texNum, const SpriteBase* spriteCommon, UINT tabSize = 4);
+	DebugText(UINT texNum, const SpriteBase* spriteCommon, uint8_t tabSize = 4);
 
 	// ￥n : X座標をして位置に戻し、Y座標を文字の高さ分加算する
 	// ￥t : tabSize文字分右にずらす

@@ -42,8 +42,8 @@ protected:
 	std::unique_ptr<Player> player;
 	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<ObjModel> playerBulModel;
-	UINT playerHpMax;
-	UINT playerHp;
+	uint16_t playerHpMax;
+	uint16_t playerHp;
 
 	// パーティクル
 	std::unique_ptr<ParticleMgr> particleMgr;
@@ -62,7 +62,7 @@ protected:
 	virtual void movePlayer();
 
 protected:
-	bool playerDamage(UINT damageNum);
+	bool playerDamage(uint16_t damageNum);
 
 public:
 

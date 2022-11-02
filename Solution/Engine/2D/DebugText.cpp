@@ -2,13 +2,13 @@
 
 #include <DirectXMath.h>
 
-DebugText::DebugText(UINT texNum, const SpriteBase* spriteCommon, UINT tabSize)
+DebugText::DebugText(UINT texNum, const SpriteBase* spriteCommon, uint8_t tabSize)
 {
 	Initialize(texNum, spriteCommon, tabSize);
 }
 
 void DebugText::Initialize(UINT texnumber, const SpriteBase* spriteCommon,
-						   UINT tabSize)
+						   uint8_t tabSize)
 {
 	this->tabSize = tabSize;
 	// 全てのスプライトデータについて
@@ -48,7 +48,7 @@ void DebugText::Print(const SpriteBase* spriteCommon, const std::string& text,
 				drawCol.w = 0.f;
 			}  if (strncmp(&textLocal[i], "\t", 1) == 0)
 			{
-				posNumX += tabSize - 1;
+				posNumX += (int)tabSize - 1;
 				textLocal[i] = ' ';
 				drawCol.w = 0.f;
 			}

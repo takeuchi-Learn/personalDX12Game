@@ -22,7 +22,7 @@ class NormalEnemy
 
 	GameObj* targetObjPt = nullptr;
 
-	UINT nowFrame = 0u;
+	uint16_t nowFrame = 0u;
 
 	// 接近フェーズ
 	void phase_Approach();

@@ -285,12 +285,12 @@ RailShoot::RailShoot()
 	// todo 関数化
 	csvData = loadCsv("Resources/enemyScript.csv", true, ',', "//");
 	{
-		UINT waitFrame = 0u;
+		uint16_t waitFrame = 0u;
 		for (auto& y : csvData)
 		{
 			if (y[0] == "WAIT")
 			{
-				waitFrame += (UINT)std::stoi(y[1]);
+				waitFrame += (uint16_t)std::stoi(y[1]);
 			} else if (y[0] == "PUSH")
 			{
 				enemyPopData.emplace_front(std::make_unique<PopEnemyData>(waitFrame,
@@ -356,11 +356,11 @@ void RailShoot::update()
 }
 
 void RailShoot::createParticle(const DirectX::XMFLOAT3& pos,
-							   const UINT particleNum,
+							   const uint16_t particleNum,
 							   const float startScale,
 							   const float vel)
 {
-	for (UINT i = 0U; i < particleNum; ++i)
+	for (uint16_t i = 0U; i < particleNum; ++i)
 	{
 		const float theata = RandomNum::getRandf(0, XM_PI);
 		const float phi = RandomNum::getRandf(0, XM_PI * 2.f);

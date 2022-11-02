@@ -86,7 +86,7 @@ void BaseStage::movePlayer()
 	}
 }
 
-bool BaseStage::playerDamage(UINT damageNum)
+bool BaseStage::playerDamage(uint16_t damageNum)
 {
 	if (player->getAlive())
 	{
