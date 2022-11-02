@@ -181,7 +181,7 @@
     <ClCompile Include="Engine\2D\DebugText.cpp" />
     <ClCompile Include="Engine\System\DX12Base.cpp" />
     <ClCompile Include="App\Scene\EndScene.cpp" />
-    <ClCompile Include="App\GameObject\Enemy.cpp" />
+    <ClCompile Include="App\GameObject\NormalEnemy.cpp" />
     <ClCompile Include="App\GameObject\EnemyBullet.cpp" />
     <ClCompile Include="App\GameObject\GameObj.cpp" />
     <ClCompile Include="Engine\3D\Fbx\FbxLoader.cpp" />
@@ -233,7 +233,7 @@
     <ClInclude Include="Engine\2D\DebugText.h" />
     <ClInclude Include="Engine\System\DX12Base.h" />
     <ClInclude Include="App\Scene\EndScene.h" />
-    <ClInclude Include="App\GameObject\Enemy.h" />
+    <ClInclude Include="App\GameObject\NormalEnemy.h" />
     <ClInclude Include="App\GameObject\EnemyBullet.h" />
     <ClInclude Include="App\GameObject\GameObj.h" />
     <ClInclude Include="Engine\3D\Fbx\FbxLoader.h" />

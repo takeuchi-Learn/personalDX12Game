@@ -6,7 +6,7 @@
 #include <functional>
 #include <forward_list>
 
-class Enemy
+class NormalEnemy
 	: public BaseEnemy
 {
 	DirectX::XMFLOAT3 vel{};
@@ -55,7 +55,7 @@ class Enemy
 	}
 
 public:
-	Enemy(Camera* camera,
+	NormalEnemy(Camera* camera,
 		  ObjModel* model,
 		  ObjModel* bulModel,
 		  const DirectX::XMFLOAT3& pos = { 0,0,0 });
@@ -79,6 +79,6 @@ public:
 	inline void chansePhase_Leave(const DirectX::XMFLOAT3& vel)
 	{
 		setVel(vel);
-		setPhase(std::bind(&Enemy::phase_Leave, this));
+		setPhase(std::bind(&NormalEnemy::phase_Leave, this));
 	}
 };

@@ -213,7 +213,7 @@
     <ClCompile Include="App\GameObject\GameObj.cpp">
       <Filter>GameObject\GameObj</Filter>
     </ClCompile>
-    <ClCompile Include="App\GameObject\Enemy.cpp">
+    <ClCompile Include="App\GameObject\NormalEnemy.cpp">
       <Filter>GameObject\Enemy</Filter>
     </ClCompile>
     <ClCompile Include="App\GameObject\EnemyBullet.cpp">
@@ -338,7 +338,7 @@
     <ClInclude Include="App\GameObject\GameObj.h">
       <Filter>GameObject\GameObj</Filter>
     </ClInclude>
-    <ClInclude Include="App\GameObject\Enemy.h">
+    <ClInclude Include="App\GameObject\NormalEnemy.h">
       <Filter>GameObject\Enemy</Filter>
     </ClInclude>
     <ClInclude Include="App\GameObject\EnemyBullet.h">

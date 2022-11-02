@@ -4,7 +4,7 @@
 #include <memory>
 #include <functional>
 #include "../Engine/2D/DebugText.h"
-#include "../GameObject/Enemy.h"
+#include "../GameObject/NormalEnemy.h"
 #include "../Engine/3D/ParticleMgr.h"
 #include "../Engine/Input/Input.h"
 #include "../Engine/System/DX12Base.h"
@@ -45,7 +45,7 @@ class RailShoot
 	std::unique_ptr<ObjSet> ground;
 
 	// 敵
-	std::forward_list<std::unique_ptr<Enemy>> enemy;
+	std::forward_list<std::unique_ptr<NormalEnemy>> enemy;
 	std::unique_ptr<ObjModel> enemyModel;
 	std::unique_ptr<ObjModel> enemyBulModel;
 

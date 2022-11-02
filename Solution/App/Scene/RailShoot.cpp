@@ -430,7 +430,7 @@ void RailShoot::updateRgbShift()
 
 void RailShoot::addEnemy(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& vel, float scale)
 {
-	auto& i = enemy.emplace_front(new Enemy(camera.get(), enemyModel.get(), enemyBulModel.get(), pos));
+	auto& i = enemy.emplace_front(new NormalEnemy(camera.get(), enemyModel.get(), enemyBulModel.get(), pos));
 	i->setScale(scale);
 	i->setVel(vel);
 	i->setTargetObj(player.get());
@@ -593,7 +593,7 @@ void RailShoot::update_play()
 		}
 
 		// 弾がなく、かつ死んだ敵は消す
-		enemy.remove_if([](const std::unique_ptr<Enemy>& i) { return !i->getAlive() && i->bulEmpty(); });
+		enemy.remove_if([](const std::unique_ptr<NormalEnemy>& i) { return !i->getAlive() && i->bulEmpty(); });
 
 		// 敵がすべて消えたら次のシーンへ
 		if (enemy.empty() && enemyPopData.empty())
@@ -725,7 +725,7 @@ void RailShoot::playerShot()
 
 	// 遠い敵を調べるためのもの
 	float oldEnemyDistance{}, nowEnemyDistance{};
-	Enemy* farthestEnemyPt = nullptr;
+	NormalEnemy* farthestEnemyPt = nullptr;
 	float farthestEnemyLen = 1.f;
 
 	// 最も近い敵の方へ弾を飛ばす

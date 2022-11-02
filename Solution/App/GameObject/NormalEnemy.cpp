@@ -1,8 +1,8 @@
-﻿#include "Enemy.h"
+﻿#include "NormalEnemy.h"
 
 using namespace DirectX;
 
-Enemy::Enemy(Camera* camera,
+NormalEnemy::NormalEnemy(Camera* camera,
 			 ObjModel* model,
 			 ObjModel* bulModel,
 			 const DirectX::XMFLOAT3& pos)
@@ -11,10 +11,10 @@ Enemy::Enemy(Camera* camera,
 	camera(camera)
 {
 	obj->rotation.y += 180.f;
-	phase = std::bind(&Enemy::phase_Approach, this);
+	phase = std::bind(&NormalEnemy::phase_Approach, this);
 }
 
-void Enemy::shot(const DirectX::XMFLOAT3& targetPos,
+void NormalEnemy::shot(const DirectX::XMFLOAT3& targetPos,
 				 float vel,
 				 float bulScale)
 {
@@ -44,7 +44,7 @@ void Enemy::shot(const DirectX::XMFLOAT3& targetPos,
 
 #pragma region phase
 
-void Enemy::phase_Approach()
+void NormalEnemy::phase_Approach()
 {
 	obj->position.x += vel.x;
 	obj->position.y += vel.y;
@@ -58,11 +58,11 @@ void Enemy::phase_Approach()
 
 	if (getPos().z < 0.f)
 	{
-		phase = std::bind(&Enemy::phase_Leave, this);
+		phase = std::bind(&NormalEnemy::phase_Leave, this);
 	}
 }
 
-void Enemy::phase_Leave()
+void NormalEnemy::phase_Leave()
 {
 	obj->position.x += vel.x;
 	obj->position.y += vel.y;
@@ -77,7 +77,7 @@ void Enemy::phase_Leave()
 
 #pragma endregion phase
 
-void Enemy::afterUpdate()
+void NormalEnemy::afterUpdate()
 {
 	++nowFrame;
 
@@ -140,7 +140,7 @@ void Enemy::afterUpdate()
 	}
 }
 
-void Enemy::additionalDraw(Light* light)
+void NormalEnemy::additionalDraw(Light* light)
 {
 	for (auto& i : bul)
 	{
