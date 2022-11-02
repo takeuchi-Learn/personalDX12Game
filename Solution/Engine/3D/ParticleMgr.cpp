@@ -453,9 +453,22 @@ void ParticleMgr::LoadTexture(const wchar_t* filePath)
 	result = LoadFromWICFile(
 		filePath, WIC_FLAGS_NONE,
 		&metadata, scratchImg);
-	if (FAILED(result))
+	assert(SUCCEEDED(result));
+
+	ScratchImage mipChain{};
+	// ミップマップ生成
+	result = GenerateMipMaps(
+		scratchImg.GetImages(),
+		scratchImg.GetImageCount(),
+		scratchImg.GetMetadata(),
+		TEX_FILTER_DEFAULT,
+		0,
+		mipChain);
+
+	if (SUCCEEDED(result))
 	{
-		assert(0);
+		scratchImg = std::move(mipChain);
+		metadata = scratchImg.GetMetadata();
 	}
 
 	const Image* img = scratchImg.GetImage(0, 0, 0); // 生データ抽出

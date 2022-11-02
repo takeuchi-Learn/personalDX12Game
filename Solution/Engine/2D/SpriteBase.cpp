@@ -199,6 +199,8 @@ UINT SpriteBase::loadTexture(const wchar_t* filename, DirectX::XMFLOAT2* pTexSiz
 
 	HRESULT result = S_FALSE;
 
+#pragma region 画像読み込み
+
 	// WICテクスチャのロード
 	TexMetadata metadata{};
 	ScratchImage scratchImg{};
@@ -223,6 +225,10 @@ UINT SpriteBase::loadTexture(const wchar_t* filename, DirectX::XMFLOAT2* pTexSiz
 		scratchImg = std::move(mipChain);
 		metadata = scratchImg.GetMetadata();
 	}
+
+#pragma endregion 画像読み込み
+
+#pragma region テクスチャ用バッファ作成
 
 	const Image* img = scratchImg.GetImage(0, 0, 0); // 生データ抽出
 
@@ -271,7 +277,9 @@ UINT SpriteBase::loadTexture(const wchar_t* filename, DirectX::XMFLOAT2* pTexSiz
 		)
 	);
 
-	if (pTexSize != nullptr) *pTexSize = XMFLOAT2(float(metadata.width), float(metadata.height));
+#pragma endregion テクスチャ用バッファ作成
+
+	if (pTexSize != nullptr) { *pTexSize = XMFLOAT2(float(metadata.width), float(metadata.height)); }
 
 	return nowTexNum;
 }

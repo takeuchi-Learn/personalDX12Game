@@ -464,21 +464,32 @@ void FbxLoader::parseSkin(FbxModel* model,
 
 void FbxLoader::loadTexture(FbxModel* model, const std::string& fullpath)
 {
-	HRESULT result = S_FALSE;
-
 	TexMetadata& metadata = model->metadata;
 	ScratchImage& scratchImg = model->scratchImg;
 
-	constexpr size_t wfilepathLen = 128;
-	wchar_t wfilepath[wfilepathLen];
+	constexpr size_t wfilepathLen = 256ui64;
+	wchar_t wfilepath[wfilepathLen]{};
 	MultiByteToWideChar(CP_ACP, 0, fullpath.c_str(), -1,
 						wfilepath, wfilepathLen);
-	result = LoadFromWICFile(wfilepath,
-							 WIC_FLAGS_NONE,
-							 &metadata,
-							 scratchImg);
-	if (FAILED(result))
+	HRESULT result = LoadFromWICFile(wfilepath,
+									 WIC_FLAGS_NONE,
+									 &metadata,
+									 scratchImg);
+	assert(SUCCEEDED(result));
+
+	ScratchImage mipChain{};
+	// ミップマップ生成
+	result = GenerateMipMaps(
+		scratchImg.GetImages(),
+		scratchImg.GetImageCount(),
+		scratchImg.GetMetadata(),
+		TEX_FILTER_DEFAULT,
+		0,
+		mipChain);
+
+	if (SUCCEEDED(result))
 	{
-		assert(0);
+		scratchImg = std::move(mipChain);
+		metadata = scratchImg.GetMetadata();
 	}
 }
