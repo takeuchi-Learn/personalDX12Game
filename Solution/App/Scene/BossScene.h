@@ -42,6 +42,9 @@ private:
 	std::unique_ptr<ObjModel> bossModel;
 	std::unique_ptr<BaseEnemy> boss;
 
+	std::unique_ptr<ObjModel> smallEnemyModel;
+	std::vector<std::unique_ptr<BaseEnemy>> smallEnemy;
+
 	// 攻撃可能な敵リスト
 	std::forward_list<BaseEnemy*> attackableEnemy;
 

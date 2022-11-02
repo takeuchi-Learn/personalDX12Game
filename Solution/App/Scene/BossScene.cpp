@@ -32,6 +32,8 @@ BossScene::BossScene() :
 	bossModel(new ObjModel("Resources/tori", "tori")),
 	boss(std::make_unique<BaseEnemy>(camera.get(), bossModel.get())),
 
+	smallEnemyModel(new ObjModel("Resources/tori", "tori")),
+
 	// --------------------
 	// 背景パイプライン
 	// --------------------
@@ -93,6 +95,19 @@ BossScene::BossScene() :
 						   const XMFLOAT2 rotaDeg = GameObj::calcRotationSyncVelDeg(vel);
 						   boss->setRotation(XMFLOAT3(rotaDeg.x, rotaDeg.y, 0.f));
 					   });
+	}
+
+	constexpr size_t smallEnemyNum = 1u;
+	smallEnemy.resize(smallEnemyNum);
+
+	for (auto& i : smallEnemy)
+	{
+		i.reset(new BaseEnemy(camera.get(), smallEnemyModel.get()));
+
+		i->setScale(10.f);
+		i->setPos(XMFLOAT3(boss->getPos().x, i->getScaleF3().y, boss->getPos().z));
+
+		attackableEnemy.emplace_front(i.get());
 	}
 
 	// 背景オブジェクト
@@ -365,7 +380,10 @@ void BossScene::drawObj3d()
 	Object3d::startDraw();
 	ground->drawWithUpdate(light.get());
 
-	boss->drawWithUpdate(light.get());
+	for (auto& i : attackableEnemy)
+	{
+		i->drawWithUpdate(light.get());
+	}
 
 	if (player->getAlive())
 	{

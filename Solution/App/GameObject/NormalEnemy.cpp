@@ -3,9 +3,9 @@
 using namespace DirectX;
 
 NormalEnemy::NormalEnemy(Camera* camera,
-			 ObjModel* model,
-			 ObjModel* bulModel,
-			 const DirectX::XMFLOAT3& pos)
+						 ObjModel* model,
+						 ObjModel* bulModel,
+						 const DirectX::XMFLOAT3& pos)
 	: BaseEnemy(camera, model, pos),
 	bulModel(bulModel),
 	camera(camera)
@@ -15,8 +15,8 @@ NormalEnemy::NormalEnemy(Camera* camera,
 }
 
 void NormalEnemy::shot(const DirectX::XMFLOAT3& targetPos,
-				 float vel,
-				 float bulScale)
+					   float vel,
+					   float bulScale)
 {
 	// C++17から追加した要素の参照が返ってくるようになった
 	std::unique_ptr<EnemyBullet>& i = bul.emplace_front(new EnemyBullet(camera,

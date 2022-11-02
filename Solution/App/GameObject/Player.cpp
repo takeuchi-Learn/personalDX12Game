@@ -91,13 +91,10 @@ void Player::shot(Camera* camera,
 
 		// 照準のある方向へ、速さvelで飛んでいく
 		XMFLOAT3 vel{};
-		XMStoreFloat3(&vel, XMVector3Normalize(XMVectorSet(player2ShotTaregt.x,
-														   player2ShotTaregt.y,
-														   player2ShotTaregt.z,
-														   1)));
-		vel.x *= speed;
-		vel.y *= speed;
-		vel.z *= speed;
+		XMStoreFloat3(&vel, speed * XMVector3Normalize(XMVectorSet(player2ShotTaregt.x,
+																   player2ShotTaregt.y,
+																   player2ShotTaregt.z,
+																   1)));
 
 		i.setVel(vel);
 	}
