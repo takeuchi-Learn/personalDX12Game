@@ -59,29 +59,41 @@ BossScene::BossScene() :
 	// ゲームオブジェクト
 	player->setScale(10.f);
 
+	attackableEnemy.emplace_front(boss.get());
 	boss->setScale(100.f);
 	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 300));
 	boss->setRotation(XMFLOAT3(0, 180.f, 0));
-	boss->setPhase([&]
-				   {
-					   XMVECTOR velVec = XMLoadFloat3(&player->getPos()) - XMLoadFloat3(&boss->getPos());
-					   velVec = XMVectorSetY(velVec, 0.f);
-					   if (XMVectorGetX(XMVector3Length(velVec)) < boss->getScale())
+	{
+		boss->setPhase([&]
 					   {
-						   return;
-					   }
+						   // ボスから自機へ向かうベクトル
+						   XMVECTOR velVec = XMLoadFloat3(&player->getPos()) - XMLoadFloat3(&boss->getPos());
 
-					   constexpr float speed = 2.f;
-					   velVec = XMVector3Normalize(velVec) * 2.f;
+						   // Y方向には移動しない
+						   velVec = XMVectorSetY(velVec, 0.f);
 
-					   XMFLOAT3 vel{ };
-					   XMStoreFloat3(&vel, velVec);
+						   // 一定距離より近ければ移動しない
+						   if (XMVectorGetX(XMVector3Length(velVec)) < boss->getScaleF3().x)
+						   {
+							   return;
+						   }
 
-					   boss->move(vel);
+						   // 大きさを反映
+						   constexpr float speed = 2.f;
+						   velVec = XMVector3Normalize(velVec) * 2.f;
 
-					   const XMFLOAT2 rotaDeg = GameObj::calcRotationSyncVelDeg(vel);
-					   boss->setRotation(XMFLOAT3(rotaDeg.x, rotaDeg.y, 0.f));
-				   });
+						   // XMFLOAT3に変換
+						   XMFLOAT3 vel{ };
+						   XMStoreFloat3(&vel, velVec);
+
+						   // 移動
+						   boss->move(vel);
+
+						   // 速度に合わせて回転
+						   const XMFLOAT2 rotaDeg = GameObj::calcRotationSyncVelDeg(vel);
+						   boss->setRotation(XMFLOAT3(rotaDeg.x, rotaDeg.y, 0.f));
+					   });
+	}
 
 	// 背景オブジェクト
 	constexpr float backScale = farZ * 0.9f;
@@ -114,10 +126,13 @@ void BossScene::update_play()
 		update_proc = std::bind(&BossScene::update_end, this);
 	}
 
-	if (Input::getInstance()->triggerKey(DIK_R))
-	{
-		startRgbShift();
-	}
+
+	// 照準の位置をマウスカーソルに合わせる
+	player->setAim2DPos(XMFLOAT2((float)input->getMousePos().x,
+								 (float)input->getMousePos().y));
+	aim2D->position.x = player->getAim2DPos().x;
+	aim2D->position.y = player->getAim2DPos().y;
+
 	updateRgbShift();
 
 	// 移動
@@ -194,6 +209,73 @@ void BossScene::update_play()
 				}
 
 				player->setRotation(rota);
+			}
+		}
+	}
+
+	// 当たり判定
+	if (player->getAlive())
+	{
+		const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - aim2D->getSize().x / 2.f,
+										   input->getMousePos().y - aim2D->getSize().y / 2.f);
+		const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + aim2D->getSize().x / 2.f,
+										   input->getMousePos().y + aim2D->getSize().y / 2.f);
+
+		XMFLOAT2 screenEnemyPos{};
+		// 遠い敵を調べるためのもの
+		float nowEnemyDistance{};
+		BaseEnemy* farthestEnemyPt = nullptr;
+		float farthestEnemyLen = 1.f;
+
+		for (BaseEnemy* i : attackableEnemy)
+		{
+			// いない敵の判定は取らない
+			if (!i->getAlive()) { continue; }
+
+			// 敵のスクリーン座標を取得
+			screenEnemyPos = i->getObj()->calcScreenPos();
+
+			// 敵が2D照準の中にいるかどうか
+			if (aim2DMin.x <= screenEnemyPos.x &&
+				aim2DMin.y <= screenEnemyPos.y &&
+				aim2DMax.x >= screenEnemyPos.x &&
+				aim2DMax.y >= screenEnemyPos.y)
+			{
+				// 敵との距離を更新
+				nowEnemyDistance = sqrtf(
+					powf(i->getPos().x - camera->getEye().x, 2.f) +
+					powf(i->getPos().y - camera->getEye().y, 2.f) +
+					powf(i->getPos().z - camera->getEye().z, 2.f)
+				);
+				// 照準の中で最も遠い敵なら情報を取っておく
+				if (farthestEnemyLen < nowEnemyDistance)
+				{
+					farthestEnemyPt = i;
+					farthestEnemyLen = nowEnemyDistance;
+				}
+			}
+		}
+		// 照準の中に敵がいればそこへ弾を出す
+		// いなければターゲットはいない
+		if (farthestEnemyPt != nullptr)
+		{
+			player->setShotTarget(farthestEnemyPt->getObj());
+			aim2D->color = XMFLOAT4(1, 0, 0, 1);
+		} else
+		{
+			player->setShotTarget(nullptr);
+			aim2D->color = XMFLOAT4(0, 0, 0, 1);
+		}
+
+		// --------------------
+		// 弾発射
+		// --------------------
+		if (player->shotTargetIsEmpty())
+		{
+			if (input->triggerMouseButton(Input::MOUSE::LEFT))
+			{
+				constexpr float bulSpeed = 8.f;
+				player->shot(camera.get(), playerBulModel.get(), bulSpeed);
 			}
 		}
 	}

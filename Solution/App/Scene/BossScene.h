@@ -3,6 +3,8 @@
 
 #include <functional>
 #include <memory>
+#include <forward_list>
+
 #include "../Engine/Input/Input.h"
 #include "../Engine/Util/Timer.h"
 #include "../Engine/Camera/CameraObj.h"
@@ -39,6 +41,9 @@ private:
 
 	std::unique_ptr<ObjModel> bossModel;
 	std::unique_ptr<BaseEnemy> boss;
+
+	// 攻撃可能な敵リスト
+	std::forward_list<BaseEnemy*> attackableEnemy;
 
 	// スプライト
 	std::unique_ptr<SpriteBase> spBase;

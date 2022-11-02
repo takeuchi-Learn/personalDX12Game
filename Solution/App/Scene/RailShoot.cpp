@@ -724,7 +724,7 @@ void RailShoot::playerShot()
 	XMFLOAT2 screenEnemyPos{};
 
 	// 遠い敵を調べるためのもの
-	float oldEnemyDistance{}, nowEnemyDistance{};
+	float nowEnemyDistance{};
 	NormalEnemy* farthestEnemyPt = nullptr;
 	float farthestEnemyLen = 1.f;
 
@@ -744,7 +744,6 @@ void RailShoot::playerShot()
 			aim2DMax.y >= screenEnemyPos.y)
 		{
 			// 敵との距離を更新
-			oldEnemyDistance = nowEnemyDistance;
 			nowEnemyDistance = sqrtf(
 				powf(i->getPos().x - camera->getEye().x, 2.f) +
 				powf(i->getPos().y - camera->getEye().y, 2.f) +
