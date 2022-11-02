@@ -378,7 +378,7 @@ void RailShoot::createParticle(const DirectX::XMFLOAT3& pos,
 									  vel.z / accNum);
 
 		constexpr XMFLOAT3 startCol = XMFLOAT3(1, 1, 0.25f), endCol = XMFLOAT3(1, 0, 1);
-		constexpr int life = Timer::oneSec / 4;
+		constexpr Timer::timeType life = Timer::oneSec / 4;
 		constexpr float endScale = 0.f;
 		constexpr float startRota = 0.f, endRota = 0.f;
 
@@ -389,8 +389,7 @@ void RailShoot::createParticle(const DirectX::XMFLOAT3& pos,
 		};
 
 		// 追加
-		particleMgr->add(std::make_unique<Timer>(),
-						 life, particlePos, vel, acc,
+		particleMgr->add(life, particlePos, vel, acc,
 						 startScale, endScale,
 						 startRota, endRota,
 						 startCol, endCol);

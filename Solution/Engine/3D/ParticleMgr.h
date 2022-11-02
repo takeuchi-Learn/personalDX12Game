@@ -51,6 +51,8 @@ public:
 	public:
 		// 座標
 		XMFLOAT3 position = {};
+		XMFLOAT3 s_position = {};
+
 		// 速度
 		XMFLOAT3 velocity = {};
 		// 加速度
@@ -108,7 +110,7 @@ private:
 	// 定数バッファ
 	ComPtr<ID3D12Resource> constBuff;
 	// パーティクル配列
-	std::forward_list<Particle> particles;
+	std::forward_list<std::unique_ptr<Particle>> particles;
 	Camera* camera = nullptr;
 
 	// メンバ関数
@@ -128,10 +130,9 @@ public:
 	inline void setCamera(Camera* camera) { this->camera = camera; }
 
 	/// @brief パーティクルの追加
-	/// @param timer 経過時間をはかるタイマー
 	/// @param life 生存時間
 	/// @param position 初期座標
-	/// @param velocity 速度
+	/// @param velocity 初速度
 	/// @param accel 加速度
 	/// @param start_scale 開始時スケール
 	/// @param end_scale 終了時スケール
@@ -139,8 +140,7 @@ public:
 	/// @param end_rotation 終了時の回転
 	/// @param start_color 開始時の色
 	/// @param end_color 終了時の色
-	void add(std::unique_ptr<Timer> timer,
-			 int life,
+	void add(Timer::timeType life,
 			 const XMFLOAT3& position, const XMFLOAT3& velocity, const XMFLOAT3& accel,
 			 float start_scale, float end_scale,
 			 float start_rotation, float end_rotation,
