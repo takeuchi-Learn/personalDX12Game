@@ -14,25 +14,46 @@ DX12Base* ParticleMgr::dxBase = DX12Base::getInstance();
 
 namespace
 {
-	const DirectX::XMFLOAT3 operator+(const DirectX::XMFLOAT3& lhs, const DirectX::XMFLOAT3& rhs)
+	XMFLOAT3 operator+(const XMFLOAT3& lhs, const XMFLOAT3& rhs)
 	{
 		return XMFLOAT3(lhs.x + rhs.x,
 						lhs.y + rhs.y,
 						lhs.z + rhs.z);
 	}
 
-	const DirectX::XMFLOAT3 operator-(const DirectX::XMFLOAT3& lhs, const DirectX::XMFLOAT3& rhs)
+	void operator+=(XMFLOAT3& lhs, const XMFLOAT3& rhs)
+	{
+		lhs.x += rhs.x;
+		lhs.y += rhs.y;
+		lhs.z += rhs.z;
+	}
+
+	XMFLOAT3 operator-(const XMFLOAT3& lhs, const XMFLOAT3& rhs)
 	{
 		return XMFLOAT3(lhs.x - rhs.x,
 						lhs.y - rhs.y,
 						lhs.z - rhs.z);
 	}
 
-	const DirectX::XMFLOAT3 operator/(const DirectX::XMFLOAT3& lhs, const float rhs)
+	XMFLOAT3 operator/(const XMFLOAT3& lhs, const float rhs)
 	{
 		return XMFLOAT3(lhs.x / rhs,
 						lhs.y / rhs,
 						lhs.z / rhs);
+	}
+
+	XMFLOAT3 operator*(const XMFLOAT3& lhs, const float rhs)
+	{
+		return XMFLOAT3(lhs.x * rhs,
+						lhs.y * rhs,
+						lhs.z * rhs);
+	}
+
+	XMFLOAT3 operator*(float lhs, const XMFLOAT3& rhs)
+	{
+		return XMFLOAT3(lhs * rhs.x,
+						lhs * rhs.y,
+						lhs * rhs.z);
 	}
 }
 
@@ -83,12 +104,11 @@ void ParticleMgr::update()
 		// 進行度を0～1の範囲に換算
 		const float f = (float)it->life / it->nowTime;
 
-		// todo 時間依存にする
 		// 速度に加速度を加算
-		it->velocity = it->velocity + it->accel;
+		it->velocity += it->accel;
 
 		// 速度による移動
-		it->position = it->position + it->velocity;
+		it->position += it->velocity;
 
 		// カラーの線形補間
 		//it->color = it->s_color + (it->e_color - it->s_color) / f;
@@ -392,7 +412,7 @@ void ParticleMgr::InitializeGraphicsPipeline()
 	gpipeline.BlendState.AlphaToCoverageEnable = true;	//透明部分の深度値は書き込まない
 
 	// デスクリプタレンジ
-	CD3DX12_DESCRIPTOR_RANGE descRangeSRV;
+	CD3DX12_DESCRIPTOR_RANGE descRangeSRV{};
 	descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0 レジスタ
 
 	// ルートパラメータ

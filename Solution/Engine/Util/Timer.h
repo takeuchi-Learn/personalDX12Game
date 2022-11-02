@@ -24,18 +24,28 @@ public:
 	/// @brief 一秒float型
 	static constexpr float oneSecF = static_cast<float>(oneSec);
 
+	/// @brief 一拍の時間を取得
+	/// @param bpm 一分間の拍数
+	/// @return 一拍の時間
+	static inline timeType getOneBeatTime(const float bpm)
+	{
+		return timeType(std::chrono::duration_cast<timeUnit>(std::chrono::seconds(60ll)).count() / bpm);
+	};
+
+	/// @brief エポックからの経過時間を取得
+	/// @return 経過時間
+	static inline timeType getNowTimeSinceEpoch()
+	{
+		return std::chrono::duration_cast<timeUnit>(std::chrono::steady_clock::now().time_since_epoch()).count();
+	}
+
 	~Timer();
 
 	Timer();
 
-	/// @brief 一拍の時間を取得
-	/// @param bpm 一分間の拍数
-	/// @return 一拍の時間
-	inline static timeType getOneBeatTime(const float bpm) { return timeType(std::chrono::duration_cast<timeUnit>(std::chrono::seconds(60ll)).count() / bpm); };
-
 	/// @brief 起点時間から現在までの時間を取得
 	/// @return 起点時間から現在までの時間
-	inline timeType getNowTime()
+	inline timeType getNowTime() const
 	{
 		return std::chrono::duration_cast<timeUnit>(std::chrono::steady_clock::now() - startTimeDir).count();
 	}
