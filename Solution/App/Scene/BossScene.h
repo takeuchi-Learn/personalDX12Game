@@ -14,29 +14,12 @@
 #include "../Engine/3D/Obj/ObjSet.h"
 #include "../GameObject/BaseEnemy.h"
 
+#include "BaseStage.h"
+
 class BossScene :
-	public GameScene
+	public BaseStage
 {
 private:
-	Input* input = nullptr;
-
-	std::unique_ptr<Timer> timer;
-
-	// 背景のパイプライン
-	Object3d::PipelineSet backPipelineSet;
-
-	// 背景と地面
-	std::unique_ptr<ObjSet> back;
-	std::unique_ptr<ObjSet> ground;
-
-	// カメラとライト
-	std::unique_ptr<CameraObj> camera;
-	std::unique_ptr<Light> light;
-
-	// ゲームオブジェクト
-	std::unique_ptr<ObjModel> playerModel;
-	std::unique_ptr<ObjModel> playerBulModel;
-	std::unique_ptr<Player> player;
 	bool playerUpTurn = false;
 
 	std::unique_ptr<ObjModel> bossModel;
@@ -44,13 +27,6 @@ private:
 
 	std::unique_ptr<ObjModel> smallEnemyModel;
 	std::vector<std::unique_ptr<BaseEnemy>> smallEnemy;
-
-	// 攻撃可能な敵リスト
-	std::forward_list<BaseEnemy*> attackableEnemy;
-
-	// スプライト
-	std::unique_ptr<SpriteBase> spBase;
-	std::unique_ptr<Sprite> aim2D;
 
 	// RGBずらし
 	static const Timer::timeType rgbShiftTimeMax = Timer::oneSec / 2;
@@ -61,17 +37,16 @@ private:
 	void startRgbShift();
 	void updateRgbShift();
 
+	void movePlayer() override;
+
 	// update_何とか関数を格納する
-	std::function<void()> update_proc;
-	void update_start();
-	void update_play();
-	void update_end();
+	void update_start() override;
+	void update_play() override;
+	void update_end() override;
 
 public:
 	BossScene();
 
 	void start() override;
-	void update() override;
-	void drawObj3d() override;
 	void drawFrontSprite() override;
 };

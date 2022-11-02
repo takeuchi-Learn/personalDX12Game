@@ -171,9 +171,19 @@ BaseStage::BaseStage() :
 
 #pragma region パーティクル
 
-	particleMgr(std::make_unique<ParticleMgr>(L"Resources/effect1.png", camera.get()))
+	particleMgr(std::make_unique<ParticleMgr>(L"Resources/effect1.png", camera.get())),
 
 #pragma endregion パーティクル
+
+#pragma region スプライト
+
+	spBase(new SpriteBase()),
+
+	aim2D(new Sprite(spBase->loadTexture(L"Resources/aimPos.png"),
+					 spBase.get()))
+
+#pragma endregion スプライト
+
 
 {
 	// --------------------
@@ -226,11 +236,17 @@ void BaseStage::update()
 		back->getModelPt()->setShivtUv(shiftUv);
 	}
 
-	// 背景オブジェクトの中心をカメラにする
-	back->setPos(camera->getEye());
+	// 照準の位置をマウスカーソルに合わせる
+	player->setAim2DPos(XMFLOAT2((float)input->getMousePos().x,
+								 (float)input->getMousePos().y));
+	aim2D->position.x = player->getAim2DPos().x;
+	aim2D->position.y = player->getAim2DPos().y;
 
+	// 更新処理本体
 	update_proc();
 
+	// 背景オブジェクトの中心をカメラにする
+	back->setPos(camera->getEye());
 	// ライトはカメラの位置にする
 	light->setLightPos(camera->getEye());
 
@@ -246,10 +262,9 @@ void BaseStage::drawObj3d()
 
 	Object3d::startDraw();
 	ground->drawWithUpdate(light.get());
-	if (player->getAlive())
-	{
-		player->drawWithUpdate(light.get());
-	}
+
+	player->drawWithUpdate(light.get());
+
 	for (auto& i : attackableEnemy)
 	{
 		i->drawWithUpdate(light.get());
@@ -258,23 +273,7 @@ void BaseStage::drawObj3d()
 
 void BaseStage::drawFrontSprite()
 {
-	constexpr ImGuiWindowFlags winFlags =
-		// リサイズ不可
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoResize |
-		// タイトルバー無し
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar |
-		// 設定を.iniに出力しない
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoSavedSettings |
-		// 移動不可
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove;
-	//// スクロールバーを常に表示
-	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysHorizontalScrollbar |
-	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar;
-
-	// 最初のウインドウの位置を指定
-	constexpr XMFLOAT2 fstWinPos = XMFLOAT2((float)WinAPI::window_width * 0.02f,
-											(float)WinAPI::window_height * 0.02f);
-
+	
 	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x,
 								   fstWinPos.y));
 	ImGui::SetNextWindowSize(ImVec2(200.f, 100.f));

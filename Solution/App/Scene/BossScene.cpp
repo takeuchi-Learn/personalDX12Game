@@ -9,49 +9,12 @@
 using namespace DirectX;
 
 BossScene::BossScene() :
-	// --------------------
-	// シングルトンインスタンス
-	// --------------------
-	input(Input::getInstance()),
-
-	timer(new Timer()),
-
-	// --------------------
-	// カメラとライト
-	// --------------------
-	camera(new CameraObj(nullptr)),
-	light(new Light()),
-
-	// --------------------
-	// モデルとオブジェクト
-	// --------------------
-	playerModel(new ObjModel("Resources/player", "player")),
-	playerBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
-	player(new Player(camera.get(), playerModel.get())),
+	BaseStage(),
 
 	bossModel(new ObjModel("Resources/tori", "tori")),
 	boss(std::make_unique<BaseEnemy>(camera.get(), bossModel.get())),
 
-	smallEnemyModel(new ObjModel("Resources/tori", "tori")),
-
-	// --------------------
-	// 背景パイプライン
-	// --------------------
-	backPipelineSet(Object3d::createGraphicsPipeline(Object3d::BLEND_MODE::ALPHA,
-													 L"Resources/Shaders/BackVS.hlsl",
-													 L"Resources/Shaders/BackPS.hlsl")),
-
-	// --------------------
-	// スプライト
-	// --------------------
-	spBase(new SpriteBase()),
-	aim2D(new Sprite(spBase->loadTexture(L"Resources/aimPos.png"),
-					 spBase.get())),
-
-	// --------------------
-	// 更新関数
-	// --------------------
-	update_proc(std::bind(&BossScene::update_start, this))
+	smallEnemyModel(new ObjModel("Resources/tori", "tori"))
 {
 	// カメラ
 	constexpr float farZ = 1000.f;
@@ -109,24 +72,6 @@ BossScene::BossScene() :
 
 		attackableEnemy.emplace_front(i.get());
 	}
-
-	// 背景オブジェクト
-	constexpr float backScale = farZ * 0.9f;
-	back.reset(new ObjSet(camera.get(), "Resources/back/", "back", true));
-	back->setScale(XMFLOAT3(backScale, backScale, backScale));
-
-	// 地面
-	ground.reset(new ObjSet(camera.get(), "Resources/ground", "ground", false));
-	constexpr float groundSize = farZ * 2.f;
-	ground->setPos(XMFLOAT3(0, -player->getScale(), 0));
-	ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
-
-	constexpr float tillingNum = groundSize / 32.f;
-	ground->getModelPt()->setTexTilling(XMFLOAT2(tillingNum, tillingNum));
-
-	// スプライト読み込み
-	aim2D = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/aimPos.png"),
-									 spBase.get());
 }
 
 void BossScene::update_start()
@@ -141,92 +86,10 @@ void BossScene::update_play()
 		update_proc = std::bind(&BossScene::update_end, this);
 	}
 
-
-	// 照準の位置をマウスカーソルに合わせる
-	player->setAim2DPos(XMFLOAT2((float)input->getMousePos().x,
-								 (float)input->getMousePos().y));
-	aim2D->position.x = player->getAim2DPos().x;
-	aim2D->position.y = player->getAim2DPos().y;
-
 	updateRgbShift();
 
-	// 移動
-	{
-		const bool hitW = input->hitKey(DIK_W);
-		const bool hitS = input->hitKey(DIK_S);
-
-		if (hitW || hitS)
-		{
-			float moveSpeed = 90.f / DX12Base::ins()->getFPS();
-			if (input->hitKey(DIK_LCONTROL))
-			{
-				moveSpeed /= 2.f;
-			} else if (input->hitKey(DIK_LSHIFT))
-			{
-				moveSpeed *= 2.f;
-			}
-
-			if (hitW)
-			{
-				player->moveForward(moveSpeed);
-			} else if (hitS)
-			{
-				player->moveForward(-moveSpeed);
-			}
-		}
-	}
-
-	// 回転
-	{
-		const bool hitA = input->hitKey(DIK_A);
-		const bool hitD = input->hitKey(DIK_D);
-		const bool triggerE = input->triggerKey(DIK_E);
-
-		if (hitA || hitD || triggerE)
-		{
-			// 上向きか否かの切り替え
-			if (triggerE)
-			{
-				XMFLOAT3 camRrota = camera->getRelativeRotaDeg();
-
-				constexpr float angle = 20.f;
-				camRrota.x += playerUpTurn ? angle : -angle;
-
-				playerUpTurn = !playerUpTurn;
-
-				//player->setRotation(rota);
-				camera->setRelativeRotaDeg(camRrota);
-			}
-
-			// 左右の回転
-			if (hitA || hitD)
-			{
-				float speed = 45.f / DX12Base::ins()->getFPS();
-
-				// 左シフトと左コントロールで速度変更
-				if (input->hitKey(DIK_LCONTROL))
-				{
-					speed /= 2.f;
-				} else if (input->hitKey(DIK_LSHIFT))
-				{
-					speed *= 2.f;
-				}
-
-				XMFLOAT3 rota = player->getRotation();
-
-				// 回転させる
-				if (hitA)
-				{
-					rota.y -= speed;
-				} else if (hitD)
-				{
-					rota.y += speed;
-				}
-
-				player->setRotation(rota);
-			}
-		}
-	}
+	// 自機の移動(と回転)
+	movePlayer();
 
 	// 当たり判定
 	if (player->getAlive())
@@ -306,39 +169,6 @@ void BossScene::start()
 	timer->reset();
 }
 
-void BossScene::update()
-{
-	{
-		// シーン遷移中も背景は回す
-		XMFLOAT2 shiftUv = back->getModelPt()->getShiftUv();
-		constexpr float shiftSpeed = 0.1f;
-
-		shiftUv.x += shiftSpeed / DX12Base::getInstance()->getFPS();
-
-		back->getModelPt()->setShivtUv(shiftUv);
-	}
-
-	{
-		aim2D->position.x =
-			(float)input->getMousePos().x;
-		aim2D->position.y =
-			(float)input->getMousePos().y;
-	}
-
-	update_proc();
-
-	{
-		const XMFLOAT3 camWorldPos = XMFLOAT3(camera->getEye().x,
-											  camera->getEye().y,
-											  camera->getEye().z);
-
-		light->setLightPos(camWorldPos);
-		back->setPos(camWorldPos);
-	}
-	light->update();
-	camera->update();
-}
-
 void BossScene::startRgbShift()
 {
 	rgbShiftFlag = true;
@@ -372,22 +202,84 @@ void BossScene::updateRgbShift()
 	}
 }
 
-void BossScene::drawObj3d()
+void BossScene::movePlayer()
 {
-	Object3d::startDraw(backPipelineSet);
-	back->drawWithUpdate(light.get());
-
-	Object3d::startDraw();
-	ground->drawWithUpdate(light.get());
-
-	for (auto& i : attackableEnemy)
+	// 移動
 	{
-		i->drawWithUpdate(light.get());
+		const bool hitW = input->hitKey(DIK_W);
+		const bool hitS = input->hitKey(DIK_S);
+
+		if (hitW || hitS)
+		{
+			float moveSpeed = 90.f / DX12Base::ins()->getFPS();
+			if (input->hitKey(DIK_LCONTROL))
+			{
+				moveSpeed /= 2.f;
+			} else if (input->hitKey(DIK_LSHIFT))
+			{
+				moveSpeed *= 2.f;
+			}
+
+			if (hitW)
+			{
+				player->moveForward(moveSpeed);
+			} else if (hitS)
+			{
+				player->moveForward(-moveSpeed);
+			}
+		}
 	}
 
-	if (player->getAlive())
+	// 回転
 	{
-		player->drawWithUpdate(light.get());
+		const bool hitA = input->hitKey(DIK_A);
+		const bool hitD = input->hitKey(DIK_D);
+		const bool triggerE = input->triggerKey(DIK_E);
+
+		if (hitA || hitD || triggerE)
+		{
+			// 上向きか否かの切り替え
+			if (triggerE)
+			{
+				XMFLOAT3 camRrota = camera->getRelativeRotaDeg();
+
+				constexpr float angle = 20.f;
+				camRrota.x += playerUpTurn ? angle : -angle;
+
+				playerUpTurn = !playerUpTurn;
+
+				//player->setRotation(rota);
+				camera->setRelativeRotaDeg(camRrota);
+			}
+
+			// 左右の回転
+			if (hitA || hitD)
+			{
+				float speed = 45.f / DX12Base::ins()->getFPS();
+
+				// 左シフトと左コントロールで速度変更
+				if (input->hitKey(DIK_LCONTROL))
+				{
+					speed /= 2.f;
+				} else if (input->hitKey(DIK_LSHIFT))
+				{
+					speed *= 2.f;
+				}
+
+				XMFLOAT3 rota = player->getRotation();
+
+				// 回転させる
+				if (hitA)
+				{
+					rota.y -= speed;
+				} else if (hitD)
+				{
+					rota.y += speed;
+				}
+
+				player->setRotation(rota);
+			}
+		}
 	}
 }
 
@@ -395,23 +287,6 @@ void BossScene::drawFrontSprite()
 {
 	spBase->drawStart(DX12Base::ins()->getCmdList());
 	aim2D->drawWithUpdate(DX12Base::ins(), spBase.get());
-
-	constexpr ImGuiWindowFlags winFlags =
-		// リサイズ不可
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoResize |
-		// タイトルバー無し
-		//ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar |
-		// 設定を.iniに出力しない
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoSavedSettings |
-		// 移動不可
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove;
-	//// スクロールバーを常に表示
-	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysHorizontalScrollbar |
-	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar;
-
-	// 最初のウインドウの位置を指定
-	constexpr XMFLOAT2 fstWinPos = XMFLOAT2((float)WinAPI::window_width * 0.02f,
-											(float)WinAPI::window_height * 0.02f);
 
 	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x,
 								   fstWinPos.y));

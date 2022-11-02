@@ -9,6 +9,8 @@
 #include "../Engine/3D/Obj/ObjSet.h"
 #include "../Engine/3D/ParticleMgr.h"
 #include "../GameObject/BaseEnemy.h"
+#include "../Engine/2D/SpriteBase.h"
+#include "../Engine/2D/Sprite.h"
 
 #include <memory>
 #include <functional>
@@ -55,8 +57,36 @@ protected:
 
 #pragma endregion 3Dオブジェクト
 
+
+	// スプライト
+	std::unique_ptr<SpriteBase> spBase;
+	std::unique_ptr<Sprite> aim2D;
+
 	// 敵発生スクリプトのCSVデータ
 	CSVType csvData;
+
+#pragma region ImGui定数
+
+	static constexpr ImGuiWindowFlags winFlags =
+		// リサイズ不可
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoResize |
+		// タイトルバー無し
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar |
+		// 設定を.iniに出力しない
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoSavedSettings |
+		// 移動不可
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove;
+	//// スクロールバーを常に表示
+	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysHorizontalScrollbar |
+	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar;
+
+	// 最初のウインドウの位置を指定
+	static constexpr DirectX::XMFLOAT2 fstWinPos =
+		DirectX::XMFLOAT2((float)WinAPI::window_width * 0.02f,
+						  (float)WinAPI::window_height * 0.02f);
+
+#pragma endregion
+
 
 	// update_何とか関数を格納する
 	std::function<void()> update_proc;
