@@ -250,6 +250,10 @@ void BaseStage::drawObj3d()
 	{
 		player->drawWithUpdate(light.get());
 	}
+	for (auto& i : attackableEnemy)
+	{
+		i->drawWithUpdate(light.get());
+	}
 }
 
 void BaseStage::drawFrontSprite()

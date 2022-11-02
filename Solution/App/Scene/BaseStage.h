@@ -8,9 +8,11 @@
 #include "../Engine/Util/Timer.h"
 #include "../Engine/3D/Obj/ObjSet.h"
 #include "../Engine/3D/ParticleMgr.h"
+#include "../GameObject/BaseEnemy.h"
 
 #include <memory>
 #include <functional>
+#include <forward_list>
 
 class BaseStage
 	: public GameScene
@@ -44,6 +46,9 @@ protected:
 	std::unique_ptr<ObjModel> playerBulModel;
 	uint16_t playerHpMax;
 	uint16_t playerHp;
+
+	// 攻撃可能な敵リスト
+	std::forward_list<BaseEnemy*> attackableEnemy;
 
 	// パーティクル
 	std::unique_ptr<ParticleMgr> particleMgr;
