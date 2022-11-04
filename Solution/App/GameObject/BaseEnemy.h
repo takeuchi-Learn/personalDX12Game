@@ -5,6 +5,8 @@ class BaseEnemy
 	: public GameObj
 {
 protected:
+	uint16_t hp;
+
 	std::function<void()> phase;
 
 	virtual void afterUpdate() {}
@@ -14,7 +16,17 @@ protected:
 public:
 	BaseEnemy(Camera* camera,
 			  ObjModel* model,
-			  const DirectX::XMFLOAT3& pos = { 0,0,0 });
+			  const DirectX::XMFLOAT3& pos = { 0,0,0 },
+			  uint16_t hp = 1u);
+
+	inline void setHp(uint16_t hp) { this->hp = hp; }
+	inline uint16_t getHp() const { return hp; }
+
+	/// @brief ダメージを与える
+	/// @param damegeNum 与えるダメージ数
+	/// @param killFlag hpが0になったらkillするかどうか(trueでkillする)
+	/// @return 倒したかどうか(倒したらtrue)
+	bool damage(uint16_t damegeNum, bool killFlag = true);
 
 	inline void move(const DirectX::XMFLOAT3& vel)
 	{

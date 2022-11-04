@@ -547,8 +547,8 @@ void RailShoot::update_play()
 					// パーティクルを生成
 					createParticle(e->getPos(), 98U, 32.f, 16.f);
 					// 敵も自機弾もさよなら
-					e->kill();
 					pb.kill();
+					e->damage(1u, true);
 				}
 			}
 		}
@@ -564,8 +564,6 @@ void RailShoot::update_play()
 			{
 				for (auto& eb : e->getBulList())
 				{
-					if (!player->getAlive()) break;
-
 					//　存在しない敵弾の処理はしない
 					if (!eb->getAlive()) continue;
 

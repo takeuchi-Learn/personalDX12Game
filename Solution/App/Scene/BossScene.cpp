@@ -6,6 +6,8 @@
 #include "../Engine/System/SceneManager.h"
 #include "../Engine/System/PostEffect.h"
 
+#include "../Engine/Collision/Collision.h"
+
 using namespace DirectX;
 
 BossScene::BossScene() :
@@ -14,17 +16,32 @@ BossScene::BossScene() :
 	bossModel(new ObjModel("Resources/tori", "tori")),
 	boss(std::make_unique<BaseEnemy>(camera.get(), bossModel.get())),
 
-	smallEnemyModel(new ObjModel("Resources/tori", "tori"))
+	smallEnemyModel(new ObjModel("Resources/tori", "tori")),
+
+	// スプライト
+	bossHpGr(new Sprite(spBase->loadTexture(L"Resources/hpBar.png"), spBase.get(), XMFLOAT2(0.5f, 0.f)))
 {
+	// --------------------
+	// スプライト
+	// --------------------
+	bossHpGr->position = XMFLOAT3(WinAPI::window_width / 2.f, 0.f, 0.f);
+	bossHpGr->setSize(XMFLOAT2(WinAPI::window_width * 0.75f,
+							   WinAPI::window_height / 20.f));
+
 	// カメラ
 	constexpr float farZ = 1000.f;
 	camera->setParentObj(player.get());
 	camera->setFarZ(farZ);
 
+	// --------------------
 	// ゲームオブジェクト
+	// --------------------
+	playerHpMax = 20u;
 	player->setScale(10.f);
 
 	attackableEnemy.emplace_front(boss.get());
+	bossHpMax = 16u;
+	boss->setHp(bossHpMax);
 	boss->setScale(100.f);
 	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 300));
 	boss->setRotation(XMFLOAT3(0, 180.f, 0));
@@ -60,17 +77,22 @@ BossScene::BossScene() :
 					   });
 	}
 
-	constexpr size_t smallEnemyNum = 1u;
+	constexpr size_t smallEnemyNum = 3u;
 	smallEnemy.resize(smallEnemyNum);
+	smallEnemyHpMax = 1u;
 
-	for (auto& i : smallEnemy)
+	for (UINT i = 0u; i < smallEnemyNum; ++i)
 	{
-		i.reset(new BaseEnemy(camera.get(), smallEnemyModel.get()));
+		smallEnemy[i].reset(new BaseEnemy(camera.get(), smallEnemyModel.get()));
 
-		i->setScale(10.f);
-		i->setPos(XMFLOAT3(boss->getPos().x, i->getScaleF3().y, boss->getPos().z));
+		constexpr float enemyScale = 10.f;
+		smallEnemy[i]->setScale(enemyScale);
+		smallEnemy[i]->setHp(smallEnemyHpMax);
+		smallEnemy[i]->setPos(XMFLOAT3(boss->getPos().x + i * enemyScale,
+									   smallEnemy[i]->getScaleF3().y,
+									   boss->getPos().z));
 
-		attackableEnemy.emplace_front(i.get());
+		attackableEnemy.emplace_front(smallEnemy[i].get());
 	}
 }
 
@@ -88,12 +110,17 @@ void BossScene::update_play()
 
 	updateRgbShift();
 
-	// 自機の移動(と回転)
-	movePlayer();
-
-	// 当たり判定
 	if (player->getAlive())
 	{
+		// --------------------
+		// 自機の移動(と回転)
+		// --------------------
+		movePlayer();
+
+		// --------------------
+		// 照準に敵がいるかどうか
+		// --------------------
+
 		const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - aim2D->getSize().x / 2.f,
 										   input->getMousePos().y - aim2D->getSize().y / 2.f);
 		const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + aim2D->getSize().x / 2.f,
@@ -154,6 +181,38 @@ void BossScene::update_play()
 			{
 				constexpr float bulSpeed = 8.f;
 				player->shot(camera.get(), playerBulModel.get(), bulSpeed);
+			}
+		}
+
+		// --------------------
+		// 自機弾と敵の当たり判定
+		// --------------------
+		for (auto& e : attackableEnemy)
+		{
+			// いない敵は判定しない
+			if (!e->getAlive()) { continue; }
+
+			const CollisionShape::Sphere enemy(XMLoadFloat3(&e->calcWorldPos()),
+											   e->getScale());
+
+			for (auto& pb : player->getBulArr())
+			{
+				// 無い弾は判定しない
+				if (!pb.getAlive()) { continue; }
+
+				const CollisionShape::Sphere bul(XMLoadFloat3(&pb.calcWorldPos()),
+												 pb.getScaleF3().z);
+
+				// 衝突していたら
+				if (Collision::CheckHit(bul, enemy))
+				{
+					// 弾はさよなら
+					pb.kill();
+
+					// 敵はダメージを受ける
+					// hpが0になったらさよなら
+					e->damage(1u, true);
+				}
 			}
 		}
 	}
@@ -286,6 +345,12 @@ void BossScene::movePlayer()
 void BossScene::drawFrontSprite()
 {
 	spBase->drawStart(DX12Base::ins()->getCmdList());
+	{
+		XMFLOAT2 size = hpGrSizeMax;
+		size.x *= (float)boss->getHp() / (float)bossHpMax;
+		bossHpGr->setSize(size);
+	}
+	bossHpGr->drawWithUpdate(DX12Base::ins(), spBase.get());
 	aim2D->drawWithUpdate(DX12Base::ins(), spBase.get());
 
 	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x,
@@ -298,6 +363,12 @@ void BossScene::drawFrontSprite()
 	ImGui::Text("AD : 回転");
 	ImGui::Text("左シフト : ダッシュ");
 	ImGui::Text("E : カメラ位置変更");
+	if (boss->getAlive())
+	{
+		ImGui::Text("ボスHP : %.2f%% (%u)",
+					(float)boss->getHp() / (float)bossHpMax * 100.f,
+					boss->getHp());
+	}
 	ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x,
 								   ImGui::GetWindowPos().y + ImGui::GetWindowSize().y));
 	ImGui::End();

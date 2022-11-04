@@ -234,6 +234,9 @@
     <ClCompile Include="App\Scene\BaseStage.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="App\GameObject\EnemyMgr.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Camera\Camera.h">
@@ -361,6 +364,9 @@
     </ClInclude>
     <ClInclude Include="App\Scene\BaseStage.h">
       <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="App\GameObject\EnemyMgr.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
