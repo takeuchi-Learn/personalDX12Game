@@ -226,11 +226,11 @@ RailShoot::RailShoot()
 	{
 		// モデルを読み込む
 		constexpr UINT wallModelTexNum = 0u;
-		wallModel.reset(new ObjModel("Resources/sphere", "sphere", wallModelTexNum));
+		wallModel.reset(new ObjModel("Resources/wallBox", "wallBox", wallModelTexNum));
 
 		// 制御点の数だけオブジェクトを置く
 		const size_t splinePointNum = splinePoint.size() - 2u;
-		const size_t wallNum = splinePointNum * 5u;
+		const size_t wallNum = splinePointNum * 2u;
 		laneWall.resize(wallNum);
 
 		XMFLOAT3 dest{};
