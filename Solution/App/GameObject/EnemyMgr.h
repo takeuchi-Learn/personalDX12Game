@@ -11,6 +11,10 @@ private:
 
 	std::forward_list <std::unique_ptr<BaseEnemy>> smallEnemy;
 
+private:
+	void smallEnemy_Approach(BaseEnemy* enemy,
+							 const DirectX::XMFLOAT3& vel);
+
 public:
 	EnemyMgr(Camera* camera, Light* light);
 

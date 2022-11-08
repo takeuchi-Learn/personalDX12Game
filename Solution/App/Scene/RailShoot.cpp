@@ -285,20 +285,14 @@ RailShoot::RailShoot()
 	// todo 関数化
 	csvData = loadCsv("Resources/enemyScript.csv", true, ',', "//");
 	{
-		uint16_t waitFrame = 0u;
 		for (auto& y : csvData)
 		{
-			if (y[0] == "WAIT")
-			{
-				waitFrame += (uint16_t)std::stoi(y[1]);
-			} else if (y[0] == "PUSH")
-			{
-				enemyPopData.emplace_front(std::make_unique<PopEnemyData>(waitFrame,
-																		  XMFLOAT3(std::stof(y[1]),
-																				   std::stof(y[2]),
-																				   std::stof(y[3])),
-																		  XMFLOAT3(0, 0, -1)));
-			}
+			enemyPopData.emplace_front(
+				std::make_unique<PopEnemyData>((uint16_t)std::stoul(y[3]),
+											   XMFLOAT3(std::stof(y[0]),
+														std::stof(y[1]),
+														std::stof(y[2])),
+											   XMFLOAT3(0, 0, -1)));
 		}
 	}
 
@@ -307,14 +301,18 @@ RailShoot::RailShoot()
 	// --------------------
 
 	// 背景の天球
-	const float backScale = camera->getFarZ() * 0.9f;
-	back->setScale({ backScale, backScale, backScale });
+	{
+		const float backScale = camera->getFarZ() * 0.9f;
+		back->setScale({ backScale, backScale, backScale });
+	}
 
 	// 地面
-	constexpr UINT groundSize = 5000u;
-	ground->setPos(XMFLOAT3(0, -player->getScale(), (float)groundSize));
-	ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
-	ground->getModelPt()->setTexTilling(XMFLOAT2(groundSize / 32.f, groundSize / 32.f));
+	{
+		constexpr UINT groundSize = 5000u;
+		ground->setPos(XMFLOAT3(0, -player->getScale(), (float)groundSize));
+		ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
+		ground->getModelPt()->setTexTilling(XMFLOAT2(groundSize / 32.f, groundSize / 32.f));
+	}
 
 	// --------------------
 	// マウスカーソルは表示しない
