@@ -111,7 +111,7 @@ RailShoot::RailShoot()
 	// 敵モデル
 	// --------------------
 	enemyModel(std::make_unique<ObjModel>("Resources/tori", "tori", 0U, true)),
-	enemyBulModel(std::make_unique<ObjModel>("Resources/bullet", "bullet", 0U, true)),
+	enemyBulModel(std::make_unique<ObjModel>("Resources/tree", "tree", 0U, true)),
 
 	// --------------------
 	// 自機関連
