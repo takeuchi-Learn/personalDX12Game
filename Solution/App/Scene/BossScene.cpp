@@ -45,7 +45,8 @@ BossScene::BossScene() :
 	boss->setScale(100.f);
 	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 300));
 	boss->setRotation(XMFLOAT3(0, 180.f, 0));
-	boss->changePhase_approach(player.get());
+	boss->setTargetObj(player.get());
+	boss->changePhase_approach();
 
 	constexpr size_t smallEnemyNum = 3u;
 	smallEnemy.resize(smallEnemyNum);
@@ -329,11 +330,12 @@ void BossScene::drawFrontSprite()
 	ImGui::SetNextWindowSize(ImVec2(200.f, 200.f));
 
 	ImGui::Begin("ボス戦", nullptr, winFlags);
-	ImGui::Text("未実装\nスペースで次のシーンへ進む");
+	ImGui::Text("スペースで次のシーンへ進む");
 	ImGui::Text("WS : 移動");
 	ImGui::Text("AD : 回転");
 	ImGui::Text("左シフト : ダッシュ");
 	ImGui::Text("E : カメラ位置変更");
+	ImGui::Text("照準内に敵 + 左クリック : 攻撃");
 	if (boss->getAlive())
 	{
 		ImGui::Text("ボスHP : %.2f%% (%u)",

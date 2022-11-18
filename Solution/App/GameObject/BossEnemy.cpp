@@ -2,7 +2,7 @@
 
 using namespace DirectX;
 
-DirectX::XMVECTOR BossEnemy::calcVelVec(GameObj* targetObj)
+DirectX::XMVECTOR BossEnemy::calcVelVec()
 {
 	XMVECTOR velVec = XMLoadFloat3(&targetObj->getPos()) - XMLoadFloat3(&getPos());
 
@@ -24,15 +24,15 @@ void BossEnemy::moveAndRota(float moveSpeed, const DirectX::XMVECTOR& velVec)
 	setRotation(XMFLOAT3(rotaDeg.x, rotaDeg.y, 0.f));
 }
 
-void BossEnemy::phase_approach(GameObj* targetObj)
+void BossEnemy::phase_approach()
 {
-	XMVECTOR velVec = calcVelVec(targetObj);
+	XMVECTOR velVec = calcVelVec();
 
 	// 一定距離より近ければ遠ざかる
 	if (XMVectorGetX(XMVector3Length(velVec)) < getScaleF3().x)
 	{
 		// todo ここで近接攻撃を開始(攻撃関数へ遷移)
-		setPhase(std::bind(&BossEnemy::phase_leave, this, targetObj));
+		setPhase(std::bind(&BossEnemy::phase_leave, this));
 		return;
 	}
 
@@ -40,15 +40,15 @@ void BossEnemy::phase_approach(GameObj* targetObj)
 	moveAndRota(moveSpeed, velVec);
 }
 
-void BossEnemy::phase_leave(GameObj* targetObj)
+void BossEnemy::phase_leave()
 {
-	XMVECTOR velVec = calcVelVec(targetObj);
+	XMVECTOR velVec = calcVelVec();
 
 	// 一定距離より遠ければ近づく
 	if (XMVectorGetX(XMVector3Length(velVec)) > getScaleF3().x * 5.f)
 	{
 		// todo ここで遠距離攻撃を開始(攻撃関数へ遷移)
-		setPhase(std::bind(&BossEnemy::phase_approach, this, targetObj));
+		setPhase(std::bind(&BossEnemy::phase_approach, this));
 		return;
 	}
 
