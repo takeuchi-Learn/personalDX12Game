@@ -153,6 +153,7 @@ void BossScene::update_play()
 					powf(i->getPos().z - camera->getEye().z, 2.f)
 				);
 				// 照準の中で最も遠い敵なら情報を取っておく
+				player->addShotTarget(i->getObj());
 				if (farthestEnemyLen < nowEnemyDistance)
 				{
 					farthestEnemyPt = i;
@@ -164,18 +165,18 @@ void BossScene::update_play()
 		// いなければターゲットはいない
 		if (farthestEnemyPt != nullptr)
 		{
-			player->setShotTarget(farthestEnemyPt->getObj());
+			player->addShotTarget(farthestEnemyPt->getObj());
 			aim2D->color = XMFLOAT4(1, 0, 0, 1);
 		} else
 		{
-			player->setShotTarget(nullptr);
+			//player->setShotTarget(nullptr);
 			aim2D->color = XMFLOAT4(0, 0, 0, 1);
 		}
 
 		// --------------------
 		// 弾発射
 		// --------------------
-		if (player->shotTargetIsEmpty())
+		if (!player->shotTargetIsEmpty())
 		{
 			if (input->triggerMouseButton(Input::MOUSE::LEFT))
 			{

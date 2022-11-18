@@ -44,13 +44,24 @@ void CameraObj::preUpdate()
 	// 反転するなら1、しないなら-1
 	constexpr float rotaInvFactor = invCamOperFlag ? 1.f : -1.f;
 
-	XMFLOAT3 targetPos = parentObj->getPos();
+	XMFLOAT3 targetPos = parentObj->calcWorldPos();
+
+	XMFLOAT3 parentRota = parentObj->getRotation();
+	{
+		for (auto* parent = parentObj->getObj()->parent;
+			 parent;
+			 parent = parent->parent) {
+			parentRota.x += parent->rotation.x;
+			parentRota.y += parent->rotation.y;
+			parentRota.z += parent->rotation.z;
+		}
+	}
 
 	// 親の回転を取得[rad]
 	const XMFLOAT3 rotaAngleRad{
-		XMConvertToRadians(rotaInvFactor * (parentObj->getRotation().x + relativeRotaDeg.x)),
-		XMConvertToRadians(rotaInvFactor * (parentObj->getRotation().y + relativeRotaDeg.y)),
-		XMConvertToRadians(rotaInvFactor * (parentObj->getRotation().z + relativeRotaDeg.z))
+		XMConvertToRadians(rotaInvFactor * (parentRota.x + relativeRotaDeg.x)),
+		XMConvertToRadians(rotaInvFactor * (parentRota.y + relativeRotaDeg.y)),
+		XMConvertToRadians(rotaInvFactor * (parentRota.z + relativeRotaDeg.z))
 	};
 
 	// 垂直角度を計算

@@ -7,7 +7,6 @@ Player::Player(Camera* camera,
 			   const DirectX::XMFLOAT3& pos)
 	: GameObj(camera, model, pos)
 {
-	shotTargetObjPt = nullptr;
 }
 
 XMVECTOR Player::getLookVec(float len)
@@ -73,30 +72,36 @@ void Player::shot(Camera* camera,
 				  float speed,
 				  float bulScale)
 {
-	// C++17から追加した要素の参照が返ってくるようになった
-	PlayerBullet& i = bul.emplace_front(camera, model, obj->position);
-	i.setScale(bulScale);
-	i.setParent(obj->parent);
-
-	if (shotTargetObjPt == nullptr)
+	if (shotTargetObjPt.empty())
 	{
+		PlayerBullet& i = bul.emplace_front(camera, model, obj->position);
+		i.setScale(bulScale);
+		i.setParent(obj->parent);
 		i.setVel(XMFLOAT3(0, 0, speed));
 	} else
 	{
-		const XMFLOAT3 player2ShotTaregt{
-			shotTargetObjPt->position.x - obj->position.x,
-			shotTargetObjPt->position.y - obj->position.y,
-			shotTargetObjPt->position.z - obj->position.z,
-		};
+		for (auto& e : shotTargetObjPt) {
+			PlayerBullet& i = bul.emplace_front(camera, model, obj->position);
+			i.setScale(bulScale);
+			i.setParent(obj->parent);
 
-		// 照準のある方向へ、速さvelで飛んでいく
-		XMFLOAT3 vel{};
-		XMStoreFloat3(&vel, speed * XMVector3Normalize(XMVectorSet(player2ShotTaregt.x,
-																   player2ShotTaregt.y,
-																   player2ShotTaregt.z,
-																   1)));
+			const XMFLOAT3 player2ShotTaregt{
+			e->position.x - obj->position.x,
+			e->position.y - obj->position.y,
+			e->position.z - obj->position.z,
+			};
 
-		i.setVel(vel);
+			// 照準のある方向へ、速さvelで飛んでいく
+			XMFLOAT3 vel{};
+			XMStoreFloat3(&vel, speed * XMVector3Normalize(XMVectorSet(player2ShotTaregt.x,
+																	   player2ShotTaregt.y,
+																	   player2ShotTaregt.z,
+																	   1)));
+
+			i.setVel(vel);
+		}
+
+		shotTargetObjPt.clear();
 	}
 }
 

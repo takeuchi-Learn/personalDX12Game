@@ -38,6 +38,55 @@ float speedLine(float2 uv, float seed, float colourIntensity = 0.125f)
 	// (段階的な)角度を参考にノイズを返す
 	return saturate(fracNoise(float2(floorAngle, floorAngle))) * colourIntensity;
 }
+float4 dither(float4 texCol, float2 uv, float ditherSize = 1.f)
+{
+	float2 pixelSize = ditherSize / winSize;
+		
+	float2 num = floor(fmod(uv / pixelSize, 2.f));
+	float c = fmod(num.x + num.y, 2.f);
+		
+	static float colors = 4.f; // 1~16
+	static float dither = 0.125f; // 0~0.5
+		
+	float4 retCol = texCol;
+		
+	retCol.r = (round(texCol.r * colors + dither) / colors) * c;
+	retCol.g = (round(texCol.g * colors + dither) / colors) * c;
+	retCol.b = (round(texCol.b * colors + dither) / colors) * c;
+	c = 1.f - c;
+	retCol.r += (round(texCol.r * colors - dither) / colors) * c;
+	retCol.g += (round(texCol.g * colors - dither) / colors) * c;
+	retCol.b += (round(texCol.b * colors - dither) / colors) * c;
+		
+	return retCol;
+}
+
+float3 chromaticSlice(float t)
+{
+	float3 ret = float3(1.f - t, 1.f - abs(t - 1.f), t - 1.f);
+	return max(ret, 0.f);
+
+}
+
+float4 chromaticAberration(float2 uv, float level = 3.f, float spread = 0.03125f)
+{
+	float2 offset = (uv - 0.5f) * float2(1.f, -1.f);
+	float3 sum = float3(0.f, 0.f, 0.f);
+	float4 ret = float4(0.f, 0.f, 0.f, 1.f);
+		
+	for (float i = 0; i < level; i++)
+	{
+		float t = 2.f * i / float(level - 1); // range 0.0->2.0
+		float3 slice = float3(1.f - t, 1.f - abs(t - 1.f), t - 1.f);
+		slice = max(slice, 0.f);
+		sum += slice;
+		float2 slice_offset = (t - 1.f) * spread * offset;
+			
+		ret.rgb += slice * tex0.Sample(smp, uv + slice_offset).rgb;
+	}
+	ret.rgb /= sum;
+	return float4(ret.rgb, 1.f);
+}
 
 float4 main(VSOutput input) : SV_TARGET
 {
@@ -87,8 +136,8 @@ float4 main(VSOutput input) : SV_TARGET
 	// --------------------
 	// rgbずらし
 	// --------------------
-	float4 texColor0 = tex0.Sample(smp, uv);
-	texColor0.g = tex0.Sample(smp, uv + rgbShiftNum).g;
+	float4 texColor0 = dither(chromaticAberration(uv), uv, 2.f);
+	texColor0.g = dither(chromaticAberration(uv + rgbShiftNum), uv, 2.f).g;
 	static float gamma = 1.f / 2.2f;
 	texColor0 = pow(texColor0, gamma);
 

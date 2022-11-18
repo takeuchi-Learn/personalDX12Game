@@ -71,9 +71,9 @@ public:
 			  float vel = 1.f,
 			  float bulScale = 10.f);
 
-	// @return 毎秒進む値
+	// @return 進む値
 	inline const DirectX::XMFLOAT3& getVel() { return vel; }
-	// @param vel 毎秒進む値
+	// @param vel 進む値
 	inline void setVel(const DirectX::XMFLOAT3& vel) { this->vel = vel; }
 
 	inline void chansePhase_Leave(const DirectX::XMFLOAT3& vel)

@@ -11,6 +11,14 @@
 
 using namespace DirectX;
 
+namespace {
+	XMFLOAT3 operator+(const XMFLOAT3& r, const XMFLOAT3& l) {
+		return XMFLOAT3(r.x + l.x,
+						r.y + l.y,
+						r.z + l.z);
+	}
+}
+
 // std::stringの2次元配列(vector)
 using CSVType = std::vector<std::vector<std::string>>;
 // @brief loadCsvの入力をstd::stringにしたもの
@@ -226,7 +234,7 @@ RailShoot::RailShoot()
 	{
 		// モデルを読み込む
 		constexpr UINT wallModelTexNum = 0u;
-		wallModel.reset(new ObjModel("Resources/wallBox", "wallBox", wallModelTexNum));
+		wallModel.reset(new ObjModel("Resources/wallBox", "wallBox", wallModelTexNum, false));
 
 		// 制御点の数だけオブジェクトを置く
 		const size_t splinePointNum = splinePoint.size() - 2u;
@@ -243,7 +251,7 @@ RailShoot::RailShoot()
 			// オブジェクトの大きさを変更
 			// --------------------
 			constexpr float scale = 16.f;
-			laneWall[y].first->scale = XMFLOAT3(scale, scale, scale);
+			laneWall[y].first->scale = XMFLOAT3(scale, scale * 32.f, scale);
 			laneWall[y].second->scale = laneWall[y].first->scale;
 
 			// --------------------
@@ -489,11 +497,11 @@ void RailShoot::update_play()
 	enemyPopData.remove_if([&](std::unique_ptr<PopEnemyData>& i)
 						   {
 							   const bool ended = nowFrame >= i->popFrame;
-							   if (ended)
-							   {
-								   addEnemy(i->pos, i->vel);
-							   }
-							   return ended;
+	if (ended)
+	{
+		addEnemy(i->pos, i->vel);
+	}
+	return ended;
 						   });
 
 	// --------------------
@@ -504,17 +512,15 @@ void RailShoot::update_play()
 	// 自機移動回転
 	movePlayer();
 
-	// --------------------
-	// 自機の弾発射
-	// --------------------
-	playerShot();
 
 	// --------------------
 	// 弾発射
 	// --------------------
-	if (player->shotTargetIsEmpty())
+	updateAimCol();
+	if (input->triggerMouseButton(Input::MOUSE::LEFT))
 	{
-		if (input->triggerMouseButton(Input::MOUSE::LEFT))
+		updatePlayerShotTarget();
+		if (!player->shotTargetIsEmpty())
 		{
 			constexpr float bulSpeed = 8.f;
 			player->shot(camera.get(), playerBulModel.get(), bulSpeed);
@@ -543,7 +549,8 @@ void RailShoot::update_play()
 												  e->getScale())))
 				{
 					// パーティクルを生成
-					createParticle(e->getPos(), 98U, 32.f, 16.f);
+					XMFLOAT3 pos = e->calcWorldPos();
+					createParticle(pos, 98U, 32.f, 16.f);
 					// 敵も自機弾もさよなら
 					pb.kill();
 					e->damage(1u, true);
@@ -707,7 +714,7 @@ void RailShoot::movePlayer()
 	}
 }
 
-void RailShoot::playerShot()
+void RailShoot::updatePlayerShotTarget()
 {
 	// 照準の範囲
 	const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - aim2D->getSize().x / 2.f,
@@ -718,16 +725,11 @@ void RailShoot::playerShot()
 	// スクリーン上の敵の位置格納変数
 	XMFLOAT2 screenEnemyPos{};
 
-	// 遠い敵を調べるためのもの
-	float nowEnemyDistance{};
-	NormalEnemy* farthestEnemyPt = nullptr;
-	float farthestEnemyLen = 1.f;
-
-	// 最も近い敵の方へ弾を飛ばす
+	// 照準の中の敵の方へ弾を飛ばす
 	for (auto& i : enemy)
 	{
 		// いない敵は無視
-		if (!i->getAlive()) continue;
+		if (!i->getAlive()) { continue; }
 
 		// 敵のスクリーン座標を取得
 		screenEnemyPos = i->getObj()->calcScreenPos();
@@ -738,40 +740,43 @@ void RailShoot::playerShot()
 			aim2DMax.x >= screenEnemyPos.x &&
 			aim2DMax.y >= screenEnemyPos.y)
 		{
-			// 敵との距離を更新
-			nowEnemyDistance = sqrtf(
-				powf(i->getPos().x - camera->getEye().x, 2.f) +
-				powf(i->getPos().y - camera->getEye().y, 2.f) +
-				powf(i->getPos().z - camera->getEye().z, 2.f)
-			);
-			// 照準の中で最も遠い敵なら情報を取っておく
-			if (farthestEnemyLen < nowEnemyDistance)
-			{
-				farthestEnemyPt = i.get();
-				farthestEnemyLen = nowEnemyDistance;
-			}
+			player->addShotTarget(i->getObj());
 		}
 	}
+}
 
-	// 照準の中に敵がいればそこへ弾を出す
-	// いなければターゲットはいない
-	if (farthestEnemyPt != nullptr)
+void RailShoot::updateAimCol()
+{
+	// 照準の範囲
+	const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - aim2D->getSize().x / 2.f,
+									   input->getMousePos().y - aim2D->getSize().y / 2.f);
+	const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + aim2D->getSize().x / 2.f,
+									   input->getMousePos().y + aim2D->getSize().y / 2.f);
+
+	// スクリーン上の敵の位置格納変数
+	XMFLOAT2 screenEnemyPos{};
+
+
+	aim2D->color = XMFLOAT4(0, 0, 0, 1);
+
+	for (auto& i : enemy)
 	{
-		player->setShotTarget(farthestEnemyPt->getObj());
-		aim2D->color = XMFLOAT4(1, 0, 0, 1);
-	} else
-	{
-		player->setShotTarget(nullptr);
-		aim2D->color = XMFLOAT4(0, 0, 0, 1);
+		// いない敵は無視
+		if (!i->getAlive()) { continue; }
+
+		// 敵のスクリーン座標を取得
+		screenEnemyPos = i->getObj()->calcScreenPos();
+
+		// 敵が2D照準の中にいるかどうか
+		if (aim2DMin.x <= screenEnemyPos.x &&
+			aim2DMin.y <= screenEnemyPos.y &&
+			aim2DMax.x >= screenEnemyPos.x &&
+			aim2DMax.y >= screenEnemyPos.y)
+		{
+			aim2D->color = XMFLOAT4(1, 0, 0, 1);
+			break;
+		}
 	}
-#ifdef _DEBUG
-	// 照準の中に敵がいるかどうかを表示
-	debugText->formatPrint(spriteBase.get(),
-						   300.f, 0.f,
-						   1.f,
-						   { 1,1,1,1 },
-						   "%s", farthestEnemyPt != nullptr ? "IN" : "NO_ENEMY");
-#endif // _DEBUG
 }
 
 void RailShoot::drawObj3d()
@@ -815,6 +820,8 @@ void RailShoot::drawFrontSprite()
 	ImGui::Begin("情報", nullptr, DX12Base::imGuiWinFlagsDef);
 	ImGui::Text("FPS : %.3f", dxBase->getFPS());
 	ImGui::Text("敵数 : %u", std::distance(enemy.begin(), enemy.end()));
+	ImGui::Text("自機弾数 : %u", std::distance(player->getBulArr().begin(), player->getBulArr().end()));
+	ImGui::Text("先数 : %u", player->getShotTargetSize());
 	ImGui::Text("経過フレーム : %u", nowFrame);
 	ImGui::Text("自機体力 : %u", playerHp);
 	ImGui::End();

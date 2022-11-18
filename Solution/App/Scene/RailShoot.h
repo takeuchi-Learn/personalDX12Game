@@ -141,7 +141,9 @@ class RailShoot
 
 	void updateRailPos();
 	void movePlayer();
-	void playerShot();
+	void updatePlayerShotTarget();
+
+	void updateAimCol();
 
 public:
 	RailShoot();

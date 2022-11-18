@@ -4,6 +4,7 @@
 
 #include "PlayerBullet.h"
 #include <forward_list>
+#include <set>
 
 #include "GameObj.h"
 
@@ -17,7 +18,7 @@ class Player
 
 	DirectX::XMFLOAT2 aim2DPos{};
 
-	Object3d* shotTargetObjPt = nullptr;
+	std::set<Object3d*> shotTargetObjPt;
 
 public:
 	Player(Camera* camera,
@@ -26,8 +27,9 @@ public:
 
 	XMVECTOR getLookVec(float len = 1.f);
 
-	inline bool shotTargetIsEmpty() const { return shotTargetObjPt != nullptr; }
-	inline void setShotTarget(Object3d* targetPt) { shotTargetObjPt = targetPt; }
+	inline bool shotTargetIsEmpty() const { return shotTargetObjPt.empty(); }
+	inline void addShotTarget(Object3d* targetPt) { shotTargetObjPt.insert(targetPt); }
+	inline auto getShotTargetSize() const { return shotTargetObjPt.size(); }
 
 	inline auto& getBulArr() { return bul; }
 

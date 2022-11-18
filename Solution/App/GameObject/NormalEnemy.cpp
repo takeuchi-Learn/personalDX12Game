@@ -58,7 +58,7 @@ void NormalEnemy::phase_Approach()
 
 	if (getPos().z < 0.f)
 	{
-		phase = std::bind(&NormalEnemy::phase_Leave, this);
+		chansePhase_Leave(XMFLOAT3(1.f, 1.f, 0.f));
 	}
 }
 
