@@ -69,6 +69,9 @@ BossScene::BossScene() :
 
 void BossScene::update_start()
 {
+	PostEffect::getInstance()->setVignIntensity(0.5f);
+	PostEffect::getInstance()->setSpeedLineIntensity(0.125f);
+
 	update_proc = std::bind(&BossScene::update_play, this);
 }
 
@@ -345,4 +348,14 @@ void BossScene::drawFrontSprite()
 	ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x,
 								   ImGui::GetWindowPos().y + ImGui::GetWindowSize().y));
 	ImGui::End();
+}
+
+BossScene::~BossScene()
+{
+	PostEffect::getInstance()->setRgbShiftNum({ 0.f, 0.f });
+
+	PostEffect::getInstance()->setSpeedLineIntensity(0.f);
+	PostEffect::getInstance()->setVignIntensity(0.25f);
+
+	PostEffect::getInstance()->changePipeLine(0U);
 }

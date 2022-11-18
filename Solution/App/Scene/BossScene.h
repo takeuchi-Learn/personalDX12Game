@@ -56,6 +56,7 @@ private:
 
 public:
 	BossScene();
+	~BossScene();
 
 	void start() override;
 	void drawFrontSprite() override;
