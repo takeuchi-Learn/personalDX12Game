@@ -13,6 +13,7 @@
 #include "../Engine/3D/Obj/Object3d.h"
 #include "../Engine/3D/Obj/ObjSet.h"
 #include "../GameObject/BaseEnemy.h"
+#include "../GameObject/BossEnemy.h"
 
 #include "BaseStage.h"
 
@@ -23,7 +24,7 @@ private:
 	bool playerUpTurn = false;
 
 	std::unique_ptr<ObjModel> bossModel;
-	std::unique_ptr<BaseEnemy> boss;
+	std::unique_ptr<BossEnemy> boss;
 	uint16_t bossHpMax;
 
 	std::unique_ptr<ObjModel> smallEnemyModel;

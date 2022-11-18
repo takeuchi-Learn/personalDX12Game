@@ -14,7 +14,7 @@ BossScene::BossScene() :
 	BaseStage(),
 
 	bossModel(new ObjModel("Resources/tori", "tori")),
-	boss(std::make_unique<BaseEnemy>(camera.get(), bossModel.get())),
+	boss(std::make_unique<BossEnemy>(camera.get(), bossModel.get())),
 
 	smallEnemyModel(new ObjModel("Resources/tori", "tori")),
 
@@ -45,37 +45,7 @@ BossScene::BossScene() :
 	boss->setScale(100.f);
 	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 300));
 	boss->setRotation(XMFLOAT3(0, 180.f, 0));
-	{
-		boss->setPhase([&]
-					   {
-						   // ボスから自機へ向かうベクトル
-						   XMVECTOR velVec = XMLoadFloat3(&player->getPos()) - XMLoadFloat3(&boss->getPos());
-
-						   // Y方向には移動しない
-						   velVec = XMVectorSetY(velVec, 0.f);
-
-						   // 一定距離より近ければ移動しない
-						   if (XMVectorGetX(XMVector3Length(velVec)) < boss->getScaleF3().x)
-						   {
-							   return;
-						   }
-
-						   // 大きさを反映
-						   constexpr float speed = 2.f;
-						   velVec = XMVector3Normalize(velVec) * 2.f;
-
-						   // XMFLOAT3に変換
-						   XMFLOAT3 vel{ };
-						   XMStoreFloat3(&vel, velVec);
-
-						   // 移動
-						   boss->move(vel);
-
-						   // 速度に合わせて回転
-						   const XMFLOAT2 rotaDeg = GameObj::calcRotationSyncVelDeg(vel);
-						   boss->setRotation(XMFLOAT3(rotaDeg.x, rotaDeg.y, 0.f));
-					   });
-	}
+	boss->changePhase_approach(player.get());
 
 	constexpr size_t smallEnemyNum = 3u;
 	smallEnemy.resize(smallEnemyNum);
