@@ -57,7 +57,6 @@ protected:
 
 #pragma endregion 3Dオブジェクト
 
-
 	// スプライト
 	std::unique_ptr<SpriteBase> spBase;
 	std::unique_ptr<Sprite> aim2D;
@@ -86,7 +85,6 @@ protected:
 						  (float)WinAPI::window_height * 0.02f);
 
 #pragma endregion
-
 
 	// update_何とか関数を格納する
 	std::function<void()> update_proc;

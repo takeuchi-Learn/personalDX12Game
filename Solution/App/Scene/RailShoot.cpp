@@ -512,7 +512,6 @@ void RailShoot::update_play()
 	// 自機移動回転
 	movePlayer();
 
-
 	// --------------------
 	// 弾発射
 	// --------------------
@@ -755,7 +754,6 @@ void RailShoot::updateAimCol()
 
 	// スクリーン上の敵の位置格納変数
 	XMFLOAT2 screenEnemyPos{};
-
 
 	aim2D->color = XMFLOAT4(0, 0, 0, 1);
 

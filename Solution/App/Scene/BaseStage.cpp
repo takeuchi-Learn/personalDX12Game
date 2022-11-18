@@ -184,7 +184,6 @@ BaseStage::BaseStage() :
 
 #pragma endregion スプライト
 
-
 {
 	// --------------------
 	// 自機
@@ -273,7 +272,6 @@ void BaseStage::drawObj3d()
 
 void BaseStage::drawFrontSprite()
 {
-	
 	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x,
 								   fstWinPos.y));
 	ImGui::SetNextWindowSize(ImVec2(200.f, 100.f));

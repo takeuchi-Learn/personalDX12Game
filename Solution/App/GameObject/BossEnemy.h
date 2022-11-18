@@ -9,4 +9,3 @@ public:
 	void phase_approach(GameObj* targetObj);
 	inline void changePhase_approach(GameObj* targetObj) { setPhase(std::bind(&BossEnemy::phase_approach, this, targetObj)); }
 };
-

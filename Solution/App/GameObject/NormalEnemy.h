@@ -56,9 +56,9 @@ class NormalEnemy
 
 public:
 	NormalEnemy(Camera* camera,
-		  ObjModel* model,
-		  ObjModel* bulModel,
-		  const DirectX::XMFLOAT3& pos = { 0,0,0 });
+				ObjModel* model,
+				ObjModel* bulModel,
+				const DirectX::XMFLOAT3& pos = { 0,0,0 });
 
 	inline void setTargetObj(GameObj* targetObj) { this->targetObjPt = targetObj; }
 
