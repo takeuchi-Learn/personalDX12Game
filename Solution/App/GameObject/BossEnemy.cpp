@@ -31,6 +31,7 @@ void BossEnemy::phase_approach(GameObj* targetObj)
 	// 一定距離より近ければ遠ざかる
 	if (XMVectorGetX(XMVector3Length(velVec)) < getScaleF3().x)
 	{
+		// todo ここで近接攻撃を開始(攻撃関数へ遷移)
 		setPhase(std::bind(&BossEnemy::phase_leave, this, targetObj));
 		return;
 	}
@@ -46,6 +47,7 @@ void BossEnemy::phase_leave(GameObj* targetObj)
 	// 一定距離より遠ければ近づく
 	if (XMVectorGetX(XMVector3Length(velVec)) > getScaleF3().x * 5.f)
 	{
+		// todo ここで遠距離攻撃を開始(攻撃関数へ遷移)
 		setPhase(std::bind(&BossEnemy::phase_approach, this, targetObj));
 		return;
 	}
