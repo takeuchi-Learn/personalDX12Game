@@ -2,12 +2,16 @@
 
 using namespace DirectX;
 
-DirectX::XMVECTOR BossEnemy::calcVelVec()
+DirectX::XMVECTOR BossEnemy::calcVelVec(GameObj* me, bool moveYFlag)
 {
-	XMVECTOR velVec = XMLoadFloat3(&targetObj->getPos()) - XMLoadFloat3(&getPos());
+	XMVECTOR velVec = XMLoadFloat3(&targetObj->getPos()) - XMLoadFloat3(&me->getPos());
 
-	// Y方向には移動しない
-	return XMVectorSetY(velVec, 0.f);
+	if (!moveYFlag) {
+		// Y方向には移動しない
+		velVec = XMVectorSetY(velVec, 0.f);
+	}
+
+	return velVec;
 }
 
 void BossEnemy::moveAndRota(float moveSpeed, const DirectX::XMVECTOR& velVec)
@@ -24,9 +28,41 @@ void BossEnemy::moveAndRota(float moveSpeed, const DirectX::XMVECTOR& velVec)
 	setRotation(XMFLOAT3(rotaDeg.x, rotaDeg.y, 0.f));
 }
 
+void BossEnemy::afterUpdate()
+{
+	smallEnemy.remove_if([](const std::unique_ptr<BaseEnemy>& i) { return !i->getAlive(); });
+}
+
+void BossEnemy::additionalDraw(Light* light)
+{
+	for (auto& i : smallEnemy) {
+		i->drawWithUpdate(light);
+	}
+}
+
+void BossEnemy::addSmallEnemy(ObjModel* model)
+{
+	auto& i = smallEnemy.emplace_front();
+	i.reset(new BaseEnemy(camera, model));
+	i->setScale(10.f);
+	i->setParent(this->getParent());
+	i->setPos(this->getPos());
+	i->setHp(1u);
+	i->setPhase(
+		[&]
+		{
+			XMVECTOR velVec = calcVelVec(i.get(), true);
+		velVec = XMVector3Normalize(velVec) * moveSpeed * 2.f;
+		XMFLOAT3 vel{};
+		XMStoreFloat3(&vel, velVec);
+		i->move(vel);
+		}
+		);
+}
+
 void BossEnemy::phase_approach()
 {
-	XMVECTOR velVec = calcVelVec();
+	XMVECTOR velVec = calcVelVec(this);
 
 	// 一定距離より近ければ遠ざかる
 	if (XMVectorGetX(XMVector3Length(velVec)) < getScaleF3().x)
@@ -42,7 +78,7 @@ void BossEnemy::phase_approach()
 
 void BossEnemy::phase_leave()
 {
-	XMVECTOR velVec = calcVelVec();
+	XMVECTOR velVec = calcVelVec(this);
 
 	// 一定距離より遠ければ近づく
 	if (XMVectorGetX(XMVector3Length(velVec)) > getScaleF3().x * 5.f)

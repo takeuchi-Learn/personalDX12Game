@@ -9,6 +9,8 @@ protected:
 
 	std::function<void()> phase;
 
+	Camera* camera = nullptr;
+
 	virtual void afterUpdate() {}
 
 	void additionalUpdate() override;

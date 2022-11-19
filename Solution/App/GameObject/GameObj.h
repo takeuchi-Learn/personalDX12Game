@@ -28,6 +28,7 @@ public:
 		return DirectX::XMFLOAT2(DirectX::XMConvertToDegrees(rad.x), DirectX::XMConvertToDegrees(rad.y));
 	}
 
+	inline Object3d* getParent() { return obj->parent; }
 	inline void setParent(Object3d* parent) { obj->parent = parent; }
 
 	inline bool getAlive() const { return alive; }

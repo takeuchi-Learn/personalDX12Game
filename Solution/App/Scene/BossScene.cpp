@@ -82,6 +82,11 @@ void BossScene::update_play()
 		update_proc = std::bind(&BossScene::update_end, this);
 	}
 
+	if (input->triggerKey(DIK_P))
+	{
+		boss->addSmallEnemy(bossModel.get());
+	}
+
 	updateRgbShift();
 
 	if (player->getAlive())
@@ -339,6 +344,7 @@ void BossScene::drawFrontSprite()
 	ImGui::Text("左シフト : ダッシュ");
 	ImGui::Text("E : カメラ位置変更");
 	ImGui::Text("照準内に敵 + 左クリック : 攻撃");
+	ImGui::Text("敵弾数 : %u", boss->calcSmallEnemyNum());
 	if (boss->getAlive())
 	{
 		ImGui::Text("ボスHP : %.2f%% (%u)",

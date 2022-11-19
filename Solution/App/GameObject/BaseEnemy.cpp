@@ -5,6 +5,7 @@ BaseEnemy::BaseEnemy(Camera* camera,
 					 const DirectX::XMFLOAT3& pos,
 					 uint16_t hp) :
 	GameObj(camera, model, pos),
+	camera(camera),
 	hp(hp),
 	phase([] {})
 {
