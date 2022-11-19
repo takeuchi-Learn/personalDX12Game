@@ -176,7 +176,6 @@ void BossScene::update_play()
 			}
 		}
 
-
 		// --------------------
 		// 自機とボス弾(雑魚敵)の当たり判定
 		// --------------------
@@ -205,6 +204,31 @@ void BossScene::update_play()
 					{
 						startRgbShift();
 					}
+				}
+			}
+		}
+
+		// --------------------
+		// 自機弾とボス弾(雑魚敵)の当たり判定
+		// --------------------
+		for (auto& pb : player->getBulArr())
+		{
+			if (!pb.getAlive()) { continue; }
+
+			const CollisionShape::Sphere bul(XMLoadFloat3(&pb.calcWorldPos()),
+											 pb.getScaleF3().z);
+
+			for (auto& e : boss->getSmallEnemyList())
+			{
+				if (!e->getAlive()) { continue; }
+
+				const CollisionShape::Sphere enemy(XMLoadFloat3(&e->calcWorldPos()),
+												   e->getScale());
+
+				if (Collision::CheckHit(bul, enemy))
+				{
+					e->damage(1u, true);
+					pb.kill();
 				}
 			}
 		}
