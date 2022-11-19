@@ -86,6 +86,7 @@ void BossEnemy::phase_leave()
 	if (XMVectorGetX(XMVector3Length(velVec)) > getScaleF3().x * 5.f)
 	{
 		// todo ここで遠距離攻撃を開始(攻撃関数へ遷移)
+		addSmallEnemy();
 		setPhase(std::bind(&BossEnemy::phase_approach, this));
 		return;
 	}

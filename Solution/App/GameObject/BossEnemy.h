@@ -25,6 +25,8 @@ public:
 
 	size_t calcSmallEnemyNum() const { return std::distance(smallEnemy.begin(), smallEnemy.end()); }
 
+	inline const auto& getSmallEnemyList() const { return smallEnemy; }
+
 	inline ObjModel* getSmallEnemyModel() { return smallEnemyModel; }
 	inline void setSmallEnemyModel(ObjModel* model) { smallEnemyModel = model; }
 
