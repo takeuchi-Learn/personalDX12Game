@@ -47,7 +47,6 @@ protected:
 	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<ObjModel> playerBulModel;
 	uint16_t playerHpMax;
-	uint16_t playerHp;
 
 	// 攻撃可能な敵リスト
 	std::forward_list<BaseEnemy*> attackableEnemy;
@@ -93,9 +92,6 @@ protected:
 	virtual void update_end();
 
 	virtual void movePlayer();
-
-protected:
-	bool playerDamage(uint16_t damageNum);
 
 public:
 

@@ -31,8 +31,6 @@ private:
 	std::vector<std::unique_ptr<BaseEnemy>> smallEnemy;
 	uint16_t smallEnemyHpMax;
 
-	uint16_t playerHpMax;
-
 	// スプライト
 	inline static constexpr DirectX::XMFLOAT2 hpGrSizeMax = DirectX::XMFLOAT2(WinAPI::window_width * 0.75f,
 																			  WinAPI::window_height / 40.f);

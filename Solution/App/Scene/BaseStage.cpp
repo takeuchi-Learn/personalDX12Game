@@ -86,21 +86,6 @@ void BaseStage::movePlayer()
 	}
 }
 
-bool BaseStage::playerDamage(uint16_t damageNum)
-{
-	if (player->getAlive())
-	{
-		if (damageNum > playerHp)
-		{
-			playerHp = 0u;
-			player->kill();
-			return true;
-		}
-		playerHp -= damageNum;
-	}
-	return false;
-}
-
 BaseStage::CSVType BaseStage::loadCsv(const std::string& csvFilePath,
 									  bool commentFlag,
 									  char divChar,
@@ -165,7 +150,6 @@ BaseStage::BaseStage() :
 	playerModel(std::make_unique<ObjModel>("Resources/player", "player")),
 	playerBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
 	playerHpMax(20U),
-	playerHp(playerHpMax),
 
 #pragma endregion 自機関係
 

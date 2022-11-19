@@ -38,6 +38,7 @@ BossScene::BossScene() :
 	// --------------------
 	playerHpMax = 20u;
 	player->setScale(10.f);
+	player->setHp(playerHpMax);
 
 	attackableEnemy.emplace_front(boss.get());
 	bossHpMax = 16u;
@@ -196,6 +197,39 @@ void BossScene::update_play()
 				}
 			}
 		}
+
+
+		// --------------------
+		// 自機とボス弾(雑魚敵)の当たり判定
+		// --------------------
+		if (player->getAlive())
+		{
+			const CollisionShape::Sphere pCol(XMLoadFloat3(&player->getPos()),
+											  player->getScale());
+
+			for (auto& i : boss->getSmallEnemyList())
+			{
+				const CollisionShape::Sphere eCol(XMLoadFloat3(&i->getPos()),
+												  i->getScale());
+
+				if (Collision::CheckHit(pCol, eCol))
+				{
+					// 当たった雑魚敵は消す
+					i->kill();
+
+					// 自機がダメージを受ける
+					if (player->damage(1u, true))
+					{
+						// 自機の体力が0になったら
+						player->kill();
+						update_proc = std::bind(&BossScene::update_end, this);
+					} else
+					{
+						startRgbShift();
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -346,6 +380,7 @@ void BossScene::drawFrontSprite()
 	ImGui::Text("E : カメラ位置変更");
 	ImGui::Text("照準内に敵 + 左クリック : 攻撃");
 	ImGui::Text("敵弾数 : %u", boss->calcSmallEnemyNum());
+	ImGui::Text("自機体力 : %.2f%%", (float)player->getHp() / (float)playerHpMax * 100.f);
 	if (boss->getAlive())
 	{
 		ImGui::Text("ボスHP : %.2f%% (%u)",
