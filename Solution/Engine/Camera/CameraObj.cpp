@@ -50,7 +50,8 @@ void CameraObj::preUpdate()
 	{
 		for (auto* parent = parentObj->getObj()->parent;
 			 parent;
-			 parent = parent->parent) {
+			 parent = parent->parent)
+		{
 			parentRota.x += parent->rotation.x;
 			parentRota.y += parent->rotation.y;
 			parentRota.z += parent->rotation.z;

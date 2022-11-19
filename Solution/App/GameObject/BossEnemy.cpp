@@ -6,7 +6,8 @@ DirectX::XMVECTOR BossEnemy::calcVelVec(GameObj* me, bool moveYFlag)
 {
 	XMVECTOR velVec = XMLoadFloat3(&targetObj->getPos()) - XMLoadFloat3(&me->getPos());
 
-	if (!moveYFlag) {
+	if (!moveYFlag)
+	{
 		// Y方向には移動しない
 		velVec = XMVectorSetY(velVec, 0.f);
 	}
@@ -35,7 +36,8 @@ void BossEnemy::afterUpdate()
 
 void BossEnemy::additionalDraw(Light* light)
 {
-	for (auto& i : smallEnemy) {
+	for (auto& i : smallEnemy)
+	{
 		i->drawWithUpdate(light);
 	}
 }

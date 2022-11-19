@@ -11,8 +11,10 @@
 
 using namespace DirectX;
 
-namespace {
-	XMFLOAT3 operator+(const XMFLOAT3& r, const XMFLOAT3& l) {
+namespace
+{
+	XMFLOAT3 operator+(const XMFLOAT3& r, const XMFLOAT3& l)
+	{
 		return XMFLOAT3(r.x + l.x,
 						r.y + l.y,
 						r.z + l.z);

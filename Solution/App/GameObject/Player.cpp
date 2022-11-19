@@ -80,7 +80,8 @@ void Player::shot(Camera* camera,
 		i.setVel(XMFLOAT3(0, 0, speed));
 	} else
 	{
-		for (auto& e : shotTargetObjPt) {
+		for (auto& e : shotTargetObjPt)
+		{
 			PlayerBullet& i = bul.emplace_front(camera, model, obj->position);
 			i.setScale(bulScale);
 			i.setParent(obj->parent);
