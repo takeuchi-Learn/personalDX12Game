@@ -178,19 +178,11 @@ RailShoot::RailShoot()
 	camera->setEye(XMFLOAT3(0, WinAPI::getInstance()->getWindowSize().y * 0.06f, -180.f));	// 視点座標
 	camera->setTarget(XMFLOAT3(0, 0, 0));	// 注視点座標
 	camera->setUp(XMFLOAT3(0, 1, 0));		// 上方向
-	//camera->update();
 
 	// --------------------
 	// ライト初期化
 	// --------------------
 	light->setLightPos(camera->getEye());
-
-	// --------------------
-	// レール現在位置のオブジェクト
-	// --------------------
-	/*railObj->setPos(XMFLOAT3(0, 0, 0));
-	railObj->setScale(1.f);
-	railObj->setRotation(XMFLOAT3(0, 0, 0));*/
 
 	// --------------------
 	// 自機初期化
@@ -390,14 +382,8 @@ void RailShoot::createParticle(const DirectX::XMFLOAT3& pos,
 		constexpr float endScale = 0.f;
 		constexpr float startRota = 0.f, endRota = 0.f;
 
-		const XMFLOAT3 particlePos{
-			pos.x + railObj->getPos().x,
-			pos.y + railObj->getPos().y,
-			pos.z + railObj->getPos().z
-		};
-
 		// 追加
-		particleMgr->add(life, particlePos, vel, acc,
+		particleMgr->add(life, pos, vel, acc,
 						 startScale, endScale,
 						 startRota, endRota,
 						 startCol, endCol);
