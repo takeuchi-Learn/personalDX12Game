@@ -42,10 +42,10 @@ void BossEnemy::additionalDraw(Light* light)
 	}
 }
 
-void BossEnemy::addSmallEnemy(ObjModel* model)
+void BossEnemy::addSmallEnemy()
 {
 	auto& i = smallEnemy.emplace_front();
-	i.reset(new BaseEnemy(camera, model));
+	i.reset(new BaseEnemy(camera, smallEnemyModel));
 	i->setScale(10.f);
 	i->setParent(this->getParent());
 	i->setPos(this->getPos());

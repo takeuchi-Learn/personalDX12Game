@@ -46,6 +46,7 @@ BossScene::BossScene() :
 	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 300));
 	boss->setRotation(XMFLOAT3(0, 180.f, 0));
 	boss->setTargetObj(player.get());
+	boss->setSmallEnemyModel(bossModel.get());
 	boss->changePhase_approach();
 
 	constexpr size_t smallEnemyNum = 3u;
@@ -84,7 +85,7 @@ void BossScene::update_play()
 
 	if (input->triggerKey(DIK_P))
 	{
-		boss->addSmallEnemy(bossModel.get());
+		boss->addSmallEnemy();
 	}
 
 	updateRgbShift();
