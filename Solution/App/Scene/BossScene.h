@@ -45,6 +45,11 @@ private:
 	void startRgbShift();
 	void updateRgbShift();
 
+	/// @return 照準内に敵がいるかどうか
+	bool addShotTarget(BaseEnemy* enemy,
+					   const DirectX::XMFLOAT2& aim2DPosMin,
+					   const DirectX::XMFLOAT2& aim2DPosMax);
+
 	void movePlayer() override;
 
 	// update_何とか関数を格納する

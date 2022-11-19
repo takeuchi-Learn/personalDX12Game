@@ -107,51 +107,29 @@ void BossScene::update_play()
 		const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + aim2D->getSize().x / 2.f,
 										   input->getMousePos().y + aim2D->getSize().y / 2.f);
 
-		XMFLOAT2 screenEnemyPos{};
-		// 遠い敵を調べるためのもの
-		float nowEnemyDistance{};
-		BaseEnemy* farthestEnemyPt = nullptr;
-		float farthestEnemyLen = 1.f;
+		bool targetIsEmpty = true;
 
 		for (BaseEnemy* i : attackableEnemy)
 		{
 			// いない敵の判定は取らない
 			if (!i->getAlive()) { continue; }
 
-			// 敵のスクリーン座標を取得
-			screenEnemyPos = i->getObj()->calcScreenPos();
-
-			// 敵が2D照準の中にいるかどうか
-			if (aim2DMin.x <= screenEnemyPos.x &&
-				aim2DMin.y <= screenEnemyPos.y &&
-				aim2DMax.x >= screenEnemyPos.x &&
-				aim2DMax.y >= screenEnemyPos.y)
-			{
-				// 敵との距離を更新
-				nowEnemyDistance = sqrtf(
-					powf(i->getPos().x - camera->getEye().x, 2.f) +
-					powf(i->getPos().y - camera->getEye().y, 2.f) +
-					powf(i->getPos().z - camera->getEye().z, 2.f)
-				);
-				// 照準の中で最も遠い敵なら情報を取っておく
-				player->addShotTarget(i->getObj());
-				if (farthestEnemyLen < nowEnemyDistance)
-				{
-					farthestEnemyPt = i;
-					farthestEnemyLen = nowEnemyDistance;
-				}
-			}
+			targetIsEmpty = addShotTarget(i, aim2DMin, aim2DMax);
 		}
-		// 照準の中に敵がいればそこへ弾を出す
-		// いなければターゲットはいない
-		if (farthestEnemyPt != nullptr)
+		for (auto& i : boss->getSmallEnemyList())
 		{
-			player->addShotTarget(farthestEnemyPt->getObj());
-			aim2D->color = XMFLOAT4(1, 0, 0, 1);
+			if (!i->getAlive()) { continue; }
+
+			targetIsEmpty = addShotTarget(i.get(), aim2DMin, aim2DMax);
+		}
+
+		// 照準の中に敵がいれば色を変える
+		if (targetIsEmpty)
+		{
+			aim2D->color = XMFLOAT4(0, 0, 0, 1);
 		} else
 		{
-			//player->setShotTarget(nullptr);
-			aim2D->color = XMFLOAT4(0, 0, 0, 1);
+			aim2D->color = XMFLOAT4(1, 0, 0, 1);
 		}
 
 		// --------------------
@@ -274,6 +252,34 @@ void BossScene::updateRgbShift()
 
 		PostEffect::getInstance()->setRgbShiftNum({ easeRate * rgbShiftMumMax, 0.f });
 	}
+}
+
+bool BossScene::addShotTarget(BaseEnemy* enemy,
+							  const DirectX::XMFLOAT2& aim2DPosMin,
+							  const DirectX::XMFLOAT2& aim2DPosMax)
+{
+	bool targetIsEmpty = true;
+
+	// 敵のスクリーン座標を取得
+	const XMFLOAT2 screenEnemyPos = enemy->getObj()->calcScreenPos();
+
+	// 敵が2D照準の中にいるかどうか
+	if (aim2DPosMin.x <= screenEnemyPos.x &&
+		aim2DPosMin.y <= screenEnemyPos.y &&
+		aim2DPosMax.x >= screenEnemyPos.x &&
+		aim2DPosMax.y >= screenEnemyPos.y)
+	{
+		// 敵との距離を更新
+		const float nowEnemyDistance = sqrtf(
+			powf(enemy->getPos().x - camera->getEye().x, 2.f) +
+			powf(enemy->getPos().y - camera->getEye().y, 2.f) +
+			powf(enemy->getPos().z - camera->getEye().z, 2.f)
+		);
+		player->addShotTarget(enemy->getObj());
+		targetIsEmpty = false;
+	}
+
+	return targetIsEmpty;
 }
 
 void BossScene::movePlayer()
