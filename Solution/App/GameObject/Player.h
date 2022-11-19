@@ -20,10 +20,17 @@ class Player
 
 	std::set<Object3d*> shotTargetObjPt;
 
+	uint16_t hp;
+
 public:
 	Player(Camera* camera,
 		   ObjModel* model,
-		   const DirectX::XMFLOAT3& pos = { 0.f,0.f,0.f });
+		   const DirectX::XMFLOAT3& pos = { 0.f,0.f,0.f },
+		   uint16_t hp = 24u);
+
+	uint16_t getHp() const { return hp; }
+	void setHp(uint16_t hp) { this->hp = hp; }
+	bool damage(uint16_t damegeNum, bool killFlag = true);
 
 	XMVECTOR getLookVec(float len = 1.f);
 

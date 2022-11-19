@@ -129,7 +129,6 @@ RailShoot::RailShoot()
 	playerModel(std::make_unique<ObjModel>("Resources/tori", "tori")),
 	playerBulModel(std::make_unique<ObjModel>("Resources/bullet", "bullet", 0U, true)),
 	playerHpMax(20u),
-	playerHp(playerHpMax),
 
 	// --------------------
 	// レール現在位置のオブジェクト
@@ -200,6 +199,7 @@ RailShoot::RailShoot()
 	player->setScale(16.f);
 	player->setParent(railObj.get());
 	player->setPos(XMFLOAT3(0, 12.f, 0));
+	player->setHp(playerHpMax);
 
 	// カメラをレールに追従させる
 	camera->setParentObj(railObj.get());
@@ -580,8 +580,9 @@ void RailShoot::update_play()
 					{
 						// 当たった敵弾は消す
 						eb->kill();
+
 						// HPが無くなったら次のシーンへ進む
-						if (--playerHp <= 0u)
+						if (player->damage(1u, true))
 						{
 							changeNextScene();
 							player->kill();
@@ -823,12 +824,12 @@ void RailShoot::drawFrontSprite()
 	ImGui::Text("自機弾数 : %u", std::distance(player->getBulArr().begin(), player->getBulArr().end()));
 	ImGui::Text("先数 : %u", player->getShotTargetSize());
 	ImGui::Text("経過フレーム : %u", nowFrame);
-	ImGui::Text("自機体力 : %u", playerHp);
+	ImGui::Text("自機体力 : %u", player->getHp());
 	ImGui::End();
 
 	spriteBase->drawStart(dxBase->getCmdList());
 
-	hpBar->setSize(XMFLOAT2((float)playerHp / (float)playerHpMax * hpBarWidMax,
+	hpBar->setSize(XMFLOAT2((float)player->getHp() / (float)playerHpMax * hpBarWidMax,
 							hpBar->getSize().y));
 	hpBar->drawWithUpdate(dxBase, spriteBase.get());
 

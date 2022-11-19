@@ -54,7 +54,6 @@ class RailShoot
 	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<ObjModel> playerBulModel;
 	uint16_t playerHpMax;
-	uint16_t playerHp;
 
 	// レールの現在位置を示すオブジェクト
 	std::unique_ptr<GameObj> railObj;

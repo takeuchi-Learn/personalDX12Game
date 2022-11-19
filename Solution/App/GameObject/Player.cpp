@@ -4,8 +4,10 @@ using namespace DirectX;
 
 Player::Player(Camera* camera,
 			   ObjModel* model,
-			   const DirectX::XMFLOAT3& pos)
-	: GameObj(camera, model, pos)
+			   const DirectX::XMFLOAT3& pos,
+			   uint16_t hp)
+	: GameObj(camera, model, pos),
+	hp(hp)
 {
 }
 
@@ -15,6 +17,19 @@ XMVECTOR Player::getLookVec(float len)
 						   XMQuaternionRotationRollPitchYaw(obj->rotation.x,
 															obj->rotation.y,
 															obj->rotation.z));
+}
+
+bool Player::damage(uint16_t damegeNum, bool killFlag)
+{
+	if (damegeNum >= hp)
+	{
+		hp = 0u;
+		if (killFlag) { kill(); }
+		return true;
+	}
+
+	hp -= damegeNum;
+	return false;
 }
 
 void Player::moveForward(float moveVel, bool moveYFlag)
