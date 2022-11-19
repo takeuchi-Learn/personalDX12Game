@@ -17,7 +17,7 @@ class NormalEnemy
 
 	Camera* camera = nullptr;
 
-	constexpr static const uint32_t shotFrameMax = 60U;
+	constexpr static const uint32_t shotFrameMax = 240U;
 	uint32_t shotFrame = 0;
 
 	GameObj* targetObjPt = nullptr;
