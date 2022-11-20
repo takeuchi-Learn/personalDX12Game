@@ -61,7 +61,7 @@ BossScene::BossScene() :
 		constexpr float enemyScale = 10.f;
 		smallEnemy[i]->setScale(enemyScale);
 		smallEnemy[i]->setHp(smallEnemyHpMax);
-		smallEnemy[i]->setPos(XMFLOAT3(boss->getPos().x + i * enemyScale,
+		smallEnemy[i]->setPos(XMFLOAT3(boss->getPos().x + i * enemyScale * 10.f,
 									   smallEnemy[i]->getScaleF3().y,
 									   boss->getPos().z));
 
@@ -79,10 +79,14 @@ void BossScene::update_start()
 
 void BossScene::update_play()
 {
+#ifdef _DEBUG
+
 	if (Input::getInstance()->hitKey(DIK_SPACE))
 	{
 		update_proc = std::bind(&BossScene::update_end, this);
 	}
+
+#endif // _DEBUG
 
 	if (input->triggerKey(DIK_P))
 	{
@@ -107,35 +111,16 @@ void BossScene::update_play()
 		const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + aim2D->getSize().x / 2.f,
 										   input->getMousePos().y + aim2D->getSize().y / 2.f);
 
-		bool targetIsEmpty = true;
-
-		for (BaseEnemy* i : attackableEnemy)
-		{
-			// いない敵の判定は取らない
-			if (!i->getAlive()) { continue; }
-
-			targetIsEmpty = addShotTarget(i, aim2DMin, aim2DMax);
+		std::forward_list<BaseEnemy*> inAim2DEnemy = attackableEnemy;
+		for (auto& i : boss->getSmallEnemyList()) {
+			inAim2DEnemy.emplace_front(i.get());
 		}
-		for (auto& i : boss->getSmallEnemyList())
-		{
-			if (!i->getAlive()) { continue; }
-
-			targetIsEmpty = addShotTarget(i.get(), aim2DMin, aim2DMax);
-		}
-
-		// 照準の中に敵がいれば色を変える
-		if (targetIsEmpty)
-		{
-			aim2D->color = XMFLOAT4(0, 0, 0, 1);
-		} else
-		{
-			aim2D->color = XMFLOAT4(1, 0, 0, 1);
-		}
+		addShotTarget(inAim2DEnemy, aim2DMin, aim2DMax);
 
 		// --------------------
 		// 弾発射
 		// --------------------
-		if (!player->shotTargetIsEmpty())
+		if (player->getShotTarget())
 		{
 			if (input->triggerMouseButton(Input::MOUSE::LEFT))
 			{
@@ -232,6 +217,11 @@ void BossScene::update_play()
 				}
 			}
 		}
+
+		if (!boss->getAlive())
+		{
+			update_proc = std::bind(&BossScene::update_end, this);
+		}
 	}
 }
 
@@ -278,29 +268,57 @@ void BossScene::updateRgbShift()
 	}
 }
 
-bool BossScene::addShotTarget(BaseEnemy* enemy,
+bool BossScene::addShotTarget(const std::forward_list<BaseEnemy*>& enemy,
 							  const DirectX::XMFLOAT2& aim2DPosMin,
 							  const DirectX::XMFLOAT2& aim2DPosMax)
 {
 	bool targetIsEmpty = true;
 
-	// 敵のスクリーン座標を取得
-	const XMFLOAT2 screenEnemyPos = enemy->getObj()->calcScreenPos();
+	// 遠い敵を調べるためのもの
+	float nowEnemyDistance{};
+	BaseEnemy* farthestEnemyPt = nullptr;
+	float farthestEnemyLen = 1.f;
 
-	// 敵が2D照準の中にいるかどうか
-	if (aim2DPosMin.x <= screenEnemyPos.x &&
-		aim2DPosMin.y <= screenEnemyPos.y &&
-		aim2DPosMax.x >= screenEnemyPos.x &&
-		aim2DPosMax.y >= screenEnemyPos.y)
+	// 照準の中の敵の方へ弾を飛ばす
+	for (auto& i : enemy)
 	{
-		// 敵との距離を更新
-		const float nowEnemyDistance = sqrtf(
-			powf(enemy->getPos().x - camera->getEye().x, 2.f) +
-			powf(enemy->getPos().y - camera->getEye().y, 2.f) +
-			powf(enemy->getPos().z - camera->getEye().z, 2.f)
-		);
-		player->addShotTarget(enemy->getObj());
-		targetIsEmpty = false;
+		// いない敵は無視
+		if (!i->getAlive()) { continue; }
+
+		// 敵のスクリーン座標を取得
+		const XMFLOAT2 screenEnemyPos = i->getObj()->calcScreenPos();
+
+		// 敵が2D照準の中にいるかどうか
+		if (aim2DPosMin.x <= screenEnemyPos.x &&
+			aim2DPosMin.y <= screenEnemyPos.y &&
+			aim2DPosMax.x >= screenEnemyPos.x &&
+			aim2DPosMax.y >= screenEnemyPos.y)
+		{
+			// 敵との距離を更新
+			nowEnemyDistance = sqrtf(
+				powf(i->getPos().x - camera->getEye().x, 2.f) +
+				powf(i->getPos().y - camera->getEye().y, 2.f) +
+				powf(i->getPos().z - camera->getEye().z, 2.f)
+			);
+			// 照準の中で最も遠い敵なら情報を取っておく
+			if (farthestEnemyLen < nowEnemyDistance)
+			{
+				farthestEnemyPt = i;
+				farthestEnemyLen = nowEnemyDistance;
+			}
+		}
+	}
+
+	// 照準の中に敵がいればそこへ弾を出す
+	// いなければターゲットはいない
+	if (farthestEnemyPt != nullptr)
+	{
+		player->setShotTarget(farthestEnemyPt->getObj());
+		aim2D->color = XMFLOAT4(1, 0, 0, 1);
+	} else
+	{
+		player->setShotTarget(nullptr);
+		aim2D->color = XMFLOAT4(0, 0, 0, 1);
 	}
 
 	return targetIsEmpty;

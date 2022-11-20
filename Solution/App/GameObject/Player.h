@@ -18,7 +18,7 @@ class Player
 
 	DirectX::XMFLOAT2 aim2DPos{};
 
-	std::set<Object3d*> shotTargetObjPt;
+	Object3d* shotTargetObjPt;
 
 	uint16_t hp;
 
@@ -34,9 +34,8 @@ public:
 
 	XMVECTOR getLookVec(float len = 1.f);
 
-	inline bool shotTargetIsEmpty() const { return shotTargetObjPt.empty(); }
-	inline void addShotTarget(Object3d* targetPt) { shotTargetObjPt.insert(targetPt); }
-	inline auto getShotTargetSize() const { return shotTargetObjPt.size(); }
+	inline const Object3d* getShotTarget() const { return shotTargetObjPt; }
+	inline void setShotTarget(Object3d* targetPt) { shotTargetObjPt = targetPt; }
 
 	inline auto& getBulArr() { return bul; }
 

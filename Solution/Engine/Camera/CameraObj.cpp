@@ -22,6 +22,14 @@ void CameraObj::updateMatWorld()
 						target.z - eye.z);
 
 	rota = parentObj->getRotation();
+	for (auto* parent = parentObj->getParent();
+		 parent;
+		 parent = parent->parent)
+	{
+		rota.x += parent->rotation.x;
+		rota.y += parent->rotation.y;
+		rota.z += parent->rotation.z;
+	}
 
 	matRot = XMMatrixIdentity();
 	matRot *= XMMatrixRotationZ(XMConvertToRadians(rota.z));

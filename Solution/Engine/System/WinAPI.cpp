@@ -11,12 +11,14 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 WinAPI::WinAPI()
 	: windowSize({ window_width, window_height })
 {
-	// 初期状態のウィンドウタイトル
-	constexpr wchar_t winTitleDef[] = L"DX12Game (SE : OtoLogic)";
+	constexpr size_t wfilepathLen = 256ui64;
+	wchar_t wfilepath[wfilepathLen]{};
+	MultiByteToWideChar(CP_ACP, 0, winTitleDef, -1,
+						wfilepath, wfilepathLen);
 
 	w.cbSize = sizeof(WNDCLASSEX);
 	w.lpfnWndProc = (WNDPROC)WindowProc; // ウィンドウプロシージャを設定
-	w.lpszClassName = winTitleDef; // ウィンドウクラス名
+	w.lpszClassName = wfilepath; // ウィンドウクラス名
 	w.hInstance = GetModuleHandle(nullptr); // ウィンドウハンドル
 	w.hCursor = LoadCursor(NULL, IDC_ARROW); // カーソル指定
 
@@ -28,7 +30,7 @@ WinAPI::WinAPI()
 
 	// ウィンドウオブジェクトの生成
 	hwnd = CreateWindow(w.lpszClassName,		// クラス名
-						winTitleDef,			// タイトルバーの文字
+						wfilepath,			// タイトルバーの文字
 						windowStyle,			// ウィンドウスタイル
 						CW_USEDEFAULT,			// 表示X座標（OSに任せる）
 						CW_USEDEFAULT,			// 表示Y座標（OSに任せる）

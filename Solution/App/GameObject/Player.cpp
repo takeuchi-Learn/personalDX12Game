@@ -87,7 +87,7 @@ void Player::shot(Camera* camera,
 				  float speed,
 				  float bulScale)
 {
-	if (shotTargetObjPt.empty())
+	if (!shotTargetObjPt)
 	{
 		PlayerBullet& i = bul.emplace_front(camera, model, obj->position);
 		i.setScale(bulScale);
@@ -95,29 +95,24 @@ void Player::shot(Camera* camera,
 		i.setVel(XMFLOAT3(0, 0, speed));
 	} else
 	{
-		for (auto& e : shotTargetObjPt)
-		{
-			PlayerBullet& i = bul.emplace_front(camera, model, obj->position);
-			i.setScale(bulScale);
-			i.setParent(obj->parent);
+		PlayerBullet& i = bul.emplace_front(camera, model, obj->position);
+		i.setScale(bulScale);
+		i.setParent(obj->parent);
 
-			const XMFLOAT3 player2ShotTaregt{
-			e->position.x - obj->position.x,
-			e->position.y - obj->position.y,
-			e->position.z - obj->position.z,
-			};
+		const XMFLOAT3 player2ShotTaregt{
+			shotTargetObjPt->position.x - obj->position.x,
+			shotTargetObjPt->position.y - obj->position.y,
+			shotTargetObjPt->position.z - obj->position.z,
+		};
 
-			// 照準のある方向へ、速さvelで飛んでいく
-			XMFLOAT3 vel{};
-			XMStoreFloat3(&vel, speed * XMVector3Normalize(XMVectorSet(player2ShotTaregt.x,
-																	   player2ShotTaregt.y,
-																	   player2ShotTaregt.z,
-																	   1)));
+		// 照準のある方向へ、速さvelで飛んでいく
+		XMFLOAT3 vel{};
+		XMStoreFloat3(&vel, speed * XMVector3Normalize(XMVectorSet(player2ShotTaregt.x,
+																   player2ShotTaregt.y,
+																   player2ShotTaregt.z,
+																   1)));
 
-			i.setVel(vel);
-		}
-
-		shotTargetObjPt.clear();
+		i.setVel(vel);
 	}
 }
 

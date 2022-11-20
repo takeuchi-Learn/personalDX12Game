@@ -507,7 +507,7 @@ void RailShoot::update_play()
 	if (input->triggerMouseButton(Input::MOUSE::LEFT))
 	{
 		updatePlayerShotTarget();
-		if (!player->shotTargetIsEmpty())
+		if (player->getShotTarget())
 		{
 			constexpr float bulSpeed = 8.f;
 			player->shot(camera.get(), playerBulModel.get(), bulSpeed);
@@ -713,6 +713,11 @@ void RailShoot::updatePlayerShotTarget()
 	// スクリーン上の敵の位置格納変数
 	XMFLOAT2 screenEnemyPos{};
 
+	// 遠い敵を調べるためのもの
+	float nowEnemyDistance{};
+	NormalEnemy* farthestEnemyPt = nullptr;
+	float farthestEnemyLen = 1.f;
+
 	// 照準の中の敵の方へ弾を飛ばす
 	for (auto& i : enemy)
 	{
@@ -728,8 +733,31 @@ void RailShoot::updatePlayerShotTarget()
 			aim2DMax.x >= screenEnemyPos.x &&
 			aim2DMax.y >= screenEnemyPos.y)
 		{
-			player->addShotTarget(i->getObj());
+			// 敵との距離を更新
+			nowEnemyDistance = sqrtf(
+				powf(i->getPos().x - camera->getEye().x, 2.f) +
+				powf(i->getPos().y - camera->getEye().y, 2.f) +
+				powf(i->getPos().z - camera->getEye().z, 2.f)
+			);
+			// 照準の中で最も遠い敵なら情報を取っておく
+			if (farthestEnemyLen < nowEnemyDistance)
+			{
+				farthestEnemyPt = i.get();
+				farthestEnemyLen = nowEnemyDistance;
+			}
 		}
+	}
+
+	// 照準の中に敵がいればそこへ弾を出す
+	// いなければターゲットはいない
+	if (farthestEnemyPt != nullptr)
+	{
+		player->setShotTarget(farthestEnemyPt->getObj());
+		aim2D->color = XMFLOAT4(1, 0, 0, 1);
+	} else
+	{
+		player->setShotTarget(nullptr);
+		aim2D->color = XMFLOAT4(0, 0, 0, 1);
 	}
 }
 
@@ -808,7 +836,6 @@ void RailShoot::drawFrontSprite()
 	ImGui::Text("FPS : %.3f", dxBase->getFPS());
 	ImGui::Text("敵数 : %u", std::distance(enemy.begin(), enemy.end()));
 	ImGui::Text("自機弾数 : %u", std::distance(player->getBulArr().begin(), player->getBulArr().end()));
-	ImGui::Text("先数 : %u", player->getShotTargetSize());
 	ImGui::Text("経過フレーム : %u", nowFrame);
 	ImGui::Text("自機体力 : %u", player->getHp());
 	ImGui::End();

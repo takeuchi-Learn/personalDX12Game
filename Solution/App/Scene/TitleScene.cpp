@@ -65,8 +65,9 @@ void TitleScene::drawFrontSprite()
 
 	ImGui::Begin("情報", nullptr, winFlags);
 	ImGui::PushFont(DX12Base::ins()->getBigImFont());
-	ImGui::Text("げぇむたいとるっ！");
+	ImGui::Text(WinAPI::winTitleDef);
 	ImGui::PopFont();
+	ImGui::Text("SE : OtoLogic");
 	ImGui::Text("Press Space");
 	ImGui::End();
 }

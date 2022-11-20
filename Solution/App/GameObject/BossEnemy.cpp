@@ -85,12 +85,28 @@ void BossEnemy::phase_leave()
 	// 一定距離より遠ければ近づく
 	if (XMVectorGetX(XMVector3Length(velVec)) > getScaleF3().x * 5.f)
 	{
-		// todo ここで遠距離攻撃を開始(攻撃関数へ遷移)
-		addSmallEnemy();
-		setPhase(std::bind(&BossEnemy::phase_approach, this));
+		// ここで遠距離攻撃を開始(攻撃関数へ遷移)
+		setPhase(std::bind(&BossEnemy::phase_attack, this));
+		nowShotFrame = shotInterval;
+		shotNum = 0u;
 		return;
 	}
 
 	// 大きさを反映
 	moveAndRota(moveSpeed, -velVec);
+}
+
+void BossEnemy::phase_attack()
+{
+	if (nowShotFrame++ >= shotInterval)
+	{
+		addSmallEnemy();
+		nowShotFrame = 0u;
+
+		if (shotNum++ >= shotNumMax)
+		{
+			shotNum = 0;
+			setPhase(std::bind(&BossEnemy::phase_approach, this));
+		}
+	}
 }

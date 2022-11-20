@@ -13,6 +13,11 @@ class BossEnemy :
 	ObjModel* smallEnemyModel = nullptr;
 	std::forward_list<std::unique_ptr<BaseEnemy>> smallEnemy;
 
+	static inline const uint32_t shotInterval = 240u;
+	uint32_t nowShotFrame = 0u;
+	static inline const uint32_t shotNumMax = 5u;
+	uint32_t shotNum = 0u;
+
 	DirectX::XMVECTOR calcVelVec(GameObj* me, bool moveYFlag = false);
 
 	void moveAndRota(float moveSpeed, const DirectX::XMVECTOR& velVec);
@@ -39,4 +44,6 @@ public:
 	inline void changePhase_approach() { setPhase(std::bind(&BossEnemy::phase_approach, this)); }
 
 	void phase_leave();
+
+	void phase_attack();
 };

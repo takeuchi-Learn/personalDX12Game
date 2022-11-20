@@ -46,7 +46,7 @@ private:
 	void updateRgbShift();
 
 	/// @return 照準内に敵がいるかどうか
-	bool addShotTarget(BaseEnemy* enemy,
+	bool addShotTarget(const std::forward_list<BaseEnemy*>& enemy,
 					   const DirectX::XMFLOAT2& aim2DPosMin,
 					   const DirectX::XMFLOAT2& aim2DPosMax);
 
