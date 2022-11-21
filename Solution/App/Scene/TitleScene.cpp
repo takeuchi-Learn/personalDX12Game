@@ -14,6 +14,8 @@ TitleScene::TitleScene()
 {
 	input = Input::getInstance();
 
+	shortBridge = std::make_unique<Sound>("Resources/SE/Shortbridge29-1.wav");
+
 	spCom.reset(new SpriteBase());
 
 	// デバッグテキスト用のテクスチャ読み込み
@@ -39,6 +41,7 @@ void TitleScene::update_normal()
 	if (input->triggerKey(DIK_SPACE))
 	{
 		update_proc = std::bind(&TitleScene::update_end, this);
+		Sound::SoundPlayWave(shortBridge.get());
 	}
 }
 

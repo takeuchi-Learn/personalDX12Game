@@ -7,10 +7,15 @@
 
 #include "../Engine/2D/DebugText.h"
 #include "../Engine/Input/Input.h"
+#include "../Engine/Sound/Sound.h"
 
 class TitleScene :
 	public GameScene
 {
+	// --------------------
+	// 音
+	// --------------------
+	std::unique_ptr<Sound> shortBridge;
 
 	// --------------------
 	// スプライト
