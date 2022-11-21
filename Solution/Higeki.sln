@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.2.32519.379
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DirectXGame", "DirectXGame.vcxproj", "{26DD8DFC-3B13-41B6-ADDC-3FFED3091A03}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Higeki", "Higeki.vcxproj", "{26DD8DFC-3B13-41B6-ADDC-3FFED3091A03}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imgui", "imgui\imgui.vcxproj", "{05525985-C110-44D6-A3BE-275262FDB18A}"
 EndProject

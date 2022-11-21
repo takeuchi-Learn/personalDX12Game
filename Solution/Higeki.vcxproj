@@ -22,7 +22,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{26dd8dfc-3b13-41b6-addc-3ffed3091a03}</ProjectGuid>
-    <RootNamespace>DirectXGame</RootNamespace>
+    <RootNamespace>Higeki</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectName>Higeki</ProjectName>
   </PropertyGroup>
