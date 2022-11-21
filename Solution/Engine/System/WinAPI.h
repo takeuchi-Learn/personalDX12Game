@@ -28,7 +28,8 @@ public:
 	const static int window_height = 720;
 
 	// 初期状態のウィンドウタイトル
-	inline static const char winTitleDef[] = "DX12Game";
+	inline static const char winTitleDef[] = "飛撃";
+	inline static const wchar_t winTitleDef_wc[] = L"飛撃";
 
 	// アスペクト比固定でウィンドウサイズを変更
 	bool setWindowWidth(int sizeX);

@@ -11,10 +11,17 @@
 class TitleScene :
 	public GameScene
 {
+
+	// --------------------
+	// スプライト
+	// --------------------
+	std::unique_ptr<SpriteBase> spCom;
+	std::unique_ptr<Sprite> title;
+	std::unique_ptr<Sprite> titleBack;
+
 	// --------------------
 	// デバッグテキスト
 	// --------------------
-	std::unique_ptr<SpriteBase> spCom;
 	std::unique_ptr<DebugText> debugText;
 	// デバッグテキスト用のテクスチャ番号
 	UINT debugTextTexNumber;

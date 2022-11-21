@@ -20,13 +20,18 @@ TitleScene::TitleScene()
 	debugTextTexNumber = spCom->loadTexture(L"Resources/debugfont.png");
 
 	debugText.reset(new DebugText(debugTextTexNumber, spCom.get()));
+
+	title = std::make_unique<Sprite>(spCom->loadTexture(L"Resources/title.png"),
+									 spCom.get(),
+									 XMFLOAT2(0.f, 0.f));
+	titleBack = std::make_unique<Sprite>(spCom->loadTexture(L"Resources/titleBack.png"),
+										 spCom.get(),
+										 XMFLOAT2(0.f, 0.f));
 }
 
 void TitleScene::update()
 {
 	update_proc();
-	debugText->Print(spCom.get(), "3D Shooting", titleStrPos.x, titleStrPos.y, 5.f);
-	debugText->Print(spCom.get(), "Press SPACE...", titleStrPos.x, titleStrPos.y + WinAPI::window_height / 2.f, 1.f);
 }
 
 void TitleScene::update_normal()
@@ -45,6 +50,8 @@ void TitleScene::update_end()
 	{
 		SceneManager::getInstange()->changeScene(new RailShoot());
 	}
+
+	title->position.y = titleStrPos.y;
 }
 
 void TitleScene::drawFrontSprite()
@@ -63,11 +70,7 @@ void TitleScene::drawFrontSprite()
 	ImGui::SetNextWindowSize(ImVec2(fstWinSize.x,
 									fstWinSize.y));
 
-	ImGui::Begin("情報", nullptr, winFlags);
-	ImGui::PushFont(DX12Base::ins()->getBigImFont());
-	ImGui::Text(WinAPI::winTitleDef);
-	ImGui::PopFont();
-	ImGui::Text("SE : OtoLogic");
-	ImGui::Text("Press Space");
-	ImGui::End();
+	spCom->drawStart(DX12Base::ins()->getCmdList());
+	titleBack->drawWithUpdate(DX12Base::ins(), spCom.get());
+	title->drawWithUpdate(DX12Base::ins(), spCom.get());
 }
