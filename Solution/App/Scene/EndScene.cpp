@@ -17,6 +17,10 @@ EndScene::EndScene()
 	debugTextTexNumber = spCom->loadTexture(L"Resources/debugfont.png");
 
 	debugText.reset(new DebugText(debugTextTexNumber, spCom.get()));
+
+	end.reset(new Sprite(spCom->loadTexture(L"Resources/end.png"),
+						 spCom.get(),
+						 DirectX::XMFLOAT2(0.f, 0.f)));
 }
 
 void EndScene::update()
@@ -25,13 +29,10 @@ void EndScene::update()
 	{
 		SceneManager::getInstange()->changeScene(new TitleScene());
 	}
-
-	debugText->Print(spCom.get(), "END", 0, 0, 10.f);
-	debugText->Print(spCom.get(), "Press SPACE...", 0.f, WinAPI::window_height / 2.f, 1.f);
 }
 
 void EndScene::drawFrontSprite()
 {
 	spCom->drawStart(DX12Base::getInstance()->getCmdList());
-	debugText->DrawAll(DX12Base::getInstance(), spCom.get());
+	end->drawWithUpdate(DX12Base::ins(), spCom.get());
 }

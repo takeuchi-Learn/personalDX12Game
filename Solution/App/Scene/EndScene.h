@@ -9,9 +9,14 @@ class EndScene :
 	public GameScene
 {
 	// --------------------
-	// デバッグテキスト
+	// スプライト
 	// --------------------
 	std::unique_ptr<SpriteBase> spCom;
+	std::unique_ptr<Sprite> end;
+
+	// --------------------
+	// デバッグテキスト
+	// --------------------
 	std::unique_ptr<DebugText> debugText;
 	// デバッグテキスト用のテクスチャ番号
 	UINT debugTextTexNumber;
