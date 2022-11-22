@@ -400,9 +400,6 @@
     <FxCompile Include="Resources\Shaders\PostEffectPS.hlsl">
       <Filter>シェーダーファイル\PostEffect</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shaders\PostEffectVS.hlsl">
-      <Filter>シェーダーファイル\PostEffect</Filter>
-    </FxCompile>
     <FxCompile Include="Resources\Shaders\BackPS.hlsl">
       <Filter>シェーダーファイル\Back</Filter>
     </FxCompile>

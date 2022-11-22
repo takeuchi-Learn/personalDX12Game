@@ -98,13 +98,9 @@ private:
 	ID3D12GraphicsCommandList* cmdList;
 
 private:
-	static const wchar_t* vsPathDef;
-
-private:
 	void initBuffer();
 
-	void createGraphicsPipelineState(const wchar_t* vsPath = L"Resources/Shaders/PostEffectVS.hlsl",
-									 const wchar_t* psPath = L"Resources/Shaders/PostEffectPS.hlsl");
+	void createGraphicsPipelineState(const wchar_t* psPath = L"Resources/Shaders/PostEffectPS.hlsl");
 
 	void transferConstBuff(float nowTime, float oneSec = Timer::oneSec);
 

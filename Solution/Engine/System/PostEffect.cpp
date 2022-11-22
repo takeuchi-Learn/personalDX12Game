@@ -8,8 +8,6 @@ using namespace DirectX;
 
 const float PostEffect::clearColor[4] = { 0.f, 0.f, 0.f, 1.f };
 
-const wchar_t* PostEffect::vsPathDef = L"Resources/Shaders/PostEffectVS.hlsl";
-
 PostEffect::PostEffect()
 	: mosaicNum({ WinAPI::window_width, WinAPI::window_height }),
 	nowPPSet(0u),
@@ -96,23 +94,35 @@ void PostEffect::initBuffer()
 	transferConstBuff((float)timer->getNowTime());
 }
 
-void PostEffect::createGraphicsPipelineState(const wchar_t* vsPath, const wchar_t* psPath)
+void PostEffect::createGraphicsPipelineState(const wchar_t* psPath)
 {
-	HRESULT result;
-
 	ComPtr<ID3DBlob> vsBlob = nullptr; // 頂点シェーダオブジェクト
 	ComPtr<ID3DBlob> psBlob = nullptr; // ピクセルシェーダオブジェクト
 	ComPtr<ID3DBlob> errorBlob = nullptr; // エラーオブジェクト
 
-	// 頂点シェーダの読み込みとコンパイル
-	result = D3DCompileFromFile(
-		vsPath,  // シェーダファイル名
+	constexpr const char hlslData[] = "\n\
+#include \"PostEffect.hlsli\"\n\
+VSOutput main(float4 pos : POSITION, float2 uv : TEXCOORD)\n\
+	{\n\
+		VSOutput output; // ピクセルシェーダーに渡す値\n\
+		output.svpos = pos;\n\
+		output.uv = uv;\n\
+		return output;\n\
+	}";
+
+	HRESULT result = D3DCompile(
+		hlslData,
+		_countof(hlslData),
+		"Resources/Shaders/",
 		nullptr,
-		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
-		"main", "vs_5_0", // エントリーポイント名、シェーダーモデル指定
-		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
+		D3D_COMPILE_STANDARD_FILE_INCLUDE,
+		"main",
+		"vs_5_0",
 		0,
-		&vsBlob, &errorBlob);
+		0,
+		&vsBlob,
+		&errorBlob
+	);
 
 	if (FAILED(result))
 	{
@@ -254,7 +264,7 @@ void PostEffect::createGraphicsPipelineState(const wchar_t* vsPath, const wchar_
 size_t PostEffect::addPipeLine(const wchar_t* psPath)
 {
 	pipelineSet.emplace_back();
-	createGraphicsPipelineState(vsPathDef, psPath);
+	createGraphicsPipelineState(psPath);
 
 	return pipelineSet.size() - 1u;
 }
