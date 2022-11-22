@@ -269,6 +269,7 @@
     <ClInclude Include="Engine\3D\ParticleMgr.h" />
     <ClInclude Include="App\Scene\PlayScene.h" />
     <ClInclude Include="Engine\System\PostEffect.h" />
+    <ClInclude Include="Engine\umePgc4.h" />
     <ClInclude Include="Engine\Util\RandomNum.h" />
     <ClInclude Include="Engine\System\SceneManager.h" />
     <ClInclude Include="Engine\Sound\Sound.h" />

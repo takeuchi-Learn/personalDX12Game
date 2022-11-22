@@ -17,6 +17,7 @@ using namespace Microsoft::WRL;
 #include <DirectXMath.h>
 
 #include "../Util/Timer.h"
+#include "../Engine/umePgc4.h"
 
 using namespace DirectX;
 
@@ -945,14 +946,17 @@ bool DX12Base::InitImgui()
 	// フォントを使用
 	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = NULL;	// iniファイルを生成しない
-	io.Fonts->AddFontFromFileTTF("Resources\\fonts\\ume-pgc4.ttf",
-								 18.f,
-								 nullptr,
-								 glyphRangesJapanese);
-	bigImFont = io.Fonts->AddFontFromFileTTF("Resources\\fonts\\ume-pgc4.ttf",
-											 36.f,
+
+	io.Fonts->AddFontFromMemoryCompressedTTF(UmePgc4::UmePgc4_compressed_data,
+											 UmePgc4::UmePgc4_compressed_size,
+											 18.f,
 											 nullptr,
 											 glyphRangesJapanese);
+	bigImFont = io.Fonts->AddFontFromMemoryCompressedTTF(UmePgc4::UmePgc4_compressed_data,
+														 UmePgc4::UmePgc4_compressed_size,
+														 36.f,
+														 nullptr,
+														 glyphRangesJapanese);
 
 	// 四角くする
 	ImGuiStyle& st = ImGui::GetStyle();

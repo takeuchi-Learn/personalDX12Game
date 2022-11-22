@@ -368,6 +368,9 @@
     <ClInclude Include="App\GameObject\EnemyMgr.h">
       <Filter>GameObject</Filter>
     </ClInclude>
+    <ClInclude Include="Engine\umePgc4.h">
+      <Filter>System</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\BasicPS.hlsl">
