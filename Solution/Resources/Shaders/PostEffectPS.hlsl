@@ -4,6 +4,51 @@ Texture2D<float4> tex0 : register(t0); // 0番スロットに設定されたテ�
 Texture2D<float4> tex1 : register(t1); // 1番スロットに設定されたテクスチャ
 SamplerState smp : register(s0); // 0番スロットに設定されたサンプラー
 
+// グローの半径
+// 現在のピクセル -> サンプルする近隣のピクセルの距離
+static float bloomR = 5.f;
+
+// これより大きい値の色がグローする
+static float bloomThreshold = 0.5f;
+
+float3 getBloomPixel(SamplerState smp, float2 uv, float2 texPixelSize)
+{
+	float2 uv2 = floor(uv / texPixelSize) * texPixelSize;
+	uv2 += texPixelSize * 0.001f;
+	float3 tl = max(tex0.Sample(smp, uv2).rgb - bloomThreshold, 0.f);
+	float3 tr = max(tex0.Sample(smp, uv2 + float2(texPixelSize.x, 0.f)).rgb - bloomThreshold, 0.f);
+	float3 bl = max(tex0.Sample(smp, uv2 + float2(0.f, texPixelSize.y)).rgb - bloomThreshold, 0.f);
+	float3 br = max(tex0.Sample(smp, uv2 + float2(texPixelSize.x, texPixelSize.y)).rgb - bloomThreshold, 0.f);
+	float2 f = frac(uv / texPixelSize);
+
+	float3 tA = lerp(tl, tr, f.x);
+	float3 tB = lerp(bl, br, f.x);
+
+	return lerp(tA, tB, f.y);
+}
+
+float3 getBloom(SamplerState smp, float2 uv, float2 texPixelSize)
+{
+	float3 bloom = float3(0.f, 0.f, 0.f);
+	float2 off = float2(1.f, 1.f) * texPixelSize * bloomR;
+	bloom += getBloomPixel(smp, uv + off * float2(-1.f, -1.f), texPixelSize * bloomR) * 0.292893f;
+	bloom += getBloomPixel(smp, uv + off * float2(-1.f, 0.f), texPixelSize * bloomR) * 0.5f;
+	bloom += getBloomPixel(smp, uv + off * float2(-1.f, 1.f), texPixelSize * bloomR) * 0.292893f;
+	bloom += getBloomPixel(smp, uv + off * float2(0.f, -1.f), texPixelSize * bloomR) * 0.5f;
+	bloom += getBloomPixel(smp, uv + off * float2(0.f, 0.f), texPixelSize * bloomR) * 1.f;
+	bloom += getBloomPixel(smp, uv + off * float2(0.f, 1.f), texPixelSize * bloomR) * 0.5f;
+	bloom += getBloomPixel(smp, uv + off * float2(1.f, -1.f), texPixelSize * bloomR) * 0.292893f;
+	bloom += getBloomPixel(smp, uv + off * float2(1.f, 0.f), texPixelSize * bloomR) * 0.5f;
+	bloom += getBloomPixel(smp, uv + off * float2(1.f, 1.f), texPixelSize * bloomR) * 0.292893f;
+	bloom /= 4.171573f;
+	return bloom;
+}
+
+float4 bloom(SamplerState smp, float2 uv, float intensity = 1.f)
+{
+	return float4(getBloom(smp, uv, 1.f / winSize) * intensity, 1.f);
+}
+
 float fracNoise(float2 coord)
 {
 	return frac(sin(dot(coord, float2(13.f, 80.f))) * 44000.f);
@@ -92,6 +137,14 @@ float4 main(VSOutput input) : SV_TARGET
 {
 	static float PI = 3.141592653589793f;
 	static float PI2 = 6.283185307179586f;
+	
+	{
+		static float bloomIntensity = 1.f;
+		
+		float4 ret = tex0.Sample(smp, input.uv);
+		ret.rgb += bloom(smp, input.uv, bloomIntensity);
+		return ret;
+	}
 	
 	// --------------------
 	// モザイク

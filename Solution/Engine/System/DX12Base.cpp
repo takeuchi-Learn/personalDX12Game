@@ -947,13 +947,13 @@ bool DX12Base::InitImgui()
 	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = NULL;	// iniファイルを生成しない
 
-	io.Fonts->AddFontFromMemoryCompressedTTF(UmePgc4::UmePgc4_compressed_data,
-											 UmePgc4::UmePgc4_compressed_size,
+	io.Fonts->AddFontFromMemoryCompressedTTF(UmePgc4_compressed_data,
+											 UmePgc4_compressed_size,
 											 18.f,
 											 nullptr,
 											 glyphRangesJapanese);
-	bigImFont = io.Fonts->AddFontFromMemoryCompressedTTF(UmePgc4::UmePgc4_compressed_data,
-														 UmePgc4::UmePgc4_compressed_size,
+	bigImFont = io.Fonts->AddFontFromMemoryCompressedTTF(UmePgc4_compressed_data,
+														 UmePgc4_compressed_size,
 														 36.f,
 														 nullptr,
 														 glyphRangesJapanese);
