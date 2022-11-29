@@ -114,9 +114,15 @@ public:
 
 #pragma endregion
 
-	// @param clearColor 何もない場所の描画色。既定引数は暗い黄色っぽい色
-	void startDraw(const DirectX::XMFLOAT3& clearColor = DirectX::XMFLOAT3(0.5f, 0.5f, 0.f));
+	void startDraw();
 	void endDraw();
+
+	// @param clearColor 何もない場所の描画色。既定引数は暗い黄色っぽい色
+	void clearBuffer(const DirectX::XMFLOAT3& clearColor = DirectX::XMFLOAT3(0.5f, 0.5f, 0.f));
+	void endResourceBarrier();
+
+	void startImGui();
+	void endImGui();
 
 	inline ID3D12Device* getDev() { return dev.Get(); };
 	inline ID3D12GraphicsCommandList* getCmdList() { return cmdList.Get(); };

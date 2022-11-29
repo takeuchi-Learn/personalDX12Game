@@ -8,6 +8,18 @@
 
 using namespace DirectX;
 
+namespace {
+	inline float easeOutBounce(float t) {
+		constexpr float n1 = 7.5625f;
+		constexpr float d1 = 2.75f;
+
+		if (t < 1.f / d1) { return n1 * t * t; }
+		if (t < 2.f / d1) { return n1 * (t -= 1.5f / d1) * t + 0.75f; }
+		if (t < 2.5f / d1) { return n1 * (t -= 2.25f / d1) * t + 0.9375f; }
+		return n1 * (t -= 2.625f / d1) * t + 0.984375f;
+	}
+}
+
 TitleScene::TitleScene()
 	: timer(std::make_unique<Timer>()),
 	update_proc(std::bind(&TitleScene::update_normal, this))
@@ -23,9 +35,14 @@ TitleScene::TitleScene()
 
 	debugText.reset(new DebugText(debugTextTexNumber, spCom.get()));
 
-	title = std::make_unique<Sprite>(spCom->loadTexture(L"Resources/title.png"),
-									 spCom.get(),
-									 XMFLOAT2(0.f, 0.f));
+	titlePos = XMFLOAT2(0.f, 0.f);
+
+	titleLogo = std::make_unique<Sprite>(spCom->loadTexture(L"Resources/title_logo.png"),
+										 spCom.get(),
+										 titlePos);
+	titleOther = std::make_unique<Sprite>(spCom->loadTexture(L"Resources/title_other.png"),
+										  spCom.get(),
+										  titlePos);
 	titleBack = std::make_unique<Sprite>(spCom->loadTexture(L"Resources/titleBack.png"),
 										 spCom.get(),
 										 XMFLOAT2(0.f, 0.f));
@@ -42,6 +59,9 @@ void TitleScene::update()
 
 void TitleScene::update_normal()
 {
+	constexpr float logoMoveRange = 16.f;
+	titleLogo->position.y = logoMoveRange * std::sin((float)timer->getNowTime() / Timer::oneSecF);
+
 	if (input->triggerKey(DIK_SPACE))
 	{
 		update_proc = std::bind(&TitleScene::update_end, this);
@@ -55,19 +75,22 @@ void TitleScene::update_end()
 	const float raito = (float)timer->getNowTime() / sceneChangeTime;
 	if (raito >= 1.f)
 	{
-		title->position.y = (float)WinAPI::window_height;
+		titlePos.y = static_cast<float>(WinAPI::window_height + 1);
 		SceneManager::getInstange()->changeScene(new RailShoot());
-		return;
+	} else {
+		titlePos.y = std::lerp(0.f,
+							   (float)WinAPI::window_height,
+							   easeOutBounce(raito));
 	}
+	titleLogo->position.y = titlePos.y;
+	titleOther->position.y = titlePos.y;
 
-	title->position.y = std::lerp(0.f,
-								  (float)WinAPI::window_height,
-								  1.f - pow(1.f - raito, 4.f));
 }
 
 void TitleScene::drawFrontSprite()
 {
 	spCom->drawStart(DX12Base::ins()->getCmdList());
 	titleBack->drawWithUpdate(DX12Base::ins(), spCom.get());
-	title->drawWithUpdate(DX12Base::ins(), spCom.get());
+	titleOther->drawWithUpdate(DX12Base::ins(), spCom.get());
+	titleLogo->drawWithUpdate(DX12Base::ins(), spCom.get());
 }

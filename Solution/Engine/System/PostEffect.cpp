@@ -490,7 +490,7 @@ void PostEffect::startDrawScene(DX12Base* dxBase)
 	}
 
 	// 深度バッファのクリア
-	cmdList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.F, 0, 0, nullptr);
+	cmdList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.f, 0, 0, nullptr);
 }
 
 void PostEffect::endDrawScene(DX12Base* dxBase)

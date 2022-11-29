@@ -1016,7 +1016,7 @@ DX12Base::~DX12Base()
 	ImGui::DestroyContext();
 }
 
-void DX12Base::startDraw(const DirectX::XMFLOAT3& clearColor)
+void DX12Base::startDraw()
 {
 	// バックバッファの番号を取得（2つなので0番か1番）
 	UINT bbIndex = swapchain->GetCurrentBackBufferIndex();
@@ -1037,36 +1037,15 @@ void DX12Base::startDraw(const DirectX::XMFLOAT3& clearColor)
 		);
 	cmdList->OMSetRenderTargets(1, &rtvH, false, &dsvH);
 
-	// 全画面クリア
-	ClearRenderTarget(clearColor);
-	// 深度バッファクリア
-	ClearDepthBuffer();
-
 	// ビューポート領域の設定
 	cmdList->RSSetViewports(1, &CD3DX12_VIEWPORT(0.0f, 0.0f, WinAPI::window_width, WinAPI::window_height));
 	// シザー矩形の設定
 	cmdList->RSSetScissorRects(1, &CD3DX12_RECT(0, 0, WinAPI::window_width, WinAPI::window_height));
-
-	// imgui開始
-	ImGui_ImplDX12_NewFrame();
-	ImGui_ImplWin32_NewFrame();
-	ImGui::NewFrame();
 }
 
 void DX12Base::endDraw()
 {
-	// imgui描画
-	ImGui::Render();
-	ID3D12DescriptorHeap* ppHeaps[] = { imguiHeap.Get() };
-	cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
-	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList.Get());
-
-	// バックバッファの番号を取得（2つなので0番か1番）
-	UINT bbIndex = swapchain->GetCurrentBackBufferIndex();
-
-	// ５．リソースバリアを戻す
-	cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(backBuffers[bbIndex].Get(),
-																	  D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT));
+	endResourceBarrier();
 
 	// 命令のクローズ
 	cmdList->Close();
@@ -1092,6 +1071,40 @@ void DX12Base::endDraw()
 
 	updateFPS();
 	flipTimeFPS();
+}
+
+void DX12Base::clearBuffer(const DirectX::XMFLOAT3& clearColor)
+{
+	// 全画面クリア
+	ClearRenderTarget(clearColor);
+	// 深度バッファクリア
+	ClearDepthBuffer();
+}
+
+void DX12Base::endResourceBarrier()
+{
+	// バックバッファの番号を取得（2つなので0番か1番）
+	UINT bbIndex = swapchain->GetCurrentBackBufferIndex();
+
+	// ５．リソースバリアを戻す
+	cmdList->ResourceBarrier(1, &CD3DX12_RESOURCE_BARRIER::Transition(backBuffers[bbIndex].Get(),
+																	  D3D12_RESOURCE_STATE_RENDER_TARGET,
+																	  D3D12_RESOURCE_STATE_PRESENT));
+}
+
+void DX12Base::startImGui()
+{
+	ImGui_ImplDX12_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+}
+
+void DX12Base::endImGui()
+{
+	ImGui::Render();
+	ID3D12DescriptorHeap* ppHeaps[] = { imguiHeap.Get() };
+	cmdList->SetDescriptorHeaps(_countof(ppHeaps), ppHeaps);
+	ImGui_ImplDX12_RenderDrawData(ImGui::GetDrawData(), cmdList.Get());
 }
 
 // --------------------

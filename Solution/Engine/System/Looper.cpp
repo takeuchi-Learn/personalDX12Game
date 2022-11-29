@@ -106,18 +106,24 @@ bool Looper::loopDraw()
 	// --------------------
 	// シーンマネージャーの描画
 	// --------------------
-	PostEffect::getInstance()->startDrawScene(DX12Base::getInstance());
-	SceneManager::getInstange()->drawObj3d();
-	PostEffect::getInstance()->endDrawScene(DX12Base::getInstance());
-
 	constexpr DirectX::XMFLOAT3 clearColor = { 0.f, 0.f, 0.f };	//黒色
-	DX12Base::getInstance()->startDraw(clearColor);
 
-	PostEffect::getInstance()->draw(DX12Base::getInstance());
+	// ポストエフェクト内の描画
+	PostEffect::getInstance()->startDrawScene(DX12Base::ins());
+	SceneManager::getInstange()->drawObj3d();
+	PostEffect::getInstance()->endDrawScene(DX12Base::ins());
+
+	// 全体の描画
+	DX12Base::ins()->startDraw();
+	DX12Base::ins()->clearBuffer(clearColor);
+	DX12Base::ins()->startImGui();
+
+	PostEffect::getInstance()->draw(DX12Base::ins());
 
 	SceneManager::getInstange()->drawFrontSprite();
 
-	DX12Base::getInstance()->endDraw();
+	DX12Base::ins()->endImGui();
+	DX12Base::ins()->endDraw();
 
 	return false;
 }

@@ -29,8 +29,11 @@ class TitleScene :
 	// スプライト
 	// --------------------
 	std::unique_ptr<SpriteBase> spCom;
-	std::unique_ptr<Sprite> title;
+	std::unique_ptr<Sprite> titleLogo;
+	std::unique_ptr<Sprite> titleOther;
 	std::unique_ptr<Sprite> titleBack;
+
+	DirectX::XMFLOAT2 titlePos{};
 
 	// --------------------
 	// デバッグテキスト
@@ -44,8 +47,8 @@ class TitleScene :
 	// update_何とか関数を格納する
 	std::function<void()> update_proc;
 
-	void update_end();
 	void update_normal();
+	void update_end();
 
 public:
 	TitleScene();
