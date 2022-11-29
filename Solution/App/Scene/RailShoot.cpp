@@ -126,7 +126,7 @@ RailShoot::RailShoot()
 	// --------------------
 	// 自機関連
 	// --------------------
-	playerModel(std::make_unique<ObjModel>("Resources/tori", "tori")),
+	playerModel(std::make_unique<ObjModel>("Resources/player", "player")),
 	playerBulModel(std::make_unique<ObjModel>("Resources/bullet", "bullet", 0U, true)),
 	playerHpMax(20u),
 

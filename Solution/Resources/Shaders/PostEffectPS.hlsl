@@ -138,14 +138,6 @@ float4 main(VSOutput input) : SV_TARGET
 	static float PI = 3.141592653589793f;
 	static float PI2 = 6.283185307179586f;
 	
-	{
-		static float bloomIntensity = 1.f;
-		
-		float4 ret = tex0.Sample(smp, input.uv);
-		ret.rgb += bloom(smp, input.uv, bloomIntensity);
-		return ret;
-	}
-	
 	// --------------------
 	// モザイク
 	// --------------------
