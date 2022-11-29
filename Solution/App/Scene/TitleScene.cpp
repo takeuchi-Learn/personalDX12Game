@@ -9,7 +9,7 @@
 using namespace DirectX;
 
 TitleScene::TitleScene()
-	: titleStrPos(0.f, 0.f),
+	: timer(std::make_unique<Timer>()),
 	update_proc(std::bind(&TitleScene::update_normal, this))
 {
 	input = Input::getInstance();
@@ -31,6 +31,10 @@ TitleScene::TitleScene()
 										 XMFLOAT2(0.f, 0.f));
 }
 
+void TitleScene::start() {
+	timer->reset();
+}
+
 void TitleScene::update()
 {
 	update_proc();
@@ -42,37 +46,27 @@ void TitleScene::update_normal()
 	{
 		update_proc = std::bind(&TitleScene::update_end, this);
 		Sound::SoundPlayWave(shortBridge.get());
+		timer->reset();
 	}
 }
 
 void TitleScene::update_end()
 {
-	titleStrPos.y += 20.f;
-
-	if (titleStrPos.y > WinAPI::window_height)
+	const float raito = (float)timer->getNowTime() / sceneChangeTime;
+	if (raito >= 1.f)
 	{
+		title->position.y = (float)WinAPI::window_height;
 		SceneManager::getInstange()->changeScene(new RailShoot());
+		return;
 	}
 
-	title->position.y = titleStrPos.y;
+	title->position.y = std::lerp(0.f,
+								  (float)WinAPI::window_height,
+								  1.f - pow(1.f - raito, 4.f));
 }
 
 void TitleScene::drawFrontSprite()
 {
-	constexpr ImGuiWindowFlags winFlags = DX12Base::imGuiWinFlagsDef |
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar;
-
-	// 最初のウインドウの位置とサイズを指定
-	constexpr XMFLOAT2 fstWinPos = XMFLOAT2((float)WinAPI::window_width * 0.02f,
-											(float)WinAPI::window_height * 0.02f);
-	ImGui::SetNextWindowPos(ImVec2(titleStrPos.x + fstWinPos.x,
-								   titleStrPos.y + fstWinPos.y));
-
-	constexpr XMFLOAT2 fstWinSize = XMFLOAT2(WinAPI::window_width / 4.f,
-											 WinAPI::window_height / 8.f);
-	ImGui::SetNextWindowSize(ImVec2(fstWinSize.x,
-									fstWinSize.y));
-
 	spCom->drawStart(DX12Base::ins()->getCmdList());
 	titleBack->drawWithUpdate(DX12Base::ins(), spCom.get());
 	title->drawWithUpdate(DX12Base::ins(), spCom.get());

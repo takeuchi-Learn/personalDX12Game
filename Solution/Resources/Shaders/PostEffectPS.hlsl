@@ -179,7 +179,7 @@ float4 main(VSOutput input) : SV_TARGET
 	uv = slUv;
 
 	// --------------------
-	// rgbずらし
+	// rgbずらし&ディザリング
 	// --------------------
 	float4 texColor0 = dither(tex0.Sample(smp, uv), uv, 2.f);
 	texColor0.g = dither(tex0.Sample(smp, uv + rgbShiftNum), uv, 2.f).g;

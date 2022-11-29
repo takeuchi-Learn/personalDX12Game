@@ -9,6 +9,8 @@
 #include "../Engine/Input/Input.h"
 #include "../Engine/Sound/Sound.h"
 
+#include "../Engine/Util/Timer.h"
+
 class TitleScene :
 	public GameScene
 {
@@ -16,6 +18,12 @@ class TitleScene :
 	// 音
 	// --------------------
 	std::unique_ptr<Sound> shortBridge;
+
+	// --------------------
+	// 時間
+	// --------------------
+	std::unique_ptr<Timer> timer;
+	const float sceneChangeTime = Timer::oneSecF;
 
 	// --------------------
 	// スプライト
@@ -33,8 +41,6 @@ class TitleScene :
 
 	Input* input = nullptr;
 
-	DirectX::XMFLOAT2 titleStrPos{};
-
 	// update_何とか関数を格納する
 	std::function<void()> update_proc;
 
@@ -43,6 +49,7 @@ class TitleScene :
 
 public:
 	TitleScene();
+	void start() override;
 	void update() override;
 	void drawFrontSprite() override;
 };
