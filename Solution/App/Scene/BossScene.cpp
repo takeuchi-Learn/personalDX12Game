@@ -24,9 +24,12 @@ BossScene::BossScene() :
 	// --------------------
 	// スプライト
 	// --------------------
-	bossHpGr->position = XMFLOAT3(WinAPI::window_width / 2.f, 0.f, 0.f);
 	bossHpGr->setSize(XMFLOAT2(WinAPI::window_width * 0.75f,
 							   WinAPI::window_height / 20.f));
+	bossHpGr->position = XMFLOAT3(WinAPI::window_width / 2.f,
+								  bossHpGr->getSize().y * 0.5f,
+								  0.f);
+	bossHpGr->color = XMFLOAT4(1.f, 0.5f, 0.f, 1.f);
 
 	// カメラ
 	constexpr float farZ = 1000.f;
@@ -112,7 +115,8 @@ void BossScene::update_play()
 										   input->getMousePos().y + aim2D->getSize().y / 2.f);
 
 		std::forward_list<BaseEnemy*> inAim2DEnemy = attackableEnemy;
-		for (auto& i : boss->getSmallEnemyList()) {
+		for (auto& i : boss->getSmallEnemyList())
+		{
 			inAim2DEnemy.emplace_front(i.get());
 		}
 		addShotTarget(inAim2DEnemy, aim2DMin, aim2DMax);

@@ -160,7 +160,7 @@ RailShoot::RailShoot()
 					 XMFLOAT2(0.5f, 1.f))),
 	hpBarWidMax(WinAPI::window_width * 0.75f)
 {
-	hpBar->color = XMFLOAT4(1, 1, 1, 0.75f);
+	hpBar->color = XMFLOAT4(0, 0.5f, 1, 1);
 	hpBar->position = XMFLOAT3(WinAPI::window_width / 2.f, WinAPI::window_height, 0.f);
 	{
 		XMFLOAT2 size = hpBar->getSize();

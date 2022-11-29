@@ -8,8 +8,10 @@
 
 using namespace DirectX;
 
-namespace {
-	inline float easeOutBounce(float t) {
+namespace
+{
+	inline float easeOutBounce(float t)
+	{
 		constexpr float n1 = 7.5625f;
 		constexpr float d1 = 2.75f;
 
@@ -48,7 +50,8 @@ TitleScene::TitleScene()
 										 XMFLOAT2(0.f, 0.f));
 }
 
-void TitleScene::start() {
+void TitleScene::start()
+{
 	timer->reset();
 }
 
@@ -77,14 +80,14 @@ void TitleScene::update_end()
 	{
 		titlePos.y = static_cast<float>(WinAPI::window_height + 1);
 		SceneManager::getInstange()->changeScene(new RailShoot());
-	} else {
+	} else
+	{
 		titlePos.y = std::lerp(0.f,
 							   (float)WinAPI::window_height,
 							   easeOutBounce(raito));
 	}
 	titleLogo->position.y = titlePos.y;
 	titleOther->position.y = titlePos.y;
-
 }
 
 void TitleScene::drawFrontSprite()
