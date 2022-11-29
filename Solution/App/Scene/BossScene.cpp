@@ -418,15 +418,20 @@ void BossScene::drawFrontSprite()
 
 	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x,
 								   fstWinPos.y));
-	ImGui::SetNextWindowSize(ImVec2(200.f, 200.f));
+	ImGui::SetNextWindowSize(ImVec2(200.f, 400.f));
 
 	ImGui::Begin("ボス戦", nullptr, winFlags);
-	ImGui::Text("スペースで次のシーンへ進む");
+	ImGui::PushFont(dxBase->getBigImFont());
+	ImGui::Text("腰を狙え!");
+	ImGui::PopFont();
+	ImGui::Text("");
+	ImGui::Text("ボスの弾は迎撃せよ！");
+	ImGui::Text("");
+	ImGui::Text("照準内に敵 + 左クリック : 攻撃");
 	ImGui::Text("WS : 移動");
 	ImGui::Text("AD : 回転");
 	ImGui::Text("左シフト : ダッシュ");
 	ImGui::Text("E : カメラ位置変更");
-	ImGui::Text("照準内に敵 + 左クリック : 攻撃");
 	ImGui::Text("敵弾数 : %u", boss->calcSmallEnemyNum());
 	ImGui::Text("自機体力 : %.2f%%", (float)player->getHp() / (float)playerHpMax * 100.f);
 	if (boss->getAlive())

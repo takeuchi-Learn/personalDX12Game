@@ -207,6 +207,9 @@ float4 main(VSOutput input) : SV_TARGET
 	// 色数を減らす
 	static float colourNum = 8.f;
 	drawCol.rgb = floor(drawCol.rgb * colourNum) / colourNum;
+	
+	// ブルーム
+	drawCol.rgb += bloom(smp, uv);
 
 	return drawCol;
 }
