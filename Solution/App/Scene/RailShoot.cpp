@@ -833,11 +833,10 @@ void RailShoot::drawFrontSprite()
 	ImGui::End();
 
 	ImGui::Begin("情報", nullptr, DX12Base::imGuiWinFlagsDef);
-	ImGui::Text("FPS : %.3f", dxBase->getFPS());
-	ImGui::Text("敵数 : %u", std::distance(enemy.begin(), enemy.end()));
-	ImGui::Text("自機弾数 : %u", std::distance(player->getBulArr().begin(), player->getBulArr().end()));
-	ImGui::Text("経過フレーム : %u", nowFrame);
-	ImGui::Text("自機体力 : %u", player->getHp());
+	ImGui::Text("左クリック : 照準内の敵へ攻撃");
+	ImGui::Text("WASD : 移動");
+	ImGui::Text("");
+	ImGui::Text("自機体力 : %u / %u", player->getHp(), playerHpMax);
 	ImGui::End();
 
 	spriteBase->drawStart(dxBase->getCmdList());

@@ -422,21 +422,30 @@ void BossScene::drawFrontSprite()
 
 	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x,
 								   fstWinPos.y));
-	ImGui::SetNextWindowSize(ImVec2(200.f, 400.f));
+	ImGui::SetNextWindowSize(ImVec2(300.f, 100.f));
 
 	ImGui::Begin("ボス戦", nullptr, winFlags);
 	ImGui::PushFont(dxBase->getBigImFont());
 	ImGui::Text("腰を狙え!");
 	ImGui::PopFont();
-	ImGui::Text("");
 	ImGui::Text("ボスの弾は迎撃せよ！");
-	ImGui::Text("");
-	ImGui::Text("照準内に敵 + 左クリック : 攻撃");
+	ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x,
+								   ImGui::GetWindowPos().y + ImGui::GetWindowSize().y));
+	ImGui::SetNextWindowSize(ImVec2(ImGui::GetWindowWidth(), 150));
+	ImGui::End();
+
+	ImGui::Begin("操作", nullptr, winFlags);
+	ImGui::Text("左クリック : 照準内の敵へ攻撃");
 	ImGui::Text("WS : 移動");
 	ImGui::Text("AD : 回転");
-	ImGui::Text("左シフト : ダッシュ");
+	ImGui::Text("左シフト + 移動 or 回転 : ダッシュ");
 	ImGui::Text("E : カメラ位置変更");
-	ImGui::Text("敵弾数 : %u", boss->calcSmallEnemyNum());
+	ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x,
+								   ImGui::GetWindowPos().y + ImGui::GetWindowSize().y));
+	ImGui::SetNextWindowSize(ImVec2(ImGui::GetWindowWidth(), 100));
+	ImGui::End();
+
+	ImGui::Begin("情報", nullptr, winFlags);
 	ImGui::Text("自機体力 : %.2f%%", (float)player->getHp() / (float)playerHpMax * 100.f);
 	if (boss->getAlive())
 	{
