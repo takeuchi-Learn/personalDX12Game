@@ -67,9 +67,10 @@ void BossEnemy::phase_approach()
 	XMVECTOR velVec = calcVelVec(this);
 
 	// 一定距離より近ければ遠ざかる
-	if (XMVectorGetX(XMVector3Length(velVec)) < getScaleF3().x)
+	if (XMVectorGetX(XMVector3Length(velVec)) < getScale())
 	{
 		// todo ここで近接攻撃を開始(攻撃関数へ遷移)
+		addSmallEnemy();
 		setPhase(std::bind(&BossEnemy::phase_leave, this));
 		return;
 	}

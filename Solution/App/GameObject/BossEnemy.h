@@ -13,7 +13,7 @@ class BossEnemy :
 	ObjModel* smallEnemyModel = nullptr;
 	std::forward_list<std::unique_ptr<BaseEnemy>> smallEnemy;
 
-	static inline const uint32_t shotInterval = 240u;
+	static inline const uint32_t shotInterval = 60u;
 	uint32_t nowShotFrame = 0u;
 	static inline const uint32_t shotNumMax = 5u;
 	uint32_t shotNum = 0u;
