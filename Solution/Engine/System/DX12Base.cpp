@@ -17,7 +17,7 @@ using namespace Microsoft::WRL;
 #include <DirectXMath.h>
 
 #include "../Util/Timer.h"
-#include "../Engine/umePgc4.h"
+#include "../Engine/KaisoTai.h"
 
 using namespace DirectX;
 
@@ -947,13 +947,13 @@ bool DX12Base::InitImgui()
 	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = NULL;	// iniファイルを生成しない
 
-	io.Fonts->AddFontFromMemoryCompressedTTF(UmePgc4_compressed_data,
-											 UmePgc4_compressed_size,
+	io.Fonts->AddFontFromMemoryCompressedTTF(KaisoTai_compressed_data,
+											 KaisoTai_compressed_size,
 											 18.f,
 											 nullptr,
 											 glyphRangesJapanese);
-	bigImFont = io.Fonts->AddFontFromMemoryCompressedTTF(UmePgc4_compressed_data,
-														 UmePgc4_compressed_size,
+	bigImFont = io.Fonts->AddFontFromMemoryCompressedTTF(KaisoTai_compressed_data,
+														 KaisoTai_compressed_size,
 														 36.f,
 														 nullptr,
 														 glyphRangesJapanese);
