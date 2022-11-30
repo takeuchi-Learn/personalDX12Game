@@ -26,7 +26,7 @@ PSOutput main(VSOutput input)
 	shadeColor.a = m_alpha;
 
 	float4 texcolor = float4(tex.Sample(smp, input.uv * texTilling + shiftUv));
-	output.target0 = shadeColor * texcolor;
+	output.target0 = shadeColor * texcolor * color;
 	// target1を反転色にする
 	output.target1 = output.target0;
 

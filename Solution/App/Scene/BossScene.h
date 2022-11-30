@@ -31,6 +31,9 @@ private:
 	std::vector<std::unique_ptr<BaseEnemy>> smallEnemy;
 	uint16_t smallEnemyHpMax;
 
+	std::unique_ptr<ObjModel> koshiModel;
+	std::unique_ptr<Object3d> koshi;
+
 	// スプライト
 	inline static constexpr DirectX::XMFLOAT2 hpGrSizeMax = DirectX::XMFLOAT2(WinAPI::window_width * 0.75f,
 																			  WinAPI::window_height / 40.f);
@@ -56,6 +59,8 @@ private:
 	void update_start() override;
 	void update_play() override;
 	void update_end() override;
+
+	void additionalDrawObj3d() override;
 
 public:
 	BossScene();

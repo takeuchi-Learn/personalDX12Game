@@ -252,6 +252,8 @@ void BaseStage::drawObj3d()
 	{
 		i->drawWithUpdate(light.get());
 	}
+
+	additionalDrawObj3d();
 }
 
 void BaseStage::drawFrontSprite()

@@ -70,6 +70,15 @@ BossScene::BossScene() :
 
 		attackableEnemy.emplace_front(smallEnemy[i].get());
 	}
+
+	// 腰
+	koshiModel = std::make_unique<ObjModel>("Resources/koshi", "koshi", 0U, false);
+	koshi = std::make_unique<Object3d>(camera.get(), koshiModel.get(), 0U);
+
+	constexpr float koshiScale = 24.f;
+	koshi->scale = XMFLOAT3(koshiScale,
+							koshiScale,
+							koshiScale);
 }
 
 void BossScene::update_start()
@@ -234,6 +243,12 @@ void BossScene::update_end()
 	SceneManager::getInstange()->changeScene(new EndScene());
 }
 
+void BossScene::additionalDrawObj3d()
+{
+	koshi->position = boss->getPos();
+	koshi->drawWithUpdate(DX12Base::ins(), light.get());
+}
+
 void BossScene::start()
 {
 	timer->reset();
@@ -318,7 +333,7 @@ bool BossScene::addShotTarget(const std::forward_list<BaseEnemy*>& enemy,
 	if (farthestEnemyPt != nullptr)
 	{
 		player->setShotTarget(farthestEnemyPt->getObj());
-		aim2D->color = XMFLOAT4(1, 0, 0, 1);
+		aim2D->color = XMFLOAT4(1, 1, 1, 1);
 	} else
 	{
 		player->setShotTarget(nullptr);

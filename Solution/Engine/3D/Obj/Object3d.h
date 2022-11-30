@@ -46,6 +46,7 @@ public:
 	// 定数バッファ用データ構造体B0
 	struct ConstBufferDataB0
 	{
+		XMFLOAT4 color;
 		XMMATRIX viewProj;
 		XMMATRIX world;	// ワールド行列
 		XMFLOAT3 cameraPos;	// カメラ位置(ワールド座標)

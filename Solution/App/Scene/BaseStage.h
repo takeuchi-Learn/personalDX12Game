@@ -93,6 +93,8 @@ protected:
 
 	virtual void movePlayer();
 
+	virtual void additionalDrawObj3d() {};
+
 public:
 
 	CSVType loadCsv(const std::string& csvFilePath,
