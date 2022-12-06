@@ -423,10 +423,12 @@ bool DX12Base::InitImgui()
 	ImGuiIO& io = ImGui::GetIO();
 	io.IniFilename = NULL;	// iniファイルを生成しない
 
-	io.Fonts->AddFontFromMemoryCompressedBase85TTF(Makinas_4_Flat_base85_compressed_data,
-												   18.f,
-												   nullptr,
-												   glyphRangesJapanese);
+	// 未指定なら最初に読み込んだフォントが使われる(と思われる)
+
+	defaultImFont = io.Fonts->AddFontFromMemoryCompressedBase85TTF(Makinas_4_Flat_base85_compressed_data,
+																   18.f,
+																   nullptr,
+																   glyphRangesJapanese);
 	bigImFont = io.Fonts->AddFontFromMemoryCompressedBase85TTF(KaisoTai_base85_compressed_data_base85,
 															   36.f,
 															   nullptr,

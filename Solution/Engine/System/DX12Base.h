@@ -40,6 +40,7 @@ class DX12Base
 
 	WinAPI* winapi = nullptr;
 
+	ImFont* defaultImFont = nullptr;
 	ImFont* bigImFont = nullptr;
 
 #pragma endregion
