@@ -753,11 +753,9 @@ void RailShoot::updatePlayerShotTarget()
 	if (farthestEnemyPt != nullptr)
 	{
 		player->setShotTarget(farthestEnemyPt->getObj());
-		aim2D->color = XMFLOAT4(1, 0, 0, 1);
 	} else
 	{
 		player->setShotTarget(nullptr);
-		aim2D->color = XMFLOAT4(0, 0, 0, 1);
 	}
 }
 
@@ -772,7 +770,8 @@ void RailShoot::updateAimCol()
 	// スクリーン上の敵の位置格納変数
 	XMFLOAT2 screenEnemyPos{};
 
-	aim2D->color = XMFLOAT4(0, 0, 0, 1);
+	// 照準内に敵がいない時の色
+	aim2D->color = XMFLOAT4(1, 1, 1, 1);
 
 	for (auto& i : enemy)
 	{
@@ -788,6 +787,7 @@ void RailShoot::updateAimCol()
 			aim2DMax.x >= screenEnemyPos.x &&
 			aim2DMax.y >= screenEnemyPos.y)
 		{
+			// 敵がいれば色を変える
 			aim2D->color = XMFLOAT4(1, 0, 0, 1);
 			break;
 		}

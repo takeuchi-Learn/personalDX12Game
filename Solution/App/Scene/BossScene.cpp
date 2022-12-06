@@ -333,11 +333,11 @@ bool BossScene::addShotTarget(const std::forward_list<BaseEnemy*>& enemy,
 	if (farthestEnemyPt != nullptr)
 	{
 		player->setShotTarget(farthestEnemyPt->getObj());
-		aim2D->color = XMFLOAT4(1, 1, 1, 1);
+		aim2D->color = XMFLOAT4(1, 0, 0, 1);
 	} else
 	{
 		player->setShotTarget(nullptr);
-		aim2D->color = XMFLOAT4(0, 0, 0, 1);
+		aim2D->color = XMFLOAT4(1, 1, 1, 1);
 	}
 
 	return targetIsEmpty;
