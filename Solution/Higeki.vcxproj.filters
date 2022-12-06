@@ -132,9 +132,6 @@
     <ClCompile Include="App\Scene\EndScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="App\Scene\PlayScene.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
     <ClCompile Include="App\Scene\TitleScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
@@ -243,9 +240,6 @@
       <Filter>Camera</Filter>
     </ClInclude>
     <ClInclude Include="App\Scene\EndScene.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="App\Scene\PlayScene.h">
       <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="App\Scene\TitleScene.h">

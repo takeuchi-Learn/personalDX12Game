@@ -147,7 +147,6 @@
     <ClCompile Include="Engine\2D\SpriteBase.cpp" />
     <ClCompile Include="Engine\3D\Obj\Object3d.cpp" />
     <ClCompile Include="Engine\3D\ParticleMgr.cpp" />
-    <ClCompile Include="App\Scene\PlayScene.cpp" />
     <ClCompile Include="Engine\System\PostEffect.cpp" />
     <ClCompile Include="Engine\Util\RandomNum.cpp" />
     <ClCompile Include="Engine\System\SceneManager.cpp" />
@@ -192,7 +191,6 @@
     <ClInclude Include="Engine\2D\SpriteBase.h" />
     <ClInclude Include="Engine\3D\Obj\Object3d.h" />
     <ClInclude Include="Engine\3D\ParticleMgr.h" />
-    <ClInclude Include="App\Scene\PlayScene.h" />
     <ClInclude Include="Engine\System\PostEffect.h" />
     <ClInclude Include="Engine\umePgc4.h" />
     <ClInclude Include="Engine\Util\RandomNum.h" />
