@@ -18,9 +18,10 @@ protected:
 public:
 	inline static DirectX::XMFLOAT2 calcRotationSyncVelRad(const DirectX::XMFLOAT3& vel)
 	{
-		return DirectX::XMFLOAT2(DX12Base::getInstance()->near_atan2(-vel.y,
-																	 sqrtf(vel.x * vel.x + vel.z * vel.z)),
-								 DX12Base::getInstance()->near_atan2(vel.x, vel.z));
+		return DirectX::XMFLOAT2(std::atan2(-vel.y,
+											std::sqrt(vel.x * vel.x +
+													  vel.z * vel.z)),
+								 std::atan2(vel.x, vel.z));
 	}
 	inline static DirectX::XMFLOAT2 calcRotationSyncVelDeg(const DirectX::XMFLOAT3& vel)
 	{

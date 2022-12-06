@@ -188,7 +188,7 @@ BaseStage::BaseStage() :
 
 	// 地面
 	const UINT groundSize = 5000u;
-	ground->setPos(XMFLOAT3(0, -player->getScale(), 0));
+	ground->setPos(XMFLOAT3(0, -player->getScale() * 5.f, 0));
 	ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
 	ground->getModelPt()->setTexTilling(XMFLOAT2(groundSize / 32.f, groundSize / 32.f));
 

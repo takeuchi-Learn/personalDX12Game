@@ -29,6 +29,8 @@ void BaseEnemy::additionalUpdate()
 	if (alive)
 	{
 		phase();
+
+		movePos(vel);
 	}
 	afterUpdate();
 }

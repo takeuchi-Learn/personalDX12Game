@@ -22,11 +22,11 @@ void BossEnemy::moveAndRota(float moveSpeed, const DirectX::XMVECTOR& velVec)
 	XMStoreFloat3(&vel, XMVector3Normalize(velVec) * moveSpeed);
 
 	// 移動
-	move(vel);
+	setVel(vel);
 
 	// 速度に合わせて回転
 	const XMFLOAT2 rotaDeg = GameObj::calcRotationSyncVelDeg(vel);
-	setRotation(XMFLOAT3(rotaDeg.x, rotaDeg.y, 0.f));
+	setRotation(XMFLOAT3(rotaDeg.x, rotaDeg.y, getRotation().z));
 }
 
 void BossEnemy::afterUpdate()
@@ -50,14 +50,15 @@ void BossEnemy::addSmallEnemy()
 	i->setParent(this->getParent());
 	i->setPos(this->getPos());
 	i->setHp(1u);
+	i->setVel(XMFLOAT3(1.f, 0.f, 0.f));
 	i->setPhase(
 		[&]
 		{
 			XMVECTOR velVec = calcVelVec(i.get(), true);
-		velVec = XMVector3Normalize(velVec) * moveSpeed * 2.f;
+		velVec = XMVector3Normalize(velVec) * moveSpeed;
 		XMFLOAT3 vel{};
 		XMStoreFloat3(&vel, velVec);
-		i->move(vel);
+		i->setVel(vel);
 		}
 		);
 }

@@ -5,7 +5,7 @@ using namespace DirectX;
 void EnemyMgr::smallEnemy_Approach(BaseEnemy* enemy,
 								   const DirectX::XMFLOAT3& vel)
 {
-	enemy->move(vel);
+	enemy->setVel(vel);
 }
 
 EnemyMgr::EnemyMgr(Camera* camera, Light* light) :
