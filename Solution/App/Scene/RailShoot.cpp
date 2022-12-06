@@ -228,7 +228,7 @@ RailShoot::RailShoot()
 	{
 		// モデルを読み込む
 		constexpr UINT wallModelTexNum = 0u;
-		wallModel.reset(new ObjModel("Resources/wallBox", "wallBox", wallModelTexNum, false));
+		wallModel.reset(new ObjModel("Resources/laneWall", "laneWall", wallModelTexNum, false));
 
 		// 制御点の数だけオブジェクトを置く
 		const size_t splinePointNum = splinePoint.size() - 2u;
@@ -273,6 +273,9 @@ RailShoot::RailShoot()
 			constexpr float laneR = 128.f;
 			laneWall[y].first->position.x += laneR;
 			laneWall[y].second->position.x -= laneWall[y].first->position.x;
+
+			laneWall[y].first->color = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.f);
+			laneWall[y].second->color = laneWall[y].first->color;
 		}
 	}
 
