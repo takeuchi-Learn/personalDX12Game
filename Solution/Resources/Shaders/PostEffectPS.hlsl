@@ -6,10 +6,10 @@ SamplerState smp : register(s0); // 0番スロットに設定されたサンプ�
 
 // グローの半径
 // 現在のピクセル -> サンプルする近隣のピクセルの距離
-static float bloomR = 5.f;
+#define bloomR (30.f)
 
 // これより大きい値の色がグローする
-static float bloomThreshold = 0.5f;
+#define bloomThreshold (0.5f)
 
 float3 getBloomPixel(SamplerState smp, float2 uv, float2 texPixelSize)
 {

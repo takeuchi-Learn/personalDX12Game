@@ -52,6 +52,7 @@ BossScene::BossScene() :
 	boss->setTargetObj(player.get());
 	boss->setSmallEnemyModel(bossModel.get());
 	boss->changePhase_approach();
+	boss->getObj()->color = XMFLOAT4(4, 4, 4, 1);
 
 	constexpr size_t smallEnemyNum = 3u;
 	smallEnemy.resize(smallEnemyNum);
