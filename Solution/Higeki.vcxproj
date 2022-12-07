@@ -148,7 +148,6 @@
     <ClCompile Include="Engine\3D\Obj\Object3d.cpp" />
     <ClCompile Include="Engine\3D\ParticleMgr.cpp" />
     <ClCompile Include="Engine\System\PostEffect.cpp" />
-    <ClCompile Include="Engine\Util\RandomNum.cpp" />
     <ClCompile Include="Engine\System\SceneManager.cpp" />
     <ClCompile Include="Engine\Sound\Sound.cpp" />
     <ClCompile Include="Engine\2D\Sprite.cpp" />

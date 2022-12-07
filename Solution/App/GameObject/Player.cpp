@@ -113,6 +113,8 @@ void Player::shot(Camera* camera,
 																   1)));
 
 		i.setVel(vel);
+		const XMFLOAT2 rota = GameObj::calcRotationSyncVelDeg(vel);
+		i.setRotation(XMFLOAT3(rota.x, rota.y, i.getRotation().z));
 	}
 }
 

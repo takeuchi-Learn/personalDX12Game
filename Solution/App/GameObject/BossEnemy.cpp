@@ -1,4 +1,5 @@
 ﻿#include "BossEnemy.h"
+#include "../Engine/Util/RandomNum.h"
 
 using namespace DirectX;
 
@@ -50,12 +51,24 @@ void BossEnemy::addSmallEnemy()
 	i->setParent(this->getParent());
 	i->setPos(this->getPos());
 	i->setHp(1u);
-	i->setVel(XMFLOAT3(1.f, 0.f, 0.f));
+
+	const XMVECTOR right = XMVector3Rotate(XMVector3Normalize(calcVelVec(this, true)),
+										   XMQuaternionRotationRollPitchYaw(RandomNum::getRandf(0.f, XM_PI),
+																			XM_PIDIV2,
+																			0.f));
+	XMFLOAT3 vel{};
+	XMStoreFloat3(&vel, right * moveSpeed);
+	i->setVel(vel);
 	i->setPhase(
 		[&]
 		{
 			XMVECTOR velVec = calcVelVec(i.get(), true);
-		velVec = XMVector3Normalize(velVec) * moveSpeed;
+		velVec = XMVector3Normalize(velVec);
+
+		const XMVECTOR oldVec = XMVector3Normalize(XMLoadFloat3(&i->getVel()));
+
+		velVec = moveSpeed * XMVectorLerp(oldVec, velVec, 0.05f);
+
 		XMFLOAT3 vel{};
 		XMStoreFloat3(&vel, velVec);
 		i->setVel(vel);

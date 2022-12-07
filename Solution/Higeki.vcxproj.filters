@@ -135,9 +135,6 @@
     <ClCompile Include="App\Scene\TitleScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\Util\RandomNum.cpp">
-      <Filter>RandomNum</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\2D\Sprite.cpp">
       <Filter>Object共通\Sprite</Filter>
     </ClCompile>

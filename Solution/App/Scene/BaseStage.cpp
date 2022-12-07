@@ -34,10 +34,9 @@ BaseStage::BaseStage() :
 void BaseStage::initPlayer()
 {
 	playerModel = std::make_unique<ObjModel>("Resources/player", "player");
-	playerBulModel = std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true);
+	playerBulModel = std::make_unique<ObjModel>("Resources/bullet", "bullet", 0U, true);
 	playerHpMax = 20U;
 
-	// 初期化子でやるとモデルがnullptrになる
 	player = std::make_unique<Player>(camera.get(), playerModel.get(), XMFLOAT3(0.f, 0.f, 0.f));
 	// 大きさを設定
 	player->setScale(10.f);

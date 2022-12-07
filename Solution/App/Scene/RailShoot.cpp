@@ -353,9 +353,9 @@ void RailShoot::createParticle(const DirectX::XMFLOAT3& pos,
 {
 	for (uint16_t i = 0U; i < particleNum; ++i)
 	{
-		const float theata = RandomNum::getRandf(0, XM_PI);
-		const float phi = RandomNum::getRandf(0, XM_PI * 2.f);
-		const float r = RandomNum::getRandf(0, vel);
+		const float theata = RandomNum::getRandf(0.f, XM_PI);
+		const float phi = RandomNum::getRandf(0.f, XM_PI * 2.f);
+		const float r = RandomNum::getRandf(0.f, vel);
 
 		const XMFLOAT3 vel{
 			r * dxBase->nearSin(theata) * dxBase->nearCos(phi),
