@@ -45,6 +45,8 @@ private:
 	Timer::timeType startRgbShiftTime = 0;
 	bool rgbShiftFlag = false;
 
+private:
+
 	void startRgbShift();
 	void updateRgbShift();
 
@@ -55,12 +57,26 @@ private:
 
 	void movePlayer() override;
 
+#pragma region updateの中身
+
 	// update_何とか関数を格納する
 	void update_start() override;
 	void update_play() override;
 	void update_end() override;
 
+#pragma endregion updateの中身
+
 	void additionalDrawObj3d() override;
+
+#pragma region 初期化
+
+	void initSprite();
+	void initGameObj();
+	void initPlayer();
+	void initEnemy();
+	void initBoss();
+
+#pragma endregion 初期化
 
 public:
 	BossScene();

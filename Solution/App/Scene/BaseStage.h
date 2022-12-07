@@ -85,6 +85,8 @@ protected:
 
 #pragma endregion
 
+#pragma region updateの中身
+
 	// update_何とか関数を格納する
 	std::function<void()> update_proc;
 	virtual void update_start();
@@ -93,7 +95,12 @@ protected:
 
 	virtual void movePlayer();
 
+#pragma endregion updateの中身
+
 	virtual void additionalDrawObj3d() {};
+
+	void initPlayer();
+	void initBackObj();
 
 public:
 

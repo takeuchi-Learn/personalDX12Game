@@ -136,15 +136,6 @@ BaseStage::BaseStage() :
 	update_proc(std::bind(&BaseStage::update_start, this)),
 #pragma  endregion シーン内共通
 
-#pragma region 背景と地面
-	backPipelineSet(Object3d::createGraphicsPipeline(Object3d::BLEND_MODE::ALPHA,
-													 L"Resources/Shaders/BackVS.hlsl",
-													 L"Resources/Shaders/BackPS.hlsl")),
-	back(std::make_unique<ObjSet>(camera.get(), "Resources/back/", "back", true)),
-	ground(std::make_unique<ObjSet>(camera.get(), "Resources/ground", "ground")),
-
-#pragma endregion 背景と地面
-
 #pragma region 自機関係
 
 	playerModel(std::make_unique<ObjModel>("Resources/player", "player")),
@@ -169,24 +160,37 @@ BaseStage::BaseStage() :
 #pragma endregion スプライト
 
 {
-	// --------------------
-	// 自機
-	// --------------------
+	// カメラ
+	camera->setFarZ(10000.f);
 
+	// 自機
+	initPlayer();
+
+	// 天球と地面
+	initBackObj();
+}
+
+void BaseStage::initPlayer()
+{
 	// 初期化子でやるとモデルがnullptrになる
 	player = std::make_unique<Player>(camera.get(), playerModel.get(), XMFLOAT3(0.f, 0.f, 0.f));
 	// 大きさを設定
 	player->setScale(10.f);
+}
 
-	// --------------------
-	// 背景と地面
-	// --------------------
+void BaseStage::initBackObj()
+{
+	backPipelineSet = Object3d::createGraphicsPipeline(Object3d::BLEND_MODE::ALPHA,
+													   L"Resources/Shaders/BackVS.hlsl",
+													   L"Resources/Shaders/BackPS.hlsl");
 
 	// 背景の天球
+	back = std::make_unique<ObjSet>(camera.get(), "Resources/back/", "back", true);
 	const float backScale = camera->getFarZ() * 0.9f;
 	back->setScale({ backScale, backScale, backScale });
 
 	// 地面
+	ground = std::make_unique<ObjSet>(camera.get(), "Resources/ground", "ground");
 	const UINT groundSize = 5000u;
 	ground->setPos(XMFLOAT3(0, -player->getScale() * 5.f, 0));
 	ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
@@ -194,15 +198,13 @@ BaseStage::BaseStage() :
 
 	constexpr float tillingNum = (float)groundSize / 32.f;
 	ground->getModelPt()->setTexTilling(XMFLOAT2(tillingNum, tillingNum));
-
-	// --------------------
-	// マウスカーソルは表示しない
-	// --------------------
-	input->changeDispMouseCursorFlag(false);
 }
 
 void BaseStage::start()
 {
+	// マウスカーソルは表示しない
+	input->changeDispMouseCursorFlag(false);
+
 	// 自機に追従する
 	camera->setParentObj(player.get());
 }

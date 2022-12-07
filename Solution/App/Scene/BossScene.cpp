@@ -10,50 +10,58 @@
 
 using namespace DirectX;
 
+#pragma region 初期化
+
 BossScene::BossScene() :
-	BaseStage(),
-
-	bossModel(new ObjModel("Resources/tori", "tori")),
-	boss(std::make_unique<BossEnemy>(camera.get(), bossModel.get())),
-
-	smallEnemyModel(new ObjModel("Resources/tori", "tori")),
-
-	// スプライト
-	bossHpGr(new Sprite(spBase->loadTexture(L"Resources/hpBar.png"), spBase.get(), XMFLOAT2(0.5f, 0.f)))
+	BaseStage()
 {
-	// --------------------
+	initSprite();
+
+	// カメラ
+	camera->setParentObj(player.get());
+
+	initGameObj();
+}
+
+void BossScene::initSprite()
+{
 	// スプライト
-	// --------------------
+	bossHpGr = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/hpBar.png"),
+										spBase.get(),
+										XMFLOAT2(0.5f, 0.f));
+
 	bossHpGr->setSize(XMFLOAT2(WinAPI::window_width * 0.75f,
 							   WinAPI::window_height / 20.f));
 	bossHpGr->position = XMFLOAT3(WinAPI::window_width / 2.f,
 								  bossHpGr->getSize().y * 0.5f,
 								  0.f);
 	bossHpGr->color = XMFLOAT4(1.f, 0.5f, 0.f, 1.f);
+}
 
-	// カメラ
-	constexpr float farZ = 1000.f;
-	camera->setParentObj(player.get());
-	camera->setFarZ(farZ);
+void BossScene::initGameObj()
+{
+	bossModel = std::make_unique<ObjModel>("Resources/tori", "tori");
+	boss = std::make_unique<BossEnemy>(camera.get(), bossModel.get());
+	smallEnemyModel = std::make_unique<ObjModel>("Resources/tori", "tori");
 
-	// --------------------
-	// ゲームオブジェクト
-	// --------------------
+	initPlayer();
+
+	initEnemy();
+}
+
+void BossScene::initPlayer()
+{
 	playerHpMax = 20u;
 	player->setScale(10.f);
 	player->setHp(playerHpMax);
+}
 
-	attackableEnemy.emplace_front(boss.get());
-	bossHpMax = 16u;
-	boss->setHp(bossHpMax);
-	boss->setScale(100.f);
-	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 300));
-	boss->setRotation(XMFLOAT3(0, 180.f, 0));
-	boss->setTargetObj(player.get());
-	boss->setSmallEnemyModel(bossModel.get());
-	boss->changePhase_approach();
-	boss->getObj()->color = XMFLOAT4(4, 4, 4, 1);
+void BossScene::initEnemy()
+{
+	// ボスの初期化
+	initBoss();
 
+	// その他の敵の初期化
 	constexpr size_t smallEnemyNum = 3u;
 	smallEnemy.resize(smallEnemyNum);
 	smallEnemyHpMax = 1u;
@@ -72,15 +80,31 @@ BossScene::BossScene() :
 		attackableEnemy.emplace_front(smallEnemy[i].get());
 	}
 
-	// 腰
-	koshiModel = std::make_unique<ObjModel>("Resources/koshi", "koshi", 0U, false);
-	koshi = std::make_unique<Object3d>(camera.get(), koshiModel.get(), 0U);
-
 	constexpr float koshiScale = 24.f;
 	koshi->scale = XMFLOAT3(koshiScale,
 							koshiScale,
 							koshiScale);
 }
+
+void BossScene::initBoss()
+{
+	attackableEnemy.emplace_front(boss.get());
+	bossHpMax = 16u;
+	boss->setHp(bossHpMax);
+	boss->setScale(100.f);
+	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 300));
+	boss->setRotation(XMFLOAT3(0, 180.f, 0));
+	boss->setTargetObj(player.get());
+	boss->setSmallEnemyModel(bossModel.get());
+	boss->changePhase_approach();
+	boss->getObj()->color = XMFLOAT4(4, 4, 4, 1);
+
+	// 腰
+	koshiModel = std::make_unique<ObjModel>("Resources/koshi", "koshi", 0U, false);
+	koshi = std::make_unique<Object3d>(camera.get(), koshiModel.get(), 0U);
+}
+
+#pragma endregion 初期化
 
 void BossScene::update_start()
 {
@@ -185,6 +209,9 @@ void BossScene::update_play()
 
 			for (auto& i : boss->getSmallEnemyList())
 			{
+				// いなければ判定しない
+				if (!i->getAlive()) { continue; }
+
 				const CollisionShape::Sphere eCol(XMLoadFloat3(&i->getPos()),
 												  i->getScale());
 
@@ -281,7 +308,7 @@ void BossScene::updateRgbShift()
 
 		// イージングを加味した進行割合
 		constexpr float  c4 = 2.f * XM_PI / 3.f;
-		const float easeRate = -powf(2.f, 10.f * (1.f - raito) - 10.f) *
+		const float easeRate = -std::pow(2.f, 10.f * (1.f - raito) - 10.f) *
 			DX12Base::ins()->nearSin((raito * 10.f - 10.75f) * c4);
 
 		PostEffect::getInstance()->setRgbShiftNum({ easeRate * rgbShiftMumMax, 0.f });
@@ -316,9 +343,9 @@ bool BossScene::addShotTarget(const std::forward_list<BaseEnemy*>& enemy,
 		{
 			// 敵との距離を更新
 			nowEnemyDistance = sqrtf(
-				powf(i->getPos().x - camera->getEye().x, 2.f) +
-				powf(i->getPos().y - camera->getEye().y, 2.f) +
-				powf(i->getPos().z - camera->getEye().z, 2.f)
+				std::pow(i->getPos().x - camera->getEye().x, 2.f) +
+				std::pow(i->getPos().y - camera->getEye().y, 2.f) +
+				std::pow(i->getPos().z - camera->getEye().z, 2.f)
 			);
 			// 照準の中で最も遠い敵なら情報を取っておく
 			if (farthestEnemyLen < nowEnemyDistance)
@@ -374,53 +401,47 @@ void BossScene::movePlayer()
 
 	// 回転
 	{
+		// 上向きか否かの切り替え
+		if (input->triggerKey(DIK_E))
+		{
+			XMFLOAT3 camRrota = camera->getRelativeRotaDeg();
+
+			constexpr float angle = 20.f;
+			camRrota.x += playerUpTurn ? angle : -angle;
+
+			playerUpTurn = !playerUpTurn;
+
+			camera->setRelativeRotaDeg(camRrota);
+		}
+
 		const bool hitA = input->hitKey(DIK_A);
 		const bool hitD = input->hitKey(DIK_D);
-		const bool triggerE = input->triggerKey(DIK_E);
-
-		if (hitA || hitD || triggerE)
+		// 左右の回転
+		if (hitA || hitD)
 		{
-			// 上向きか否かの切り替え
-			if (triggerE)
+			float speed = 45.f / DX12Base::ins()->getFPS();
+
+			// 左シフトと左コントロールで速度変更
+			if (input->hitKey(DIK_LCONTROL))
 			{
-				XMFLOAT3 camRrota = camera->getRelativeRotaDeg();
-
-				constexpr float angle = 20.f;
-				camRrota.x += playerUpTurn ? angle : -angle;
-
-				playerUpTurn = !playerUpTurn;
-
-				//player->setRotation(rota);
-				camera->setRelativeRotaDeg(camRrota);
+				speed /= 2.f;
+			} else if (input->hitKey(DIK_LSHIFT))
+			{
+				speed *= 2.f;
 			}
 
-			// 左右の回転
-			if (hitA || hitD)
+			XMFLOAT3 rota = player->getRotation();
+
+			// 回転させる
+			if (hitA)
 			{
-				float speed = 45.f / DX12Base::ins()->getFPS();
-
-				// 左シフトと左コントロールで速度変更
-				if (input->hitKey(DIK_LCONTROL))
-				{
-					speed /= 2.f;
-				} else if (input->hitKey(DIK_LSHIFT))
-				{
-					speed *= 2.f;
-				}
-
-				XMFLOAT3 rota = player->getRotation();
-
-				// 回転させる
-				if (hitA)
-				{
-					rota.y -= speed;
-				} else if (hitD)
-				{
-					rota.y += speed;
-				}
-
-				player->setRotation(rota);
+				rota.y -= speed;
+			} else if (hitD)
+			{
+				rota.y += speed;
 			}
+
+			player->setRotation(rota);
 		}
 	}
 }
