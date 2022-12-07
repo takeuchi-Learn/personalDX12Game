@@ -99,6 +99,11 @@ class RailShoot
 	// 敵発生スクリプトのCSVデータ
 	CSVType csvData;
 
+	// @brief loadCsvの入力をstd::stringにしたもの
+	// @return 読み込んだcsvの中身。失敗したらデフォルトコンストラクタで初期化された空のvector2次元配列が返る
+	// @param commentFlag //で始まる行を無視するかどうか(trueで無視)
+	// @param divChar フィールドの区切り文字
+	// @param commentStartStr コメント開始文字
 	CSVType loadCsv(const std::string& csvFilePath,
 					bool commentFlag = true,
 					char divChar = ',',
@@ -128,6 +133,13 @@ class RailShoot
 	void startRgbShift();
 	void updateRgbShift();
 
+	/// @brief 天球を回す
+	void rotationBack();
+
+	/// @brief 敵を追加
+	/// @param pos 敵の位置
+	/// @param vel 敵の速度
+	/// @param scale 敵の大きさ
 	void addEnemy(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& vel, float scale = 5.f);
 
 	void changeNextScene();

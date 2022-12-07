@@ -21,13 +21,6 @@ namespace
 	}
 }
 
-// std::stringの2次元配列(vector)
-using CSVType = std::vector<std::vector<std::string>>;
-// @brief loadCsvの入力をstd::stringにしたもの
-// @return 読み込んだcsvの中身。失敗したらデフォルトコンストラクタで初期化された空のvector2次元配列が返る
-// @param commentFlag //で始まる行を無視するかどうか(trueで無視)
-// @param divChar フィールドの区切り文字
-// @param commentStartStr コメント開始文字
 RailShoot::CSVType RailShoot::loadCsv(const std::string& csvFilePath,
 									  bool commentFlag,
 									  char divChar,
@@ -315,8 +308,11 @@ RailShoot::RailShoot()
 	{
 		constexpr UINT groundSize = 5000u;
 		ground->setPos(XMFLOAT3(0, -player->getScale(), (float)groundSize));
+		
 		ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
-		ground->getModelPt()->setTexTilling(XMFLOAT2(groundSize / 32.f, groundSize / 32.f));
+
+		constexpr float tillingNum = groundSize / 32.f;
+		ground->getModelPt()->setTexTilling(XMFLOAT2(tillingNum, tillingNum));
 	}
 
 	// --------------------
@@ -334,15 +330,7 @@ void RailShoot::start()
 
 void RailShoot::update()
 {
-	{
-		// シーン遷移中も背景は回す
-		XMFLOAT2 shiftUv = back->getModelPt()->getShiftUv();
-		constexpr float shiftSpeed = 0.01f;
-
-		shiftUv.x += shiftSpeed / DX12Base::getInstance()->getFPS();
-
-		back->getModelPt()->setShivtUv(shiftUv);
-	}
+	rotationBack();
 
 	// 背景オブジェクトの中心をカメラにする
 	back->setPos(camera->getEye());
@@ -422,6 +410,17 @@ void RailShoot::updateRgbShift()
 
 		PostEffect::getInstance()->setRgbShiftNum({ easeRate * rgbShiftMumMax, 0.f });
 	}
+}
+
+void RailShoot::rotationBack()
+{
+	// シーン遷移中も背景は回す
+	XMFLOAT2 shiftUv = back->getModelPt()->getShiftUv();
+	constexpr float shiftSpeed = 0.01f;
+
+	shiftUv.x += shiftSpeed / DX12Base::getInstance()->getFPS();
+
+	back->getModelPt()->setShivtUv(shiftUv);
 }
 
 void RailShoot::addEnemy(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& vel, float scale)

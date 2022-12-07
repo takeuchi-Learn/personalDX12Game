@@ -6,6 +6,84 @@
 
 using namespace DirectX;
 
+#pragma region 初期化
+
+BaseStage::BaseStage() :
+	dxBase(DX12Base::ins()),
+	input(Input::getInstance()),
+	timer(std::make_unique<Timer>()),
+	camera(std::make_unique<CameraObj>(nullptr)),
+	light(std::make_unique<Light>()),
+
+	update_proc(std::bind(&BaseStage::update_start, this)),
+	particleMgr(std::make_unique<ParticleMgr>(L"Resources/effect1.png", camera.get()))
+{
+	// カメラ
+	camera->setFarZ(10000.f);
+
+	// 自機
+	initPlayer();
+
+	// 天球と地面
+	initBackObj();
+
+	// スプライト
+	initSprite();
+}
+
+void BaseStage::initPlayer()
+{
+	playerModel = std::make_unique<ObjModel>("Resources/player", "player");
+	playerBulModel = std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true);
+	playerHpMax = 20U;
+
+	// 初期化子でやるとモデルがnullptrになる
+	player = std::make_unique<Player>(camera.get(), playerModel.get(), XMFLOAT3(0.f, 0.f, 0.f));
+	// 大きさを設定
+	player->setScale(10.f);
+}
+
+void BaseStage::initBackObj()
+{
+	backPipelineSet = Object3d::createGraphicsPipeline(Object3d::BLEND_MODE::ALPHA,
+													   L"Resources/Shaders/BackVS.hlsl",
+													   L"Resources/Shaders/BackPS.hlsl");
+
+	// 背景の天球
+	back = std::make_unique<ObjSet>(camera.get(), "Resources/back/", "back", true);
+	const float backScale = camera->getFarZ() * 0.9f;
+	back->setScale({ backScale, backScale, backScale });
+
+	// 地面
+	ground = std::make_unique<ObjSet>(camera.get(), "Resources/ground", "ground");
+	const UINT groundSize = 5000u;
+	ground->setPos(XMFLOAT3(0, -player->getScale() * 5.f, 0));
+	ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
+	ground->getModelPt()->setTexTilling(XMFLOAT2(groundSize / 32.f, groundSize / 32.f));
+
+	constexpr float tillingNum = (float)groundSize / 32.f;
+	ground->getModelPt()->setTexTilling(XMFLOAT2(tillingNum, tillingNum));
+}
+
+void BaseStage::initSprite()
+{
+	spBase = std::make_unique<SpriteBase>();
+
+	aim2D = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/aimPos.png"),
+									 spBase.get());
+}
+
+void BaseStage::start()
+{
+	// マウスカーソルは表示しない
+	input->changeDispMouseCursorFlag(false);
+
+	// 自機に追従する
+	camera->setParentObj(player.get());
+}
+
+#pragma endregion 初期化
+
 void BaseStage::update_start()
 {
 	update_proc = std::bind(&BaseStage::update_play, this);
@@ -94,10 +172,7 @@ BaseStage::CSVType BaseStage::loadCsv(const std::string& csvFilePath,
 	CSVType csvData{};	// csvの中身を格納
 
 	std::ifstream ifs(csvFilePath);
-	if (!ifs)
-	{
-		return csvData;
-	}
+	if (!ifs) { return csvData; }
 
 	std::string line{};
 	// 開いたファイルを一行読み込む(カーソルも動く)
@@ -122,91 +197,6 @@ BaseStage::CSVType BaseStage::loadCsv(const std::string& csvFilePath,
 	}
 
 	return csvData;
-}
-
-BaseStage::BaseStage() :
-#pragma region シーン内共通
-
-	dxBase(DX12Base::ins()),
-	input(Input::getInstance()),
-	timer(std::make_unique<Timer>()),
-	camera(std::make_unique<CameraObj>(nullptr)),
-	light(std::make_unique<Light>()),
-
-	update_proc(std::bind(&BaseStage::update_start, this)),
-#pragma  endregion シーン内共通
-
-#pragma region 自機関係
-
-	playerModel(std::make_unique<ObjModel>("Resources/player", "player")),
-	playerBulModel(std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true)),
-	playerHpMax(20U),
-
-#pragma endregion 自機関係
-
-#pragma region パーティクル
-
-	particleMgr(std::make_unique<ParticleMgr>(L"Resources/effect1.png", camera.get())),
-
-#pragma endregion パーティクル
-
-#pragma region スプライト
-
-	spBase(new SpriteBase()),
-
-	aim2D(new Sprite(spBase->loadTexture(L"Resources/aimPos.png"),
-					 spBase.get()))
-
-#pragma endregion スプライト
-
-{
-	// カメラ
-	camera->setFarZ(10000.f);
-
-	// 自機
-	initPlayer();
-
-	// 天球と地面
-	initBackObj();
-}
-
-void BaseStage::initPlayer()
-{
-	// 初期化子でやるとモデルがnullptrになる
-	player = std::make_unique<Player>(camera.get(), playerModel.get(), XMFLOAT3(0.f, 0.f, 0.f));
-	// 大きさを設定
-	player->setScale(10.f);
-}
-
-void BaseStage::initBackObj()
-{
-	backPipelineSet = Object3d::createGraphicsPipeline(Object3d::BLEND_MODE::ALPHA,
-													   L"Resources/Shaders/BackVS.hlsl",
-													   L"Resources/Shaders/BackPS.hlsl");
-
-	// 背景の天球
-	back = std::make_unique<ObjSet>(camera.get(), "Resources/back/", "back", true);
-	const float backScale = camera->getFarZ() * 0.9f;
-	back->setScale({ backScale, backScale, backScale });
-
-	// 地面
-	ground = std::make_unique<ObjSet>(camera.get(), "Resources/ground", "ground");
-	const UINT groundSize = 5000u;
-	ground->setPos(XMFLOAT3(0, -player->getScale() * 5.f, 0));
-	ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
-	ground->getModelPt()->setTexTilling(XMFLOAT2(groundSize / 32.f, groundSize / 32.f));
-
-	constexpr float tillingNum = (float)groundSize / 32.f;
-	ground->getModelPt()->setTexTilling(XMFLOAT2(tillingNum, tillingNum));
-}
-
-void BaseStage::start()
-{
-	// マウスカーソルは表示しない
-	input->changeDispMouseCursorFlag(false);
-
-	// 自機に追従する
-	camera->setParentObj(player.get());
 }
 
 void BaseStage::update()

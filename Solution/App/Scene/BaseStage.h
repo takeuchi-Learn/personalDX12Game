@@ -101,6 +101,7 @@ protected:
 
 	void initPlayer();
 	void initBackObj();
+	void initSprite();
 
 public:
 
