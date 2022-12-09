@@ -57,7 +57,7 @@ void BossEnemy::addSmallEnemy()
 																			XM_PIDIV2,
 																			0.f));
 	XMFLOAT3 vel{};
-	XMStoreFloat3(&vel, right * moveSpeed);
+	XMStoreFloat3(&vel, right * smallEnemyMoveSpeed);
 	i->setVel(vel);
 	i->setPhase(
 		[&]
@@ -67,7 +67,7 @@ void BossEnemy::addSmallEnemy()
 
 		const XMVECTOR oldVec = XMVector3Normalize(XMLoadFloat3(&i->getVel()));
 
-		velVec = moveSpeed * XMVectorLerp(oldVec, velVec, 0.05f);
+		velVec = smallEnemyMoveSpeed * XMVectorLerp(oldVec, velVec, 0.05f);
 
 		XMFLOAT3 vel{};
 		XMStoreFloat3(&vel, velVec);

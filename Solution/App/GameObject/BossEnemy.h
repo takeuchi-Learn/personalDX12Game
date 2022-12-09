@@ -12,6 +12,7 @@ class BossEnemy :
 
 	ObjModel* smallEnemyModel = nullptr;
 	std::forward_list<std::unique_ptr<BaseEnemy>> smallEnemy;
+	float smallEnemyMoveSpeed = 2.f;
 
 	static inline const uint32_t shotInterval = 60u;
 	uint32_t nowShotFrame = 0u;

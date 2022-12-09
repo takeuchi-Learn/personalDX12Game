@@ -19,7 +19,7 @@ BossScene::BossScene() :
 
 	// カメラ
 	camera->setParentObj(player.get());
-	sceneChangeStartCamLen = camera->getEye2TargetLen() * 10.f;;
+	sceneChangeStartCamLen = camera->getEye2TargetLen() * 10.f;
 	sceneChangeEndCamLen = camera->getEye2TargetLen();
 
 	initGameObj();
@@ -135,7 +135,7 @@ void BossScene::update_start()
 	if (raito > 1.f)
 	{
 		update_proc = std::bind(&BossScene::update_play, this);
-		
+
 		player->setPos(sceneChangeEndPos);
 		player->setRotation(sceneChangeEndRota);
 		camera->setEye2TargetLen(sceneChangeEndCamLen);
@@ -154,7 +154,7 @@ void BossScene::update_start()
 	nowPos.x = std::lerp(sceneChangeStartPos.x, sceneChangeEndPos.x, raito);
 	nowPos.y = std::lerp(sceneChangeStartPos.y, sceneChangeEndPos.y, raito);
 	nowPos.z = std::lerp(sceneChangeStartPos.z, sceneChangeEndPos.z, raito);
-	
+
 	player->setPos(nowPos);
 
 	XMFLOAT3 nowRota{};
