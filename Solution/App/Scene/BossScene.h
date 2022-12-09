@@ -45,6 +45,14 @@ private:
 	Timer::timeType startRgbShiftTime = 0;
 	bool rgbShiftFlag = false;
 
+	const static Timer::timeType sceneChangeTime = Timer::oneSec * 3;
+	DirectX::XMFLOAT3 sceneChangeStartPos{};
+	DirectX::XMFLOAT3 sceneChangeEndPos{};
+	DirectX::XMFLOAT3 sceneChangeStartRota{};
+	DirectX::XMFLOAT3 sceneChangeEndRota{};
+	float sceneChangeStartCamLen;
+	float sceneChangeEndCamLen;
+
 private:
 
 	void startRgbShift();

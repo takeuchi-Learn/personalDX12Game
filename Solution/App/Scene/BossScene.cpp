@@ -19,6 +19,8 @@ BossScene::BossScene() :
 
 	// カメラ
 	camera->setParentObj(player.get());
+	sceneChangeStartCamLen = camera->getEye2TargetLen() * 10.f;;
+	sceneChangeEndCamLen = camera->getEye2TargetLen();
 
 	initGameObj();
 }
@@ -54,6 +56,13 @@ void BossScene::initPlayer()
 	playerHpMax = 20u;
 	player->setScale(10.f);
 	player->setHp(playerHpMax);
+
+	sceneChangeStartPos = XMFLOAT3(0.f, 500.f, 0.f);
+	sceneChangeEndPos = XMFLOAT3(0.f, 0.f, 0.f);
+
+	sceneChangeStartRota = player->getRotation();
+	sceneChangeStartRota.y += 90.f;
+	sceneChangeEndRota = player->getRotation();
 }
 
 void BossScene::initEnemy()
@@ -104,14 +113,56 @@ void BossScene::initBoss()
 	koshi = std::make_unique<Object3d>(camera.get(), koshiModel.get(), 0U);
 }
 
-#pragma endregion 初期化
-
-void BossScene::update_start()
+void BossScene::start()
 {
 	PostEffect::getInstance()->setVignIntensity(0.5f);
 	PostEffect::getInstance()->setSpeedLineIntensity(0.125f);
 
-	update_proc = std::bind(&BossScene::update_play, this);
+	for (auto& i : attackableEnemy)
+	{
+		i->actionable = false;
+	}
+
+	timer->reset();
+}
+
+#pragma endregion 初期化
+
+void BossScene::update_start()
+{
+	const float raito = (float)timer->getNowTime() / (float)sceneChangeTime;
+
+	if (raito > 1.f)
+	{
+		update_proc = std::bind(&BossScene::update_play, this);
+		
+		player->setPos(sceneChangeEndPos);
+		player->setRotation(sceneChangeEndRota);
+		camera->setEye2TargetLen(sceneChangeEndCamLen);
+
+		for (auto& i : attackableEnemy)
+		{
+			i->actionable = true;
+		}
+		return;
+	}
+
+	float camLen = std::lerp(sceneChangeStartCamLen, sceneChangeEndCamLen, raito);
+	camera->setEye2TargetLen(camLen);
+
+	XMFLOAT3 nowPos{};
+	nowPos.x = std::lerp(sceneChangeStartPos.x, sceneChangeEndPos.x, raito);
+	nowPos.y = std::lerp(sceneChangeStartPos.y, sceneChangeEndPos.y, raito);
+	nowPos.z = std::lerp(sceneChangeStartPos.z, sceneChangeEndPos.z, raito);
+	
+	player->setPos(nowPos);
+
+	XMFLOAT3 nowRota{};
+	nowRota.x = std::lerp(sceneChangeStartRota.x, sceneChangeEndRota.x, raito);
+	nowRota.y = std::lerp(sceneChangeStartRota.y, sceneChangeEndRota.y, raito);
+	nowRota.z = std::lerp(sceneChangeStartRota.z, sceneChangeEndRota.z, raito);
+
+	player->setRotation(nowRota);
 }
 
 void BossScene::update_play()
@@ -275,11 +326,6 @@ void BossScene::additionalDrawObj3d()
 {
 	koshi->position = boss->getPos();
 	koshi->drawWithUpdate(DX12Base::ins(), light.get());
-}
-
-void BossScene::start()
-{
-	timer->reset();
 }
 
 void BossScene::startRgbShift()

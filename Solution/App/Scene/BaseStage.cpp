@@ -76,9 +76,7 @@ void BaseStage::start()
 {
 	// マウスカーソルは表示しない
 	input->changeDispMouseCursorFlag(false);
-
-	// 自機に追従する
-	camera->setParentObj(player.get());
+	timer->reset();
 }
 
 #pragma endregion 初期化
@@ -86,6 +84,9 @@ void BaseStage::start()
 void BaseStage::update_start()
 {
 	update_proc = std::bind(&BaseStage::update_play, this);
+
+	// 自機に追従する
+	camera->setParentObj(player.get());
 }
 
 void BaseStage::update_play()
