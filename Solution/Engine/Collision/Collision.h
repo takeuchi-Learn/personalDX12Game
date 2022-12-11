@@ -3,7 +3,7 @@
 #include "CollisionShape.h"
 #include <vector>
 
-#include "../3D/Obj/Object3d.h"
+#include "3D/Obj/Object3d.h"
 
 /// @brief 衝突判定をするクラス
 class Collision

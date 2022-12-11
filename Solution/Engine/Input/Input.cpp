@@ -4,7 +4,7 @@
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
 
-#include "../System/WinAPI.h"
+#include "System/WinAPI.h"
 
 Input::Input()
 {

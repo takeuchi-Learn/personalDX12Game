@@ -1,6 +1,6 @@
 ﻿#include "ParticleMgr.h"
 
-#include "../System/PostEffect.h"
+#include "System/PostEffect.h"
 
 #include <d3dcompiler.h>
 #include <DirectXTex.h>

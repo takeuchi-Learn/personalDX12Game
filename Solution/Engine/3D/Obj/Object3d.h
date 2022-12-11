@@ -6,9 +6,9 @@
 #include <d3d12.h>
 
 #include "ObjModel.h"
-#include "../Engine/System/DX12Base.h"
-#include "../Engine/Camera/Camera.h"
-#include"../Light.h"
+#include "System/DX12Base.h"
+#include "Camera/Camera.h"
+#include "3D/Light.h"
 
 class Object3d
 {

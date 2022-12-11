@@ -10,8 +10,8 @@
 #include <string>
 #include <vector>
 
-#include "../Engine/Camera/Camera.h"
-#include "../Light.h"
+#include "Camera/Camera.h"
+#include "3D/Light.h"
 
 class FbxObj3d
 {

@@ -3,7 +3,7 @@
 #include <d3dx12.h>
 
 #include <d3dcompiler.h>
-#include "../Engine/System/PostEffect.h"
+#include "System/PostEffect.h"
 
 #pragma comment(lib, "d3dcompiler.lib")
 

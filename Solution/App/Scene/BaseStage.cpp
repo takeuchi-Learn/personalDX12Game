@@ -1,5 +1,5 @@
 ﻿#include "BaseStage.h"
-#include "../Engine/System/SceneManager.h"
+#include "System/SceneManager.h"
 #include "TitleScene.h"
 #include <fstream>
 #include <DirectXMath.h>

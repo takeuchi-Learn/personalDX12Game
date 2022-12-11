@@ -4,7 +4,7 @@
 #pragma comment(lib, "d3dcompiler.lib")
 
 #include "FbxLoader.h"
-#include "../../System/PostEffect.h"
+#include "System/PostEffect.h"
 using namespace Microsoft::WRL;
 using namespace DirectX;
 

@@ -4,10 +4,10 @@
 #include "BossScene.h"
 
 #include <fstream>
-#include "../Engine/Util/RandomNum.h"
-#include "../Engine/System/PostEffect.h"
-#include "../Engine/Collision/Collision.h"
-#include "../Engine/System/SceneManager.h"
+#include "Util/RandomNum.h"
+#include "System/PostEffect.h"
+#include "Collision/Collision.h"
+#include "System/SceneManager.h"
 
 using namespace DirectX;
 

@@ -3,7 +3,7 @@
 #include <wrl.h>
 #include <DirectXMath.h>
 #include <d3d12.h>
-#include "../System/DX12Base.h"
+#include "System/DX12Base.h"
 
 class Light
 {

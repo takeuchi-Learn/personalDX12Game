@@ -1,16 +1,16 @@
 ﻿#pragma once
-#include "../Engine/System/GameScene.h"
+#include "System/GameScene.h"
 
 #include <memory>
 #include <functional>
-#include "../Engine/2D/DebugText.h"
-#include "../GameObject/NormalEnemy.h"
-#include "../Engine/3D/ParticleMgr.h"
-#include "../Engine/Input/Input.h"
-#include "../Engine/System/DX12Base.h"
-#include "../Engine/Camera/CameraObj.h"
-#include "../GameObject/Player.h"
-#include "../Engine/3D/Obj/ObjSet.h"
+#include "2D/DebugText.h"
+#include "GameObject/NormalEnemy.h"
+#include "3D/ParticleMgr.h"
+#include "Input/Input.h"
+#include "System/DX12Base.h"
+#include "Camera/CameraObj.h"
+#include "GameObject/Player.h"
+#include "3D/Obj/ObjSet.h"
 
 class RailShoot
 	: public GameScene

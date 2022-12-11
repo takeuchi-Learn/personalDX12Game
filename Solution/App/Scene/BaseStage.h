@@ -1,16 +1,16 @@
 ﻿#pragma once
-#include "../Engine/System/GameScene.h"
+#include "System/GameScene.h"
 
-#include "../Engine/Input/Input.h"
-#include "../Engine/System/DX12Base.h"
-#include "../Engine/Camera/CameraObj.h"
-#include "../GameObject/Player.h"
-#include "../Engine/Util/Timer.h"
-#include "../Engine/3D/Obj/ObjSet.h"
-#include "../Engine/3D/ParticleMgr.h"
-#include "../GameObject/BaseEnemy.h"
-#include "../Engine/2D/SpriteBase.h"
-#include "../Engine/2D/Sprite.h"
+#include "Input/Input.h"
+#include "System/DX12Base.h"
+#include "Camera/CameraObj.h"
+#include "GameObject/Player.h"
+#include "Util/Timer.h"
+#include "3D/Obj/ObjSet.h"
+#include "3D/ParticleMgr.h"
+#include "GameObject/BaseEnemy.h"
+#include "2D/SpriteBase.h"
+#include "2D/Sprite.h"
 
 #include <memory>
 #include <functional>

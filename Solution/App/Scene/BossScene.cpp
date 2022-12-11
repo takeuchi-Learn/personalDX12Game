@@ -3,10 +3,10 @@
 
 #include <DirectXMath.h>
 #include <imgui.h>
-#include "../Engine/System/SceneManager.h"
-#include "../Engine/System/PostEffect.h"
+#include "System/SceneManager.h"
+#include "System/PostEffect.h"
 
-#include "../Engine/Collision/Collision.h"
+#include "Collision/Collision.h"
 
 using namespace DirectX;
 

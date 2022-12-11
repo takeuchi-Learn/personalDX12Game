@@ -5,7 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include "Mesh.h"
-#include "../Engine/System/DX12Base.h"
+#include "System/DX12Base.h"
 
 class ObjModel
 {

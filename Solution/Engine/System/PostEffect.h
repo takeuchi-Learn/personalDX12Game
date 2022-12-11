@@ -1,9 +1,9 @@
 ﻿#pragma once
-#include "../../Engine/System/DX12Base.h"
+#include "System/DX12Base.h"
 
 #include <memory>
 #include <vector>
-#include "../Util/Timer.h"
+#include "Util/Timer.h"
 
 class PostEffect
 {

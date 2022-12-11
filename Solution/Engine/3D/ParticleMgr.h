@@ -5,8 +5,8 @@
 #include <d3d12.h>
 #include <d3dx12.h>
 #include <forward_list>
-#include "../Camera/Camera.h"
-#include "../Util/Timer.h"
+#include "Camera/Camera.h"
+#include "Util/Timer.h"
 
 class ParticleMgr
 {

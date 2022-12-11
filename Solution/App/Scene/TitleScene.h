@@ -1,15 +1,15 @@
 ﻿#pragma once
-#include "../Engine/System/GameScene.h"
+#include "System/GameScene.h"
 
 #include <memory>
 #include <functional>
 #include <DirectXMath.h>
 
-#include "../Engine/2D/DebugText.h"
-#include "../Engine/Input/Input.h"
-#include "../Engine/Sound/Sound.h"
+#include "2D/DebugText.h"
+#include "Input/Input.h"
+#include "Sound/Sound.h"
 
-#include "../Engine/Util/Timer.h"
+#include "Util/Timer.h"
 
 class TitleScene :
 	public GameScene

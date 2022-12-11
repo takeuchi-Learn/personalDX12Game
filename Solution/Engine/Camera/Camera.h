@@ -2,7 +2,7 @@
 
 #include <DirectXMath.h>
 
-#include "../../Engine/System/DX12Base.h"
+#include "System/DX12Base.h"
 
 class Camera
 {

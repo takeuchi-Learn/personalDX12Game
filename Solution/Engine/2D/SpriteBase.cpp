@@ -8,7 +8,7 @@
 #include <d3dx12.h>
 
 #include <DirectXTex.h>
-#include "../System/DX12Base.h"
+#include "System/DX12Base.h"
 
 using namespace DirectX;
 using namespace Microsoft::WRL;

@@ -1,9 +1,9 @@
 ﻿#pragma once
-#include "../Engine/System/GameScene.h"
+#include "System/GameScene.h"
 
 #include <memory>
-#include "../../Engine/2D/DebugText.h"
-#include "../Engine/Input/Input.h"
+#include "2D/DebugText.h"
+#include "Input/Input.h"
 
 class EndScene :
 	public GameScene

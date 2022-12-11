@@ -15,7 +15,7 @@
 
 #include <fbxsdk.h>
 
-#include "../Engine/System/DX12Base.h"
+#include "System/DX12Base.h"
 
 class FbxModel
 {

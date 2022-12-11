@@ -46,14 +46,14 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)lib\imgui\include;$(ProjectDir)lib\DirectXTex\include;$(ProjectDir)lib\fbx_sdk\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)lib\imgui\include;$(ProjectDir)lib\DirectXTex\include;$(ProjectDir)lib\fbx_sdk\include;$(ProjectDir)Engine;$(ProjectDir)App;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)lib\imgui\lib\$(Configuration);$(ProjectDir)lib\DirectXTex\lib\$(Configuration);$(ProjectDir)lib\fbx_sdk\lib;$(LibraryPath)</LibraryPath>
     <PublicIncludeDirectories>
     </PublicIncludeDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)lib\imgui\include;$(ProjectDir)lib\DirectXTex\include;$(ProjectDir)lib\fbx_sdk\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)lib\imgui\include;$(ProjectDir)lib\DirectXTex\include;$(ProjectDir)lib\fbx_sdk\include;$(ProjectDir)Engine;$(ProjectDir)App;$(IncludePath)</IncludePath>
     <LibraryPath>$(ProjectDir)lib\imgui\lib\$(Configuration);$(ProjectDir)lib\DirectXTex\lib\$(Configuration);$(ProjectDir)lib\fbx_sdk\lib;$(LibraryPath)</LibraryPath>
     <PublicIncludeDirectories>
     </PublicIncludeDirectories>

@@ -1,9 +1,9 @@
 ﻿#include "Looper.h"
 
 #include <DirectXMath.h>
-#include "../3D/Obj/Object3d.h"
-#include "../Sound/SoundBase.h"
-#include "../Input/Input.h"
+#include "3D/Obj/Object3d.h"
+#include "Sound/SoundBase.h"
+#include "Input/Input.h"
 #include "SceneManager.h"
 using namespace DirectX;
 

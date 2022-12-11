@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include "SpriteBase.h"
 
-#include "../System/DX12Base.h"
+#include "System/DX12Base.h"
 
 class Sprite
 {

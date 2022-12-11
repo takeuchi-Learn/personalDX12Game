@@ -1,8 +1,8 @@
 ﻿#include "EndScene.h"
 
 #include "TitleScene.h"
-#include "../Engine/System/PostEffect.h"
-#include "../Engine/System/SceneManager.h"
+#include "System/PostEffect.h"
+#include "System/SceneManager.h"
 
 EndScene::EndScene()
 {

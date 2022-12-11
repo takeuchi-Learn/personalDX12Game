@@ -1,19 +1,19 @@
 ﻿#pragma once
-#include "../Engine/System/GameScene.h"
+#include "System/GameScene.h"
 
 #include <functional>
 #include <memory>
 #include <forward_list>
 
-#include "../Engine/Input/Input.h"
-#include "../Engine/Util/Timer.h"
-#include "../Engine/Camera/CameraObj.h"
-#include "../Engine/2D/Sprite.h"
-#include "../GameObject/Player.h"
-#include "../Engine/3D/Obj/Object3d.h"
-#include "../Engine/3D/Obj/ObjSet.h"
-#include "../GameObject/BaseEnemy.h"
-#include "../GameObject/BossEnemy.h"
+#include "Input/Input.h"
+#include "Util/Timer.h"
+#include "Camera/CameraObj.h"
+#include "2D/Sprite.h"
+#include "GameObject/Player.h"
+#include "3D/Obj/Object3d.h"
+#include "3D/Obj/ObjSet.h"
+#include "GameObject/BaseEnemy.h"
+#include "GameObject/BossEnemy.h"
 
 #include "BaseStage.h"
 

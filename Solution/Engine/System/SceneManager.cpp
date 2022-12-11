@@ -2,7 +2,7 @@
 
 #include "PostEffect.h"
 
-#include "../App/Scene/TitleScene.h"
+#include "Scene/TitleScene.h"
 
 SceneManager::SceneManager()
 	: nextScene(nullptr)

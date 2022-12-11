@@ -1,9 +1,9 @@
 ﻿#pragma once
 #include <DirectXMath.h>
 #include <memory>
-#include "../Engine/System/DX12Base.h"
-#include "../Engine/3D/Light.h"
-#include "../Engine/3D/Obj/Object3d.h"
+#include "System/DX12Base.h"
+#include "3D/Light.h"
+#include "3D/Obj/Object3d.h"
 
 class GameObj
 {
