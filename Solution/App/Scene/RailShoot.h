@@ -12,6 +12,7 @@
 #include "GameObject/Player.h"
 #include "3D/Obj/ObjSet.h"
 
+/// @brief レールシューティングのシーン
 class RailShoot
 	: public GameScene
 {

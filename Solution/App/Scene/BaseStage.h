@@ -1,4 +1,9 @@
-﻿#pragma once
+﻿/*****************************************************************//**
+ * \file   BaseStage.h
+ * \brief  ステージ基底クラス
+ *********************************************************************/
+
+#pragma once
 #include "System/GameScene.h"
 
 #include "Input/Input.h"
@@ -16,6 +21,7 @@
 #include <functional>
 #include <forward_list>
 
+ /// @brief ステージ基底クラス
 class BaseStage
 	: public GameScene
 {

@@ -2,6 +2,7 @@
 
 #include "GameObj.h"
 
+/// @brief 通常敵の弾クラス
 class EnemyBullet
 	: public GameObj
 {

@@ -1,4 +1,9 @@
-﻿#pragma once
+﻿/*****************************************************************//**
+ * \file   BossScene.h
+ * \brief  ボス戦のシーン
+ *********************************************************************/
+
+#pragma once
 #include "System/GameScene.h"
 
 #include <functional>
@@ -17,6 +22,7 @@
 
 #include "BaseStage.h"
 
+ /// @brief ボス戦シーンクラス
 class BossScene :
 	public BaseStage
 {

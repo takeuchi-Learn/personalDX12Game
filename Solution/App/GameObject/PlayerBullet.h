@@ -2,6 +2,7 @@
 
 #include "GameObj.h"
 
+/// @brief 自機の弾クラス
 class PlayerBullet
 	: public GameObj
 {

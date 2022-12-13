@@ -8,6 +8,7 @@
 
 #include "GameObj.h"
 
+/// @brief 自機クラス
 class Player
 	: public GameObj
 {

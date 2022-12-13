@@ -7,7 +7,7 @@
 #include "GameObject/BaseEnemy.h"
 #include <forward_list>
 
-/// @brief ボス敵クラス
+ /// @brief ボス敵クラス
 class BossEnemy :
 	public BaseEnemy
 {

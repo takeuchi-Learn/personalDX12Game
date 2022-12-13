@@ -7,7 +7,7 @@
 #include "GameObj.h"
 #include <functional>
 
-/// @brief 敵基底クラス
+ /// @brief 敵基底クラス
 class BaseEnemy
 	: public GameObj
 {

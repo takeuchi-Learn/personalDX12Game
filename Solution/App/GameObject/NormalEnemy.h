@@ -6,6 +6,7 @@
 #include <functional>
 #include <forward_list>
 
+/// @brief レールシューティングの通常敵クラス
 class NormalEnemy
 	: public BaseEnemy
 {

@@ -5,6 +5,7 @@
 #include "3D/Light.h"
 #include "3D/Obj/Object3d.h"
 
+/// @brief ゲームオブジェクト基底クラス
 class GameObj
 {
 protected:
