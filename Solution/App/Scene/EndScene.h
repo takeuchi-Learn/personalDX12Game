@@ -25,6 +25,7 @@ class EndScene :
 
 public:
 	EndScene();
+	void start() override;
 	void update() override;
 	void drawFrontSprite() override;
 };

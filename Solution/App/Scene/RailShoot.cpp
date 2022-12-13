@@ -314,15 +314,13 @@ RailShoot::RailShoot()
 		constexpr float tillingNum = groundSize / 32.f;
 		ground->getModelPt()->setTexTilling(XMFLOAT2(tillingNum, tillingNum));
 	}
-
-	// --------------------
-	// マウスカーソルは表示しない
-	// --------------------
-	input->changeDispMouseCursorFlag(false);
 }
 
 void RailShoot::start()
 {
+	// マウスカーソルは表示しない
+	input->changeDispMouseCursorFlag(false);
+
 	// タイマー開始
 	timer->reset();
 	startSceneChangeTime = timer->getNowTime();

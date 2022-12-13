@@ -23,6 +23,12 @@ EndScene::EndScene()
 						 DirectX::XMFLOAT2(0.f, 0.f)));
 }
 
+void EndScene::start()
+{
+	// マウスカーソルは表示する
+	input->changeDispMouseCursorFlag(true);
+}
+
 void EndScene::update()
 {
 	if (input->triggerKey(DIK_SPACE))
