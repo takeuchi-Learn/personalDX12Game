@@ -116,7 +116,7 @@
     <ClCompile Include="App\Scene\BossScene.cpp" />
     <ClCompile Include="App\Scene\BaseStage.cpp" />
     <ClCompile Include="App\GameObject\BaseEnemy.cpp" />
-    <ClCompile Include="App\GameObject\BossEnemy.cpp" />
+    <ClCompile Include="App\GameObject\Boss\BossEnemy.cpp" />
     <ClCompile Include="App\GameObject\EnemyMgr.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Camera\CameraObj.cpp" />
@@ -160,7 +160,7 @@
     <ClInclude Include="App\Scene\BossScene.h" />
     <ClInclude Include="App\Scene\BaseStage.h" />
     <ClInclude Include="App\GameObject\BaseEnemy.h" />
-    <ClInclude Include="App\GameObject\BossEnemy.h" />
+    <ClInclude Include="App\GameObject\Boss\BossEnemy.h" />
     <ClInclude Include="App\GameObject\EnemyMgr.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
     <ClInclude Include="Engine\Camera\CameraObj.h" />

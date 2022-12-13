@@ -308,7 +308,7 @@ RailShoot::RailShoot()
 	{
 		constexpr UINT groundSize = 5000u;
 		ground->setPos(XMFLOAT3(0, -player->getScale(), (float)groundSize));
-		
+
 		ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
 
 		constexpr float tillingNum = groundSize / 32.f;

@@ -1,6 +1,13 @@
-﻿#pragma once
+﻿/*****************************************************************//**
+ * \file   BaseEnemy.h
+ * \brief  敵基底クラス
+ *********************************************************************/
+
+#pragma once
 #include "GameObj.h"
 #include <functional>
+
+/// @brief 敵基底クラス
 class BaseEnemy
 	: public GameObj
 {
@@ -30,13 +37,13 @@ public:
 	BaseEnemy(Camera* camera,
 			  ObjModel* model,
 			  const DirectX::XMFLOAT3& pos = { 0,0,0 },
-			  uint16_t hp = 1u);
+			  uint16_t hp = 1ui16);
 
 	inline void setHp(uint16_t hp) { this->hp = hp; }
 	inline uint16_t getHp() const { return hp; }
 
-	inline void setVel(const decltype(vel)& vel) { this->vel = vel; }
-	inline const decltype(vel)& getVel() const { return vel; }
+	inline void setVel(const DirectX::XMFLOAT3& vel) { this->vel = vel; }
+	inline const DirectX::XMFLOAT3& getVel() const { return vel; }
 
 	/// @brief ダメージを与える
 	/// @param damegeNum 与えるダメージ数

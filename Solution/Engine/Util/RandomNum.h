@@ -32,7 +32,6 @@ public:
 	// シード値を変更
 	inline void resetSeed(auto seed) { mt = std::mt19937_64(seed); }
 
-
 	/// @brief 整数の一様乱数
 	/// @tparam intType 整数型
 	/// @param min 最小値

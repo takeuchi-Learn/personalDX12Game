@@ -43,39 +43,6 @@ void BossEnemy::additionalDraw(Light* light)
 	}
 }
 
-void BossEnemy::addSmallEnemy()
-{
-	auto& i = smallEnemy.emplace_front();
-	i.reset(new BaseEnemy(camera, smallEnemyModel));
-	i->setScale(10.f);
-	i->setParent(this->getParent());
-	i->setPos(this->getPos());
-	i->setHp(1u);
-
-	const XMVECTOR right = XMVector3Rotate(XMVector3Normalize(calcVelVec(this, true)),
-										   XMQuaternionRotationRollPitchYaw(RandomNum::getRandf(0.f, XM_PI),
-																			XM_PIDIV2,
-																			0.f));
-	XMFLOAT3 vel{};
-	XMStoreFloat3(&vel, right * smallEnemyMoveSpeed);
-	i->setVel(vel);
-	i->setPhase(
-		[&]
-		{
-			XMVECTOR velVec = calcVelVec(i.get(), true);
-		velVec = XMVector3Normalize(velVec);
-
-		const XMVECTOR oldVec = XMVector3Normalize(XMLoadFloat3(&i->getVel()));
-
-		velVec = smallEnemyMoveSpeed * XMVectorLerp(oldVec, velVec, 0.05f);
-
-		XMFLOAT3 vel{};
-		XMStoreFloat3(&vel, velVec);
-		i->setVel(vel);
-		}
-		);
-}
-
 void BossEnemy::phase_approach()
 {
 	XMVECTOR velVec = calcVelVec(this);
@@ -124,4 +91,38 @@ void BossEnemy::phase_attack()
 			setPhase(std::bind(&BossEnemy::phase_approach, this));
 		}
 	}
+}
+
+// 弾関係
+void BossEnemy::addSmallEnemy()
+{
+	auto& i = smallEnemy.emplace_front();
+	i.reset(new BaseEnemy(camera, smallEnemyModel));
+	i->setScale(10.f);
+	i->setParent(this->getParent());
+	i->setPos(this->getPos());
+	i->setHp(1u);
+
+	const XMVECTOR right = XMVector3Rotate(XMVector3Normalize(calcVelVec(this, true)),
+										   XMQuaternionRotationRollPitchYaw(RandomNum::getRandf(0.f, XM_PI),
+																			XM_PIDIV2,
+																			0.f));
+	XMFLOAT3 vel{};
+	XMStoreFloat3(&vel, right * smallEnemyMoveSpeed);
+	i->setVel(vel);
+	i->setPhase(
+		[&]
+		{
+			XMVECTOR velVec = calcVelVec(i.get(), true);
+		velVec = XMVector3Normalize(velVec);
+
+		const XMVECTOR oldVec = XMVector3Normalize(XMLoadFloat3(&i->getVel()));
+
+		velVec = smallEnemyMoveSpeed * XMVectorLerp(oldVec, velVec, 0.05f);
+
+		XMFLOAT3 vel{};
+		XMStoreFloat3(&vel, velVec);
+		i->setVel(vel);
+		}
+		);
 }

@@ -13,7 +13,7 @@
 #include "3D/Obj/Object3d.h"
 #include "3D/Obj/ObjSet.h"
 #include "GameObject/BaseEnemy.h"
-#include "GameObject/BossEnemy.h"
+#include "GameObject/Boss/BossEnemy.h"
 
 #include "BaseStage.h"
 
