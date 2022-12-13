@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "BaseEnemy.h"
 #include <forward_list>
 #include <memory>

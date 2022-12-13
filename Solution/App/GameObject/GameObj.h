@@ -34,7 +34,8 @@ public:
 	inline void setParent(Object3d* parent) { obj->parent = parent; }
 
 	inline bool getAlive() const { return alive; }
-	// aliveをfalseにする
+
+	/// @brief aliveをfalseにする
 	inline void kill() { alive = false; }
 
 	inline Object3d* getObj() const { return obj.get(); }

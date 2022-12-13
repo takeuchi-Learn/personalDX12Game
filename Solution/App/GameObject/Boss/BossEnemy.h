@@ -27,7 +27,11 @@ class BossEnemy :
 public:
 	using BaseEnemy::BaseEnemy;
 
+	/// @brief 攻撃対象を設定
+	/// @param obj 攻撃対象オブジェクトのポインタ
 	inline void setTargetObj(GameObj* obj) { targetObj = obj; }
+	/// @brief 攻撃対象を取得
+	/// @return 攻撃対象のポインタ
 	inline GameObj* getTargetObj() { return targetObj; }
 
 	void phase_approach();
