@@ -55,6 +55,7 @@ private:
 	uint32_t nowShotFrame = 0u;
 	static inline const uint32_t shotNumMax = 15u;
 	uint32_t shotNum = 0u;
+	static inline const uint32_t shoEnemyNum = 5;
 
 public:
 	/// @brief 小さい敵を弾として出す

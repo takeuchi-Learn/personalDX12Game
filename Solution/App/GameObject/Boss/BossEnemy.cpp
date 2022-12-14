@@ -82,7 +82,10 @@ void BossEnemy::phase_attack()
 {
 	if (nowShotFrame++ >= shotInterval)
 	{
-		addSmallEnemy();
+		for (uint32_t i = 0; i < shoEnemyNum; ++i)
+		{
+			addSmallEnemy();
+		}
 		nowShotFrame = 0u;
 
 		if (shotNum++ >= shotNumMax)
