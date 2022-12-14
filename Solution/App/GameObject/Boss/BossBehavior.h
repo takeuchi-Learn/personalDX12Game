@@ -12,7 +12,7 @@
 
 class BossEnemy;
 
- /// @brief ボスの行動
+/// @brief ボスの行動
 class BossBehavior
 {
 public:
@@ -23,8 +23,6 @@ public:
 		ATTACK,
 	};
 
-	PHASE phase;
-
 private:
 	// ---------------
 	// メンバ変数
@@ -32,6 +30,8 @@ private:
 
 	BossEnemy* boss = nullptr;
 	std::unique_ptr<Selector> rootNode;
+
+	PHASE phase;
 
 private:
 	// ---------------
@@ -47,7 +47,13 @@ public:
 	BossBehavior(BossEnemy* boss);
 	BossBehavior();
 
+	/// @brief ボスをセット
+	/// @param boss ボスのポインタ
 	inline void setBoss(BossEnemy* boss) { this->boss = boss; }
+
+	/// @brief 現在のフェーズを取得
+	/// @return 現在のフェーズ
+	inline PHASE getPhase() const { return phase; }
 
 	/// @brief ルートノードを実行実行
 	/// @return 実行結果
