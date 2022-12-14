@@ -103,6 +103,9 @@
     <Filter Include="Scene\BossScene">
       <UniqueIdentifier>{935b8486-a01e-4866-9a73-4e18f3119326}</UniqueIdentifier>
     </Filter>
+    <Filter Include="BehaviorTree">
+      <UniqueIdentifier>{706d684d-c6ed-410e-ab93-40e4078a77c4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\System\System.cpp">
@@ -230,6 +233,15 @@
     </ClCompile>
     <ClCompile Include="App\GameObject\EnemyMgr.cpp">
       <Filter>GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\BehaviorTree\Selector.cpp">
+      <Filter>BehaviorTree</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine\BehaviorTree\Sequencer.cpp">
+      <Filter>BehaviorTree</Filter>
+    </ClCompile>
+    <ClCompile Include="App\GameObject\Boss\BossBehavior.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -361,6 +373,18 @@
     </ClInclude>
     <ClInclude Include="Engine\umePgc4.h">
       <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\BehaviorTree\Sequencer.h">
+      <Filter>BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\BehaviorTree\BaseComposite.h">
+      <Filter>BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\BehaviorTree\Selector.h">
+      <Filter>BehaviorTree</Filter>
+    </ClInclude>
+    <ClInclude Include="App\GameObject\Boss\BossBehavior.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

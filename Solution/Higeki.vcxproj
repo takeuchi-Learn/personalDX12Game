@@ -118,6 +118,7 @@
     <ClCompile Include="App\GameObject\BaseEnemy.cpp" />
     <ClCompile Include="App\GameObject\Boss\BossEnemy.cpp" />
     <ClCompile Include="App\GameObject\EnemyMgr.cpp" />
+    <ClCompile Include="App\GameObject\Boss\BossBehavior.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Camera\CameraObj.cpp" />
     <ClCompile Include="Engine\Collision\Collision.cpp" />
@@ -155,6 +156,8 @@
     <ClCompile Include="Engine\Util\Timer.cpp" />
     <ClCompile Include="App\Scene\TitleScene.cpp" />
     <ClCompile Include="Engine\System\WinAPI.cpp" />
+    <ClCompile Include="Engine\BehaviorTree\Sequencer.cpp" />
+    <ClCompile Include="Engine\BehaviorTree\Selector.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App\Scene\BossScene.h" />
@@ -162,6 +165,8 @@
     <ClInclude Include="App\GameObject\BaseEnemy.h" />
     <ClInclude Include="App\GameObject\Boss\BossEnemy.h" />
     <ClInclude Include="App\GameObject\EnemyMgr.h" />
+    <ClInclude Include="App\GameObject\Boss\BossBehavior.h" />
+    <ClInclude Include="Engine\BehaviorTree\BaseComposite.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
     <ClInclude Include="Engine\Camera\CameraObj.h" />
     <ClInclude Include="Engine\Collision\Collision.h" />
@@ -200,6 +205,8 @@
     <ClInclude Include="Engine\Util\Timer.h" />
     <ClInclude Include="App\Scene\TitleScene.h" />
     <ClInclude Include="Engine\System\WinAPI.h" />
+    <ClInclude Include="Engine\BehaviorTree\Sequencer.h" />
+    <ClInclude Include="Engine\BehaviorTree\Selector.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\BackPS.hlsl">

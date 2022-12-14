@@ -4,13 +4,16 @@
  *********************************************************************/
 
 #pragma once
-#include "GameObject/BaseEnemy.h"
+#include <GameObject/BaseEnemy.h>
 #include <forward_list>
+#include <GameObject/Boss/BossBehavior.h>
 
  /// @brief ボス敵クラス
 class BossEnemy :
 	public BaseEnemy
 {
+	friend class BossBehavior;
+
 	// 攻撃対象へのポインタ
 	GameObj* targetObj = nullptr;
 

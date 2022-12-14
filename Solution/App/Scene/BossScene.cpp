@@ -10,6 +10,18 @@
 
 using namespace DirectX;
 
+namespace
+{
+	inline XMFLOAT3 lerp(const XMFLOAT3& s, const XMFLOAT3& e, float t)
+	{
+		return XMFLOAT3(
+			std::lerp(s.x, e.x, t),
+			std::lerp(s.y, e.y, t),
+			std::lerp(s.z, e.z, t)
+		);
+	}
+}
+
 #pragma region 初期化
 
 BossScene::BossScene() :
@@ -147,22 +159,11 @@ void BossScene::update_start()
 		return;
 	}
 
-	float camLen = std::lerp(sceneChangeStartCamLen, sceneChangeEndCamLen, raito);
+	player->setPos(lerp(sceneChangeStartPos, sceneChangeEndPos, raito));
+	player->setRotation(lerp(sceneChangeStartRota, sceneChangeEndRota, raito));
+
+	const float camLen = std::lerp(sceneChangeStartCamLen, sceneChangeEndCamLen, raito);
 	camera->setEye2TargetLen(camLen);
-
-	XMFLOAT3 nowPos{};
-	nowPos.x = std::lerp(sceneChangeStartPos.x, sceneChangeEndPos.x, raito);
-	nowPos.y = std::lerp(sceneChangeStartPos.y, sceneChangeEndPos.y, raito);
-	nowPos.z = std::lerp(sceneChangeStartPos.z, sceneChangeEndPos.z, raito);
-
-	player->setPos(nowPos);
-
-	XMFLOAT3 nowRota{};
-	nowRota.x = std::lerp(sceneChangeStartRota.x, sceneChangeEndRota.x, raito);
-	nowRota.y = std::lerp(sceneChangeStartRota.y, sceneChangeEndRota.y, raito);
-	nowRota.z = std::lerp(sceneChangeStartRota.z, sceneChangeEndRota.z, raito);
-
-	player->setRotation(nowRota);
 }
 
 void BossScene::update_play()
