@@ -110,7 +110,7 @@ void BossScene::initEnemy()
 void BossScene::initBoss()
 {
 	attackableEnemy.emplace_front(boss.get());
-	bossHpMax = 16u;
+	bossHpMax = 128u;
 	boss->setHp(bossHpMax);
 	boss->setScale(100.f);
 	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 300));

@@ -51,9 +51,9 @@ private:
 	std::forward_list<std::unique_ptr<BaseEnemy>> smallEnemy;
 	float smallEnemyMoveSpeed = 2.f;
 
-	static inline const uint32_t shotInterval = 60u;
+	static inline const uint32_t shotInterval = 30u;
 	uint32_t nowShotFrame = 0u;
-	static inline const uint32_t shotNumMax = 5u;
+	static inline const uint32_t shotNumMax = 15u;
 	uint32_t shotNum = 0u;
 
 public:

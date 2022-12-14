@@ -16,11 +16,13 @@ class BossEnemy;
 class BossBehavior
 {
 public:
+
+	/// @brief ボスのフェーズ
 	enum class PHASE : uint8_t
 	{
-		APPROACH,
-		LEAVE,
-		ATTACK,
+		APPROACH,	/// 接近
+		LEAVE,		/// 離脱
+		ATTACK,		/// 攻撃
 	};
 
 private:
@@ -28,7 +30,7 @@ private:
 	// メンバ変数
 	// ---------------
 
-	BossEnemy* boss = nullptr;
+	BossEnemy* boss;
 	std::unique_ptr<Selector> rootNode;
 
 	PHASE phase;
@@ -42,9 +44,10 @@ private:
 	NODE_RESULT phase_leave();
 	NODE_RESULT phase_attack();
 
-
 public:
 	BossBehavior(BossEnemy* boss);
+
+	/// @brief bossはnullptrで初期化
 	BossBehavior();
 
 	/// @brief ボスをセット
@@ -58,6 +61,4 @@ public:
 	/// @brief ルートノードを実行実行
 	/// @return 実行結果
 	inline NODE_RESULT run() { return rootNode->run(); }
-
 };
-
