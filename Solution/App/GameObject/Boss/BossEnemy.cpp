@@ -32,7 +32,6 @@ void BossEnemy::moveAndRota(float moveSpeed, const DirectX::XMVECTOR& velVec)
 
 void BossEnemy::afterUpdate()
 {
-	smallEnemy.remove_if([](const std::unique_ptr<BaseEnemy>& i) { return !i->getAlive(); });
 }
 
 void BossEnemy::additionalDraw(Light* light)

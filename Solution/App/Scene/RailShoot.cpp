@@ -582,11 +582,15 @@ void RailShoot::update_play()
 			}
 		}
 
-		// 弾がなく、かつ死んだ敵は消す
-		enemy.remove_if([](const std::unique_ptr<NormalEnemy>& i) { return !i->getAlive() && i->bulEmpty(); });
+		// 弾がなく、かつ死んだ敵の判定
+		bool enemyEmpty = false;
+		for (const auto& i : enemy)
+		{
+			enemyEmpty = i->getAlive() && i->bulEmpty();
+		}
 
 		// 敵がすべて消えたら次のシーンへ
-		if (enemy.empty() && enemyPopData.empty())
+		if (enemyEmpty && enemyPopData.empty())
 		{
 			changeNextScene();
 		}
