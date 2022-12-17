@@ -9,6 +9,8 @@ class PlayerBullet
 	DirectX::XMFLOAT3 vel{};
 	float speed = 1.f;
 
+	GameObj* targetObjPt = nullptr;
+
 public:
 
 	uint16_t life = 180ui16;
@@ -19,6 +21,9 @@ private:
 
 public:
 	using GameObj::GameObj;
+
+	inline GameObj* getTargetObjPt() const { return targetObjPt; }
+	inline void setTargetObjPt(GameObj* target) { this->targetObjPt = target; }
 
 	inline float getSpeed() const { return speed; }
 	inline void setSpeed(float speed) { this->speed = speed; }

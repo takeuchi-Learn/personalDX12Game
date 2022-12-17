@@ -509,7 +509,7 @@ void RailShoot::update_play()
 		updatePlayerShotTarget();
 		if (player->getShotTarget())
 		{
-			constexpr float bulSpeed = 8.f;
+			constexpr float bulSpeed = 2.f;
 			player->shot(camera.get(), playerBulModel.get(), bulSpeed);
 		}
 	}

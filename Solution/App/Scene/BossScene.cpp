@@ -214,7 +214,7 @@ void BossScene::update_play()
 		{
 			if (input->triggerMouseButton(Input::MOUSE::LEFT))
 			{
-				constexpr float bulSpeed = 8.f;
+				constexpr float bulSpeed = 2.f;
 				player->shot(camera.get(), playerBulModel.get(), bulSpeed);
 			}
 		}

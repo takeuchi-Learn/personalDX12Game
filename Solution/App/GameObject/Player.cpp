@@ -91,21 +91,11 @@ void Player::shot(Camera* camera,
 	i.setScale(bulScale);
 	i.setParent(obj->parent);
 	i.setSpeed(speed);
+	i.setVel(XMFLOAT3(0, 0, speed));
 
-	if (!shotTargetObjPt)
+	if (shotTargetObjPt)
 	{
-		i.setVel(XMFLOAT3(0, 0, speed));
-	} else
-	{
-		// 照準のある方向へ、速さvelで飛んでいく
-		const XMFLOAT3 vel = GameObj::calcVel(shotTargetObjPt->getPos(), obj->position, speed);
-
-		// 速度を反映
-		i.setVel(vel);
-
-		// 速度に合わせて回転
-		const XMFLOAT2 rota = GameObj::calcRotationSyncVelDeg(vel);
-		i.setRotation(XMFLOAT3(rota.x, rota.y, i.getRotation().z));
+		i.setTargetObjPt(shotTargetObjPt);
 	}
 }
 

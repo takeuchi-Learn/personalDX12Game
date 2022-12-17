@@ -75,9 +75,9 @@ public:
 	/// @return 大きさベクトルの長さを返す
 	inline float calcScale() const
 	{
-		return std::sqrtf(obj->scale.x * obj->scale.x +
-						  obj->scale.y * obj->scale.y +
-						  obj->scale.z * obj->scale.z);
+		return std::sqrt(obj->scale.x * obj->scale.x +
+						 obj->scale.y * obj->scale.y +
+						 obj->scale.z * obj->scale.z);
 	}
 
 	inline const DirectX::XMFLOAT3& getRotation() const { return obj->rotation; }
