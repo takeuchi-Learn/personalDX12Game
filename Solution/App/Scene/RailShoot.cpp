@@ -253,7 +253,7 @@ RailShoot::RailShoot()
 
 			// 制御点間の割合とインデックスを取得
 			float startIndex = 0.f;
-			startIndexRaito = modf(startIndexRaito, &startIndex);
+			startIndexRaito = std::modf(startIndexRaito, &startIndex);
 
 			// スプライン補間でレーンの位置を求める
 			XMStoreFloat3(&dest, splinePosition(splinePoint, (size_t)startIndex, startIndexRaito));
@@ -403,7 +403,7 @@ void RailShoot::updateRgbShift()
 		constexpr float rgbShiftMumMax = 1.f / 16.f;
 
 		constexpr float  c4 = 2.f * XM_PI / 3.f;
-		const float easeRate = -powf(2.f, 10.f * (1.f - raito) - 10.f) *
+		const float easeRate = -std::pow(2.f, 10.f * (1.f - raito) - 10.f) *
 			dxBase->nearSin((raito * 10.f - 10.75f) * c4);
 
 		PostEffect::getInstance()->setRgbShiftNum({ easeRate * rgbShiftMumMax, 0.f });
@@ -449,7 +449,7 @@ void RailShoot::update_start()
 	const float timeRaito = (float)nowTime / sceneChangeTime;
 	PostEffect::getInstance()->setAlpha(timeRaito);
 
-	const float mosCoe = powf(timeRaito, 5);
+	const float mosCoe = std::pow(timeRaito, 5.f);
 	PostEffect::getInstance()->setMosaicNum(XMFLOAT2(WinAPI::getInstance()->getWindowSize().x * mosCoe,
 													 WinAPI::getInstance()->getWindowSize().y * mosCoe));
 
@@ -618,7 +618,7 @@ void RailShoot::update_end()
 	const float timeRaito = (float)nowTime / sceneChangeTime;
 	PostEffect::getInstance()->setAlpha(1.f - timeRaito);
 
-	const float mosCoe = powf(1.f - timeRaito, 5);
+	const float mosCoe = std::pow(1.f - timeRaito, 5.f);
 	PostEffect::getInstance()->setMosaicNum(XMFLOAT2(WinAPI::window_width * mosCoe,
 													 WinAPI::window_height * mosCoe));
 
@@ -734,10 +734,10 @@ void RailShoot::updatePlayerShotTarget()
 			aim2DMax.y >= screenEnemyPos.y)
 		{
 			// 敵との距離を更新
-			nowEnemyDistance = sqrtf(
-				powf(i->getPos().x - camera->getEye().x, 2.f) +
-				powf(i->getPos().y - camera->getEye().y, 2.f) +
-				powf(i->getPos().z - camera->getEye().z, 2.f)
+			nowEnemyDistance = std::sqrt(
+				std::pow(i->getPos().x - camera->getEye().x, 2.f) +
+				std::pow(i->getPos().y - camera->getEye().y, 2.f) +
+				std::pow(i->getPos().z - camera->getEye().z, 2.f)
 			);
 			// 照準の中で最も遠い敵なら情報を取っておく
 			if (farthestEnemyLen < nowEnemyDistance)

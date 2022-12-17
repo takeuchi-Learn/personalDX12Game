@@ -87,32 +87,23 @@ void Player::shot(Camera* camera,
 				  float speed,
 				  float bulScale)
 {
+	PlayerBullet& i = bul.emplace_front(camera, model, obj->position);
+	i.setScale(bulScale);
+	i.setParent(obj->parent);
+	i.setSpeed(speed);
+
 	if (!shotTargetObjPt)
 	{
-		PlayerBullet& i = bul.emplace_front(camera, model, obj->position);
-		i.setScale(bulScale);
-		i.setParent(obj->parent);
 		i.setVel(XMFLOAT3(0, 0, speed));
 	} else
 	{
-		PlayerBullet& i = bul.emplace_front(camera, model, obj->position);
-		i.setScale(bulScale);
-		i.setParent(obj->parent);
-
-		const XMFLOAT3 player2ShotTaregt{
-			shotTargetObjPt->position.x - obj->position.x,
-			shotTargetObjPt->position.y - obj->position.y,
-			shotTargetObjPt->position.z - obj->position.z,
-		};
-
 		// 照準のある方向へ、速さvelで飛んでいく
-		XMFLOAT3 vel{};
-		XMStoreFloat3(&vel, speed * XMVector3Normalize(XMVectorSet(player2ShotTaregt.x,
-																   player2ShotTaregt.y,
-																   player2ShotTaregt.z,
-																   1)));
+		const XMFLOAT3 vel = GameObj::calcVel(shotTargetObjPt->position, obj->position, speed);
 
+		// 速度を反映
 		i.setVel(vel);
+
+		// 速度に合わせて回転
 		const XMFLOAT2 rota = GameObj::calcRotationSyncVelDeg(vel);
 		i.setRotation(XMFLOAT3(rota.x, rota.y, i.getRotation().z));
 	}
@@ -126,7 +117,7 @@ void Player::additionalUpdate()
 
 void Player::additionalDraw(Light* light)
 {
-	for (auto& i : bul)
+	for (PlayerBullet& i : bul)
 	{
 		i.drawWithUpdate(light);
 	}

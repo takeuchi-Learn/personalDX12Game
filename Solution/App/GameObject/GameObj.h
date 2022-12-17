@@ -30,6 +30,28 @@ public:
 		return DirectX::XMFLOAT2(DirectX::XMConvertToDegrees(rad.x), DirectX::XMConvertToDegrees(rad.y));
 	}
 
+	inline static DirectX::XMFLOAT3 calcVel(const DirectX::XMFLOAT3& targetPos,
+											const DirectX::XMFLOAT3& nowPos,
+											float velScale)
+	{
+		DirectX::XMFLOAT3 velF3{
+			targetPos.x - nowPos.x,
+			targetPos.y - nowPos.y,
+			targetPos.z - nowPos.z
+		};
+
+		const DirectX::XMVECTOR velVec =
+			DirectX::XMVectorScale(
+				DirectX::XMVector3Normalize(
+					DirectX::XMLoadFloat3(&velF3)
+				),
+				velScale
+			);
+
+		DirectX::XMStoreFloat3(&velF3, velVec);
+		return velF3;
+	}
+
 	inline Object3d* getParent() { return obj->parent; }
 	inline void setParent(Object3d* parent) { obj->parent = parent; }
 
