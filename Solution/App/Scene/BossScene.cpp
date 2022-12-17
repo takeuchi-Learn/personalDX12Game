@@ -366,15 +366,13 @@ bool BossScene::addShotTarget(const std::forward_list<BaseEnemy*>& enemy,
 							  const DirectX::XMFLOAT2& aim2DPosMin,
 							  const DirectX::XMFLOAT2& aim2DPosMax)
 {
-	bool targetIsEmpty = true;
-
 	// 遠い敵を調べるためのもの
 	float nowEnemyDistance{};
 	BaseEnemy* farthestEnemyPt = nullptr;
 	float farthestEnemyLen = 1.f;
 
 	// 照準の中の敵の方へ弾を飛ばす
-	for (auto& i : enemy)
+	for (BaseEnemy* i : enemy)
 	{
 		// いない敵は無視
 		if (!i->getAlive()) { continue; }
@@ -405,17 +403,16 @@ bool BossScene::addShotTarget(const std::forward_list<BaseEnemy*>& enemy,
 
 	// 照準の中に敵がいればそこへ弾を出す
 	// いなければターゲットはいない
-	if (farthestEnemyPt != nullptr)
+	player->setShotTarget(farthestEnemyPt);
+
+	if (farthestEnemyPt)
 	{
-		player->setShotTarget(farthestEnemyPt->getObj());
 		aim2D->color = XMFLOAT4(1, 0, 0, 1);
-	} else
-	{
-		player->setShotTarget(nullptr);
-		aim2D->color = XMFLOAT4(1, 1, 1, 1);
+		return true;
 	}
 
-	return targetIsEmpty;
+	aim2D->color = XMFLOAT4(1, 1, 1, 1);
+	return false;
 }
 
 void BossScene::movePlayer()

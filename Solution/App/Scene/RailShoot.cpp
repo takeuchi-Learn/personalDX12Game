@@ -752,7 +752,7 @@ void RailShoot::updatePlayerShotTarget()
 	// いなければターゲットはいない
 	if (farthestEnemyPt != nullptr)
 	{
-		player->setShotTarget(farthestEnemyPt->getObj());
+		player->setShotTarget(farthestEnemyPt);
 	} else
 	{
 		player->setShotTarget(nullptr);

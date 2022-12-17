@@ -98,7 +98,7 @@ void Player::shot(Camera* camera,
 	} else
 	{
 		// 照準のある方向へ、速さvelで飛んでいく
-		const XMFLOAT3 vel = GameObj::calcVel(shotTargetObjPt->position, obj->position, speed);
+		const XMFLOAT3 vel = GameObj::calcVel(shotTargetObjPt->getPos(), obj->position, speed);
 
 		// 速度を反映
 		i.setVel(vel);
