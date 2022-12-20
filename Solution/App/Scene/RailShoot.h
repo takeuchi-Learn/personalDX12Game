@@ -3,6 +3,8 @@
 
 #include <memory>
 #include <functional>
+#include <unordered_map>
+
 #include "2D/DebugText.h"
 #include "GameObject/NormalEnemy.h"
 #include "3D/ParticleMgr.h"
@@ -33,7 +35,11 @@ class RailShoot
 
 	std::unique_ptr<Sprite> aim2D;
 	std::unique_ptr<Sprite> hpBar;
-	float hpBarWidMax;
+	std::unique_ptr<Sprite> hpBarEdge;
+	const float hpBarWidMax;
+
+	// 操作説明
+	std::unordered_map<std::string, std::unique_ptr<Sprite>> operInst;
 
 	// --------------------
 	// 3Dオブジェクト

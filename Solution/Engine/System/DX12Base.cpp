@@ -463,11 +463,10 @@ void DX12Base::ClearDepthBuffer()
 	cmdList->ClearDepthStencilView(dsvH, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 }
 
-DX12Base::DX12Base()
+DX12Base::DX12Base() :
+	winapi(WinAPI::getInstance()),
+	fps(-1.f)
 {
-	this->winapi = WinAPI::getInstance();
-
-	fps = -1.f;
 	updateFPS();
 	flipTimeFPS();
 

@@ -516,7 +516,6 @@ void BossScene::drawFrontSprite()
 	ImGui::End();
 
 	ImGui::Begin("操作", nullptr, winFlags);
-	ImGui::Text("左クリック : 照準内の敵へ攻撃");
 	ImGui::Text("WS : 移動");
 	ImGui::Text("AD : 回転");
 	ImGui::Text("左シフト + 移動 or 回転 : ダッシュ");

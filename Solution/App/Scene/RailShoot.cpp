@@ -150,11 +150,14 @@ RailShoot::RailShoot()
 
 	hpBar(new Sprite(spriteBase->loadTexture(L"Resources/hpBar.png"),
 					 spriteBase.get(),
-					 XMFLOAT2(0.5f, 1.f))),
-	hpBarWidMax(WinAPI::window_width * 0.75f)
+					 XMFLOAT2(0.f, 1.f))),
+	hpBarEdge(new Sprite(spriteBase->loadTexture(L"Resources/hpBar.png"),
+						 spriteBase.get(),
+						 XMFLOAT2(0.f, 1.f))),
+	hpBarWidMax(WinAPI::window_width * 0.25f)
 {
 	hpBar->color = XMFLOAT4(0, 0.5f, 1, 1);
-	hpBar->position = XMFLOAT3(WinAPI::window_width / 2.f, WinAPI::window_height, 0.f);
+	hpBar->position = XMFLOAT3(WinAPI::window_width / 20.f, WinAPI::window_height, 0.f);
 	{
 		XMFLOAT2 size = hpBar->getSize();
 		size.x = hpBarWidMax;
@@ -162,6 +165,44 @@ RailShoot::RailShoot()
 		hpBar->setSize(size);
 
 		hpBar->position.y -= size.y;
+	}
+	hpBarEdge->position = hpBar->position;
+	hpBarEdge->setSize(hpBar->getSize());
+
+	// 操作説明
+	constexpr XMFLOAT3 centerPos = XMFLOAT3(WinAPI::window_width / 2.f, WinAPI::window_height * 0.75f, 0.f);
+
+	operInst["W"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/W.png"),
+											 spriteBase.get(),
+											 XMFLOAT2(0.5f, 0.5f));
+	operInst["W"]->position.x = centerPos.x;
+	operInst["W"]->position.y = centerPos.y - 100.f;
+
+	operInst["S"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/S.png"),
+											 spriteBase.get(),
+											 XMFLOAT2(0.5f, 0.5f));
+	operInst["S"]->position.x = centerPos.x;
+	operInst["S"]->position.y = centerPos.y + 100.f;
+
+	operInst["A"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/A.png"),
+											 spriteBase.get(),
+											 XMFLOAT2(0.5f, 0.5f));
+	operInst["A"]->position.x = centerPos.x - 100.f;
+	operInst["A"]->position.y = centerPos.y;
+
+	operInst["D"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/D.png"),
+											 spriteBase.get(),
+											 XMFLOAT2(0.5f, 0.5f));
+	operInst["D"]->position.x = centerPos.x + 100.f;
+	operInst["D"]->position.y = centerPos.y;
+
+	operInst["Mouse_L"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/Mouse_L.png"),
+												   spriteBase.get(),
+												   XMFLOAT2(0.f, 0.f));
+
+	for (auto& i : operInst)
+	{
+		i.second->update(spriteBase.get());
 	}
 
 	// --------------------
@@ -511,6 +552,8 @@ void RailShoot::update_play()
 		{
 			constexpr float bulSpeed = 2.f;
 			player->shot(camera.get(), playerBulModel.get(), bulSpeed);
+
+			operInst.at("Mouse_L")->isInvisible = true;
 		}
 	}
 
@@ -582,17 +625,29 @@ void RailShoot::update_play()
 			}
 		}
 
+		// ------------------------------
 		// 弾がなく、かつ死んだ敵の判定
-		bool enemyEmpty = false;
-		for (const auto& i : enemy)
-		{
-			enemyEmpty = i->getAlive() && i->bulEmpty();
-		}
+		// ------------------------------
 
-		// 敵がすべて消えたら次のシーンへ
-		if (enemyEmpty && enemyPopData.empty())
+		// まだ出ていない敵がいなければ
+		if (enemyPopData.empty())
 		{
-			changeNextScene();
+			bool enemyEmpty = false;
+
+			for (const auto& i : enemy)
+			{
+				// 生きていない && 弾がない
+				enemyEmpty = !i->getAlive() && i->bulEmpty();
+
+				// 生きている敵(及びその弾)がいるなら走査終了
+				if (!enemyEmpty) { break; }
+			}
+
+			// 敵がすべて消えたら次のシーンへ
+			if (enemyEmpty)
+			{
+				changeNextScene();
+			}
 		}
 	}
 
@@ -690,18 +745,22 @@ void RailShoot::movePlayer()
 		if (hitD && player->getPos().x < 110.f)
 		{
 			player->moveRight(moveSpeed);
+			operInst.at("D")->isInvisible = true;
 		} else if (hitA && player->getPos().x > -110.f)
 		{
 			player->moveRight(-moveSpeed);
+			operInst.at("A")->isInvisible = true;
 		}
 
 		// 高さ方向に移動
 		if (hitW && player->getPos().y < 110.f)
 		{
 			player->moveUp(moveSpeed);
+			operInst.at("W")->isInvisible = true;
 		} else if (hitS && player->getPos().y > 5.f)
 		{
 			player->moveUp(-moveSpeed);
+			operInst.at("S")->isInvisible = true;
 		}
 	}
 }
@@ -828,29 +887,28 @@ void RailShoot::drawFrontSprite()
 	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x,
 								   fstWinPos.y));
 
-	ImGui::Begin("レールシューティング", nullptr, DX12Base::imGuiWinFlagsDef);
-	ImGui::Text("スクリプトで指定したとおりに敵が出る");
-	ImGui::Text("敵は一定間隔で弾を発射する");
-	ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x,
-								   ImGui::GetWindowPos().y + ImGui::GetWindowSize().y));
-	ImGui::SetNextWindowSize(ImVec2(ImGui::GetWindowWidth(), 150));
-	ImGui::End();
-
 	ImGui::Begin("情報", nullptr, DX12Base::imGuiWinFlagsDef);
-	ImGui::Text("左クリック : 照準内の敵へ攻撃");
-	ImGui::Text("WASD : 移動");
 	ImGui::Text("");
 	ImGui::Text("自機体力 : %u / %u", player->getHp(), playerHpMax);
+	ImGui::Text("敵数 : %u", static_cast<UINT>(std::distance(enemy.begin(), enemy.end())));
 	ImGui::End();
 
 	spriteBase->drawStart(dxBase->getCmdList());
 
 	hpBar->setSize(XMFLOAT2((float)player->getHp() / (float)playerHpMax * hpBarWidMax,
 							hpBar->getSize().y));
+	hpBarEdge->drawWithUpdate(dxBase, spriteBase.get());
 	hpBar->drawWithUpdate(dxBase, spriteBase.get());
+
 
 	aim2D->position = XMFLOAT3(player->getAim2DPos().x, player->getAim2DPos().y, 0.f);
 	aim2D->drawWithUpdate(dxBase, spriteBase.get());
+
+	operInst.at("Mouse_L")->position = XMFLOAT3(aim2D->position.x, aim2D->position.y, 0);
+	for (auto& i : operInst)
+	{
+		i.second->drawWithUpdate(DX12Base::ins(), spriteBase.get());
+	}
 
 	debugText->DrawAll(dxBase, spriteBase.get());
 }
