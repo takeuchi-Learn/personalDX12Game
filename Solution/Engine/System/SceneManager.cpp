@@ -5,11 +5,10 @@
 #include "Scene/TitleScene.h"
 
 SceneManager::SceneManager()
-	: nextScene(nullptr)
+	: nextScene(nullptr),
+	postEff2Num((UINT)PostEffect::getInstance()->addPipeLine(L"Resources/Shaders/PostEffectPS_2.hlsl"))
 {
-	postEff2Num = (UINT)PostEffect::getInstance()->addPipeLine(L"Resources/Shaders/PostEffectPS_2.hlsl");
-
-	nowScene = (GameScene*)new TitleScene();
+	nowScene.reset((GameScene*)new TitleScene());
 	nowScene->start();
 }
 
@@ -19,11 +18,10 @@ void SceneManager::update()
 	if (nextScene != nullptr)
 	{
 		// 今のシーンを削除し、次のシーンに入れ替える
-		delete nowScene;
-		nowScene = nextScene;
+		nowScene = std::move(nextScene);
 
 		//次シーンの情報をクリア
-		nextScene = nullptr;
+		nextScene.reset();
 
 		// 次のシーンの初期化処理
 		nowScene->start();
@@ -44,14 +42,4 @@ void SceneManager::drawFrontSprite()
 
 SceneManager::~SceneManager()
 {
-	if (nowScene != nullptr)
-	{
-		delete nowScene;
-		nowScene = nullptr;
-	}
-}
-
-void SceneManager::changeScene(GameScene* nextScene)
-{
-	this->nextScene = nextScene;
 }

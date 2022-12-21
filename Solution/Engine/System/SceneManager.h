@@ -10,8 +10,8 @@ private:
 	SceneManager& operator=(const SceneManager& sm) = delete;
 	SceneManager();
 
-	GameScene* nowScene = nullptr;
-	GameScene* nextScene = nullptr;
+	std::unique_ptr<GameScene> nowScene;
+	std::unique_ptr<GameScene> nextScene;
 
 	using UINT = unsigned int;
 
@@ -32,5 +32,6 @@ public:
 	void drawObj3d() override;
 	void drawFrontSprite() override;
 
-	void changeScene(GameScene* nextScene);
+	template <class SCENE>
+	inline void changeScene() { nextScene = std::make_unique<SCENE>(); }
 };

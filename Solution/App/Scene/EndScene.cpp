@@ -34,7 +34,7 @@ void EndScene::update()
 {
 	if (input->triggerKey(DIK_SPACE))
 	{
-		SceneManager::getInstange()->changeScene(new TitleScene());
+		SceneManager::getInstange()->changeScene<TitleScene>();
 	}
 }
 

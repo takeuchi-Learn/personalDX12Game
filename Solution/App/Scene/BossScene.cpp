@@ -302,7 +302,7 @@ void BossScene::update_play()
 
 void BossScene::update_end()
 {
-	SceneManager::getInstange()->changeScene(new EndScene());
+	SceneManager::getInstange()->changeScene<EndScene>();
 }
 
 void BossScene::additionalDrawObj3d()

@@ -715,7 +715,7 @@ void RailShoot::update_end()
 	// 時間が来たら次のシーンへ進む
 	if (nowTime >= sceneChangeTime)
 	{
-		SceneManager::getInstange()->changeScene(new BossScene());
+		SceneManager::getInstange()->changeScene<BossScene>();
 	}
 
 	// --------------------
@@ -934,6 +934,7 @@ void RailShoot::drawFrontSprite()
 											(float)WinAPI::window_height * 0.02f);
 	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x,
 								   fstWinPos.y));
+	ImGui::SetNextWindowSize(ImVec2(256.f, 128.f));
 
 	ImGui::Begin("レールシューティング", nullptr, DX12Base::imGuiWinFlagsDef);
 	ImGui::Text("");

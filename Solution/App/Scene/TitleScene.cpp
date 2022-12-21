@@ -82,7 +82,7 @@ void TitleScene::update_end()
 	if (raito >= 1.f)
 	{
 		titlePos.y = static_cast<float>(WinAPI::window_height + 1);
-		SceneManager::getInstange()->changeScene(new RailShoot());
+		SceneManager::getInstange()->changeScene<RailShoot>();
 	} else
 	{
 		titlePos.y = std::lerp(0.f,

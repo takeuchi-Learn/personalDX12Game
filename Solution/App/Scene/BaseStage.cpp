@@ -96,7 +96,7 @@ void BaseStage::update_play()
 
 void BaseStage::update_end()
 {
-	SceneManager::getInstange()->changeScene(new TitleScene());
+	SceneManager::getInstange()->changeScene<TitleScene>();
 }
 
 void BaseStage::movePlayer()
