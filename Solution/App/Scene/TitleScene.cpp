@@ -32,21 +32,25 @@ TitleScene::TitleScene()
 	spCom.reset(new SpriteBase());
 
 	// デバッグテキスト用のテクスチャ読み込み
-	debugTextTexNumber = spCom->loadTexture(L"Resources/debugfont.png");
-
-	debugText.reset(new DebugText(debugTextTexNumber, spCom.get()));
+	debugText.reset(new DebugText(spCom->loadTexture(L"Resources/debugfont.png"),
+								  spCom.get()));
 
 	titlePos = XMFLOAT2(0.f, 0.f);
 
 	titleLogo = std::make_unique<Sprite>(spCom->loadTexture(L"Resources/title_logo.png"),
 										 spCom.get(),
 										 titlePos);
+	titleLogo->setSize(XMFLOAT2((float)WinAPI::window_width, (float)WinAPI::window_height));
+
 	titleOther = std::make_unique<Sprite>(spCom->loadTexture(L"Resources/title_other.png"),
 										  spCom.get(),
 										  titlePos);
+	titleOther->setSize(XMFLOAT2((float)WinAPI::window_width, (float)WinAPI::window_height));
+
 	titleBack = std::make_unique<Sprite>(spCom->loadTexture(L"Resources/titleBack.png"),
 										 spCom.get(),
 										 XMFLOAT2(0.f, 0.f));
+	titleBack->setSize(XMFLOAT2((float)WinAPI::window_width, (float)WinAPI::window_height));
 }
 
 void TitleScene::start()

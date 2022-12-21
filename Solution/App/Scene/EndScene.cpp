@@ -14,13 +14,14 @@ EndScene::EndScene()
 	spCom.reset(new SpriteBase());
 
 	// デバッグテキスト用のテクスチャ読み込み
-	debugTextTexNumber = spCom->loadTexture(L"Resources/debugfont.png");
-
-	debugText.reset(new DebugText(debugTextTexNumber, spCom.get()));
+	debugText.reset(new DebugText(spCom->loadTexture(L"Resources/debugfont.png"), spCom.get()));
 
 	end.reset(new Sprite(spCom->loadTexture(L"Resources/end.png"),
 						 spCom.get(),
 						 DirectX::XMFLOAT2(0.f, 0.f)));
+
+	end->setSize(DirectX::XMFLOAT2((float)WinAPI::window_width,
+								   (float)WinAPI::window_height));
 }
 
 void EndScene::start()

@@ -3,8 +3,21 @@
 #include <imgui_impl_win32.h>
 #include <cmath>
 
-// 通常スタイルからサイズ変更を無くしたスタイル
+// ----------------------------------------
+// デバッグのときはフルスクリーンにしない
+// ----------------------------------------
+#ifdef _DEBUG
+#define MY_FULLSCREEN_FALSE
+#endif // _DEBUG
+
+// ----------------------------------------
+// フルスクリーンにするか否かでスタイルを変える
+// ----------------------------------------
+#ifdef MY_FULLSCREEN_FALSE
 const DWORD	WinAPI::windowStyle = WS_OVERLAPPEDWINDOW ^ WS_THICKFRAME;
+#else
+const DWORD	WinAPI::windowStyle = WS_VISIBLE | WS_POPUP;
+#endif // MY_FULLSCREEN_FALSE
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -19,8 +32,28 @@ WinAPI::WinAPI()
 
 	// ウィンドウクラスをOSに登録
 	RegisterClassEx(&w);
+
 	// ウィンドウサイズ{ X座標 Y座標 横幅 縦幅 }
 	RECT wrc = { 0, 0, window_width, window_height };
+
+	// <<< フルスクリーンにする場合のみ行う処理
+#ifndef MY_FULLSCREEN_FALSE
+
+	// 画面横幅を取得
+	int displayWid = GetSystemMetrics(SM_CXSCREEN);
+	if (0 == displayWid) { displayWid = GetSystemMetrics(CW_USEDEFAULT); }
+
+	// 画面縦幅を取得
+	int displayHei = GetSystemMetrics(SM_CYSCREEN);
+	if (0 == displayHei) { displayHei = GetSystemMetrics(CW_USEDEFAULT); }
+
+	// ウインドウサイズを画面サイズにする
+	wrc.right = displayWid;
+	wrc.bottom = displayHei;
+
+#endif // !MY_FULLSCREEN_FALSE
+	// >>> フルスクリーンにする場合のみ行う処理ここまで
+
 	AdjustWindowRect(&wrc, windowStyle, false); // 自動でサイズ補正
 
 	// ウィンドウオブジェクトの生成
@@ -44,29 +77,27 @@ bool WinAPI::setWindowSize(int sizeX, int sizeY, const POINT* pos, bool bRepaint
 {
 	POINT winPos{};
 
-	if (pos == nullptr)
+	if (pos)
+	{
+		winPos = *pos;
+	} else
 	{
 		WINDOWINFO wInfo{};
 		GetWindowInfo(hwnd, &wInfo);
 
 		winPos.x = wInfo.rcWindow.left;
 		winPos.y = wInfo.rcWindow.top;
-	} else
-	{
-		winPos = *pos;
 	}
 
 	RECT wrc = { 0, 0, sizeX, sizeY };
 	AdjustWindowRect(&wrc, windowStyle, false); // 自動でサイズ補正
 
-	const bool ret
-		= MoveWindow(hwnd,
-					 winPos.x,
-					 winPos.y,
-					 wrc.right - wrc.left,
-					 wrc.bottom - wrc.top,
-					 bRepaint ? TRUE : FALSE)
-		? true : false;
+	const bool ret = (bool)MoveWindow(hwnd,
+									  winPos.x,
+									  winPos.y,
+									  wrc.right - wrc.left,
+									  wrc.bottom - wrc.top,
+									  bRepaint ? TRUE : FALSE);
 
 	windowSize.x = sizeX;
 	windowSize.y = sizeY;

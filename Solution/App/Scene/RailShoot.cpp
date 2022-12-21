@@ -171,29 +171,30 @@ RailShoot::RailShoot()
 
 	// 操作説明
 	constexpr XMFLOAT3 centerPos = XMFLOAT3(WinAPI::window_width / 2.f, WinAPI::window_height * 0.75f, 0.f);
+	constexpr float diffVal = WinAPI::window_width * 0.1f;
 
 	operInst["W"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/W.png"),
 											 spriteBase.get(),
 											 XMFLOAT2(0.5f, 0.5f));
 	operInst["W"]->position.x = centerPos.x;
-	operInst["W"]->position.y = centerPos.y - 100.f;
+	operInst["W"]->position.y = centerPos.y - diffVal;
 
 	operInst["S"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/S.png"),
 											 spriteBase.get(),
 											 XMFLOAT2(0.5f, 0.5f));
 	operInst["S"]->position.x = centerPos.x;
-	operInst["S"]->position.y = centerPos.y + 100.f;
+	operInst["S"]->position.y = centerPos.y + diffVal;
 
 	operInst["A"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/A.png"),
 											 spriteBase.get(),
 											 XMFLOAT2(0.5f, 0.5f));
-	operInst["A"]->position.x = centerPos.x - 100.f;
+	operInst["A"]->position.x = centerPos.x - diffVal;
 	operInst["A"]->position.y = centerPos.y;
 
 	operInst["D"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/D.png"),
 											 spriteBase.get(),
 											 XMFLOAT2(0.5f, 0.5f));
-	operInst["D"]->position.x = centerPos.x + 100.f;
+	operInst["D"]->position.x = centerPos.x + diffVal;
 	operInst["D"]->position.y = centerPos.y;
 
 	operInst["Mouse_L"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/Mouse_L.png"),
@@ -891,6 +892,8 @@ void RailShoot::drawFrontSprite()
 	ImGui::Text("");
 	ImGui::Text("自機体力 : %u / %u", player->getHp(), playerHpMax);
 	ImGui::Text("敵数 : %u", static_cast<UINT>(std::distance(enemy.begin(), enemy.end())));
+	const auto& mousePos = input->getMousePosF2();
+	ImGui::Text("%.2f, %.2f", mousePos.x / WinAPI::window_width, mousePos.y / WinAPI::window_height);
 	ImGui::End();
 
 	spriteBase->drawStart(dxBase->getCmdList());
