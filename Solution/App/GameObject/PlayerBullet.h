@@ -22,6 +22,9 @@ private:
 public:
 	using GameObj::GameObj;
 
+	inline void setLife(uint16_t life) { this->life = life; }
+	inline uint16_t getLife() const { return life; }
+
 	inline GameObj* getTargetObjPt() const { return targetObjPt; }
 	inline void setTargetObjPt(GameObj* target) { this->targetObjPt = target; }
 

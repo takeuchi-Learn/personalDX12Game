@@ -90,8 +90,11 @@ void Player::shot(Camera* camera,
 	PlayerBullet& i = bul.emplace_front(camera, model, obj->position);
 	i.setScale(bulScale);
 	i.setParent(obj->parent);
+	i.setLife(bulLife);
 	i.setSpeed(speed);
-	i.setVel(XMFLOAT3(0, 0, speed));
+	XMFLOAT3 tmp{};
+	XMStoreFloat3(&tmp, XMVector3Transform(XMVectorSet(0, 0, speed, 1), obj->getMatRota()));
+	i.setVel(tmp);
 
 	if (shotTargetObjPt)
 	{

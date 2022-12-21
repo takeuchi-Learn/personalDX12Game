@@ -56,7 +56,6 @@ void BossScene::initGameObj()
 {
 	bossModel = std::make_unique<ObjModel>("Resources/tori", "tori");
 	boss = std::make_unique<BossEnemy>(camera.get(), bossModel.get());
-	smallEnemyModel = std::make_unique<ObjModel>("Resources/tori", "tori");
 
 	initPlayer();
 
@@ -68,6 +67,8 @@ void BossScene::initPlayer()
 	playerHpMax = 20u;
 	player->setScale(10.f);
 	player->setHp(playerHpMax);
+
+	player->setBulLife(300ui16);
 
 	sceneChangeStartPos = XMFLOAT3(0.f, 500.f, 0.f);
 	sceneChangeEndPos = XMFLOAT3(0.f, 0.f, 0.f);
@@ -81,25 +82,6 @@ void BossScene::initEnemy()
 {
 	// ボスの初期化
 	initBoss();
-
-	// その他の敵の初期化
-	constexpr size_t smallEnemyNum = 3u;
-	smallEnemy.resize(smallEnemyNum);
-	smallEnemyHpMax = 1u;
-
-	for (UINT i = 0u; i < smallEnemyNum; ++i)
-	{
-		smallEnemy[i].reset(new BaseEnemy(camera.get(), smallEnemyModel.get()));
-
-		constexpr float enemyScale = 10.f;
-		smallEnemy[i]->setScale(enemyScale);
-		smallEnemy[i]->setHp(smallEnemyHpMax);
-		smallEnemy[i]->setPos(XMFLOAT3(boss->getPos().x + i * enemyScale * 10.f,
-									   smallEnemy[i]->getScaleF3().y,
-									   boss->getPos().z));
-
-		attackableEnemy.emplace_front(smallEnemy[i].get());
-	}
 
 	constexpr float koshiScale = 24.f;
 	koshi->scale = XMFLOAT3(koshiScale,

@@ -33,10 +33,6 @@ private:
 	std::unique_ptr<BossEnemy> boss;
 	uint16_t bossHpMax;
 
-	std::unique_ptr<ObjModel> smallEnemyModel;
-	std::vector<std::unique_ptr<BaseEnemy>> smallEnemy;
-	uint16_t smallEnemyHpMax;
-
 	std::unique_ptr<ObjModel> koshiModel;
 	std::unique_ptr<Object3d> koshi;
 

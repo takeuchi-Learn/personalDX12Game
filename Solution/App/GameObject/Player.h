@@ -16,6 +16,7 @@ class Player
 	using XMVECTOR = DirectX::XMVECTOR;
 
 	std::forward_list<PlayerBullet> bul;
+	uint16_t bulLife = 180ui16;
 
 	DirectX::XMFLOAT2 aim2DPos{};
 
@@ -28,6 +29,9 @@ public:
 		   ObjModel* model,
 		   const DirectX::XMFLOAT3& pos = { 0.f,0.f,0.f },
 		   uint16_t hp = 24u);
+
+	inline uint16_t getBulLife() const { return bulLife; }
+	inline void setBulLife(uint16_t bulLife) { this->bulLife = bulLife; }
 
 	uint16_t getHp() const { return hp; }
 	void setHp(uint16_t hp) { this->hp = hp; }

@@ -522,7 +522,7 @@ void RailShoot::update_play()
 	// 敵を増やす
 	// --------------------
 
-	// 終わった発生情報は削除
+	// 終わった発生情報は消費して削除
 	enemyPopData.remove_if([&](std::unique_ptr<PopEnemyData>& i)
 						   {
 							   const bool ended = nowFrame >= i->popFrame;
