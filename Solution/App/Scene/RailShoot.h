@@ -40,6 +40,7 @@ class RailShoot
 
 	// 操作説明
 	std::unordered_map<std::string, std::unique_ptr<Sprite>> operInst;
+	const float operInstPosR;
 
 	// --------------------
 	// 3Dオブジェクト
@@ -74,7 +75,6 @@ class RailShoot
 	// RGBずらし
 	// --------------------
 	static const Timer::timeType rgbShiftTimeMax = Timer::oneSec / 2;
-	Timer::timeType nowRgbShiftTime = 0;
 	Timer::timeType startRgbShiftTime = 0;
 	bool rgbShiftFlag = false;
 

@@ -154,7 +154,8 @@ RailShoot::RailShoot()
 	hpBarEdge(new Sprite(spriteBase->loadTexture(L"Resources/hpBar.png"),
 						 spriteBase.get(),
 						 XMFLOAT2(0.f, 1.f))),
-	hpBarWidMax(WinAPI::window_width * 0.25f)
+	hpBarWidMax(WinAPI::window_width * 0.25f),
+	operInstPosR(WinAPI::window_width * 0.1f)
 {
 	hpBar->color = XMFLOAT4(0, 0.5f, 1, 1);
 	hpBar->position = XMFLOAT3(WinAPI::window_width / 20.f, WinAPI::window_height, 0.f);
@@ -171,30 +172,29 @@ RailShoot::RailShoot()
 
 	// 操作説明
 	constexpr XMFLOAT3 centerPos = XMFLOAT3(WinAPI::window_width / 2.f, WinAPI::window_height * 0.75f, 0.f);
-	constexpr float diffVal = WinAPI::window_width * 0.1f;
 
 	operInst["W"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/W.png"),
 											 spriteBase.get(),
 											 XMFLOAT2(0.5f, 0.5f));
 	operInst["W"]->position.x = centerPos.x;
-	operInst["W"]->position.y = centerPos.y - diffVal;
+	operInst["W"]->position.y = centerPos.y - operInstPosR;
 
 	operInst["S"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/S.png"),
 											 spriteBase.get(),
 											 XMFLOAT2(0.5f, 0.5f));
 	operInst["S"]->position.x = centerPos.x;
-	operInst["S"]->position.y = centerPos.y + diffVal;
+	operInst["S"]->position.y = centerPos.y + operInstPosR;
 
 	operInst["A"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/A.png"),
 											 spriteBase.get(),
 											 XMFLOAT2(0.5f, 0.5f));
-	operInst["A"]->position.x = centerPos.x - diffVal;
+	operInst["A"]->position.x = centerPos.x - operInstPosR;
 	operInst["A"]->position.y = centerPos.y;
 
 	operInst["D"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/D.png"),
 											 spriteBase.get(),
 											 XMFLOAT2(0.5f, 0.5f));
-	operInst["D"]->position.x = centerPos.x + diffVal;
+	operInst["D"]->position.x = centerPos.x + operInstPosR;
 	operInst["D"]->position.y = centerPos.y;
 
 	operInst["Mouse_L"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/Mouse_L.png"),
@@ -424,32 +424,30 @@ void RailShoot::createParticle(const DirectX::XMFLOAT3& pos,
 void RailShoot::startRgbShift()
 {
 	rgbShiftFlag = true;
-	nowRgbShiftTime = 0;
 	startRgbShiftTime = timer->getNowTime();
 }
 
 void RailShoot::updateRgbShift()
 {
-	if (rgbShiftFlag)
+	if (!rgbShiftFlag) { return; }
+
+	const auto nowRgbShiftTime = timer->getNowTime() - startRgbShiftTime;
+
+	const float raito = (float)nowRgbShiftTime / (float)rgbShiftTimeMax;
+	if (raito > 1.f)
 	{
-		nowRgbShiftTime = timer->getNowTime() - startRgbShiftTime;
-
-		const float raito = (float)nowRgbShiftTime / (float)rgbShiftTimeMax;
-		if (raito > 1.f)
-		{
-			PostEffect::getInstance()->setRgbShiftNum({ 0.f, 0.f });
-			rgbShiftFlag = false;
-			return;
-		}
-
-		constexpr float rgbShiftMumMax = 1.f / 16.f;
-
-		constexpr float  c4 = 2.f * XM_PI / 3.f;
-		const float easeRate = -std::pow(2.f, 10.f * (1.f - raito) - 10.f) *
-			dxBase->nearSin((raito * 10.f - 10.75f) * c4);
-
-		PostEffect::getInstance()->setRgbShiftNum({ easeRate * rgbShiftMumMax, 0.f });
+		PostEffect::getInstance()->setRgbShiftNum({ 0.f, 0.f });
+		rgbShiftFlag = false;
+		return;
 	}
+
+	constexpr float rgbShiftMumMax = 1.f / 16.f;
+
+	constexpr float  c4 = 2.f * XM_PI / 3.f;
+	const float easeRate = -std::pow(2.f, 10.f * (1.f - raito) - 10.f) *
+		dxBase->nearSin((raito * 10.f - 10.75f) * c4);
+
+	PostEffect::getInstance()->setRgbShiftNum({ easeRate * rgbShiftMumMax, 0.f });
 }
 
 void RailShoot::rotationBack()
@@ -518,6 +516,50 @@ void RailShoot::update_play()
 	// 照準の位置をマウスカーソルに合わせる
 	player->setAim2DPos(XMFLOAT2((float)input->getMousePos().x,
 								 (float)input->getMousePos().y));
+	// 照準の位置に照準画像を表示
+	aim2D->position = XMFLOAT3(player->getAim2DPos().x, player->getAim2DPos().y, 0.f);
+
+	// 操作説明の位置
+	{
+		if (!operInst.at("Mouse_L")->isInvisible)
+		{
+			operInst.at("Mouse_L")->position = XMFLOAT3(aim2D->position.x,
+														aim2D->position.y,
+														0);
+		}
+
+		const bool dispW = !operInst.at("W")->isInvisible;
+		const bool dispS = !operInst.at("S")->isInvisible;
+		const bool dispA = !operInst.at("A")->isInvisible;
+		const bool dispD = !operInst.at("D")->isInvisible;
+
+		if (dispW || dispS || dispA || dispD)
+		{
+			const XMFLOAT2 pposF2 = player->getObj()->calcScreenPos();
+			const XMFLOAT3 playerPos2D = XMFLOAT3(pposF2.x, pposF2.y, 0.f);
+
+			if (dispW)
+			{
+				operInst.at("W")->position = playerPos2D;
+				operInst.at("W")->position.y -= operInstPosR;
+			}
+			if (dispS)
+			{
+				operInst.at("S")->position = playerPos2D;
+				operInst.at("S")->position.y += operInstPosR;
+			}
+			if (dispA)
+			{
+				operInst.at("A")->position = playerPos2D;
+				operInst.at("A")->position.x -= operInstPosR;
+			}
+			if (dispD)
+			{
+				operInst.at("D")->position = playerPos2D;
+				operInst.at("D")->position.x += operInstPosR;
+			}
+		}
+	}
 
 	// --------------------
 	// 敵を増やす
@@ -568,7 +610,7 @@ void RailShoot::update_play()
 		Sphere pBulCol{};
 		for (auto& pb : player->getBulArr())
 		{
-			if (!pb.getAlive()) continue;
+			if (!pb.getAlive()) { continue; }
 
 			pBulCol = Sphere(XMLoadFloat3(&pb.getPos()), pb.getScale());
 
@@ -601,7 +643,7 @@ void RailShoot::update_play()
 				for (auto& eb : e->getBulList())
 				{
 					//　存在しない敵弾の処理はしない
-					if (!eb->getAlive()) continue;
+					if (!eb->getAlive()) { continue; }
 
 					// 自機と敵の弾が当たっていたら
 					if (Collision::CheckHit(playerCol,
@@ -635,6 +677,7 @@ void RailShoot::update_play()
 		{
 			bool enemyEmpty = false;
 
+			// 敵とその弾がすべて消えたかを調べる
 			for (const auto& i : enemy)
 			{
 				// 生きていない && 弾がない
@@ -651,6 +694,10 @@ void RailShoot::update_play()
 			}
 		}
 	}
+
+	// 自機の体力バーの大きさを変更
+	hpBar->setSize(XMFLOAT2((float)player->getHp() / (float)playerHpMax * hpBarWidMax,
+							hpBar->getSize().y));
 
 	// ライトはカメラの位置にする
 	light->setLightPos(camera->getEye());
@@ -888,26 +935,19 @@ void RailShoot::drawFrontSprite()
 	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x,
 								   fstWinPos.y));
 
-	ImGui::Begin("情報", nullptr, DX12Base::imGuiWinFlagsDef);
+	ImGui::Begin("レールシューティング", nullptr, DX12Base::imGuiWinFlagsDef);
 	ImGui::Text("");
 	ImGui::Text("自機体力 : %u / %u", player->getHp(), playerHpMax);
-	ImGui::Text("敵数 : %u", static_cast<UINT>(std::distance(enemy.begin(), enemy.end())));
-	const auto& mousePos = input->getMousePosF2();
-	ImGui::Text("%.2f, %.2f", mousePos.x / WinAPI::window_width, mousePos.y / WinAPI::window_height);
 	ImGui::End();
 
 	spriteBase->drawStart(dxBase->getCmdList());
 
-	hpBar->setSize(XMFLOAT2((float)player->getHp() / (float)playerHpMax * hpBarWidMax,
-							hpBar->getSize().y));
 	hpBarEdge->drawWithUpdate(dxBase, spriteBase.get());
 	hpBar->drawWithUpdate(dxBase, spriteBase.get());
 
 
-	aim2D->position = XMFLOAT3(player->getAim2DPos().x, player->getAim2DPos().y, 0.f);
 	aim2D->drawWithUpdate(dxBase, spriteBase.get());
 
-	operInst.at("Mouse_L")->position = XMFLOAT3(aim2D->position.x, aim2D->position.y, 0);
 	for (auto& i : operInst)
 	{
 		i.second->drawWithUpdate(DX12Base::ins(), spriteBase.get());
