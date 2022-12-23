@@ -246,6 +246,8 @@ void BaseStage::drawObj3d()
 	}
 
 	additionalDrawObj3d();
+
+	particleMgr->drawWithUpdate();
 }
 
 void BaseStage::drawFrontSprite()

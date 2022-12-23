@@ -5,6 +5,7 @@
 #include <imgui.h>
 #include "System/SceneManager.h"
 #include "System/PostEffect.h"
+#include <Util/RandomNum.h>
 
 #include "Collision/Collision.h"
 
@@ -229,6 +230,9 @@ void BossScene::update_play()
 					// 敵はダメージを受ける
 					// hpが0になったらさよなら
 					e->damage(1u, true);
+
+					// エフェクトを出す
+					createParticle(e->calcWorldPos(), 32U, 16.f, 16.f, XMFLOAT3(1.f, 0.25f, 0.25f));
 				}
 			}
 		}
@@ -289,6 +293,9 @@ void BossScene::update_play()
 				{
 					e->damage(1u, true);
 					pb.kill();
+
+					// エフェクトを出す
+					createParticle(e->calcWorldPos(), 16U, 8.f, 4.f, XMFLOAT3(1.f, 0.25f, 0.25f));
 				}
 			}
 		}
@@ -309,6 +316,42 @@ void BossScene::additionalDrawObj3d()
 {
 	koshi->position = boss->getPos();
 	koshi->drawWithUpdate(DX12Base::ins(), light.get());
+}
+
+void BossScene::createParticle(const DirectX::XMFLOAT3& pos,
+							   const uint16_t particleNum,
+							   const float startScale,
+							   const float vel,
+							   const DirectX::XMFLOAT3& startCol,
+							   const DirectX::XMFLOAT3& endCol)
+{
+	for (uint16_t i = 0U; i < particleNum; ++i)
+	{
+		const float theata = RandomNum::getRandf(0.f, XM_PI);
+		const float phi = RandomNum::getRandf(0.f, XM_PI * 2.f);
+		const float r = RandomNum::getRandf(0.f, vel);
+
+		const XMFLOAT3 vel{
+			r * dxBase->nearSin(theata) * dxBase->nearCos(phi),
+			r * dxBase->nearCos(theata),
+			r * dxBase->nearSin(theata) * dxBase->nearSin(phi)
+		};
+
+		constexpr float accNum = 10.f;
+		const XMFLOAT3 acc = XMFLOAT3(vel.x / accNum,
+									  vel.y / accNum,
+									  vel.z / accNum);
+
+		constexpr Timer::timeType life = Timer::oneSec / Timer::timeType(4);
+		constexpr float endScale = 0.f;
+		constexpr float startRota = 0.f, endRota = 0.f;
+
+		// 追加
+		particleMgr->add(life, pos, vel, acc,
+						 startScale, endScale,
+						 startRota, endRota,
+						 startCol, endCol);
+	}
 }
 
 void BossScene::startRgbShift()
@@ -369,7 +412,7 @@ bool BossScene::addShotTarget(const std::forward_list<BaseEnemy*>& enemy,
 			aim2DPosMax.y >= screenEnemyPos.y)
 		{
 			// 敵との距離を更新
-			nowEnemyDistance = sqrtf(
+			nowEnemyDistance = std::sqrt(
 				std::pow(i->getPos().x - camera->getEye().x, 2.f) +
 				std::pow(i->getPos().y - camera->getEye().y, 2.f) +
 				std::pow(i->getPos().z - camera->getEye().z, 2.f)

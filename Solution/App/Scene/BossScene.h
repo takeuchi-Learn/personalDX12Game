@@ -56,6 +56,12 @@ private:
 	float sceneChangeEndCamLen;
 
 private:
+	void createParticle(const DirectX::XMFLOAT3& pos,
+						const uint16_t particleNum = 10U,
+						const float startScale = 1.f,
+						const float vel = 5.f,
+						const DirectX::XMFLOAT3& startCol = { 1.f, 1.f, 0.25f },
+						const DirectX::XMFLOAT3& endCol = { 1.f, 0.f, 1.f });
 
 	void startRgbShift();
 	void updateRgbShift();
