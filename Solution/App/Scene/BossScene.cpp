@@ -45,8 +45,7 @@ void BossScene::initSprite()
 										spBase.get(),
 										XMFLOAT2(0.5f, 0.f));
 
-	bossHpGr->setSize(XMFLOAT2(WinAPI::window_width * 0.75f,
-							   WinAPI::window_height / 20.f));
+	bossHpGr->setSize(XMFLOAT2(0.f, hpGrSizeMax.y));
 	bossHpGr->position = XMFLOAT3(WinAPI::window_width / 2.f,
 								  bossHpGr->getSize().y * 0.5f,
 								  0.f);
@@ -164,6 +163,12 @@ void BossScene::update_appearBoss()
 								   appearBossData->endCamLen,
 								   raito);
 	camera->setEye2TargetLen(camLen);
+
+	const float scaleRaito = std::lerp(appearBossData->startBossHpGrScale,
+									   appearBossData->endBossHpGrScale,
+									   raito);
+
+	bossHpGr->setSize(XMFLOAT2(scaleRaito, bossHpGr->getSize().y));
 }
 
 void BossScene::update_play()
@@ -322,6 +327,12 @@ void BossScene::update_play()
 			update_proc = std::bind(&BossScene::update_end, this);
 		}
 	}
+
+	{
+		XMFLOAT2 size = hpGrSizeMax;
+		size.x *= (float)boss->getHp() / (float)bossHpMax;
+		bossHpGr->setSize(size);
+	}
 }
 
 void BossScene::update_end()
@@ -351,7 +362,9 @@ void BossScene::startAppearBoss()
 			AppearBossData{
 				.appearBossTime = static_cast<float>(Timer::oneSec * 5),
 				.startCamLen = camParam->eye2TargetLen,
-				.endCamLen = camParam->eye2TargetLen * 4.f
+				.endCamLen = camParam->eye2TargetLen * 4.f,
+				.startBossHpGrScale = 0.f,
+				.endBossHpGrScale = hpGrSizeMax.x
 			}
 	);
 
@@ -582,11 +595,6 @@ void BossScene::movePlayer()
 void BossScene::drawFrontSprite()
 {
 	spBase->drawStart(DX12Base::ins()->getCmdList());
-	{
-		XMFLOAT2 size = hpGrSizeMax;
-		size.x *= (float)boss->getHp() / (float)bossHpMax;
-		bossHpGr->setSize(size);
-	}
 	bossHpGr->drawWithUpdate(DX12Base::ins(), spBase.get());
 	aim2D->drawWithUpdate(DX12Base::ins(), spBase.get());
 

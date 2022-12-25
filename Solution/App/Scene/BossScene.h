@@ -90,6 +90,8 @@ private:
 		float appearBossTime;
 		float startCamLen;
 		float endCamLen;
+		float startBossHpGrScale;
+		float endBossHpGrScale;
 	};
 	std::unique_ptr<AppearBossData> appearBossData;
 
