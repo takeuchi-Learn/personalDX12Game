@@ -92,6 +92,8 @@ private:
 		float endCamLen;
 		float startBossHpGrScale;
 		float endBossHpGrScale;
+		float startCamAngle;
+		float endCamAngle;
 	};
 	std::unique_ptr<AppearBossData> appearBossData;
 

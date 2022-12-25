@@ -155,6 +155,13 @@ void BossScene::update_appearBoss()
 	// 進行度[0~1]
 	float raito = (float)timer->getNowTime() / appearBossData->appearBossTime;
 
+	// カメラ回転
+	XMFLOAT3 rota = camera->getRelativeRotaDeg();
+	rota.y = std::lerp(appearBossData->startCamAngle,
+					   appearBossData->endCamAngle,
+					   raito);
+	camera->setRelativeRotaDeg(rota);
+
 	// イージング(四乗)
 	raito *= raito * raito * raito;
 
@@ -354,7 +361,8 @@ void BossScene::startAppearBoss()
 
 	// カメラをボス登場演出に合わせる
 	camera->setParentObj(boss.get());
-	camera->setRelativeRotaDeg(XMFLOAT3(0.f, 180.f, 0.f));
+	constexpr float angle = 180.f;
+	camera->setRelativeRotaDeg(XMFLOAT3(0.f, angle, 0.f));
 
 	// 演出用情報
 	appearBossData =
@@ -364,7 +372,9 @@ void BossScene::startAppearBoss()
 				.startCamLen = camParam->eye2TargetLen,
 				.endCamLen = camParam->eye2TargetLen * 4.f,
 				.startBossHpGrScale = 0.f,
-				.endBossHpGrScale = hpGrSizeMax.x
+				.endBossHpGrScale = hpGrSizeMax.x,
+				.startCamAngle = angle,
+				.endCamAngle = angle + 360.f
 			}
 	);
 
