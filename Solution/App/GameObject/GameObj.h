@@ -12,6 +12,7 @@ protected:
 	std::unique_ptr<Object3d> obj;
 
 	bool alive = true;
+	bool drawFlag = true;
 
 	virtual void additionalUpdate() {};
 	virtual void additionalDraw(Light* light) {}
@@ -56,9 +57,12 @@ public:
 	inline void setParent(Object3d* parent) { obj->parent = parent; }
 
 	inline bool getAlive() const { return alive; }
-
+	inline void setAlive(bool alive) { this->alive = alive; }
 	/// @brief aliveをfalseにする
 	inline void kill() { alive = false; }
+
+	inline bool getDrawFlag() const { return drawFlag; }
+	inline void setDrawFlag(bool drawFlag) { this->drawFlag = drawFlag; }
 
 	inline Object3d* getObj() const { return obj.get(); }
 
@@ -93,6 +97,7 @@ public:
 	GameObj(Camera* camera,
 			ObjModel* model,
 			const DirectX::XMFLOAT3& pos = { 0,0,0 });
+	~GameObj();
 
 	// drawWithUpdate関数の頭で呼ばれる
 	void update();

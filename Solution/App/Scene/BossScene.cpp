@@ -115,7 +115,7 @@ void BossScene::start()
 
 	for (auto& i : attackableEnemy)
 	{
-		i->actionable = false;
+		i->setAlive(false);
 	}
 
 	timer->reset();
@@ -125,27 +125,44 @@ void BossScene::start()
 
 void BossScene::update_start()
 {
-	const float raito = (float)timer->getNowTime() / (float)sceneChangeTime;
-
-	if (raito > 1.f)
+	if (timer->getNowTime() > sceneChangeTime)
 	{
-		update_proc = std::bind(&BossScene::update_play, this);
-
 		player->setPos(sceneChangeEndPos);
 		player->setRotation(sceneChangeEndRota);
 		camera->setEye2TargetLen(sceneChangeEndCamLen);
 
-		for (auto& i : attackableEnemy)
-		{
-			i->actionable = true;
-		}
+		startAppearBoss();
 		return;
 	}
+
+	const float raito = (float)timer->getNowTime() / (float)sceneChangeTime;
 
 	player->setPos(lerp(sceneChangeStartPos, sceneChangeEndPos, raito));
 	player->setRotation(lerp(sceneChangeStartRota, sceneChangeEndRota, raito));
 
 	const float camLen = std::lerp(sceneChangeStartCamLen, sceneChangeEndCamLen, raito);
+	camera->setEye2TargetLen(camLen);
+}
+
+void BossScene::update_appearBoss()
+{
+	// 時間が来たら次へ進む
+	if (timer->getNowTime() > appearBossData->appearBossTime)
+	{
+		endAppearBoss();
+		return;
+	}
+
+	// 進行度[0~1]
+	float raito = (float)timer->getNowTime() / appearBossData->appearBossTime;
+
+	// イージング(四乗)
+	raito *= raito * raito * raito;
+
+	// カメラと追従対象のの距離
+	const float camLen = std::lerp(appearBossData->startCamLen,
+								   appearBossData->endCamLen,
+								   raito);
 	camera->setEye2TargetLen(camLen);
 }
 
@@ -232,7 +249,7 @@ void BossScene::update_play()
 					e->damage(1u, true);
 
 					// エフェクトを出す
-					createParticle(e->calcWorldPos(), 32U, 16.f, 16.f, XMFLOAT3(1.f, 0.25f, 0.25f));
+					createParticle(e->calcWorldPos(), 128U, 16.f, 16.f, XMFLOAT3(0.25f, 1.f, 1.f));
 				}
 			}
 		}
@@ -310,6 +327,53 @@ void BossScene::update_play()
 void BossScene::update_end()
 {
 	SceneManager::getInstange()->changeScene<EndScene>();
+}
+
+void BossScene::startAppearBoss()
+{
+	// カメラの情報を取っておく
+	camParam =
+		std::make_unique<CameraParam>(
+			CameraParam{
+				.parentObj = camera->getParentObj(),
+				.angleRad = camera->getRelativeRotaDeg(),
+				.eye2TargetLen = camera->getEye2TargetLen()
+			}
+	);
+
+	// カメラをボス登場演出に合わせる
+	camera->setParentObj(boss.get());
+	camera->setRelativeRotaDeg(XMFLOAT3(0.f, 180.f, 0.f));
+
+	// 演出用情報
+	appearBossData =
+		std::make_unique<AppearBossData>(
+			AppearBossData{
+				.appearBossTime = static_cast<float>(Timer::oneSec * 5),
+				.startCamLen = camParam->eye2TargetLen,
+				.endCamLen = camParam->eye2TargetLen * 4.f
+			}
+	);
+
+	update_proc = std::bind(&BossScene::update_appearBoss, this);
+	timer->reset();
+}
+
+void BossScene::endAppearBoss()
+{
+	// ボス行動開始
+	for (auto& i : attackableEnemy)
+	{
+		i->setAlive(true);
+	}
+
+	// カメラを自機に戻す
+	camera->setParentObj(camParam->parentObj);
+	camera->setRelativeRotaDeg(camParam->angleRad);
+	camera->setEye2TargetLen(camParam->eye2TargetLen);
+
+	// 関数を変える
+	update_proc = std::bind(&BossScene::update_play, this);
 }
 
 void BossScene::additionalDrawObj3d()

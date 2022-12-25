@@ -20,6 +20,7 @@ protected:
 
 	Camera* camera = nullptr;
 
+	virtual void beforeUpdate() {}
 	virtual void afterUpdate() {}
 
 	void additionalUpdate() override;
@@ -32,8 +33,6 @@ protected:
 	}
 
 public:
-	bool actionable = true;
-
 	BaseEnemy(Camera* camera,
 			  ObjModel* model,
 			  const DirectX::XMFLOAT3& pos = { 0,0,0 },

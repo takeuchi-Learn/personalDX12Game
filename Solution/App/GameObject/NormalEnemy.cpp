@@ -81,6 +81,9 @@ void NormalEnemy::afterUpdate()
 {
 	++nowFrame;
 
+	// 生きている時のみ表示
+	drawFlag = alive;
+
 	bul.remove_if([](std::unique_ptr<EnemyBullet>& i) { return !i->getAlive(); });
 
 	if (!targetObjPt)

@@ -77,10 +77,34 @@ private:
 
 	// update_何とか関数を格納する
 	void update_start() override;
+	void update_appearBoss();
 	void update_play() override;
 	void update_end() override;
 
 #pragma endregion updateの中身
+
+#pragma region ボス登場演出
+
+	struct AppearBossData
+	{
+		float appearBossTime;
+		float startCamLen;
+		float endCamLen;
+	};
+	std::unique_ptr<AppearBossData> appearBossData;
+
+	struct CameraParam
+	{
+		GameObj* parentObj;
+		DirectX::XMFLOAT3 angleRad;
+		float eye2TargetLen;
+	};
+	std::unique_ptr<CameraParam> camParam;
+
+	void startAppearBoss();
+	void endAppearBoss();
+
+#pragma endregion ボス登場演出
 
 	void additionalDrawObj3d() override;
 

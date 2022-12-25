@@ -32,6 +32,11 @@ void BossEnemy::moveAndRota(float moveSpeed, const DirectX::XMVECTOR& velVec)
 
 void BossEnemy::afterUpdate()
 {
+	// 死んだ弾は消す
+	for (auto& i : smallEnemy)
+	{
+		i->setDrawFlag(i->getAlive());
+	}
 }
 
 void BossEnemy::additionalDraw(Light* light)

@@ -19,18 +19,20 @@ GameObj::GameObj(Camera* camera,
 	setPos(pos);
 }
 
+GameObj::~GameObj()
+{
+	obj.reset(nullptr);
+}
+
 void GameObj::update()
 {
 	additionalUpdate();
-	if (alive)
-	{
-		obj->update();
-	}
+	obj->update();
 }
 
 void GameObj::draw(Light* light)
 {
-	if (alive)
+	if (drawFlag)
 	{
 		obj->draw(DX12Base::getInstance(), light);
 	}

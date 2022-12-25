@@ -26,7 +26,8 @@ bool BaseEnemy::damage(uint16_t damegeNum, bool killFlag)
 
 void BaseEnemy::additionalUpdate()
 {
-	if (alive && actionable)
+	beforeUpdate();
+	if (alive)
 	{
 		phase();
 
