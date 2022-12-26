@@ -162,7 +162,7 @@ void BossScene::update_appearBoss()
 	}
 
 	// 進行度[0~1]
-	float raito = (float)timer->getNowTime() / appearBossData->appearBossTime;
+	const float raito = (float)timer->getNowTime() / appearBossData->appearBossTime;
 
 	// カメラ回転
 	XMFLOAT3 rota = camera->getRelativeRotaDeg();
@@ -172,22 +172,27 @@ void BossScene::update_appearBoss()
 	camera->setRelativeRotaDeg(rota);
 
 	// イージング(四乗)
-	raito *= raito * raito * raito;
+	const float camRaito = raito * raito * raito * raito;
 
 	// カメラと追従対象のの距離
 	const float camLen = std::lerp(appearBossData->startCamLen,
 								   appearBossData->endCamLen,
-								   raito);
+								   camRaito);
 	camera->setEye2TargetLen(camLen);
+
+	// 体力バー
+	float barRaito = 1.f - raito;
+	barRaito *= barRaito * barRaito * barRaito;
+	barRaito = 1.f - barRaito;
 
 	float scaleRaito = std::lerp(appearBossData->startBossHpGrScale,
 								 appearBossData->endBossHpGrScale,
-								 raito);
+								 barRaito);
 	bossHpGr->setSize(XMFLOAT2(scaleRaito, bossHpGr->getSize().y));
 
 	scaleRaito = std::lerp(appearBossData->startPlayerHpGrScale,
 						   appearBossData->endPlayerHpGrScale,
-						   raito);
+						   barRaito);
 	playerHpBar->setSize(XMFLOAT2(scaleRaito, playerHpBar->getSize().y));
 }
 
@@ -349,11 +354,14 @@ void BossScene::update_play()
 	}
 
 	// ボス体力バーの大きさを変更
-	bossHpGr->setSize(XMFLOAT2((float)boss->getHp() / (float)bossHpMax * hpGrSizeMax.x,
-							   hpGrSizeMax.y));
+	float oldLen = bossHpGr->getSize().x;
+	float nowLen = (float)boss->getHp() / (float)bossHpMax * hpGrSizeMax.x;
+	bossHpGr->setSize(XMFLOAT2(std::lerp(oldLen, nowLen, 0.5f), hpGrSizeMax.y));
+
 	// 自機の体力バーの大きさを変更
-	playerHpBar->setSize(XMFLOAT2((float)player->getHp() / (float)playerHpMax * playerHpBarWidMax,
-								  playerHpBar->getSize().y));
+	oldLen = playerHpBar->getSize().x;
+	nowLen = (float)player->getHp() / (float)playerHpMax * playerHpBarWidMax;
+	playerHpBar->setSize(XMFLOAT2(std::lerp(oldLen, nowLen, 0.5f), playerHpBar->getSize().y));
 }
 
 void BossScene::update_end()
