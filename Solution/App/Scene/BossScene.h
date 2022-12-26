@@ -41,6 +41,10 @@ private:
 																			  WinAPI::window_height / 40.f);
 	std::unique_ptr<Sprite> bossHpGr;
 
+	const float playerHpBarWidMax;
+	std::unique_ptr<Sprite> playerHpBar;
+	std::unique_ptr<Sprite> playerHpBarEdge;
+
 	// RGBずらし
 	static const Timer::timeType rgbShiftTimeMax = Timer::oneSec / 2;
 	Timer::timeType nowRgbShiftTime = 0;
@@ -94,6 +98,8 @@ private:
 		float endBossHpGrScale;
 		float startCamAngle;
 		float endCamAngle;
+		float startPlayerHpGrScale;
+		float endPlayerHpGrScale;
 	};
 	std::unique_ptr<AppearBossData> appearBossData;
 

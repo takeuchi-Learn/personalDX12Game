@@ -26,7 +26,8 @@ namespace
 #pragma region 初期化
 
 BossScene::BossScene() :
-	BaseStage()
+	BaseStage(),
+	playerHpBarWidMax(WinAPI::window_width * 0.25f)
 {
 	initSprite();
 
@@ -40,7 +41,7 @@ BossScene::BossScene() :
 
 void BossScene::initSprite()
 {
-	// スプライト
+	// ボス体力
 	bossHpGr = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/hpBar.png"),
 										spBase.get(),
 										XMFLOAT2(0.5f, 0.f));
@@ -50,6 +51,23 @@ void BossScene::initSprite()
 								  bossHpGr->getSize().y * 0.5f,
 								  0.f);
 	bossHpGr->color = XMFLOAT4(1.f, 0.5f, 0.f, 1.f);
+
+	// 自機体力
+	playerHpBar = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/hpBar.png"),
+										   spBase.get(),
+										   XMFLOAT2(0.f, 1.f));
+	playerHpBarEdge = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/hpBar.png"),
+											   spBase.get(),
+											   XMFLOAT2(0.f, 1.f));
+
+	playerHpBar->color = XMFLOAT4(0.f, 0.5f, 1.f, 1.f);
+
+	playerHpBarEdge->setSize(XMFLOAT2(playerHpBarWidMax, (float)WinAPI::window_height / 32.f));
+	playerHpBar->setSize(XMFLOAT2(0.f, playerHpBarEdge->getSize().y));
+
+	playerHpBar->position = XMFLOAT3(WinAPI::window_width / 20.f, WinAPI::window_height - playerHpBar->getSize().y, 0.f);
+	playerHpBarEdge->position = playerHpBar->position;
+
 }
 
 void BossScene::initGameObj()
@@ -171,11 +189,15 @@ void BossScene::update_appearBoss()
 								   raito);
 	camera->setEye2TargetLen(camLen);
 
-	const float scaleRaito = std::lerp(appearBossData->startBossHpGrScale,
-									   appearBossData->endBossHpGrScale,
-									   raito);
-
+	float scaleRaito = std::lerp(appearBossData->startBossHpGrScale,
+								 appearBossData->endBossHpGrScale,
+								 raito);
 	bossHpGr->setSize(XMFLOAT2(scaleRaito, bossHpGr->getSize().y));
+
+	scaleRaito = std::lerp(appearBossData->startPlayerHpGrScale,
+						   appearBossData->endPlayerHpGrScale,
+						   raito);
+	playerHpBar->setSize(XMFLOAT2(scaleRaito, playerHpBar->getSize().y));
 }
 
 void BossScene::update_play()
@@ -335,11 +357,12 @@ void BossScene::update_play()
 		}
 	}
 
-	{
-		XMFLOAT2 size = hpGrSizeMax;
-		size.x *= (float)boss->getHp() / (float)bossHpMax;
-		bossHpGr->setSize(size);
-	}
+	// ボス体力バーの大きさを変更
+	bossHpGr->setSize(XMFLOAT2((float)boss->getHp() / (float)bossHpMax * hpGrSizeMax.x,
+							   hpGrSizeMax.y));
+	// 自機の体力バーの大きさを変更
+	playerHpBar->setSize(XMFLOAT2((float)player->getHp() / (float)playerHpMax * playerHpBarWidMax,
+								  playerHpBar->getSize().y));
 }
 
 void BossScene::update_end()
@@ -374,7 +397,9 @@ void BossScene::startAppearBoss()
 				.startBossHpGrScale = 0.f,
 				.endBossHpGrScale = hpGrSizeMax.x,
 				.startCamAngle = angle,
-				.endCamAngle = angle + 360.f
+				.endCamAngle = angle + 360.f,
+				.startPlayerHpGrScale = 0.f,
+				.endPlayerHpGrScale = playerHpBarWidMax
 			}
 	);
 
@@ -394,6 +419,9 @@ void BossScene::endAppearBoss()
 	camera->setParentObj(camParam->parentObj);
 	camera->setRelativeRotaDeg(camParam->angleRad);
 	camera->setEye2TargetLen(camParam->eye2TargetLen);
+
+	bossHpGr->setSize(XMFLOAT2(appearBossData->endBossHpGrScale, bossHpGr->getSize().y));
+	playerHpBar->setSize(XMFLOAT2(appearBossData->endPlayerHpGrScale, playerHpBar->getSize().y));
 
 	// 関数を変える
 	update_proc = std::bind(&BossScene::update_play, this);
@@ -607,6 +635,9 @@ void BossScene::drawFrontSprite()
 	spBase->drawStart(DX12Base::ins()->getCmdList());
 	bossHpGr->drawWithUpdate(DX12Base::ins(), spBase.get());
 	aim2D->drawWithUpdate(DX12Base::ins(), spBase.get());
+
+	playerHpBarEdge->drawWithUpdate(dxBase, spBase.get());
+	playerHpBar->drawWithUpdate(dxBase, spBase.get());
 
 	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x,
 								   fstWinPos.y));
