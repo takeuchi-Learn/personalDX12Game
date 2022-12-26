@@ -41,31 +41,22 @@ BossScene::BossScene() :
 
 void BossScene::initSprite()
 {
-	// ボス体力
-	bossHpGr = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/hpBar.png"),
-										spBase.get(),
-										XMFLOAT2(0.5f, 0.f));
+	const UINT hpBarTex = spBase->loadTexture(L"Resources/hpBar.png");
 
+	// ボス体力
+	bossHpGr = std::make_unique<Sprite>(hpBarTex, spBase.get(), XMFLOAT2(0.5f, 0.f));
 	bossHpGr->setSize(XMFLOAT2(0.f, hpGrSizeMax.y));
-	bossHpGr->position = XMFLOAT3(WinAPI::window_width / 2.f,
-								  bossHpGr->getSize().y * 0.5f,
-								  0.f);
+	bossHpGr->position = XMFLOAT3(WinAPI::window_width / 2.f, bossHpGr->getSize().y / 2.f, 0.f);
 	bossHpGr->color = XMFLOAT4(1.f, 0.5f, 0.f, 1.f);
 
 	// 自機体力
-	playerHpBar = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/hpBar.png"),
-										   spBase.get(),
-										   XMFLOAT2(0.f, 1.f));
-	playerHpBarEdge = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/hpBar.png"),
-											   spBase.get(),
-											   XMFLOAT2(0.f, 1.f));
-
+	playerHpBar = std::make_unique<Sprite>(hpBarTex, spBase.get(), XMFLOAT2(0.f, 1.f));
+	playerHpBar->setSize(XMFLOAT2(0.f, (float)WinAPI::window_height / 32.f));
+	playerHpBar->position = XMFLOAT3(WinAPI::window_width / 20.f, WinAPI::window_height - playerHpBar->getSize().y, 0.f);
 	playerHpBar->color = XMFLOAT4(0.f, 0.5f, 1.f, 1.f);
 
-	playerHpBarEdge->setSize(XMFLOAT2(playerHpBarWidMax, (float)WinAPI::window_height / 32.f));
-	playerHpBar->setSize(XMFLOAT2(0.f, playerHpBarEdge->getSize().y));
-
-	playerHpBar->position = XMFLOAT3(WinAPI::window_width / 20.f, WinAPI::window_height - playerHpBar->getSize().y, 0.f);
+	playerHpBarEdge = std::make_unique<Sprite>(hpBarTex, spBase.get(), XMFLOAT2(0.f, 1.f));
+	playerHpBarEdge->setSize(XMFLOAT2(playerHpBarWidMax, playerHpBar->getSize().y));
 	playerHpBarEdge->position = playerHpBar->position;
 
 }
