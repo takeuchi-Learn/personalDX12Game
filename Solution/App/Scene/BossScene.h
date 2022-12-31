@@ -83,6 +83,7 @@ private:
 	void update_start() override;
 	void update_appearBoss();
 	void update_play() override;
+	void update_killBoss();
 	void update_end() override;
 
 #pragma endregion updateの中身
@@ -115,6 +116,21 @@ private:
 	void endAppearBoss();
 
 #pragma endregion ボス登場演出
+
+#pragma region ボス死亡演出
+
+	struct KillBossData
+	{
+		float startBossScale;
+		float endBossScale;
+	};
+	std::unique_ptr<KillBossData> killBossData;
+
+	void startKillBoss();
+
+	void endKillBoss();
+
+#pragma endregion ボス死亡演出
 
 	void additionalDrawObj3d() override;
 

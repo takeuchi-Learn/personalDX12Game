@@ -73,8 +73,8 @@ public:
 	inline void setScale(float scale) { obj->scale = DirectX::XMFLOAT3(scale, scale, scale); }
 	inline const DirectX::XMFLOAT3& getScaleF3() const { return obj->scale; }
 
-	/// @return Xのスケールを返す
-	inline float getScale() const { return obj->scale.x; }
+	/// @return Zのスケールを返す
+	inline float getScale() const { return obj->scale.z; }
 
 	/// @return 大きさベクトルの長さを返す
 	inline float calcScale() const

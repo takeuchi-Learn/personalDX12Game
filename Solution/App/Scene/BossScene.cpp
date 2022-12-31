@@ -91,11 +91,6 @@ void BossScene::initEnemy()
 {
 	// ボスの初期化
 	initBoss();
-
-	constexpr float koshiScale = 24.f;
-	koshi->scale = XMFLOAT3(koshiScale,
-							koshiScale,
-							koshiScale);
 }
 
 void BossScene::initBoss()
@@ -114,6 +109,9 @@ void BossScene::initBoss()
 	// 腰
 	koshiModel = std::make_unique<ObjModel>("Resources/koshi", "koshi", 0U, false);
 	koshi = std::make_unique<Object3d>(camera.get(), koshiModel.get(), 0U);
+	koshi->parent = boss->getObj();
+	constexpr float scale = 0.25f;
+	koshi->scale = XMFLOAT3(scale, scale, scale);
 }
 
 void BossScene::start()
@@ -202,7 +200,7 @@ void BossScene::update_play()
 
 	if (Input::getInstance()->hitKey(DIK_SPACE))
 	{
-		update_proc = std::bind(&BossScene::update_end, this);
+		startKillBoss();
 	}
 
 #endif // _DEBUG
@@ -310,7 +308,7 @@ void BossScene::update_play()
 					{
 						// 自機の体力が0になったら
 						player->kill();
-						update_proc = std::bind(&BossScene::update_end, this);
+						startKillBoss();
 					} else
 					{
 						startRgbShift();
@@ -349,7 +347,7 @@ void BossScene::update_play()
 
 		if (!boss->getAlive())
 		{
-			update_proc = std::bind(&BossScene::update_end, this);
+			startKillBoss();
 		}
 	}
 
@@ -362,6 +360,13 @@ void BossScene::update_play()
 	oldLen = playerHpBar->getSize().x;
 	nowLen = (float)player->getHp() / (float)playerHpMax * playerHpBarWidMax;
 	playerHpBar->setSize(XMFLOAT2(std::lerp(oldLen, nowLen, 0.5f), playerHpBar->getSize().y));
+}
+
+void BossScene::update_killBoss()
+{
+	// todo ボス死亡演出を作る
+
+	endKillBoss();
 }
 
 void BossScene::update_end()
@@ -426,9 +431,58 @@ void BossScene::endAppearBoss()
 	update_proc = std::bind(&BossScene::update_play, this);
 }
 
+void BossScene::startKillBoss()
+{
+	// カメラの情報を取っておく
+	camParam =
+		std::make_unique<CameraParam>(
+			CameraParam{
+				.parentObj = camera->getParentObj(),
+				.angleRad = camera->getRelativeRotaDeg(),
+				.eye2TargetLen = camera->getEye2TargetLen()
+			}
+	);
+
+	// カメラをボス登場演出に合わせる
+	camera->setParentObj(boss.get());
+	constexpr float angle = 180.f;
+	camera->setRelativeRotaDeg(XMFLOAT3(0.f, angle, 0.f));
+
+	// 演出用情報
+	killBossData =
+		std::make_unique<KillBossData>(
+			KillBossData{ .startBossScale = boss->getScale(),
+			.endBossScale = 0.f
+			}
+	);
+
+	// ボス死亡演出開始
+	update_proc = std::bind(&BossScene::update_killBoss, this);
+	timer->reset();
+}
+
+void BossScene::endKillBoss()
+{
+	const auto nowTime = timer->getNowTime();
+	constexpr auto endTime = Timer::oneSecF * 3;
+
+	if (nowTime > endTime)
+	{
+		update_proc = std::bind(&BossScene::update_end, this);
+	} else
+	{
+		const float raito = (float)nowTime / (float)endTime;
+
+		const float scale = std::lerp(killBossData->startBossScale,
+									  killBossData->endBossScale,
+									  raito * raito * raito * raito);
+
+		boss->setScale(scale);
+	}
+}
+
 void BossScene::additionalDrawObj3d()
 {
-	koshi->position = boss->getPos();
 	koshi->drawWithUpdate(DX12Base::ins(), light.get());
 }
 
