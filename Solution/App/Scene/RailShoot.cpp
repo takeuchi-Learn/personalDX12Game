@@ -211,6 +211,7 @@ RailShoot::RailShoot()
 	for (auto& i : operInst)
 	{
 		i.second->update(spriteBase.get());
+		i.second->color = XMFLOAT4(1, 1, 1, 0.5f);
 		i.second->isInvisible = true;
 	}
 
