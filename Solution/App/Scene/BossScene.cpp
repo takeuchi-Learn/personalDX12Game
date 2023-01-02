@@ -364,9 +364,23 @@ void BossScene::update_play()
 
 void BossScene::update_killBoss()
 {
-	// todo ボス死亡演出を作る
+	const auto nowTime = timer->getNowTime();
+	constexpr auto endTime = Timer::oneSecF * 3;
 
-	endKillBoss();
+	if (nowTime > endTime)
+	{
+		endKillBoss();
+	} else
+	{
+		const float raito = (float)nowTime / (float)endTime;
+
+		const float scale = std::lerp(killBossData->startBossScale,
+									  killBossData->endBossScale,
+									  raito * raito * raito * raito);
+
+		boss->setScale(scale);
+	}
+
 }
 
 void BossScene::update_end()
@@ -463,22 +477,8 @@ void BossScene::startKillBoss()
 
 void BossScene::endKillBoss()
 {
-	const auto nowTime = timer->getNowTime();
-	constexpr auto endTime = Timer::oneSecF * 3;
 
-	if (nowTime > endTime)
-	{
-		update_proc = std::bind(&BossScene::update_end, this);
-	} else
-	{
-		const float raito = (float)nowTime / (float)endTime;
-
-		const float scale = std::lerp(killBossData->startBossScale,
-									  killBossData->endBossScale,
-									  raito * raito * raito * raito);
-
-		boss->setScale(scale);
-	}
+	update_proc = std::bind(&BossScene::update_end, this);
 }
 
 void BossScene::additionalDrawObj3d()
