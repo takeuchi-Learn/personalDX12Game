@@ -154,8 +154,33 @@ class RailShoot
 	// update_何とか関数を格納する
 	std::function<void()> update_proc;
 	void update_start();
+	void update_appearPlayer();
 	void update_play();
 	void update_end();
+
+
+#pragma region 自機登場演出
+
+	template<class T>
+	struct startEnd
+	{
+		T start;
+		T end;
+	};
+
+	struct AppearPlayer
+	{
+		startEnd<DirectX::XMFLOAT3> playerPos;
+		const Timer::timeType appearTime;
+		std::unique_ptr<Timer> timer;
+	};
+
+	std::unique_ptr<AppearPlayer> appearPlayer;
+
+	void startAppearPlayer();
+	void endAppearPlayer();
+
+#pragma endregion 自機登場演出
 
 	void updateRailPos();
 	void movePlayer();

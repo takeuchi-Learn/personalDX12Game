@@ -19,6 +19,13 @@ namespace
 						r.y + l.y,
 						r.z + l.z);
 	}
+
+	inline XMFLOAT3 lerp(const XMFLOAT3& r, const XMFLOAT3& l, float t)
+	{
+		return XMFLOAT3(std::lerp(r.x, l.x, t),
+						std::lerp(r.y, l.y, t),
+						std::lerp(r.z, l.z, t));
+	}
 }
 
 RailShoot::CSVType RailShoot::loadCsv(const std::string& csvFilePath,
@@ -228,8 +235,8 @@ RailShoot::RailShoot()
 	player->setPos(XMFLOAT3(0, 12.f, 0));
 	player->setHp(playerHpMax);
 
-	// カメラをレールに追従させる
-	camera->setParentObj(railObj.get());
+	// カメラを自機に追従させる
+	camera->setParentObj(player.get());
 	camera->update();
 
 	// --------------------
@@ -483,7 +490,7 @@ void RailShoot::update_start()
 	const Timer::timeType nowTime = timer->getNowTime() - startSceneChangeTime;
 	if (nowTime >= sceneChangeTime)
 	{
-		update_proc = std::bind(&RailShoot::update_play, this);
+		startAppearPlayer();
 	}
 
 	const float timeRaito = (float)nowTime / sceneChangeTime;
@@ -500,6 +507,26 @@ void RailShoot::update_start()
 
 	const float speedLineIntensity = 0.125f * timeRaito;
 	PostEffect::getInstance()->setSpeedLineIntensity(speedLineIntensity);
+}
+
+void RailShoot::update_appearPlayer()
+{
+	const auto nowTime = appearPlayer->timer->getNowTime();
+
+	if (nowTime > appearPlayer->appearTime)
+	{
+		endAppearPlayer();
+
+		return;
+	}
+
+	const float raito = (float)nowTime / (float)appearPlayer->appearTime;
+
+	const XMFLOAT3 nowPos = lerp(appearPlayer->playerPos.start,
+								 appearPlayer->playerPos.end,
+								 raito);
+
+	player->setPos(nowPos);
 }
 
 void RailShoot::update_play()
@@ -730,6 +757,31 @@ void RailShoot::update_end()
 													 WinAPI::window_height * mosCoe));
 
 	PostEffect::getInstance()->setNoiseIntensity(1.f - timeRaito);
+}
+
+void RailShoot::startAppearPlayer()
+{
+	appearPlayer = std::make_unique<AppearPlayer>(
+		AppearPlayer{
+		.playerPos =
+			{
+				.start = XMFLOAT3(0, 12.f, -1000.f),
+				.end = XMFLOAT3(0, 12.f, 0)
+			},
+		.appearTime = Timer::oneSec * 3,
+		.timer = std::make_unique<Timer>()
+		}
+	);
+
+	update_proc = std::bind(&RailShoot::update_appearPlayer, this);
+	appearPlayer->timer->reset();
+}
+
+void RailShoot::endAppearPlayer()
+{
+	player->setPos(appearPlayer->playerPos.end);
+
+	update_proc = std::bind(&RailShoot::update_play, this);
 }
 
 void RailShoot::updateRailPos()

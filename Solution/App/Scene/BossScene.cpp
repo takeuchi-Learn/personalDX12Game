@@ -477,7 +477,6 @@ void BossScene::startKillBoss()
 
 void BossScene::endKillBoss()
 {
-
 	update_proc = std::bind(&BossScene::update_end, this);
 }
 
