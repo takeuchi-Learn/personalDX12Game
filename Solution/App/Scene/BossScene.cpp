@@ -58,7 +58,6 @@ void BossScene::initSprite()
 	playerHpBarEdge = std::make_unique<Sprite>(hpBarTex, spBase.get(), XMFLOAT2(0.f, 1.f));
 	playerHpBarEdge->setSize(XMFLOAT2(playerHpBarWidMax, playerHpBar->getSize().y));
 	playerHpBarEdge->position = playerHpBar->position;
-
 }
 
 void BossScene::initGameObj()
@@ -380,7 +379,6 @@ void BossScene::update_killBoss()
 
 		boss->setScale(scale);
 	}
-
 }
 
 void BossScene::update_end()

@@ -158,7 +158,6 @@ class RailShoot
 	void update_play();
 	void update_end();
 
-
 #pragma region 自機登場演出
 
 	template<class T>
@@ -173,9 +172,18 @@ class RailShoot
 		startEnd<DirectX::XMFLOAT3> playerPos;
 		const Timer::timeType appearTime;
 		std::unique_ptr<Timer> timer;
+		startEnd<DirectX::XMFLOAT3> playerScale;
 	};
 
+	inline const static DirectX::XMFLOAT3 appearPPosEnd = DirectX::XMFLOAT3(0, 12, 0);
+	inline const static DirectX::XMFLOAT3 appearPPosStart = DirectX::XMFLOAT3(appearPPosEnd.x,
+																			  appearPPosEnd.y,
+																			  appearPPosEnd.z - 1000.f);
+
 	std::unique_ptr<AppearPlayer> appearPlayer;
+
+	void initFixedCam(const DirectX::XMFLOAT3& startPos,
+					  const DirectX::XMFLOAT3& endPos);
 
 	void startAppearPlayer();
 	void endAppearPlayer();

@@ -13,14 +13,14 @@ using namespace DirectX;
 
 namespace
 {
-	XMFLOAT3 operator+(const XMFLOAT3& r, const XMFLOAT3& l)
+	inline XMFLOAT3 operator+(const XMFLOAT3& r, const XMFLOAT3& l)
 	{
 		return XMFLOAT3(r.x + l.x,
 						r.y + l.y,
 						r.z + l.z);
 	}
 
-	inline XMFLOAT3 lerp(const XMFLOAT3& r, const XMFLOAT3& l, float t)
+	constexpr XMFLOAT3 lerp(const XMFLOAT3& r, const XMFLOAT3& l, float t)
 	{
 		return XMFLOAT3(std::lerp(r.x, l.x, t),
 						std::lerp(r.y, l.y, t),
@@ -211,6 +211,7 @@ RailShoot::RailShoot()
 	for (auto& i : operInst)
 	{
 		i.second->update(spriteBase.get());
+		i.second->isInvisible = true;
 	}
 
 	// --------------------
@@ -235,10 +236,6 @@ RailShoot::RailShoot()
 	player->setPos(XMFLOAT3(0, 12.f, 0));
 	player->setHp(playerHpMax);
 
-	// カメラを自機に追従させる
-	camera->setParentObj(player.get());
-	camera->update();
-
 	// --------------------
 	// スプライン
 	// --------------------
@@ -249,11 +246,10 @@ RailShoot::RailShoot()
 		// 制御点の情報はCSVから読み込む
 		csvData = loadCsv("Resources/splinePos.csv", true, ',', "//");
 
+		// 始点は原点
 		// startは2つ必要
-		splinePoint.emplace_back(XMVectorSet(std::stof(csvData[0][0]),
-											 std::stof(csvData[0][1]),
-											 std::stof(csvData[0][2]),
-											 1));
+		splinePoint.emplace_back(XMVectorSet(0, 0, 0, 1));
+		splinePoint.emplace_back(XMVectorSet(0, 0, 0, 1));
 
 		// CSVの内容を配列に格納
 		for (auto& y : csvData)
@@ -367,6 +363,9 @@ RailShoot::RailShoot()
 
 void RailShoot::start()
 {
+	// カメラは固定カメラ
+	initFixedCam(appearPPosStart, appearPPosEnd);
+
 	// マウスカーソルは表示しない
 	input->changeDispMouseCursorFlag(false);
 
@@ -527,6 +526,12 @@ void RailShoot::update_appearPlayer()
 								 raito);
 
 	player->setPos(nowPos);
+
+	camera->setTarget(player->calcWorldPos());
+
+	player->setScaleF3(lerp(appearPlayer->playerScale.start,
+							appearPlayer->playerScale.end,
+							raito));
 }
 
 void RailShoot::update_play()
@@ -759,19 +764,44 @@ void RailShoot::update_end()
 	PostEffect::getInstance()->setNoiseIntensity(1.f - timeRaito);
 }
 
+void RailShoot::initFixedCam(const XMFLOAT3& startPos,
+							 const XMFLOAT3& endPos)
+{
+	XMFLOAT3 eye = lerp(startPos, endPos, 0.5f);
+	eye.x += player->getScaleF3().x * 1.5f;
+	camera->setEye(eye);
+	camera->setParentObj(nullptr);
+	camera->setTarget(startPos);
+}
+
 void RailShoot::startAppearPlayer()
 {
+	// 登場演出の情報
 	appearPlayer = std::make_unique<AppearPlayer>(
 		AppearPlayer{
 		.playerPos =
 			{
-				.start = XMFLOAT3(0, 12.f, -1000.f),
-				.end = XMFLOAT3(0, 12.f, 0)
+				.start = appearPPosStart,
+				.end = appearPPosEnd
 			},
 		.appearTime = Timer::oneSec * 3,
-		.timer = std::make_unique<Timer>()
+		.timer = std::make_unique<Timer>(),
+		.playerScale =
+			{
+				.start = XMFLOAT3(0,0,0),
+				.end = player->getScaleF3()
+			}
 		}
 	);
+
+	// カメラ設定
+	initFixedCam(appearPPosStart, appearPPosEnd);
+
+	// 自機の大きさ
+	player->setScale(0.f);
+
+	// 自機を演出開始位置に置く
+	player->setPos(appearPPosStart);
 
 	update_proc = std::bind(&RailShoot::update_appearPlayer, this);
 	appearPlayer->timer->reset();
@@ -779,7 +809,20 @@ void RailShoot::startAppearPlayer()
 
 void RailShoot::endAppearPlayer()
 {
+	// 自機を演出終了位置に置く
 	player->setPos(appearPlayer->playerPos.end);
+
+	// 自機の大きさを戻す
+	player->setScaleF3(appearPlayer->playerScale.end);
+
+	// 自機に追従する
+	camera->setParentObj(player.get());
+
+	// 操作説明を表示
+	for (auto& i : operInst)
+	{
+		i.second->isInvisible = false;
+	}
 
 	update_proc = std::bind(&RailShoot::update_play, this);
 }
@@ -997,7 +1040,6 @@ void RailShoot::drawFrontSprite()
 
 	hpBarEdge->drawWithUpdate(dxBase, spriteBase.get());
 	hpBar->drawWithUpdate(dxBase, spriteBase.get());
-
 
 	aim2D->drawWithUpdate(dxBase, spriteBase.get());
 
