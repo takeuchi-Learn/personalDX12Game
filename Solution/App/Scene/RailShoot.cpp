@@ -9,6 +9,14 @@
 #include "Collision/Collision.h"
 #include "System/SceneManager.h"
 
+#ifdef min
+#undef min
+#endif // min
+
+#ifdef max
+#undef max
+#endif // max
+
 using namespace DirectX;
 
 namespace
@@ -222,6 +230,12 @@ RailShoot::RailShoot()
 	camera->setEye(XMFLOAT3(0, WinAPI::getInstance()->getWindowSize().y * 0.06f, -180.f));	// 視点座標
 	camera->setTarget(XMFLOAT3(0, 0, 0));	// 注視点座標
 	camera->setUp(XMFLOAT3(0, 1, 0));		// 上方向
+	//camera->setEye2TargetLen(50.f);
+	{
+		/*XMFLOAT3 rota = camera->getRelativeRotaDeg();
+		camera->setRelativeRotaDeg(rota);*/
+		camera->setFogAngleYRad(XM_PI / 6.f);
+	}
 
 	// --------------------
 	// ライト初期化
@@ -533,6 +547,13 @@ void RailShoot::update_appearPlayer()
 	player->setScaleF3(lerp(appearPlayer->playerScale.start,
 							appearPlayer->playerScale.end,
 							raito));
+
+	// 1->0->1と進む
+	const float fogRaito = 2.f * (std::max(raito, 0.5f) - std::min(raito, 0.5f));
+
+	camera->setFogAngleYRad(std::lerp(appearPlayer->camFogRad.start,
+									  appearPlayer->camFogRad.end,
+									  std::pow(fogRaito, 0.5f)));
 }
 
 void RailShoot::update_play()
@@ -791,7 +812,12 @@ void RailShoot::startAppearPlayer()
 			{
 				.start = XMFLOAT3(0,0,0),
 				.end = player->getScaleF3()
-			}
+			},
+		.camFogRad =
+		{
+			.start = XM_PI / 9.f,
+			.end = XM_PI / 3.f
+}
 		}
 	);
 
@@ -818,6 +844,9 @@ void RailShoot::endAppearPlayer()
 
 	// 自機に追従する
 	camera->setParentObj(player.get());
+
+
+	camera->setFogAngleYRad(appearPlayer->camFogRad.end);
 
 	// 操作説明を表示
 	for (auto& i : operInst)

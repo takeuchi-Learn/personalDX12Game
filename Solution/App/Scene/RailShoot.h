@@ -173,6 +173,7 @@ class RailShoot
 		const Timer::timeType appearTime;
 		std::unique_ptr<Timer> timer;
 		startEnd<DirectX::XMFLOAT3> playerScale;
+		startEnd<float> camFogRad;
 	};
 
 	inline const static DirectX::XMFLOAT3 appearPPosEnd = DirectX::XMFLOAT3(0, 12, 0);
