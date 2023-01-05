@@ -230,12 +230,7 @@ RailShoot::RailShoot()
 	camera->setEye(XMFLOAT3(0, WinAPI::getInstance()->getWindowSize().y * 0.06f, -180.f));	// 視点座標
 	camera->setTarget(XMFLOAT3(0, 0, 0));	// 注視点座標
 	camera->setUp(XMFLOAT3(0, 1, 0));		// 上方向
-	//camera->setEye2TargetLen(50.f);
-	{
-		/*XMFLOAT3 rota = camera->getRelativeRotaDeg();
-		camera->setRelativeRotaDeg(rota);*/
-		camera->setFogAngleYRad(XM_PI / 6.f);
-	}
+	camera->setFogAngleYRad(camFogEnd);	// フォグ
 
 	// --------------------
 	// ライト初期化
@@ -551,6 +546,7 @@ void RailShoot::update_appearPlayer()
 	// 1->0->1と進む
 	const float fogRaito = 2.f * (std::max(raito, 0.5f) - std::min(raito, 0.5f));
 
+	// フォグを変更
 	camera->setFogAngleYRad(std::lerp(appearPlayer->camFogRad.start,
 									  appearPlayer->camFogRad.end,
 									  std::pow(fogRaito, 0.5f)));
@@ -815,8 +811,8 @@ void RailShoot::startAppearPlayer()
 			},
 		.camFogRad =
 		{
-			.start = XM_PI / 9.f,
-			.end = XM_PI / 3.f
+			.start = camFogStart,
+			.end = camFogEnd
 }
 		}
 	);
@@ -845,7 +841,7 @@ void RailShoot::endAppearPlayer()
 	// 自機に追従する
 	camera->setParentObj(player.get());
 
-
+	// フォグの設定
 	camera->setFogAngleYRad(appearPlayer->camFogRad.end);
 
 	// 操作説明を表示

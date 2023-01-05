@@ -176,6 +176,9 @@ class RailShoot
 		startEnd<float> camFogRad;
 	};
 
+	inline static constexpr float camFogStart = DirectX::XM_PI / 9.f;
+	inline static constexpr float camFogEnd = DirectX::XM_PI / 3.f;
+
 	inline const static DirectX::XMFLOAT3 appearPPosEnd = DirectX::XMFLOAT3(0, 12, 0);
 	inline const static DirectX::XMFLOAT3 appearPPosStart = DirectX::XMFLOAT3(appearPPosEnd.x,
 																			  appearPPosEnd.y,
