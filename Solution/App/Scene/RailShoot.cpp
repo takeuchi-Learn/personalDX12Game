@@ -230,7 +230,7 @@ RailShoot::RailShoot()
 	camera->setEye(XMFLOAT3(0, WinAPI::getInstance()->getWindowSize().y * 0.06f, -180.f));	// 視点座標
 	camera->setTarget(XMFLOAT3(0, 0, 0));	// 注視点座標
 	camera->setUp(XMFLOAT3(0, 1, 0));		// 上方向
-	camera->setFogAngleYRad(camFogEnd);	// フォグ
+	camera->setFogAngleYRad(camFogEnd);		// フォグ
 
 	// --------------------
 	// ライト初期化
@@ -838,8 +838,8 @@ void RailShoot::endAppearPlayer()
 	// 自機の大きさを戻す
 	player->setScaleF3(appearPlayer->playerScale.end);
 
-	// 自機に追従する
-	camera->setParentObj(player.get());
+	// レールに追従する
+	camera->setParentObj(railObj.get());
 
 	// フォグの設定
 	camera->setFogAngleYRad(appearPlayer->camFogRad.end);
@@ -908,7 +908,11 @@ void RailShoot::movePlayer()
 
 	if (hitW || hitA || hitS || hitD)
 	{
-		const float moveSpeed = 90.f / dxBase->getFPS();
+		float moveSpeed = 90.f / dxBase->getFPS();
+		if (input->hitKey(DIK_LSHIFT))
+		{
+			moveSpeed *= 2.f;
+		}
 
 		// 横移動
 		if (hitD && player->getPos().x < 110.f)
