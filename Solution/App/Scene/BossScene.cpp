@@ -199,7 +199,7 @@ void BossScene::update_play()
 
 	if (Input::getInstance()->hitKey(DIK_SPACE))
 	{
-		startKillBoss();
+		update_proc = std::bind(&BossScene::update_end, this);
 	}
 
 #endif // _DEBUG
@@ -388,6 +388,9 @@ void BossScene::update_end()
 
 void BossScene::startAppearBoss()
 {
+	// 照準は非表示
+	aim2D->isInvisible = true;
+
 	// カメラの情報を取っておく
 	camParam =
 		std::make_unique<CameraParam>(
@@ -425,6 +428,9 @@ void BossScene::startAppearBoss()
 
 void BossScene::endAppearBoss()
 {
+	// 照準を表示
+	aim2D->isInvisible = false;
+
 	// ボス行動開始
 	for (auto& i : attackableEnemy)
 	{
@@ -445,6 +451,9 @@ void BossScene::endAppearBoss()
 
 void BossScene::startKillBoss()
 {
+	// 照準は消す
+	aim2D->isInvisible = true;
+
 	// ボスの体力は消す
 	bossHpGr->isInvisible = true;
 
