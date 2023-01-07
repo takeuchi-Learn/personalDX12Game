@@ -27,6 +27,26 @@ namespace
 						r.y + l.y,
 						r.z + l.z);
 	}
+	inline XMFLOAT3 operator-(const XMFLOAT3& r, const XMFLOAT3& l)
+	{
+		return XMFLOAT3(r.x - l.x,
+						r.y - l.y,
+						r.z - l.z);
+	}
+
+	void operator+=(XMFLOAT3& lhs, const XMFLOAT3& rhs)
+	{
+		lhs.x += rhs.x;
+		lhs.y += rhs.y;
+		lhs.z += rhs.z;
+	}
+
+	void operator-=(XMFLOAT3& lhs, const XMFLOAT3& rhs)
+	{
+		lhs.x -= rhs.x;
+		lhs.y -= rhs.y;
+		lhs.z -= rhs.z;
+	}
 
 	constexpr XMFLOAT3 lerp(const XMFLOAT3& r, const XMFLOAT3& l, float t)
 	{
@@ -276,24 +296,26 @@ RailShoot::RailShoot()
 	{
 		// モデルを読み込む
 		constexpr UINT wallModelTexNum = 0u;
-		wallModel.reset(new ObjModel("Resources/laneWall", "laneWall", wallModelTexNum, false));
+		wallModel.reset(new ObjModel("Resources/ring", "ring", wallModelTexNum, false));
 
 		// 制御点の数だけオブジェクトを置く
 		const size_t splinePointNum = splinePoint.size() - 2u;
-		const size_t wallNum = splinePointNum * 2u;
+		const size_t wallNum = splinePointNum;
 		laneWall.resize(wallNum);
 
 		XMFLOAT3 dest{};
+		XMFLOAT3 preLanePos{};
 		for (UINT y = 0u; y < wallNum; ++y)
 		{
 			laneWall[y].first.reset(new Object3d(camera.get(), wallModel.get(), wallModelTexNum));
-			laneWall[y].second.reset(new Object3d(camera.get(), wallModel.get(), wallModelTexNum));
+			laneWall[y].second.reset(new Object3d(camera.get(), nullptr, wallModelTexNum));
+			// todo 別の壁オブジェクトも用意し、左右に配置する
 
 			// --------------------
 			// オブジェクトの大きさを変更
 			// --------------------
-			constexpr float scale = 16.f;
-			laneWall[y].first->scale = XMFLOAT3(scale, scale * 32.f, scale);
+			constexpr float scale = 96.f;
+			laneWall[y].first->scale = XMFLOAT3(scale, scale, scale);
 			laneWall[y].second->scale = laneWall[y].first->scale;
 
 			// --------------------
@@ -310,6 +332,12 @@ RailShoot::RailShoot()
 			float startIndex = 0.f;
 			startIndexRaito = std::modf(startIndexRaito, &startIndex);
 
+			// 前の点の位置を取っておく
+			if (y > 0u)
+			{
+				preLanePos = dest;
+			}
+
 			// スプライン補間でレーンの位置を求める
 			XMStoreFloat3(&dest, splinePosition(splinePoint, (size_t)startIndex, startIndexRaito));
 			laneWall[y].first->position = dest;
@@ -318,12 +346,32 @@ RailShoot::RailShoot()
 			// --------------------
 			// レーンの左右に配置する
 			// --------------------
-			constexpr float laneR = 128.f;
-			laneWall[y].first->position.x += laneR;
-			laneWall[y].second->position.x -= laneWall[y].first->position.x;
+			constexpr float laneR = 192.f;
 
+			// 右方向を取得
+			XMFLOAT2 velRota = GameObj::calcRotationSyncVelRad(dest - preLanePos);
+			const XMVECTOR rightVec = XMVector3Rotate(XMVectorSet(laneR, 0, 0, 0),
+													  XMQuaternionRotationRollPitchYaw(velRota.x,
+																					   velRota.y,
+																					   0.f));
+			// XMFLOAT3にする
+			XMFLOAT3 right{};
+			XMStoreFloat3(&right, rightVec);
+
+			//// 左右にずらす
+			//laneWall[y].first->position += right;
+			//laneWall[y].second->position -= right;
+
+			// 色を変更
 			laneWall[y].first->color = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.f);
 			laneWall[y].second->color = laneWall[y].first->color;
+
+			// 度数法に変換
+			velRota.x = XMConvertToDegrees(velRota.x);
+			velRota.y = XMConvertToDegrees(velRota.y);
+			// 回転を反映
+			laneWall[y].first->rotation = XMFLOAT3(velRota.x, velRota.y, 0);
+			laneWall[y].second->rotation = laneWall[y].first->rotation;
 		}
 	}
 
@@ -880,20 +928,26 @@ void RailShoot::updateRailPos()
 	// 位置を反映
 	railObj->setPos(pos);
 
-	// 移動速度を算出
-	const XMFLOAT3 vel = XMFLOAT3(pos.x - prePos.x,
-								  pos.y - prePos.y,
-								  pos.z - prePos.z);
+	if (pos.x != prePos.x ||
+		pos.y != prePos.y ||
+		pos.z != prePos.z)
+	{
+		// 移動速度を算出
+		const XMFLOAT3 vel = XMFLOAT3(pos.x - prePos.x,
+									  pos.y - prePos.y,
+									  pos.z - prePos.z);
 
-	// 移動方向への回転角
-	XMFLOAT2 rota = GameObj::calcRotationSyncVelDeg(vel);
+		// 移動方向への回転角
+		XMFLOAT2 rota = GameObj::calcRotationSyncVelDeg(vel);
 
-	// 異常な値は0にする
-	if (!isfinite(rota.x)) { rota.x = 0.f; }
-	if (!isfinite(rota.y)) { rota.y = 0.f; }
+		// 異常な値は0にする
+		if (!isfinite(rota.x)) { rota.x = 0.f; }
+		if (!isfinite(rota.y)) { rota.y = 0.f; }
 
-	// 回転を反映
-	railObj->setRotation(XMFLOAT3(rota.x, rota.y, railObj->getRotation().z));
+		// 回転を反映
+		railObj->setRotation(XMFLOAT3(rota.x, rota.y, railObj->getRotation().z));
+
+	}
 }
 
 // --------------------
