@@ -174,7 +174,7 @@ void ParticleMgr::draw()
 	}
 
 	// パイプラインステートの設定
-	dxBase->getCmdList()->SetPipelineState(pipelinestate.Get());
+	dxBase->getCmdList()->SetPipelineState(pipelinestate[nowBlendMode].Get());
 	// ルートシグネチャの設定
 	dxBase->getCmdList()->SetGraphicsRootSignature(rootsignature.Get());
 	// プリミティブ形状を設定
@@ -344,6 +344,36 @@ void ParticleMgr::InitializeGraphicsPipeline()
 		},
 	};
 
+#pragma region ブレンド設定
+
+	// レンダーターゲットのブレンド設定
+	D3D12_RENDER_TARGET_BLEND_DESC blenddesc{};
+	blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;	// RBGA全てのチャンネルを描画
+	blenddesc.BlendEnable = true;
+
+#pragma region ブレンドステート
+
+	//半透明合成
+	/*blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
+	blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;*/
+	//加算
+	blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
+	blenddesc.SrcBlend = D3D12_BLEND_ONE;
+	blenddesc.DestBlend = D3D12_BLEND_ONE;
+	////減算
+	//blenddesc.BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;
+	//blenddesc.SrcBlend = D3D12_BLEND_ONE;
+	//blenddesc.DestBlend = D3D12_BLEND_ONE;
+
+#pragma endregion ブレンドステート
+
+	blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;
+	blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;
+
+#pragma endregion ブレンド設定
+
 	// グラフィックスパイプラインの流れを設定
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC gpipeline{};
 	gpipeline.VS = CD3DX12_SHADER_BYTECODE(vsBlob.Get());
@@ -360,29 +390,6 @@ void ParticleMgr::InitializeGraphicsPipeline()
 	gpipeline.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	// デプスの書き込みを禁止
 	gpipeline.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
-
-	// レンダーターゲットのブレンド設定
-	D3D12_RENDER_TARGET_BLEND_DESC blenddesc{};
-	blenddesc.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;	// RBGA全てのチャンネルを描画
-	blenddesc.BlendEnable = true;
-#pragma region ブレンドステート
-	//半透明合成
-	/*blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
-	blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
-	blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;*/
-	//加算
-	blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
-	blenddesc.SrcBlend = D3D12_BLEND_ONE;
-	blenddesc.DestBlend = D3D12_BLEND_ONE;
-	////減算
-	//blenddesc.BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;
-	//blenddesc.SrcBlend = D3D12_BLEND_ONE;
-	//blenddesc.DestBlend = D3D12_BLEND_ONE;
-#pragma endregion ブレンドステート
-
-	blenddesc.BlendOpAlpha = D3D12_BLEND_OP_ADD;
-	blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;
-	blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;
 
 	constexpr UINT renderTargetNum = min(PostEffect::renderTargetNum, _countof(gpipeline.BlendState.RenderTarget));
 
@@ -430,6 +437,7 @@ void ParticleMgr::InitializeGraphicsPipeline()
 	ComPtr<ID3DBlob> rootSigBlob;
 	// バージョン自動判定のシリアライズ
 	result = D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &rootSigBlob, &errorBlob);
+	assert(SUCCEEDED(result));
 	// ルートシグネチャの生成
 	result = dxBase->getDev()->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&rootsignature));
 	assert(SUCCEEDED(result));
@@ -437,9 +445,27 @@ void ParticleMgr::InitializeGraphicsPipeline()
 	gpipeline.pRootSignature = rootsignature.Get();
 
 	// グラフィックスパイプラインの生成
-	result = dxBase->getDev()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate));
-
+	result = dxBase->getDev()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate[ADD]));
 	assert(SUCCEEDED(result));
+
+#pragma region 減算合成のパイプライン生成
+
+	// 減算
+	blenddesc.BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;
+	blenddesc.SrcBlend = D3D12_BLEND_ONE;
+	blenddesc.DestBlend = D3D12_BLEND_ONE;
+
+	// ブレンドステートの設定
+	for (UINT i = 0u; i < renderTargetNum; ++i)
+	{
+		gpipeline.BlendState.RenderTarget[i] = blenddesc;
+	}
+
+	result = dxBase->getDev()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelinestate[SUB]));
+	assert(SUCCEEDED(result));
+
+#pragma endregion 減算合成のパイプライン生成
+
 }
 
 void ParticleMgr::LoadTexture(const wchar_t* filePath)

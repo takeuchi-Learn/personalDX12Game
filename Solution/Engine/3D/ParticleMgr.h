@@ -10,6 +10,13 @@
 
 class ParticleMgr
 {
+public:
+	enum ParticleMgr_BLENDMODE : uint8_t
+	{
+		ADD = 0u,
+		SUB = 1u
+	};
+
 private:
 	// エイリアス
    // Microsoft::WRL::を省略
@@ -94,7 +101,7 @@ private:
 	// ルートシグネチャ
 	ComPtr<ID3D12RootSignature> rootsignature;
 	// パイプラインステートオブジェクト
-	ComPtr<ID3D12PipelineState> pipelinestate;
+	ComPtr<ID3D12PipelineState> pipelinestate[2];
 	// デスクリプタヒープ
 	ComPtr<ID3D12DescriptorHeap> descHeap;
 	// 頂点バッファ
@@ -113,8 +120,19 @@ private:
 	std::forward_list<std::unique_ptr<Particle>> particles;
 	Camera* camera = nullptr;
 
+public:
+	/// @brief 現在のブレンドモード
+	ParticleMgr_BLENDMODE nowBlendMode = ParticleMgr_BLENDMODE::ADD;
+
 	// メンバ関数
 public:
+	/// @brief ブレンドモードを切り替え
+	/// @return 切り替え後のブレンドモード
+	inline ParticleMgr_BLENDMODE changeBlendMode() const
+	{
+		nowBlendMode == ADD ? SUB : ADD;
+		return nowBlendMode;
+	}
 
 	// テクスチャは1x1白で初期化
 	ParticleMgr();
