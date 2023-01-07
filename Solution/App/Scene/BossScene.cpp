@@ -307,7 +307,7 @@ void BossScene::update_play()
 					{
 						// 自機の体力が0になったら
 						player->kill();
-						startKillBoss();
+						update_proc = std::bind(&BossScene::update_end, this);
 					} else
 					{
 						startRgbShift();
