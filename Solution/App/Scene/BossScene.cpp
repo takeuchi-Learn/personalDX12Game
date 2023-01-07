@@ -445,6 +445,9 @@ void BossScene::endAppearBoss()
 
 void BossScene::startKillBoss()
 {
+	// ボスの体力は消す
+	bossHpGr->isInvisible = true;
+
 	// カメラの情報を取っておく
 	camParam =
 		std::make_unique<CameraParam>(
