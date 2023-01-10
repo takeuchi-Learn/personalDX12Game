@@ -319,8 +319,8 @@ RailShoot::RailShoot()
 			// --------------------
 			constexpr float scale = 96.f;
 			constexpr XMFLOAT3 scalef3(scale, scale, scale);
-			right->scale = XMFLOAT3(16, 16 * 32, 16);
-			left->scale = XMFLOAT3(16, 16 * 32, 16);
+			right->scale = XMFLOAT3(16, 16 * 16, 16);
+			left->scale = XMFLOAT3(16, 16 * 16, 16);
 			ring->scale = XMFLOAT3(96, 96, 96);
 
 			// --------------------
@@ -348,6 +348,9 @@ RailShoot::RailShoot()
 			right->position = dest;
 			left->position = dest;
 			ring->position = dest;
+
+			right->position.y = 16 * 16;
+			left->position.y = 16 * 16;
 
 			// --------------------
 			// レーンの左右に配置する
