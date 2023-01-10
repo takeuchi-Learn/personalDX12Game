@@ -94,7 +94,8 @@ class RailShoot
 	uint16_t splineIndex = splineIndexDef;
 
 	std::unique_ptr<ObjModel> wallModel;
-	std::vector <std::pair<std::unique_ptr<Object3d>, std::unique_ptr<Object3d>>> laneWall;
+	std::unique_ptr<ObjModel> ringModel;
+	std::vector<std::vector<std::unique_ptr<Object3d>>> laneWall;
 
 	// --------------------
 	// 敵発生関連

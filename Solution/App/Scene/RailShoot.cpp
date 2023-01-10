@@ -296,7 +296,8 @@ RailShoot::RailShoot()
 	{
 		// モデルを読み込む
 		constexpr UINT wallModelTexNum = 0u;
-		wallModel.reset(new ObjModel("Resources/ring", "ring", wallModelTexNum, false));
+		wallModel.reset(new ObjModel("Resources/laneWall", "laneWall", wallModelTexNum, false));
+		ringModel.reset(new ObjModel("Resources/ring", "ring", wallModelTexNum, false));
 
 		// 制御点の数だけオブジェクトを置く
 		const size_t splinePointNum = splinePoint.size() - 2u;
@@ -307,16 +308,20 @@ RailShoot::RailShoot()
 		XMFLOAT3 preLanePos{};
 		for (UINT y = 0u; y < wallNum; ++y)
 		{
-			laneWall[y].first.reset(new Object3d(camera.get(), wallModel.get(), wallModelTexNum));
-			laneWall[y].second.reset(new Object3d(camera.get(), nullptr, wallModelTexNum));
-			// todo 別の壁オブジェクトも用意し、左右に配置する
+			laneWall[y].resize(3);
+
+			auto& right = laneWall[y][0] = std::make_unique<Object3d>(camera.get(), wallModel.get(), wallModelTexNum);
+			auto& left = laneWall[y][1] = std::make_unique<Object3d>(camera.get(), wallModel.get(), wallModelTexNum);
+			auto& ring = laneWall[y][2] = std::make_unique<Object3d>(camera.get(), ringModel.get(), wallModelTexNum);
 
 			// --------------------
 			// オブジェクトの大きさを変更
 			// --------------------
 			constexpr float scale = 96.f;
-			laneWall[y].first->scale = XMFLOAT3(scale, scale, scale);
-			laneWall[y].second->scale = laneWall[y].first->scale;
+			constexpr XMFLOAT3 scalef3(scale, scale, scale);
+			right->scale = XMFLOAT3(16, 16 * 32, 16);
+			left->scale = XMFLOAT3(16, 16 * 32, 16);
+			ring->scale = XMFLOAT3(96, 96, 96);
 
 			// --------------------
 			// レーンの位置にする
@@ -340,8 +345,9 @@ RailShoot::RailShoot()
 
 			// スプライン補間でレーンの位置を求める
 			XMStoreFloat3(&dest, splinePosition(splinePoint, (size_t)startIndex, startIndexRaito));
-			laneWall[y].first->position = dest;
-			laneWall[y].second->position = laneWall[y].first->position;
+			right->position = dest;
+			left->position = dest;
+			ring->position = dest;
 
 			// --------------------
 			// レーンの左右に配置する
@@ -355,23 +361,25 @@ RailShoot::RailShoot()
 																					   velRota.y,
 																					   0.f));
 			// XMFLOAT3にする
-			XMFLOAT3 right{};
-			XMStoreFloat3(&right, rightVec);
+			XMFLOAT3 rightPos{};
+			XMStoreFloat3(&rightPos, rightVec);
 
 			//// 左右にずらす
-			//laneWall[y].first->position += right;
-			//laneWall[y].second->position -= right;
+			right->position += rightPos;
+			left->position -= rightPos;
 
 			// 色を変更
-			laneWall[y].first->color = XMFLOAT4(0.4f, 0.4f, 0.4f, 1.f);
-			laneWall[y].second->color = laneWall[y].first->color;
+			constexpr float colVal = 0.5f;
+			constexpr XMFLOAT4 col = XMFLOAT4(colVal, colVal, colVal, 1.f);
+			right->color = col;
+			left->color = col;
+			ring->color = col;
 
 			// 度数法に変換
 			velRota.x = XMConvertToDegrees(velRota.x);
 			velRota.y = XMConvertToDegrees(velRota.y);
 			// 回転を反映
-			laneWall[y].first->rotation = XMFLOAT3(velRota.x, velRota.y, 0);
-			laneWall[y].second->rotation = laneWall[y].first->rotation;
+			ring->rotation = XMFLOAT3(velRota.x, velRota.y, 0);
 		}
 	}
 
@@ -906,14 +914,14 @@ void RailShoot::updateRailPos()
 	float raito = float(splineNowFrame++) / float(splineFrameMax);
 	if (raito >= 1.f)
 	{
-		if (splineIndex < splinePoint.size() - 3u)
+		if (splineIndex >= splinePoint.size() - 3u)
+		{
+			raito = 1.f;
+		} else
 		{
 			++splineIndex;
 			raito -= 1.f;
 			splineNowFrame = 0u;
-		} else
-		{
-			raito = 1.f;
 		}
 	}
 	// 更新前の位置を記憶
@@ -946,7 +954,6 @@ void RailShoot::updateRailPos()
 
 		// 回転を反映
 		railObj->setRotation(XMFLOAT3(rota.x, rota.y, railObj->getRotation().z));
-
 	}
 }
 
@@ -1099,8 +1106,10 @@ void RailShoot::drawObj3d()
 
 	for (auto& y : laneWall)
 	{
-		y.first->drawWithUpdate(DX12Base::ins(), light.get());
-		y.second->drawWithUpdate(DX12Base::ins(), light.get());
+		for (auto& x : y)
+		{
+			x->drawWithUpdate(DX12Base::ins(), light.get());
+		}
 	}
 
 	particleMgr->drawWithUpdate();

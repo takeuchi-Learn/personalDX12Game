@@ -465,7 +465,6 @@ void ParticleMgr::InitializeGraphicsPipeline()
 	assert(SUCCEEDED(result));
 
 #pragma endregion 減算合成のパイプライン生成
-
 }
 
 void ParticleMgr::LoadTexture(const wchar_t* filePath)
