@@ -102,7 +102,6 @@ void BossScene::initBoss()
 	boss->setRotation(XMFLOAT3(0, 180.f, 0));
 	boss->setTargetObj(player.get());
 	boss->setSmallEnemyModel(bossModel.get());
-	boss->changePhase_approach();
 	boss->getObj()->color = XMFLOAT4(4, 4, 4, 1);
 
 	// 腰

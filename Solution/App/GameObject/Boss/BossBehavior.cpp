@@ -1,4 +1,5 @@
 ﻿#include "BossBehavior.h"
+#include <GameObject/Boss/BossEnemy.h>
 #include <DirectXMath.h>
 
 using namespace DirectX;
@@ -37,8 +38,8 @@ NODE_RESULT BossBehavior::phase_leave()
 	{
 		// ここで遠距離攻撃を開始(攻撃関数へ遷移)
 		phase = PHASE::ATTACK;
-		boss->nowShotFrame = boss->shotInterval;
-		boss->shotNum = 0u;
+		nowShotFrame = shotInterval;
+		shotNum = 0u;
 		return NODE_RESULT::SUCCESS;;
 	}
 
@@ -53,14 +54,17 @@ NODE_RESULT BossBehavior::phase_attack()
 	// 違うフェーズなら実行しない
 	if (phase != PHASE::ATTACK) { return NODE_RESULT::FAIL; }
 
-	if (boss->nowShotFrame++ >= boss->shotInterval)
+	if (nowShotFrame++ >= shotInterval)
 	{
-		boss->addSmallEnemy();
-		boss->nowShotFrame = 0u;
-
-		if (boss->shotNum++ >= boss->shotNumMax)
+		for (uint32_t i = 0; i < shoEnemyNum; ++i)
 		{
-			boss->shotNum = 0;
+			boss->addSmallEnemy();
+		}
+		nowShotFrame = 0u;
+
+		if (shotNum++ >= shotNumMax)
+		{
+			shotNum = 0;
 			phase = PHASE::APPROACH;
 		}
 	}

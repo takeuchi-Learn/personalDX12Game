@@ -47,57 +47,16 @@ void BossEnemy::additionalDraw(Light* light)
 	}
 }
 
-void BossEnemy::phase_approach()
+BossEnemy::BossEnemy(Camera* camera,
+					 ObjModel* model,
+					 const DirectX::XMFLOAT3& pos,
+					 uint16_t hp) : BaseEnemy(camera,
+											  model,
+											  pos,
+											  hp),
+	bossBehavior(std::make_unique<BossBehavior>(this))
 {
-	XMVECTOR velVec = calcVelVec(this);
-
-	// 一定距離より近ければ遠ざかる
-	if (XMVectorGetX(XMVector3Length(velVec)) < getScale())
-	{
-		// todo ここで近接攻撃を開始(攻撃関数へ遷移)
-		addSmallEnemy();
-		setPhase(std::bind(&BossEnemy::phase_leave, this));
-		return;
-	}
-
-	// 大きさを反映
-	moveAndRota(moveSpeed, velVec);
-}
-
-void BossEnemy::phase_leave()
-{
-	XMVECTOR velVec = calcVelVec(this);
-
-	// 一定距離より遠ければ近づく
-	if (XMVectorGetX(XMVector3Length(velVec)) > getScaleF3().x * 5.f)
-	{
-		// ここで遠距離攻撃を開始(攻撃関数へ遷移)
-		setPhase(std::bind(&BossEnemy::phase_attack, this));
-		nowShotFrame = shotInterval;
-		shotNum = 0u;
-		return;
-	}
-
-	// 大きさを反映
-	moveAndRota(moveSpeed, -velVec);
-}
-
-void BossEnemy::phase_attack()
-{
-	if (nowShotFrame++ >= shotInterval)
-	{
-		for (uint32_t i = 0; i < shoEnemyNum; ++i)
-		{
-			addSmallEnemy();
-		}
-		nowShotFrame = 0u;
-
-		if (shotNum++ >= shotNumMax)
-		{
-			shotNum = 0;
-			setPhase(std::bind(&BossEnemy::phase_approach, this));
-		}
-	}
+	setPhase([&] { return bossBehavior->run(); });
 }
 
 // 弾関係

@@ -8,7 +8,6 @@
 #include <BehaviorTree/Selector.h>
 #include <BehaviorTree/Sequencer.h>
 #include <memory>
-#include <GameObject/Boss/BossEnemy.h>
 
 class BossEnemy;
 
@@ -34,6 +33,16 @@ private:
 	std::unique_ptr<Selector> rootNode;
 
 	PHASE phase;
+
+#pragma region 弾発射関係
+
+	static inline constexpr uint32_t shotInterval = 30u;
+	uint32_t nowShotFrame = 0u;
+	static inline constexpr uint32_t shotNumMax = 15u;
+	uint32_t shotNum = 0u;
+	static inline constexpr uint32_t shoEnemyNum = 5;
+
+#pragma endregion 弾発射関係
 
 private:
 	// ---------------

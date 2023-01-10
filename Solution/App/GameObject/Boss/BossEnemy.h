@@ -14,6 +14,8 @@ class BossEnemy :
 {
 	friend class BossBehavior;
 
+	std::unique_ptr<BossBehavior> bossBehavior;
+
 	// 攻撃対象へのポインタ
 	GameObj* targetObj = nullptr;
 
@@ -28,7 +30,10 @@ class BossEnemy :
 	void additionalDraw(Light* light) override;
 
 public:
-	using BaseEnemy::BaseEnemy;
+	BossEnemy(Camera* camera,
+			  ObjModel* model,
+			  const DirectX::XMFLOAT3& pos = { 0,0,0 },
+			  uint16_t hp = 1ui16);
 
 	/// @brief 攻撃対象を設定
 	/// @param obj 攻撃対象オブジェクトのポインタ
@@ -37,25 +42,12 @@ public:
 	/// @return 攻撃対象のポインタ
 	inline GameObj* getTargetObj() { return targetObj; }
 
-	void phase_approach();
-	inline void changePhase_approach() { setPhase(std::bind(&BossEnemy::phase_approach, this)); }
-
-	void phase_leave();
-
-	void phase_attack();
-
 #pragma region 弾関係
 
 private:
 	ObjModel* smallEnemyModel = nullptr;
 	std::forward_list<std::unique_ptr<BaseEnemy>> smallEnemy;
 	float smallEnemyMoveSpeed = 2.f;
-
-	static inline const uint32_t shotInterval = 30u;
-	uint32_t nowShotFrame = 0u;
-	static inline const uint32_t shotNumMax = 15u;
-	uint32_t shotNum = 0u;
-	static inline const uint32_t shoEnemyNum = 5;
 
 public:
 	/// @brief 小さい敵を弾として出す
