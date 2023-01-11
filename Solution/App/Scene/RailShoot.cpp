@@ -996,12 +996,12 @@ void RailShoot::movePlayer()
 	bool keyInput = false;
 	bool padInput = false;
 
-#pragma region キーボード
+#pragma region 四方向入力キーボードとパッド十字ボタン
 
-	const bool hitW = input->hitKey(DIK_W);
-	const bool hitA = input->hitKey(DIK_A);
-	const bool hitS = input->hitKey(DIK_S);
-	const bool hitD = input->hitKey(DIK_D);
+	const bool hitW = input->hitKey(DIK_W) || input->hitKey(DIK_UP) || input->getPadButton(Input::PAD::UP);
+	const bool hitA = input->hitKey(DIK_A) || input->hitKey(DIK_LEFT) || input->getPadButton(Input::PAD::LEFT);
+	const bool hitS = input->hitKey(DIK_S) || input->hitKey(DIK_DOWN) || input->getPadButton(Input::PAD::DOWN);
+	const bool hitD = input->hitKey(DIK_D) || input->hitKey(DIK_RIGHT) || input->getPadButton(Input::PAD::RIGHT);
 	if (hitW || hitA || hitS || hitD)
 	{
 		keyInput = true;
@@ -1025,7 +1025,7 @@ void RailShoot::movePlayer()
 		}
 	}
 
-#pragma endregion キーボード
+#pragma endregion 四方向入力キーボードとパッド十字ボタン
 
 #pragma region パッド
 

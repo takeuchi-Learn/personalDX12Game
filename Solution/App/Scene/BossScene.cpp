@@ -724,26 +724,37 @@ void BossScene::movePlayer()
 		camera->setRelativeRotaDeg(camRrota);
 	}
 
-	// パッドの入力
+	// パッドの入力値
 	XMFLOAT2 inputVal = input->getPadLStickRaito();
 
+#pragma region 四方向入力キーボードとパッド十字ボタン
+
 	// 移動
-	if (input->hitKey(DIK_W))
 	{
-		inputVal.y = 1.f;
-	} else if (input->hitKey(DIK_S))
-	{
-		inputVal.y = -1.f;
+		const bool hitW = input->hitKey(DIK_W) || input->hitKey(DIK_UP) || input->getPadButton(Input::PAD::UP);
+		const bool hitA = input->hitKey(DIK_A) || input->hitKey(DIK_LEFT) || input->getPadButton(Input::PAD::LEFT);
+		const bool hitS = input->hitKey(DIK_S) || input->hitKey(DIK_DOWN) || input->getPadButton(Input::PAD::DOWN);
+		const bool hitD = input->hitKey(DIK_D) || input->hitKey(DIK_RIGHT) || input->getPadButton(Input::PAD::RIGHT);
+
+		if (hitW)
+		{
+			inputVal.y = 1.f;
+		} else if (hitS)
+		{
+			inputVal.y = -1.f;
+		}
+
+		// 回転
+		if (hitA)
+		{
+			inputVal.x = -1.f;
+		} else if (hitD)
+		{
+			inputVal.x = 1.f;
+		}
 	}
 
-	// 回転
-	if (input->hitKey(DIK_A))
-	{
-		inputVal.x = -1.f;
-	} else if (input->hitKey(DIK_D))
-	{
-		inputVal.x = 1.f;
-	}
+#pragma endregion 四方向入力キーボードとパッド十字ボタン
 
 	// ゆっくりかどうか
 	const bool slowFlag =
