@@ -17,9 +17,7 @@ Input::~Input()
 
 void Input::init()
 {
-	HRESULT result;
-
-	result = DirectInput8Create(
+	HRESULT result = DirectInput8Create(
 		WinAPI::getInstance()->getW().hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&dinput, nullptr);
 
 	result = dinput->CreateDevice(GUID_SysKeyboard, &devkeyboard, NULL);
@@ -34,6 +32,9 @@ void Input::init()
 	result = devmouse->SetDataFormat(&c_dfDIMouse2); // 標準形式
 
 	result = devmouse->SetCooperativeLevel(WinAPI::getInstance()->getHwnd(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE | DISCL_NOWINKEY);
+
+	// PAD
+	initPad(padNum);
 }
 
 void Input::update()
@@ -49,6 +50,8 @@ void Input::update()
 
 	GetCursorPos(&mousePos);
 	ScreenToClient(WinAPI::getInstance()->getHwnd(), &mousePos);
+
+	updatePad(padNum);
 }
 
 void Input::resetState()
@@ -57,20 +60,13 @@ void Input::resetState()
 	{
 		key[i] = 0;
 		preKey[i] = 0;
-
-		mouseState = DIMOUSESTATE2();
-		preMouseState = DIMOUSESTATE2();
 	}
-}
 
-Input::MouseMove Input::getMouseMove()
-{
-	MouseMove ret{
-		.x = mouseState.lX,
-		.y = mouseState.lY,
-		.wheel = mouseState.lZ
-	};
-	return ret;
+	mouseState = DIMOUSESTATE2();
+	preMouseState = DIMOUSESTATE2();
+
+	ZeroMemory(&state, sizeof(XINPUT_STATE));
+	ZeroMemory(&preState, sizeof(XINPUT_STATE));
 }
 
 bool Input::setMousePos(int x, int y)
@@ -84,4 +80,66 @@ bool Input::setMousePos(int x, int y)
 void Input::changeDispMouseCursorFlag(const bool dispFlag)
 {
 	ShowCursor((BOOL)dispFlag);
+}
+
+bool Input::initPad(DWORD padIndex)
+{
+	ZeroMemory(&state, sizeof(XINPUT_STATE));
+	DWORD dwResult = XInputGetState(0, &state);
+
+	return ERROR_SUCCESS == dwResult;
+}
+
+void Input::updatePad(DWORD padIndex)
+{
+	preState = state;
+
+	initPad(padIndex);
+
+	// 無効な入力は0にする
+	if ((state.Gamepad.sThumbLX < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
+		 state.Gamepad.sThumbLX > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE) &&
+		(state.Gamepad.sThumbLY < XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE &&
+		 state.Gamepad.sThumbLY > -XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE))
+	{
+		state.Gamepad.sThumbLX = 0;
+		state.Gamepad.sThumbLY = 0;
+	}
+	if ((state.Gamepad.sThumbRX < XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE &&
+		 state.Gamepad.sThumbRX > -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE) &&
+		(state.Gamepad.sThumbRY < XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE &&
+		 state.Gamepad.sThumbRY > -XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE))
+	{
+		state.Gamepad.sThumbRX = 0;
+		state.Gamepad.sThumbRY = 0;
+	}
+
+	// 左スティックの入力を方向パッドに変換
+	state.Gamepad.wButtons |=
+		padThumbToDPad(state.Gamepad.sThumbLX,
+					   state.Gamepad.sThumbLY,
+					   XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE);
+}
+
+WORD Input::padThumbToDPad(SHORT sThumbX, SHORT sThumbY, SHORT sDeadZone)
+{
+	WORD wButtons = 0;
+
+	if (sThumbY >= sDeadZone)
+	{
+		wButtons |= XINPUT_GAMEPAD_DPAD_UP;
+	} else if (sThumbY <= -sDeadZone)
+	{
+		wButtons |= XINPUT_GAMEPAD_DPAD_DOWN;
+	}
+
+	if (sThumbX <= -sDeadZone)
+	{
+		wButtons |= XINPUT_GAMEPAD_DPAD_LEFT;
+	} else if (sThumbX >= sDeadZone)
+	{
+		wButtons |= XINPUT_GAMEPAD_DPAD_RIGHT;
+	}
+
+	return wButtons;
 }
