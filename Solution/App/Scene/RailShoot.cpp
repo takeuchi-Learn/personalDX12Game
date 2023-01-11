@@ -268,6 +268,27 @@ RailShoot::RailShoot()
 	player->setHp(playerHpMax);
 
 	// --------------------
+	// 背景と地面
+	// --------------------
+
+	// 背景の天球
+	{
+		const float backScale = camera->getFarZ() * 0.9f;
+		back->setScale({ backScale, backScale, backScale });
+	}
+
+	// 地面
+	{
+		constexpr UINT groundSize = 5000u;
+		ground->setPos(XMFLOAT3(0, -player->getScale() * 3.f, (float)groundSize));
+
+		ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
+
+		constexpr float tillingNum = groundSize / 32.f;
+		ground->getModelPt()->setTexTilling(XMFLOAT2(tillingNum, tillingNum));
+	}
+
+	// --------------------
 	// スプライン
 	// --------------------
 
@@ -350,8 +371,8 @@ RailShoot::RailShoot()
 			left->position = dest;
 			ring->position = dest;
 
-			right->position.y = 16 * 16;
-			left->position.y = 16 * 16;
+			right->position.y = ground->getPos().y + 16 * 16;
+			left->position.y = ground->getPos().y + 16 * 16;
 
 			// --------------------
 			// レーンの左右に配置する
@@ -407,27 +428,6 @@ RailShoot::RailShoot()
 														std::stof(y[2])),
 											   XMFLOAT3(0, 0, -1)));
 		}
-	}
-
-	// --------------------
-	// 背景と地面
-	// --------------------
-
-	// 背景の天球
-	{
-		const float backScale = camera->getFarZ() * 0.9f;
-		back->setScale({ backScale, backScale, backScale });
-	}
-
-	// 地面
-	{
-		constexpr UINT groundSize = 5000u;
-		ground->setPos(XMFLOAT3(0, -player->getScale(), (float)groundSize));
-
-		ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
-
-		constexpr float tillingNum = groundSize / 32.f;
-		ground->getModelPt()->setTexTilling(XMFLOAT2(tillingNum, tillingNum));
 	}
 }
 
