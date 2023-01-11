@@ -810,7 +810,7 @@ void BossScene::drawFrontSprite()
 
 	ImGui::Begin("ボス戦", nullptr, winFlags);
 	ImGui::PushFont(dxBase->getBigImFont());
-	ImGui::Text("腰を狙え!");
+	ImGui::Text("イボを撃ち潰せ！");
 	ImGui::PopFont();
 	ImGui::Text("ボスの弾は迎撃せよ！");
 	ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x,
