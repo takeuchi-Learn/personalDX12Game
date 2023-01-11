@@ -69,8 +69,8 @@ void TitleScene::update_normal()
 	titleLogo->position.y = logoMoveRange * std::sin((float)timer->getNowTime() / Timer::oneSecF);
 
 	if (input->triggerKey(DIK_SPACE) ||
-		input->getPadButton(Input::PAD::A) ||
-		input->getPadButton(Input::PAD::B))
+		input->triggerPadButton(Input::PAD::A) ||
+		input->triggerPadButton(Input::PAD::B))
 	{
 		update_proc = std::bind(&TitleScene::update_end, this);
 		Sound::SoundPlayWave(shortBridge.get());
