@@ -445,6 +445,15 @@ void RailShoot::start()
 
 void RailShoot::update()
 {
+#ifdef _DEBUG
+
+	if (input->hitKey(DIK_LSHIFT) && input->hitKey(DIK_SPACE))
+	{
+		changeNextScene();
+	}
+
+#endif // _DEBUG
+
 	rotationBack();
 
 	// 背景オブジェクトの中心をカメラにする
@@ -613,15 +622,6 @@ void RailShoot::update_appearPlayer()
 
 void RailShoot::update_play()
 {
-#ifdef _DEBUG
-
-	if (input->hitKey(DIK_LSHIFT) && input->hitKey(DIK_SPACE))
-	{
-		changeNextScene();
-	}
-
-#endif // _DEBUG
-
 	{
 		// マウスカーソルの位置をパッド入力に合わせてずらす
 		POINT pos = input->getMousePos();

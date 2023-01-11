@@ -76,7 +76,7 @@ void BossScene::initPlayer()
 	player->setScale(10.f);
 	player->setHp(playerHpMax);
 
-	player->setBulLife(300ui16);
+	player->setBulLife(600ui16);
 
 	sceneChangeStartPos = XMFLOAT3(0.f, 500.f, 0.f);
 	sceneChangeEndPos = XMFLOAT3(0.f, 0.f, 0.f);
@@ -94,22 +94,79 @@ void BossScene::initEnemy()
 
 void BossScene::initBoss()
 {
-	attackableEnemy.emplace_front(boss.get());
-	bossHpMax = 128u;
-	boss->setHp(bossHpMax);
 	boss->setScale(100.f);
 	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 300));
 	boss->setRotation(XMFLOAT3(0, 180.f, 0));
 	boss->setTargetObj(player.get());
 	boss->setSmallEnemyModel(bossModel.get());
 	boss->getObj()->color = XMFLOAT4(4, 4, 4, 1);
+	boss->setAlive(false);
 
-	// 腰
-	koshiModel = std::make_unique<ObjModel>("Resources/koshi", "koshi", 0U, false);
-	koshi = std::make_unique<Object3d>(camera.get(), koshiModel.get(), 0U);
-	koshi->parent = boss->getObj();
-	constexpr float scale = 0.25f;
-	koshi->scale = XMFLOAT3(scale, scale, scale);
+	// ボスのパーツ
+	bossPartsModel = std::make_unique<ObjModel>("Resources/koshi", "koshi", 0U, false);
+	bossParts.resize(8);
+	for (auto& i : bossParts)
+	{
+		i = std::make_unique<BaseEnemy>(camera.get(), bossPartsModel.get());
+
+		// ボス本体を親とする
+		i->setParent(boss->getObj());
+
+		// 大きさを変更
+		constexpr float scale = 0.1f;
+		i->setScale(scale);
+
+		// 体力を設定
+		constexpr uint16_t hp = 10ui16;
+		i->setHp(hp);
+		bossHpMax += hp;
+
+		// 攻撃可能な敵リストに追加
+		attackableEnemy.emplace_front(i.get());
+	}
+	XMFLOAT3 pos{};
+
+	// 肩
+	pos = bossParts[1]->getPos();
+	pos.x += 0.25f;
+	pos.y += 0.5f;
+	bossParts[1]->setPos(pos);
+
+	pos = bossParts[2]->getPos();
+	pos.x -= 0.25f;
+	pos.y += 0.5f;
+	bossParts[2]->setPos(pos);
+
+	// 足
+	pos = bossParts[3]->getPos();
+	pos.x += 0.25f;
+	pos.y -= 0.75f;
+	bossParts[3]->setPos(pos);
+
+
+	pos = bossParts[4]->getPos();
+	pos.x -= 0.25f;
+	pos.y -= 0.75f;
+	bossParts[4]->setPos(pos);
+
+	// 脚
+	pos = bossParts[5]->getPos();
+	pos.x += 0.25f;
+	pos.y -= 0.25f;
+	pos.z -= 0.125f;
+	bossParts[5]->setPos(pos);
+
+	pos = bossParts[6]->getPos();
+	pos.x -= 0.25f;
+	pos.y -= 0.25f;
+	pos.z -= 0.125f;
+	bossParts[6]->setPos(pos);
+
+	// 頭
+	pos = bossParts[7]->getPos();
+	pos.y += 0.875f;
+	pos.z += 0.5f;
+	bossParts[7]->setPos(pos);
 }
 
 void BossScene::start()
@@ -275,10 +332,16 @@ void BossScene::update_play()
 
 					// 敵はダメージを受ける
 					// hpが0になったらさよなら
-					e->damage(1u, true);
-
-					// エフェクトを出す
-					createParticle(e->calcWorldPos(), 128U, 16.f, 16.f, XMFLOAT3(0.25f, 1.f, 1.f));
+					if (e->damage(1u, true))
+					{
+						e->setDrawFlag(false);
+						// 赤エフェクトを出す
+						createParticle(e->calcWorldPos(), 128U, 16.f, 16.f, XMFLOAT3(1.f, 0.25f, 0.25f));
+					} else
+					{
+						// シアンエフェクトを出す
+						createParticle(e->calcWorldPos(), 96U, 12.f, 12.f, XMFLOAT3(0.25f, 1.f, 1.f));
+					}
 				}
 			}
 		}
@@ -346,6 +409,23 @@ void BossScene::update_play()
 			}
 		}
 
+		if (boss->getAlive())
+		{
+			bool alive = false;
+			for (auto& i : bossParts)
+			{
+				//todo bossPartsが全て死んでいたらボスは死ぬ
+				if (i->getAlive())
+				{
+					alive = true;
+				}
+			}
+			if (!alive)
+			{
+				boss->kill();
+			}
+		}
+
 		if (!boss->getAlive())
 		{
 			startKillBoss();
@@ -354,7 +434,7 @@ void BossScene::update_play()
 
 	// ボス体力バーの大きさを変更
 	float oldLen = bossHpGr->getSize().x;
-	float nowLen = (float)boss->getHp() / (float)bossHpMax * hpGrSizeMax.x;
+	float nowLen = (float)calcBossHp() / (float)bossHpMax * hpGrSizeMax.x;
 	bossHpGr->setSize(XMFLOAT2(std::lerp(oldLen, nowLen, 0.5f), hpGrSizeMax.y));
 
 	// 自機の体力バーの大きさを変更
@@ -434,6 +514,7 @@ void BossScene::endAppearBoss()
 	aim2D->isInvisible = false;
 
 	// ボス行動開始
+	boss->setAlive(true);
 	for (auto& i : attackableEnemy)
 	{
 		i->setAlive(true);
@@ -494,7 +575,11 @@ void BossScene::endKillBoss()
 
 void BossScene::additionalDrawObj3d()
 {
-	koshi->drawWithUpdate(DX12Base::ins(), light.get());
+	boss->drawWithUpdate(light.get());
+	for (auto& i : bossParts)
+	{
+		i->drawWithUpdate(light.get());
+	}
 }
 
 void BossScene::createParticle(const DirectX::XMFLOAT3& pos,
@@ -745,7 +830,7 @@ void BossScene::drawFrontSprite()
 	if (boss->getAlive())
 	{
 		ImGui::Text("ボスHP : %.2f%% (%u)",
-					(float)boss->getHp() / (float)bossHpMax * 100.f,
+					(float)calcBossHp() / (float)bossHpMax * 100.f,
 					boss->getHp());
 	}
 	ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x,

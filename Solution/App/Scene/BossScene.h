@@ -31,10 +31,10 @@ private:
 
 	std::unique_ptr<ObjModel> bossModel;
 	std::unique_ptr<BossEnemy> boss;
-	uint16_t bossHpMax;
+	uint16_t bossHpMax{};
 
-	std::unique_ptr<ObjModel> koshiModel;
-	std::unique_ptr<Object3d> koshi;
+	std::unique_ptr<ObjModel> bossPartsModel;
+	std::vector<std::unique_ptr<BaseEnemy>> bossParts;
 
 	// スプライト
 	inline static constexpr DirectX::XMFLOAT2 hpGrSizeMax = DirectX::XMFLOAT2(WinAPI::window_width * 0.75f,
@@ -143,6 +143,23 @@ private:
 	void initBoss();
 
 #pragma endregion 初期化
+
+#pragma region その他
+
+	inline uint32_t calcBossHp() const
+	{
+		uint32_t bossHp = 0ui32;
+		for (auto& i : bossParts)
+		{
+			if (i->getAlive())
+			{
+				bossHp += (uint32_t)i->getHp();
+			}
+		}
+		return bossHp;
+	}
+
+#pragma endregion その他
 
 public:
 	BossScene();
