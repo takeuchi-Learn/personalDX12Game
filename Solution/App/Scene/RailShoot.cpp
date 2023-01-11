@@ -262,6 +262,7 @@ RailShoot::RailShoot()
 #pragma region 音
 
 	killSe = std::make_unique<Sound>("Resources/SE/Sys_Set03-click.wav");
+	bgm = std::make_unique<Sound>("Resources/BGM/A-Sense-of-Loss.wav");
 
 #pragma endregion 音
 
@@ -448,6 +449,9 @@ void RailShoot::start()
 
 	// マウスカーソルは表示しない
 	input->changeDispMouseCursorFlag(false);
+
+	// bgm鳴らす
+	Sound::SoundPlayWave(bgm.get(), XAUDIO2_LOOP_INFINITE, 0.2f);
 
 	// タイマー開始
 	timer->reset();
@@ -857,6 +861,10 @@ void RailShoot::update_end()
 	// 時間が来たら次のシーンへ進む
 	if (nowTime >= sceneChangeTime)
 	{
+		// bgm止める
+		Sound::SoundStopWave(bgm.get());
+
+		// 次のシーンへ進む
 		SceneManager::getInstange()->changeScene<BossScene>();
 	}
 

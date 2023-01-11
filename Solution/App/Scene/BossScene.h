@@ -66,6 +66,7 @@ private:
 
 	std::unique_ptr<Sound> killSe;
 	std::unique_ptr<Sound> bossDamageSe;
+	std::unique_ptr<Sound> bgm;
 
 #pragma endregion 音
 

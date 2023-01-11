@@ -34,6 +34,7 @@ BossScene::BossScene() :
 
 	killSe = std::make_unique<Sound>("Resources/SE/Sys_Set03-click.wav");
 	bossDamageSe = std::make_unique<Sound>("Resources/SE/SNES-Shooter02-05(Bomb).wav");
+	bgm = std::make_unique<Sound>("Resources/BGM/Sympathetic-Nerves.wav");
 
 #pragma endregion 音
 
@@ -186,6 +187,9 @@ void BossScene::start()
 	{
 		i->setAlive(false);
 	}
+
+	// bgm鳴らす
+	Sound::SoundPlayWave(bgm.get(), XAUDIO2_LOOP_INFINITE, 0.2f);
 
 	timer->reset();
 }
@@ -480,6 +484,10 @@ void BossScene::update_killBoss()
 
 void BossScene::update_end()
 {
+	// BGM止める
+	Sound::SoundStopWave(bgm.get());
+
+	// 次のシーンへ進む
 	SceneManager::getInstange()->changeScene<EndScene>();
 }
 
