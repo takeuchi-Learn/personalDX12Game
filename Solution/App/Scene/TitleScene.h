@@ -18,6 +18,7 @@ class TitleScene :
 	// 音
 	// --------------------
 	std::unique_ptr<Sound> shortBridge;
+	std::unique_ptr<Sound> bgm;
 
 	// --------------------
 	// 時間

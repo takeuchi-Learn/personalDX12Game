@@ -28,6 +28,7 @@ TitleScene::TitleScene()
 	input = Input::getInstance();
 
 	shortBridge = std::make_unique<Sound>("Resources/SE/Shortbridge29-1.wav");
+	bgm = std::make_unique<Sound>("Resources/BGM/Detour.wav");
 
 	spCom.reset(new SpriteBase());
 
@@ -55,6 +56,7 @@ TitleScene::TitleScene()
 
 void TitleScene::start()
 {
+	Sound::SoundPlayWave(bgm.get(), XAUDIO2_LOOP_INFINITE, 0.2f);
 	timer->reset();
 }
 
@@ -74,6 +76,7 @@ void TitleScene::update_normal()
 	{
 		update_proc = std::bind(&TitleScene::update_end, this);
 		Sound::SoundPlayWave(shortBridge.get());
+		Sound::SoundStopWave(bgm.get());
 		timer->reset();
 	}
 }
