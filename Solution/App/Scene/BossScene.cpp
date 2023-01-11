@@ -461,6 +461,9 @@ void BossScene::update_killBoss()
 
 		boss->setScale(scale);
 	}
+
+	// パーティクルを毎フレーム出す
+	createParticle(boss->calcWorldPos(), 32U, 16.f, 16.f);
 }
 
 void BossScene::update_end()
