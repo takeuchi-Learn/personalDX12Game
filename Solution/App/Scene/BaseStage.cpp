@@ -215,7 +215,11 @@ void BaseStage::update()
 		POINT pos = input->getMousePos();
 
 		XMFLOAT2 rStick = input->getPadRStickRaito();
-		constexpr float speed = 10.f;
+		float speed = 10.f;
+		if (input->getPadButton(Input::PAD::RIGHT_THUMB))
+		{
+			speed /= 2.f;
+		}
 
 		pos.x += static_cast<LONG>(rStick.x * speed);
 		pos.y += static_cast<LONG>(-rStick.y * speed);
