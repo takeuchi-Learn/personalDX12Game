@@ -117,6 +117,8 @@ class RailShoot
 					char divChar = ',',
 					const std::string& commentStartStr = "//");
 
+	void loadEnemyScript();
+
 	struct PopEnemyData
 	{
 		uint16_t popFrame;

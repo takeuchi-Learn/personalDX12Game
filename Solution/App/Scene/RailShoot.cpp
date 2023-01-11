@@ -94,6 +94,22 @@ RailShoot::CSVType RailShoot::loadCsv(const std::string& csvFilePath,
 	return csvData;
 }
 
+void RailShoot::loadEnemyScript()
+{
+	csvData = loadCsv("Resources/enemyScript.csv", true, ',', "//");
+	{
+		for (auto& y : csvData)
+		{
+			enemyPopData.emplace_front(
+				std::make_unique<PopEnemyData>((uint16_t)std::stoul(y[3]),
+											   XMFLOAT3(std::stof(y[0]),
+														std::stof(y[1]),
+														std::stof(y[2])),
+											   XMFLOAT3(0, 0, -1)));
+		}
+	}
+}
+
 XMVECTOR RailShoot::splinePosition(const std::vector<XMVECTOR>& points,
 								   const size_t& startIndex,
 								   float t)
@@ -416,19 +432,7 @@ RailShoot::RailShoot()
 	enemy.resize(0U);
 
 	// 敵発生スクリプト
-	// todo 関数化
-	csvData = loadCsv("Resources/enemyScript.csv", true, ',', "//");
-	{
-		for (auto& y : csvData)
-		{
-			enemyPopData.emplace_front(
-				std::make_unique<PopEnemyData>((uint16_t)std::stoul(y[3]),
-											   XMFLOAT3(std::stof(y[0]),
-														std::stof(y[1]),
-														std::stof(y[2])),
-											   XMFLOAT3(0, 0, -1)));
-		}
-	}
+	loadEnemyScript();
 }
 
 void RailShoot::start()
