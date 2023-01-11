@@ -710,7 +710,9 @@ bool BossScene::addShotTarget(const std::forward_list<BaseEnemy*>& enemy,
 void BossScene::movePlayer()
 {
 	// 上向きか否かの切り替え
-	if (input->triggerKey(DIK_E))
+	if (input->triggerKey(DIK_E) ||
+		input->triggerPadButton(Input::PAD::X) ||
+		input->triggerPadButton(Input::PAD::Y))
 	{
 		XMFLOAT3 camRrota = camera->getRelativeRotaDeg();
 
