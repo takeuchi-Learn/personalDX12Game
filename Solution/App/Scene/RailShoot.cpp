@@ -715,7 +715,9 @@ void RailShoot::update_play()
 	// --------------------
 	updateAimCol();
 	if (input->triggerMouseButton(Input::MOUSE::LEFT) ||
-		input->triggerPadButton(Input::PAD::RB))
+		input->triggerPadButton(Input::PAD::RB) ||
+		input->triggerPadButton(Input::PAD::A) ||
+		input->triggerPadButton(Input::PAD::B))
 	{
 		updatePlayerShotTarget();
 		if (player->getShotTarget())
@@ -1016,7 +1018,6 @@ void RailShoot::movePlayer()
 		{
 			moveVal.y -= 1.f;
 		}
-
 	}
 
 #pragma endregion キーボード

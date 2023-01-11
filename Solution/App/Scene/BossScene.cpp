@@ -239,7 +239,9 @@ void BossScene::update_play()
 		if (player->getShotTarget())
 		{
 			if (input->triggerMouseButton(Input::MOUSE::LEFT) ||
-				input->triggerPadButton(Input::PAD::RB))
+				input->triggerPadButton(Input::PAD::RB) ||
+				input->triggerPadButton(Input::PAD::A) ||
+				input->triggerPadButton(Input::PAD::B))
 			{
 				constexpr float bulSpeed = 2.f;
 				player->shot(camera.get(), playerBulModel.get(), bulSpeed);
@@ -702,7 +704,6 @@ void BossScene::movePlayer()
 		rota.y += speed;
 
 		player->setRotation(rota);
-
 	}
 }
 
