@@ -251,6 +251,7 @@ RailShoot::RailShoot()
 	camera->setTarget(XMFLOAT3(0, 0, 0));	// 注視点座標
 	camera->setUp(XMFLOAT3(0, 1, 0));		// 上方向
 	camera->setFogAngleYRad(camFogEnd);		// フォグ
+	camera->setEye2TargetLen(200.f);
 
 	// --------------------
 	// ライト初期化
@@ -1002,19 +1003,19 @@ void RailShoot::movePlayer()
 		keyInput = true;
 
 		// 横移動
-		if (hitD && player->getPos().x < 110.f)
+		if (hitD)
 		{
 			moveVal.x += 1.f;
-		} else if (hitA && player->getPos().x > -110.f)
+		} else if (hitA)
 		{
 			moveVal.x -= 1.f;
 		}
 
 		// 高さ方向に移動
-		if (hitW && player->getPos().y < 110.f)
+		if (hitW)
 		{
 			moveVal.y += 1.f;
-		} else if (hitS && player->getPos().y > 5.f)
+		} else if (hitS)
 		{
 			moveVal.y -= 1.f;
 		}
@@ -1077,27 +1078,36 @@ void RailShoot::movePlayer()
 
 		if (moveVal.x != 0.f)
 		{
-			player->moveRight(moveVal.x);
+			if (player->getPos().x + moveVal.x < 180.f &&
+				player->getPos().x + moveVal.x > -180.f)
+			{
+				player->moveRight(moveVal.x);
 
-			if (moveVal.x > 0.f)
-			{
-				operInst.at("D")->isInvisible = true;
-			} else if (moveVal.x < 0.f)
-			{
-				operInst.at("A")->isInvisible = true;
+				if (moveVal.x > 0.f)
+				{
+					operInst.at("D")->isInvisible = true;
+				} else if (moveVal.x < 0.f)
+				{
+					operInst.at("A")->isInvisible = true;
+				}
 			}
 		}
 
 		if (moveVal.y != 0.f)
 		{
-			player->moveUp(moveVal.y);
 
-			if (moveVal.y > 0.f)
+			if (player->getPos().y + moveVal.y < 150.f &&
+				player->getPos().y + moveVal.y > -15.f)
 			{
-				operInst.at("W")->isInvisible = true;
-			} else if (moveVal.y < 0.f)
-			{
-				operInst.at("S")->isInvisible = true;
+				player->moveUp(moveVal.y);
+
+				if (moveVal.y > 0.f)
+				{
+					operInst.at("W")->isInvisible = true;
+				} else if (moveVal.y < 0.f)
+				{
+					operInst.at("S")->isInvisible = true;
+				}
 			}
 		}
 	}
