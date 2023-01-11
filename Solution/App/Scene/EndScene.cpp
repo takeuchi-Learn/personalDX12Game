@@ -32,7 +32,9 @@ void EndScene::start()
 
 void EndScene::update()
 {
-	if (input->triggerKey(DIK_SPACE))
+	if (input->triggerKey(DIK_SPACE) ||
+		input->getPadButton(Input::PAD::A) ||
+		input->getPadButton(Input::PAD::B))
 	{
 		SceneManager::getInstange()->changeScene<TitleScene>();
 	}

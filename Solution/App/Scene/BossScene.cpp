@@ -238,7 +238,8 @@ void BossScene::update_play()
 		// --------------------
 		if (player->getShotTarget())
 		{
-			if (input->triggerMouseButton(Input::MOUSE::LEFT))
+			if (input->triggerMouseButton(Input::MOUSE::LEFT) ||
+				input->triggerPadButton(Input::PAD::RB))
 			{
 				constexpr float bulSpeed = 2.f;
 				player->shot(camera.get(), playerBulModel.get(), bulSpeed);
@@ -618,76 +619,90 @@ bool BossScene::addShotTarget(const std::forward_list<BaseEnemy*>& enemy,
 
 void BossScene::movePlayer()
 {
-	// 移動
+	// 上向きか否かの切り替え
+	if (input->triggerKey(DIK_E))
 	{
-		const bool hitW = input->hitKey(DIK_W);
-		const bool hitS = input->hitKey(DIK_S);
+		XMFLOAT3 camRrota = camera->getRelativeRotaDeg();
 
-		if (hitW || hitS)
-		{
-			float moveSpeed = 90.f / DX12Base::ins()->getFPS();
-			if (input->hitKey(DIK_LCONTROL))
-			{
-				moveSpeed /= 2.f;
-			} else if (input->hitKey(DIK_LSHIFT))
-			{
-				moveSpeed *= 2.f;
-			}
+		constexpr float angle = 20.f;
+		camRrota.x += playerUpTurn ? angle : -angle;
 
-			if (hitW)
-			{
-				player->moveForward(moveSpeed);
-			} else if (hitS)
-			{
-				player->moveForward(-moveSpeed);
-			}
-		}
+		playerUpTurn = !playerUpTurn;
+
+		camera->setRelativeRotaDeg(camRrota);
+	}
+
+	// パッドの入力
+	XMFLOAT2 inputVal = input->getPadLStickRaito();
+
+	// 移動
+	if (input->hitKey(DIK_W))
+	{
+		inputVal.y = 1.f;
+	} else if (input->hitKey(DIK_S))
+	{
+		inputVal.y = -1.f;
 	}
 
 	// 回転
+	if (input->hitKey(DIK_A))
 	{
-		// 上向きか否かの切り替え
-		if (input->triggerKey(DIK_E))
+		inputVal.x = -1.f;
+	} else if (input->hitKey(DIK_D))
+	{
+		inputVal.x = 1.f;
+	}
+
+	// ゆっくりかどうか
+	const bool slowFlag =
+		input->hitKey(DIK_LCONTROL) ||
+		input->getPadButton(Input::PAD::LEFT_THUMB);
+
+	// ダッシュするかどうか
+	const bool dashFlag =
+		input->hitKey(DIK_LSHIFT) ||
+		input->getPadButton(Input::PAD::LB);
+
+	// 移動回転を反映
+	if (inputVal.y != 0.f)
+	{
+		// 移動
+		float moveSpeed = inputVal.y * 90.f / DX12Base::ins()->getFPS();
+
+		if (slowFlag)
 		{
-			XMFLOAT3 camRrota = camera->getRelativeRotaDeg();
-
-			constexpr float angle = 20.f;
-			camRrota.x += playerUpTurn ? angle : -angle;
-
-			playerUpTurn = !playerUpTurn;
-
-			camera->setRelativeRotaDeg(camRrota);
+			moveSpeed /= 2.f;
+		} else if (dashFlag)
+		{
+			moveSpeed *= 2.f;
 		}
 
-		const bool hitA = input->hitKey(DIK_A);
-		const bool hitD = input->hitKey(DIK_D);
+		// 移動させる
+		player->moveForward(moveSpeed);
+	}
+	if (inputVal.x != 0.f)
+	{
+		// 回転
+
 		// 左右の回転
-		if (hitA || hitD)
+		float speed = inputVal.x * 45.f / DX12Base::ins()->getFPS();
+
+		// 左シフトと左コントロールで速度変更
+		if (input->hitKey(DIK_LCONTROL))
 		{
-			float speed = 45.f / DX12Base::ins()->getFPS();
-
-			// 左シフトと左コントロールで速度変更
-			if (input->hitKey(DIK_LCONTROL))
-			{
-				speed /= 2.f;
-			} else if (input->hitKey(DIK_LSHIFT))
-			{
-				speed *= 2.f;
-			}
-
-			XMFLOAT3 rota = player->getRotation();
-
-			// 回転させる
-			if (hitA)
-			{
-				rota.y -= speed;
-			} else if (hitD)
-			{
-				rota.y += speed;
-			}
-
-			player->setRotation(rota);
+			speed /= 2.f;
+		} else if (dashFlag)
+		{
+			speed *= 2.f;
 		}
+
+		XMFLOAT3 rota = player->getRotation();
+
+		// 回転させる
+		rota.y += speed;
+
+		player->setRotation(rota);
+
 	}
 }
 

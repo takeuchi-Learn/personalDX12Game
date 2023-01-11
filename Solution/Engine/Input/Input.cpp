@@ -1,5 +1,7 @@
 ﻿#include "Input.h"
 
+#include <cmath>
+
 #include <dinput.h>
 #pragma comment(lib, "dinput8.lib")
 #pragma comment(lib, "dxguid.lib")
@@ -142,4 +144,50 @@ WORD Input::padThumbToDPad(SHORT sThumbX, SHORT sThumbY, SHORT sDeadZone)
 	}
 
 	return wButtons;
+}
+
+DirectX::XMFLOAT2 Input::getPadLStickRaito() const
+{
+	const bool isLStickX = this->isVaildPadLStickX();
+
+	const bool isLStickY = this->isVaildPadLStickY();
+
+	DirectX::XMFLOAT2 inputRaito = DirectX::XMFLOAT2(0.f, 0.f);
+
+	const SHORT inputValX = getPadLStickX();
+	const SHORT inputValY = getPadLStickY();
+
+	if (isLStickX)
+	{
+		inputRaito.x = (float)inputValX / 32767.f;
+	}
+	if (isLStickY)
+	{
+		inputRaito.y = (float)inputValY / 32767.f;
+	}
+
+	return inputRaito;
+}
+
+DirectX::XMFLOAT2 Input::getPadRStickRaito() const
+{
+	const bool isLStickX = this->isVaildPadRStickX();
+
+	const bool isLStickY = this->isVaildPadRStickY();
+
+	DirectX::XMFLOAT2 inputRaito = DirectX::XMFLOAT2(0.f, 0.f);
+
+	const SHORT inputValX = getPadRStickX();
+	const SHORT inputValY = getPadRStickY();
+
+	if (isLStickX)
+	{
+		inputRaito.x = (float)inputValX / 32767.f;
+	}
+	if (isLStickY)
+	{
+		inputRaito.y = (float)inputValY / 32767.f;
+	}
+
+	return inputRaito;
 }

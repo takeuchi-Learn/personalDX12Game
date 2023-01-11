@@ -210,6 +210,19 @@ void BaseStage::update()
 		back->getModelPt()->setShivtUv(shiftUv);
 	}
 
+	{
+		// マウスカーソルの位置をパッド入力に合わせてずらす
+		POINT pos = input->getMousePos();
+
+		XMFLOAT2 rStick = input->getPadRStickRaito();
+		constexpr float speed = 10.f;
+
+		pos.x += static_cast<LONG>(rStick.x * speed);
+		pos.y += static_cast<LONG>(-rStick.y * speed);
+
+		input->setMousePos(pos.x, pos.y);
+	}
+
 	// 照準の位置をマウスカーソルに合わせる
 	player->setAim2DPos(XMFLOAT2((float)input->getMousePos().x,
 								 (float)input->getMousePos().y));
