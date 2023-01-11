@@ -29,6 +29,14 @@ BossScene::BossScene() :
 	BaseStage(),
 	playerHpBarWidMax(WinAPI::window_width * 0.25f)
 {
+
+#pragma region 音
+
+	killSe = std::make_unique<Sound>("Resources/SE/Sys_Set03-click.wav");
+	bossDamageSe = std::make_unique<Sound>("Resources/SE/SNES-Shooter02-05(Bomb).wav");
+
+#pragma endregion 音
+
 	initSprite();
 
 	// カメラ
@@ -337,10 +345,12 @@ void BossScene::update_play()
 						e->setDrawFlag(false);
 						// 赤エフェクトを出す
 						createParticle(e->calcWorldPos(), 128U, 16.f, 16.f, XMFLOAT3(1.f, 0.25f, 0.25f));
+						Sound::SoundPlayWave(killSe.get(), 0, 0.2f);
 					} else
 					{
 						// シアンエフェクトを出す
 						createParticle(e->calcWorldPos(), 96U, 12.f, 12.f, XMFLOAT3(0.25f, 1.f, 1.f));
+						Sound::SoundPlayWave(bossDamageSe.get(), 0, 0.2f);
 					}
 				}
 			}
@@ -405,6 +415,8 @@ void BossScene::update_play()
 
 					// エフェクトを出す
 					createParticle(e->calcWorldPos(), 16U, 8.f, 4.f, XMFLOAT3(1.f, 0.25f, 0.25f));
+
+					Sound::SoundPlayWave(killSe.get(), 0, 0.2f);
 				}
 			}
 		}

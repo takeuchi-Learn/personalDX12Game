@@ -13,6 +13,7 @@
 #include "Camera/CameraObj.h"
 #include "GameObject/Player.h"
 #include "3D/Obj/ObjSet.h"
+#include <Sound/Sound.h>
 
 /// @brief レールシューティングのシーン
 class RailShoot
@@ -26,6 +27,12 @@ class RailShoot
 	std::unique_ptr<Light> light;
 
 	std::unique_ptr<Timer> timer;
+
+#pragma region 音
+
+	std::unique_ptr<Sound> killSe;
+
+#pragma endregion 音
 
 	// --------------------
 	// スプライト

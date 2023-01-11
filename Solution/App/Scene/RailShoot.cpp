@@ -259,6 +259,12 @@ RailShoot::RailShoot()
 		i.second->isInvisible = true;
 	}
 
+#pragma region 音
+
+	killSe = std::make_unique<Sound>("Resources/SE/Sys_Set03-click.wav");
+
+#pragma endregion 音
+
 	// --------------------
 	// カメラ初期化
 	// --------------------
@@ -761,6 +767,8 @@ void RailShoot::update_play()
 					// 敵も自機弾もさよなら
 					pb.kill();
 					e->damage(1u, true);
+
+					Sound::SoundPlayWave(killSe.get(), 0, 0.2f);
 				}
 			}
 		}

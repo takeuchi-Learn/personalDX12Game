@@ -19,6 +19,7 @@
 #include "3D/Obj/ObjSet.h"
 #include "GameObject/BaseEnemy.h"
 #include "GameObject/Boss/BossEnemy.h"
+#include <Sound/Sound.h>
 
 #include "BaseStage.h"
 
@@ -58,6 +59,15 @@ private:
 	DirectX::XMFLOAT3 sceneChangeEndRota{};
 	float sceneChangeStartCamLen;
 	float sceneChangeEndCamLen;
+
+
+
+#pragma region 音
+
+	std::unique_ptr<Sound> killSe;
+	std::unique_ptr<Sound> bossDamageSe;
+
+#pragma endregion 音
 
 private:
 	void createParticle(const DirectX::XMFLOAT3& pos,
