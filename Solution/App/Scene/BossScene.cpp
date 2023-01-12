@@ -808,7 +808,7 @@ void BossScene::movePlayer()
 		// 回転
 
 		// 左右の回転
-		float speed = inputVal.x * 45.f / DX12Base::ins()->getFPS();
+		float speed = inputVal.x * 30.f / DX12Base::ins()->getFPS();
 
 		// 左シフトと左コントロールで速度変更
 		if (input->hitKey(DIK_LCONTROL))
