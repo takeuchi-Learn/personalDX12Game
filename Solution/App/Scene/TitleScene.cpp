@@ -1,7 +1,6 @@
 ﻿#include "TitleScene.h"
 
 #include "RailShoot.h"
-#include "BaseStage.h"
 #include "System/SceneManager.h"
 #include <DirectXMath.h>
 

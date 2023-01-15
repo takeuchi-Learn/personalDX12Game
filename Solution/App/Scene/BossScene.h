@@ -17,18 +17,44 @@
 #include "GameObject/Player.h"
 #include "3D/Obj/Object3d.h"
 #include "3D/Obj/ObjSet.h"
+#include "3D/ParticleMgr.h"
 #include "GameObject/BaseEnemy.h"
 #include "GameObject/Boss/BossEnemy.h"
 #include <Sound/Sound.h>
 
-#include "BaseStage.h"
-
  /// @brief ボス戦シーンクラス
 class BossScene :
-	public BaseStage
+	public GameScene
 {
+public:
+	// std::stringの2次元配列(vector)
+	using CSVType = std::vector<std::vector<std::string>>;
+
 private:
+
+#pragma region シーン内共通
+
+	DX12Base* dxBase = nullptr;
+	Input* input = nullptr;
+
+	std::unique_ptr<CameraObj> camera;
+
+	std::unique_ptr<Light> light;
+
+	std::unique_ptr<Timer> timer;
+
+	// 敵発生スクリプトのCSVデータ
+	CSVType csvData;
+
+#pragma endregion シーン内共通
+
+#pragma region 自機
+
 	bool playerUpTurn = false;
+
+#pragma endregion 自機
+
+#pragma region ボス
 
 	std::unique_ptr<ObjModel> bossModel;
 	std::unique_ptr<BossEnemy> boss;
@@ -37,7 +63,37 @@ private:
 	std::unique_ptr<ObjModel> bossPartsModel;
 	std::vector<std::unique_ptr<BaseEnemy>> bossParts;
 
-	// スプライト
+#pragma endregion ボス
+
+#pragma region 3Dオブジェクト
+
+	// 背景のパイプライン
+	Object3d::PipelineSet backPipelineSet;
+
+	// 背景と地面
+	std::unique_ptr<ObjSet> back;
+	std::unique_ptr<ObjSet> ground;
+
+	// 自機
+	std::unique_ptr<Player> player;
+	std::unique_ptr<ObjModel> playerModel;
+	std::unique_ptr<ObjModel> playerBulModel;
+	uint16_t playerHpMax;
+
+	// 攻撃可能な敵リスト
+	std::forward_list<BaseEnemy*> attackableEnemy;
+
+	// パーティクル
+	std::unique_ptr<ParticleMgr> particleMgr;
+
+#pragma endregion 3Dオブジェクト
+
+#pragma region スプライト
+
+	std::unique_ptr<SpriteBase> spBase;
+
+	std::unique_ptr<Sprite> aim2D;
+
 	inline static constexpr DirectX::XMFLOAT2 hpGrSizeMax = DirectX::XMFLOAT2(WinAPI::window_width * 0.75f,
 																			  WinAPI::window_height / 40.f);
 	std::unique_ptr<Sprite> bossHpGr;
@@ -45,6 +101,33 @@ private:
 	const float playerHpBarWidMax;
 	std::unique_ptr<Sprite> playerHpBar;
 	std::unique_ptr<Sprite> playerHpBarEdge;
+
+#pragma endregion スプライト
+
+
+#pragma region ImGui定数
+
+	static constexpr ImGuiWindowFlags winFlags =
+		// リサイズ不可
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoResize |
+		// タイトルバー無し
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar |
+		// 設定を.iniに出力しない
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoSavedSettings |
+		// 移動不可
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove;
+	//// スクロールバーを常に表示
+	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysHorizontalScrollbar |
+	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar;
+
+	// 最初のウインドウの位置を指定
+	static constexpr DirectX::XMFLOAT2 fstWinPos =
+		DirectX::XMFLOAT2((float)WinAPI::window_width * 0.02f,
+						  (float)WinAPI::window_height * 0.02f);
+
+#pragma endregion
+
+#pragma region 演出
 
 	// RGBずらし
 	static const Timer::timeType rgbShiftTimeMax = Timer::oneSec / 2;
@@ -60,7 +143,7 @@ private:
 	float sceneChangeStartCamLen;
 	float sceneChangeEndCamLen;
 
-
+#pragma endregion 演出
 
 #pragma region 音
 
@@ -86,16 +169,17 @@ private:
 					   const DirectX::XMFLOAT2& aim2DPosMin,
 					   const DirectX::XMFLOAT2& aim2DPosMax);
 
-	void movePlayer() override;
+	void movePlayer();
 
 #pragma region updateの中身
 
 	// update_何とか関数を格納する
-	void update_start() override;
+	std::function<void()> update_proc;
+	void update_start();
 	void update_appearBoss();
-	void update_play() override;
+	void update_play();
 	void update_killBoss();
-	void update_end() override;
+	void update_end();
 
 #pragma endregion updateの中身
 
@@ -143,8 +227,6 @@ private:
 
 #pragma endregion ボス死亡演出
 
-	void additionalDrawObj3d() override;
-
 #pragma region 初期化
 
 	void initSprite();
@@ -152,10 +234,16 @@ private:
 	void initPlayer();
 	void initEnemy();
 	void initBoss();
+	void initBackObj();
 
 #pragma endregion 初期化
 
 #pragma region その他
+
+	CSVType loadCsv(const std::string& csvFilePath,
+					bool commentFlag = true,
+					char divChar = ',',
+					const std::string& commentStartStr = "//");
 
 	inline uint32_t calcBossHp() const
 	{
@@ -177,5 +265,7 @@ public:
 	~BossScene();
 
 	void start() override;
+	void update() override;
+	void drawObj3d() override;
 	void drawFrontSprite() override;
 };
