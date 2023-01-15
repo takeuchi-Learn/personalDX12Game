@@ -1,5 +1,6 @@
 ﻿#include "BossScene.h"
 #include "EndScene.h"
+#include "GameOverScene.h"
 
 #include <DirectXMath.h>
 #include <imgui.h>
@@ -395,7 +396,7 @@ void BossScene::update_play()
 
 	if (Input::getInstance()->hitKey(DIK_SPACE))
 	{
-		update_proc = std::bind(&BossScene::update_end, this);
+		update_proc = std::bind(&BossScene::update_end<EndScene>, this);
 	}
 
 #endif // _DEBUG
@@ -514,7 +515,7 @@ void BossScene::update_play()
 					{
 						// 自機の体力が0になったら
 						player->kill();
-						update_proc = std::bind(&BossScene::update_end, this);
+						update_proc = std::bind(&BossScene::update_end<GameOverScene>, this);
 					} else
 					{
 						startRgbShift();
@@ -610,13 +611,14 @@ void BossScene::update_killBoss()
 	createParticle(boss->calcWorldPos(), 32U, 16.f, 16.f);
 }
 
+template<class NextScene>
 void BossScene::update_end()
 {
 	// BGM止める
 	Sound::SoundStopWave(bgm.get());
 
 	// 次のシーンへ進む
-	SceneManager::getInstange()->changeScene<EndScene>();
+	SceneManager::getInstange()->changeScene<NextScene>();
 }
 
 void BossScene::startAppearBoss()
@@ -721,7 +723,7 @@ void BossScene::startKillBoss()
 
 void BossScene::endKillBoss()
 {
-	update_proc = std::bind(&BossScene::update_end, this);
+	update_proc = std::bind(&BossScene::update_end<EndScene>, this);
 }
 
 void BossScene::drawObj3d()

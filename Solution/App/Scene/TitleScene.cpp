@@ -73,6 +73,19 @@ void TitleScene::update_normal()
 		input->triggerPadButton(Input::PAD::A) ||
 		input->triggerPadButton(Input::PAD::B))
 	{
+
+#ifdef _DEBUG
+
+		if (input->hitKey(DIK_LSHIFT))
+		{
+			Sound::SoundStopWave(bgm.get());
+			SceneManager::getInstange()->changeScene<RailShoot>();
+			return;
+		}
+
+#endif // _DEBUG
+
+
 		update_proc = std::bind(&TitleScene::update_end, this);
 		Sound::SoundPlayWave(shortBridge.get());
 		Sound::SoundStopWave(bgm.get());

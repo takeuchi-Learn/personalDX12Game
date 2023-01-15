@@ -179,6 +179,7 @@ private:
 	void update_appearBoss();
 	void update_play();
 	void update_killBoss();
+	template<class NextScene>
 	void update_end();
 
 #pragma endregion updateの中身
