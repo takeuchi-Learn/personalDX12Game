@@ -106,6 +106,9 @@
     <Filter Include="BehaviorTree">
       <UniqueIdentifier>{706d684d-c6ed-410e-ab93-40e4078a77c4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObject\Enemy\Boss">
+      <UniqueIdentifier>{df962beb-8db5-4d78-a37e-17dc5619b832}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\System\System.cpp">
@@ -225,9 +228,6 @@
     <ClCompile Include="App\GameObject\BaseEnemy.cpp">
       <Filter>GameObject\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="App\GameObject\Boss\BossEnemy.cpp">
-      <Filter>GameObject\Enemy</Filter>
-    </ClCompile>
     <ClCompile Include="App\Scene\BaseStage.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
@@ -240,8 +240,14 @@
     <ClCompile Include="Engine\BehaviorTree\Sequencer.cpp">
       <Filter>BehaviorTree</Filter>
     </ClCompile>
+    <ClCompile Include="App\GameObject\Boss\BossEnemy.cpp">
+      <Filter>GameObject\Enemy\Boss</Filter>
+    </ClCompile>
     <ClCompile Include="App\GameObject\Boss\BossBehavior.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>GameObject\Enemy\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="App\Scene\GameOverScene.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -362,9 +368,6 @@
     <ClInclude Include="App\GameObject\BaseEnemy.h">
       <Filter>GameObject\Enemy</Filter>
     </ClInclude>
-    <ClInclude Include="App\GameObject\Boss\BossEnemy.h">
-      <Filter>GameObject\Enemy</Filter>
-    </ClInclude>
     <ClInclude Include="App\Scene\BaseStage.h">
       <Filter>Scene</Filter>
     </ClInclude>
@@ -383,8 +386,14 @@
     <ClInclude Include="Engine\BehaviorTree\Selector.h">
       <Filter>BehaviorTree</Filter>
     </ClInclude>
+    <ClInclude Include="App\GameObject\Boss\BossEnemy.h">
+      <Filter>GameObject\Enemy\Boss</Filter>
+    </ClInclude>
     <ClInclude Include="App\GameObject\Boss\BossBehavior.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>GameObject\Enemy\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="App\Scene\GameOverScene.h">
+      <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

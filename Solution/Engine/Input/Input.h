@@ -32,6 +32,10 @@ public:
 		static Input input{};
 		return &input;
 	}
+	inline static Input* ins()
+	{
+		return getInstance();
+	}
 
 	void init();
 	void update();

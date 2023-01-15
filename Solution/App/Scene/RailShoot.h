@@ -160,6 +160,7 @@ class RailShoot
 	/// @param scale 敵の大きさ
 	void addEnemy(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& vel, float scale = 5.f);
 
+	template<class NextScene>
 	void changeNextScene();
 
 	// update_何とか関数を格納する
@@ -167,6 +168,7 @@ class RailShoot
 	void update_start();
 	void update_appearPlayer();
 	void update_play();
+	template<class NextScene>
 	void update_end();
 
 #pragma region 自機登場演出

@@ -2,6 +2,7 @@
 #include <DirectXMath.h>
 
 #include "BossScene.h"
+#include "GameOverScene.h"
 
 #include <fstream>
 #include "Util/RandomNum.h"
@@ -464,7 +465,7 @@ void RailShoot::update()
 
 	if (input->hitKey(DIK_LSHIFT) && input->hitKey(DIK_SPACE))
 	{
-		changeNextScene();
+		changeNextScene<BossScene>();
 	}
 
 #endif // _DEBUG
@@ -569,11 +570,12 @@ void RailShoot::addEnemy(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& 
 	i->setParent(railObj->getObj());
 }
 
+template<class NextScene>
 void RailShoot::changeNextScene()
 {
 	PostEffect::getInstance()->changePipeLine(0U);
 
-	update_proc = std::bind(&RailShoot::update_end, this);
+	update_proc = std::bind(&RailShoot::update_end<NextScene>, this);
 	startSceneChangeTime = timer->getNowTime();
 }
 
@@ -802,7 +804,7 @@ void RailShoot::update_play()
 						// HPが無くなったら次のシーンへ進む
 						if (player->damage(1u, true))
 						{
-							changeNextScene();
+							changeNextScene<GameOverScene>();
 							player->kill();
 						} else
 						{
@@ -836,7 +838,7 @@ void RailShoot::update_play()
 			// 敵がすべて消えたら次のシーンへ
 			if (enemyEmpty)
 			{
-				changeNextScene();
+				changeNextScene<BossScene>();
 			}
 		}
 	}
@@ -854,6 +856,7 @@ void RailShoot::update_play()
 	updateRgbShift();
 }
 
+template<class NextScene>
 void RailShoot::update_end()
 {
 	const Timer::timeType nowTime = timer->getNowTime() - startSceneChangeTime;
@@ -865,7 +868,7 @@ void RailShoot::update_end()
 		Sound::SoundStopWave(bgm.get());
 
 		// 次のシーンへ進む
-		SceneManager::getInstange()->changeScene<BossScene>();
+		SceneManager::getInstange()->changeScene<NextScene>();
 	}
 
 	// --------------------
