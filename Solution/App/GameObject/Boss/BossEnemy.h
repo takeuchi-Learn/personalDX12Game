@@ -66,7 +66,10 @@ public:
 	inline void setSmallEnemyModel(ObjModel* model) { smallEnemyModel = model; }
 
 	/// @brief 小さい敵を弾として出す
-	void addSmallEnemyHoming();
+	void addSmallEnemyHoming(const DirectX::XMFLOAT4& color = DirectX::XMFLOAT4(1.f,
+																				1.f,
+																				1.f,
+																				1.f));
 
 	void addSmallEnemy(const DirectX::XMVECTOR& direction,
 					   const DirectX::XMFLOAT4& color = DirectX::XMFLOAT4(1.f,

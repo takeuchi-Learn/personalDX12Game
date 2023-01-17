@@ -568,7 +568,7 @@ void RailShoot::addEnemy(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& 
 	i->setVel(vel);
 	i->setTargetObj(player.get());
 	i->setParent(railObj->getObj());
-	i->setCol(XMFLOAT4(1.f, 0.5f, 0.125f, 1.f));
+	i->setCol(XMFLOAT4(1, 0.25f, 0.125f, 1.f));
 }
 
 template<class NextScene>

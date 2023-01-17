@@ -15,7 +15,7 @@ NODE_RESULT BossBehavior::phase_approach()
 	if (XMVectorGetX(XMVector3Length(velVec)) < boss->getScale())
 	{
 		// todo ここで近接攻撃を開始(攻撃関数へ遷移)
-		boss->addSmallEnemyHoming();
+		boss->addSmallEnemyHoming(bulCol);
 		phase = PHASE::LEAVE;
 		return NODE_RESULT::SUCCESS;
 	}
@@ -69,7 +69,7 @@ NODE_RESULT BossBehavior::phase_attack()
 																							(float)i / float(shotEnemyNum - 1)),
 																				  0.f));
 
-			boss->addSmallEnemy(vel);
+			boss->addSmallEnemy(vel, bulCol);
 		}
 		nowShotFrame = 0u;
 

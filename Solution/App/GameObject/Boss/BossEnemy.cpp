@@ -60,7 +60,7 @@ BossEnemy::BossEnemy(Camera* camera,
 }
 
 // 弾関係
-void BossEnemy::addSmallEnemyHoming()
+void BossEnemy::addSmallEnemyHoming(const DirectX::XMFLOAT4& color)
 {
 	auto& i = smallEnemy.emplace_front();
 	i.reset(new BaseEnemy(camera, smallEnemyModel));
@@ -69,6 +69,7 @@ void BossEnemy::addSmallEnemyHoming()
 	i->setPos(this->getPos());
 	i->setHp(1u);
 	i->setLife(bulLife);
+	i->setCol(color);
 
 	const XMVECTOR right = XMVector3Rotate(XMVector3Normalize(calcVelVec(this, true)),
 										   XMQuaternionRotationRollPitchYaw(RandomNum::getRandf(0.f, XM_PI),

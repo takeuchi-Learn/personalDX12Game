@@ -8,6 +8,7 @@
 #include <BehaviorTree/Selector.h>
 #include <BehaviorTree/Sequencer.h>
 #include <memory>
+#include <DirectXMath.h>
 
 class BossEnemy;
 
@@ -41,6 +42,9 @@ private:
 	static inline constexpr uint32_t shotCountMax = 15u;
 	uint32_t shotCount = 0u;
 	static inline constexpr uint32_t shotEnemyNum = 16;
+
+	static inline constexpr DirectX::XMFLOAT4 bulCol =
+		DirectX::XMFLOAT4(1, 0.25f, 0.125f, 1.f);
 
 #pragma endregion 弾発射関係
 
