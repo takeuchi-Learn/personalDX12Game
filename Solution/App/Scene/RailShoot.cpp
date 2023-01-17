@@ -568,6 +568,7 @@ void RailShoot::addEnemy(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& 
 	i->setVel(vel);
 	i->setTargetObj(player.get());
 	i->setParent(railObj->getObj());
+	i->setCol(XMFLOAT4(1.f, 0.5f, 0.125f, 1.f));
 }
 
 template<class NextScene>
@@ -1125,24 +1126,48 @@ void RailShoot::movePlayer()
 		// 移動させる
 		if (moveYFlag)
 		{
-			player->moveUp(inputVal.y * speed);
+			bool moveFlag = false;
 			if (inputVal.y > 0.f)
 			{
-				operInst.at("W")->isInvisible = true;
+				if (player->getPos().y <= 140.f)
+				{
+					moveFlag = true;
+					operInst.at("W")->isInvisible = true;
+				}
 			} else if (inputVal.y < 0.f)
 			{
-				operInst.at("S")->isInvisible = true;
+				if (player->getPos().y >= -55.f)
+				{
+					moveFlag = true;
+					operInst.at("S")->isInvisible = true;
+				}
+			}
+			if (moveFlag)
+			{
+				player->moveUp(inputVal.y * speed);
 			}
 		}
 		if (moveXFlag)
 		{
-			player->moveRight(inputVal.x * speed);
+			bool moveFlag = false;
 			if (inputVal.x > 0.f)
 			{
-				operInst.at("D")->isInvisible = true;
+				if (player->getPos().x <= 140.f)
+				{
+					moveFlag = true;
+					operInst.at("D")->isInvisible = true;
+				}
 			} else if (inputVal.x < 0.f)
 			{
-				operInst.at("A")->isInvisible = true;
+				if (player->getPos().x >= -140.f)
+				{
+					moveFlag = true;
+					operInst.at("A")->isInvisible = true;
+				}
+			}
+			if (moveFlag)
+			{
+				player->moveRight(inputVal.x * speed);
 			}
 		}
 	}
@@ -1276,6 +1301,10 @@ void RailShoot::drawFrontSprite()
 	ImGui::Begin("レールシューティング", nullptr, DX12Base::imGuiWinFlagsDef);
 	ImGui::Text("");
 	ImGui::Text("自機体力 : %u / %u", player->getHp(), playerHpMax);
+	ImGui::Text("自機位置 : %.2f %.2f %.2f",
+				player->getPos().x,
+				player->getPos().y,
+				player->getPos().z);
 	ImGui::End();
 
 	spriteBase->drawStart(dxBase->getCmdList());

@@ -135,7 +135,7 @@ void BossScene::initBoss()
 	boss->setRotation(XMFLOAT3(0, 180.f, 0));
 	boss->setTargetObj(player.get());
 	boss->setSmallEnemyModel(bossModel.get());
-	boss->getObj()->color = XMFLOAT4(4, 4, 4, 1);
+	boss->getObj()->color = XMFLOAT4(4, 1, 0.5f, 1);
 	boss->setAlive(false);
 
 	// ボスのパーツ

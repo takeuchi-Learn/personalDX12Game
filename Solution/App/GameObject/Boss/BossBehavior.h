@@ -38,9 +38,9 @@ private:
 
 	static inline constexpr uint32_t shotInterval = 60u;
 	uint32_t nowShotFrame = 0u;
-	static inline constexpr uint32_t shotNumMax = 15u;
-	uint32_t shotNum = 0u;
-	static inline constexpr uint32_t shotEnemyNum = 2;
+	static inline constexpr uint32_t shotCountMax = 15u;
+	uint32_t shotCount = 0u;
+	static inline constexpr uint32_t shotEnemyNum = 16;
 
 #pragma endregion 弾発射関係
 

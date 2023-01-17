@@ -68,7 +68,11 @@ public:
 	/// @brief 小さい敵を弾として出す
 	void addSmallEnemyHoming();
 
-	void addSmallEnemy(const DirectX::XMVECTOR& direction);
+	void addSmallEnemy(const DirectX::XMVECTOR& direction,
+					   const DirectX::XMFLOAT4& color = DirectX::XMFLOAT4(1.f,
+																		  1.f,
+																		  1.f,
+																		  1.f));
 
 #pragma endregion 弾関係
 };

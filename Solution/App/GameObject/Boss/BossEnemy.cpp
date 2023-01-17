@@ -94,7 +94,8 @@ void BossEnemy::addSmallEnemyHoming()
 		);
 }
 
-void BossEnemy::addSmallEnemy(const DirectX::XMVECTOR& direction)
+void BossEnemy::addSmallEnemy(const DirectX::XMVECTOR& direction,
+							  const DirectX::XMFLOAT4& color)
 {
 	// 0ベクトルだと向きが無いので除外
 	assert(!XMVector3Equal(direction, XMVectorZero()));
@@ -107,6 +108,7 @@ void BossEnemy::addSmallEnemy(const DirectX::XMVECTOR& direction)
 	i->setPos(this->getPos());
 	i->setHp(1u);
 	i->setLife(bulLife);
+	i->setCol(color);
 
 	XMVECTOR velVec = smallEnemyMoveSpeed * XMVector3Normalize(direction);
 	XMFLOAT3 vel{};

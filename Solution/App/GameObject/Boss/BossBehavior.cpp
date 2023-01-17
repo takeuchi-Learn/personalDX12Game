@@ -39,8 +39,8 @@ NODE_RESULT BossBehavior::phase_leave()
 		// ここで遠距離攻撃を開始(攻撃関数へ遷移)
 		phase = PHASE::ATTACK;
 		nowShotFrame = shotInterval;
-		shotNum = 0u;
-		return NODE_RESULT::SUCCESS;;
+		shotCount = 0u;
+		return NODE_RESULT::SUCCESS;
 	}
 
 	// 大きさを反映
@@ -60,24 +60,25 @@ NODE_RESULT BossBehavior::phase_attack()
 
 		constexpr float angleMax = static_cast<float>(3.141592653589793 * (1.0 / 4.0));
 
-		constexpr float bulNum = 13.f, bulNumMaxIndex = bulNum - 1.f;
-
-		for (float i = 0.f; i < bulNum; i += 1.f)
+		for (uint32_t i = 0ui32; i < shotEnemyNum; ++i)
 		{
-			XMVECTOR vel = XMVector3Rotate(velVec,
-										   XMQuaternionRotationRollPitchYaw(0.f,
-																			std::lerp(-angleMax,
-																					  angleMax,
-																					  i / bulNumMaxIndex),
-																			0.f));
+			const XMVECTOR vel = XMVector3Rotate(velVec,
+												 XMQuaternionRotationRollPitchYaw(0.f,
+																				  std::lerp(-angleMax,
+																							angleMax,
+																							(float)i / float(shotEnemyNum - 1)),
+																				  0.f));
 
 			boss->addSmallEnemy(vel);
 		}
 		nowShotFrame = 0u;
 
-		if (shotNum++ >= shotNumMax)
+		if (shotCount < shotCountMax)
 		{
-			shotNum = 0;
+			++shotCount;
+		} else
+		{
+			shotCount = 0;
 			phase = PHASE::APPROACH;
 		}
 	}
