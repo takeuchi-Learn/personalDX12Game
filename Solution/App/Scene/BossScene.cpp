@@ -881,22 +881,35 @@ void BossScene::movePlayer()
 
 #pragma region 四方向入力キーボードとパッド十字ボタン
 
+	bool inputXFlag = false, inputYFlag = false;
+
 	// 移動
 	if (input->hitKey(DIK_W) || input->hitKey(DIK_UP) || input->getPadButton(Input::PAD::UP))
 	{
 		inputVal.y = 1.f;
+		inputYFlag = true;
 	} else if (input->hitKey(DIK_S) || input->hitKey(DIK_DOWN) || input->getPadButton(Input::PAD::DOWN))
 	{
 		inputVal.y = -1.f;
+		inputYFlag = true;
 	}
 
 	// 回転
 	if (input->hitKey(DIK_A) || input->hitKey(DIK_LEFT) || input->getPadButton(Input::PAD::LEFT))
 	{
 		inputVal.x = -1.f;
+		inputYFlag = true;
 	} else if (input->hitKey(DIK_D) || input->hitKey(DIK_RIGHT) || input->getPadButton(Input::PAD::RIGHT))
 	{
 		inputVal.x = 1.f;
+		inputYFlag = true;
+	}
+
+	if (inputXFlag && inputYFlag)
+	{
+		constexpr float val = 1.f / 1.41421356f;
+
+		inputVal = XMFLOAT2(val, val);
 	}
 
 #pragma endregion 四方向入力キーボードとパッド十字ボタン

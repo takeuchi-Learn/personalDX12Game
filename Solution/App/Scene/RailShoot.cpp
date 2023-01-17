@@ -1099,13 +1099,17 @@ void RailShoot::movePlayer()
 		// 大きさを移動速度にする
 		XMStoreFloat2(&moveVal, moveSpeed * XMVector2Normalize(XMLoadFloat2(&moveVal)));
 
+		// 横移動するなら
 		if (moveVal.x != 0.f)
 		{
+			// 移動可能範囲内なら
 			if (player->getPos().x + moveVal.x < 180.f &&
 				player->getPos().x + moveVal.x > -180.f)
 			{
+				// 動く
 				player->moveRight(moveVal.x);
 
+				// 動いた方向の説明は消す
 				if (moveVal.x > 0.f)
 				{
 					operInst.at("D")->isInvisible = true;
@@ -1116,14 +1120,17 @@ void RailShoot::movePlayer()
 			}
 		}
 
+		// 縦移動するなら
 		if (moveVal.y != 0.f)
 		{
-
+			// 移動可能範囲内なら
 			if (player->getPos().y + moveVal.y < 150.f &&
 				player->getPos().y + moveVal.y > -15.f)
 			{
+				// 動く
 				player->moveUp(moveVal.y);
 
+				// 動いた方向の説明は消す
 				if (moveVal.y > 0.f)
 				{
 					operInst.at("W")->isInvisible = true;
