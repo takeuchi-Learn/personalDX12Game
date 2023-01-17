@@ -218,7 +218,7 @@ void BossScene::initBackObj()
 	// 地面
 	ground = std::make_unique<ObjSet>(camera.get(), "Resources/ground", "ground");
 	constexpr UINT groundSize = 5000u;
-	ground->setPos(XMFLOAT3(0, -player->getScale() * 5.f, 0));
+	ground->setPos(XMFLOAT3(0, -player->getScale() * 500.f, 0));
 	ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
 
 	constexpr float tillingNum = (float)groundSize / 32.f;
