@@ -73,16 +73,8 @@ void TitleScene::update_normal()
 		input->triggerPadButton(Input::PAD::A) ||
 		input->triggerPadButton(Input::PAD::B))
 	{
-#ifdef _DEBUG
-
-		if (input->hitKey(DIK_LSHIFT))
-		{
-			Sound::SoundStopWave(bgm.get());
-			SceneManager::getInstange()->changeScene<RailShoot>();
-			return;
-		}
-
-#endif // _DEBUG
+		// 次シーンの読み込み開始
+		th.reset(new std::thread([&] { nextScene = std::make_unique<RailShoot>(); }));
 
 		update_proc = std::bind(&TitleScene::update_end, this);
 		Sound::SoundPlayWave(shortBridge.get());
@@ -97,7 +89,11 @@ void TitleScene::update_end()
 	if (raito >= 1.f)
 	{
 		titlePos.y = static_cast<float>(WinAPI::window_height + 1);
-		SceneManager::getInstange()->changeScene<RailShoot>();
+
+		// 次シーンの読み込み終了を待つ
+		th->join();
+		// 次シーンへ進む
+		SceneManager::getInstange()->changeSceneFromInstance(nextScene);
 	} else
 	{
 		titlePos.y = std::lerp(0.f,

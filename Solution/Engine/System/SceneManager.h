@@ -40,4 +40,9 @@ public:
 
 	template <class SCENE>
 	inline void changeScene() { nextScene = std::make_unique<SCENE>(); }
+
+	inline void changeSceneFromInstance(std::unique_ptr<GameScene>& nextScene)
+	{
+		this->nextScene = std::move(nextScene);
+	}
 };

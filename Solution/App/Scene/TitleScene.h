@@ -16,6 +16,8 @@
 
 #include "Util/Timer.h"
 
+#include <thread>
+
  /// @brief タイトル画面シーンのクラス
 class TitleScene :
 	public GameScene
@@ -46,6 +48,13 @@ class TitleScene :
 	// デバッグテキスト
 	// --------------------
 	std::unique_ptr<DebugText> debugText;
+
+
+	// --------------------
+	// シーン
+	// --------------------
+	std::unique_ptr<GameScene> nextScene;
+	std::unique_ptr<std::thread> th;
 
 	Input* input = nullptr;
 
