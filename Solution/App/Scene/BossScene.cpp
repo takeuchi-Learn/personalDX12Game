@@ -399,11 +399,6 @@ void BossScene::update_play()
 
 #endif // _DEBUG
 
-	if (input->triggerKey(DIK_P))
-	{
-		boss->addSmallEnemy();
-	}
-
 	updateRgbShift();
 
 	if (player->getAlive())

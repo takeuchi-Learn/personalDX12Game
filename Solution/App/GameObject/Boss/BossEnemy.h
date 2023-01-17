@@ -22,6 +22,10 @@ class BossEnemy :
 	// 移動速度
 	float moveSpeed = 2.f;
 
+	/// @brief 原点からボスの攻撃対象を向くベクトルを算出
+	/// @param me 原点
+	/// @param moveYFlag Y方向に移動するかどうか
+	/// @return 原点->ボスのベクトル
 	DirectX::XMVECTOR calcVelVec(GameObj* me, bool moveYFlag = false);
 
 	void moveAndRota(float moveSpeed, const DirectX::XMVECTOR& velVec);
@@ -49,10 +53,9 @@ private:
 	std::forward_list<std::unique_ptr<BaseEnemy>> smallEnemy;
 	float smallEnemyMoveSpeed = 2.f;
 
-public:
-	/// @brief 小さい敵を弾として出す
-	void addSmallEnemy();
+	static const inline uint32_t bulLife = 900u;
 
+public:
 	/// @brief 弾として出された小さい敵の数を算出
 	/// @return 小さい敵の数
 	inline size_t calcSmallEnemyNum() const { return std::distance(smallEnemy.begin(), smallEnemy.end()); }
@@ -61,6 +64,11 @@ public:
 
 	inline ObjModel* getSmallEnemyModel() { return smallEnemyModel; }
 	inline void setSmallEnemyModel(ObjModel* model) { smallEnemyModel = model; }
+
+	/// @brief 小さい敵を弾として出す
+	void addSmallEnemyHoming();
+
+	void addSmallEnemy(const DirectX::XMVECTOR& direction);
 
 #pragma endregion 弾関係
 };

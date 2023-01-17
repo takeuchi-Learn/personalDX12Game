@@ -158,13 +158,13 @@ void DX12Base::initDevice()
 	//ComPtr<IDXGIFactory6> dxgiFactory;
 
 #ifdef _DEBUG
-	//デバッグレイヤーをオンに
-	ComPtr<ID3D12Debug1> debugController;
-	if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
-	{
-		debugController->EnableDebugLayer();
-		debugController->SetEnableGPUBasedValidation(TRUE);
-	}
+	////デバッグレイヤーをオンに
+	//ComPtr<ID3D12Debug1> debugController;
+	//if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugController))))
+	//{
+	//	debugController->EnableDebugLayer();
+	//	debugController->SetEnableGPUBasedValidation(TRUE);
+	//}
 #endif
 
 	// アダプターの列挙用

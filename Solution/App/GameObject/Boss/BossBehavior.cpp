@@ -15,7 +15,7 @@ NODE_RESULT BossBehavior::phase_approach()
 	if (XMVectorGetX(XMVector3Length(velVec)) < boss->getScale())
 	{
 		// todo ここで近接攻撃を開始(攻撃関数へ遷移)
-		boss->addSmallEnemy();
+		boss->addSmallEnemyHoming();
 		phase = PHASE::LEAVE;
 		return NODE_RESULT::SUCCESS;
 	}
@@ -56,9 +56,22 @@ NODE_RESULT BossBehavior::phase_attack()
 
 	if (nowShotFrame++ >= shotInterval)
 	{
-		for (uint32_t i = 0; i < shotEnemyNum; ++i)
+		const XMVECTOR velVec = XMVector3Normalize(boss->calcVelVec(boss, true));
+
+		constexpr float angleMax = static_cast<float>(3.141592653589793 * (1.0 / 4.0));
+
+		constexpr float bulNum = 13.f, bulNumMaxIndex = bulNum - 1.f;
+
+		for (float i = 0.f; i < bulNum; i += 1.f)
 		{
-			boss->addSmallEnemy();
+			XMVECTOR vel = XMVector3Rotate(velVec,
+										   XMQuaternionRotationRollPitchYaw(0.f,
+																			std::lerp(-angleMax,
+																					  angleMax,
+																					  i / bulNumMaxIndex),
+																			0.f));
+
+			boss->addSmallEnemy(vel);
 		}
 		nowShotFrame = 0u;
 

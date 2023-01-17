@@ -29,9 +29,12 @@ void BaseEnemy::additionalUpdate()
 	beforeUpdate();
 	if (alive)
 	{
+
 		phase();
 
 		movePos(vel);
+
+		life == 0u ? kill() : --life;
 	}
 	afterUpdate();
 }

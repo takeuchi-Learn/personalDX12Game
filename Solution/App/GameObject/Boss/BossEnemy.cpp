@@ -60,7 +60,7 @@ BossEnemy::BossEnemy(Camera* camera,
 }
 
 // 弾関係
-void BossEnemy::addSmallEnemy()
+void BossEnemy::addSmallEnemyHoming()
 {
 	auto& i = smallEnemy.emplace_front();
 	i.reset(new BaseEnemy(camera, smallEnemyModel));
@@ -68,6 +68,7 @@ void BossEnemy::addSmallEnemy()
 	i->setParent(this->getParent());
 	i->setPos(this->getPos());
 	i->setHp(1u);
+	i->setLife(bulLife);
 
 	const XMVECTOR right = XMVector3Rotate(XMVector3Normalize(calcVelVec(this, true)),
 										   XMQuaternionRotationRollPitchYaw(RandomNum::getRandf(0.f, XM_PI),
@@ -91,4 +92,24 @@ void BossEnemy::addSmallEnemy()
 		i->setVel(vel);
 		}
 		);
+}
+
+void BossEnemy::addSmallEnemy(const DirectX::XMVECTOR& direction)
+{
+	// 0ベクトルだと向きが無いので除外
+	assert(!XMVector3Equal(direction, XMVectorZero()));
+	assert(!XMVector3IsInfinite(direction));
+
+	auto& i = smallEnemy.emplace_front();
+	i.reset(new BaseEnemy(camera, smallEnemyModel));
+	i->setScale(10.f);
+	i->setParent(this->getParent());
+	i->setPos(this->getPos());
+	i->setHp(1u);
+	i->setLife(bulLife);
+
+	XMVECTOR velVec = smallEnemyMoveSpeed * XMVector3Normalize(direction);
+	XMFLOAT3 vel{};
+	XMStoreFloat3(&vel, velVec);
+	i->setVel(vel);
 }
