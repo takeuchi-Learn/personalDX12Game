@@ -59,6 +59,17 @@ void TitleScene::start()
 	timer->reset();
 }
 
+TitleScene::~TitleScene()
+{
+	if (th)
+	{
+		if (th->joinable())
+		{
+			th->join();
+		}
+	}
+}
+
 void TitleScene::update()
 {
 	update_proc();

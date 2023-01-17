@@ -66,6 +66,7 @@ class TitleScene :
 
 public:
 	TitleScene();
+	~TitleScene();
 	void start() override;
 	void update() override;
 	void drawFrontSprite() override;
