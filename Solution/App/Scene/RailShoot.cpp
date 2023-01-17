@@ -1009,140 +1009,87 @@ void RailShoot::updateRailPos()
 // --------------------
 void RailShoot::movePlayer()
 {
-	XMFLOAT2 moveVal = XMFLOAT2(0.f, 0.f);
-	XMFLOAT2 padInputRaito = input->getPadLStickRaito();
-
-	bool keyInput = false;
-	bool padInput = false;
+	// パッドの入力値
+	XMFLOAT2 inputVal = input->getPadLStickRaito();
 
 #pragma region 四方向入力キーボードとパッド十字ボタン
 
-	const bool hitW = input->hitKey(DIK_W) || input->hitKey(DIK_UP) || input->getPadButton(Input::PAD::UP);
-	const bool hitA = input->hitKey(DIK_A) || input->hitKey(DIK_LEFT) || input->getPadButton(Input::PAD::LEFT);
-	const bool hitS = input->hitKey(DIK_S) || input->hitKey(DIK_DOWN) || input->getPadButton(Input::PAD::DOWN);
-	const bool hitD = input->hitKey(DIK_D) || input->hitKey(DIK_RIGHT) || input->getPadButton(Input::PAD::RIGHT);
-	if (hitW || hitA || hitS || hitD)
+	bool inputXFlag = false, inputYFlag = false;
+
+	// 移動
+	if (input->hitKey(DIK_W) || input->hitKey(DIK_UP) || input->getPadButton(Input::PAD::UP))
 	{
-		keyInput = true;
+		inputVal.y = 1.f;
+		inputYFlag = true;
+	} else if (input->hitKey(DIK_S) || input->hitKey(DIK_DOWN) || input->getPadButton(Input::PAD::DOWN))
+	{
+		inputVal.y = -1.f;
+		inputYFlag = true;
+	}
 
-		// 横移動
-		if (hitD)
-		{
-			moveVal.x += 1.f;
-		} else if (hitA)
-		{
-			moveVal.x -= 1.f;
-		}
+	// 回転
+	if (input->hitKey(DIK_A) || input->hitKey(DIK_LEFT) || input->getPadButton(Input::PAD::LEFT))
+	{
+		inputVal.x = -1.f;
+		inputYFlag = true;
+	} else if (input->hitKey(DIK_D) || input->hitKey(DIK_RIGHT) || input->getPadButton(Input::PAD::RIGHT))
+	{
+		inputVal.x = 1.f;
+		inputYFlag = true;
+	}
 
-		// 高さ方向に移動
-		if (hitW)
-		{
-			moveVal.y += 1.f;
-		} else if (hitS)
-		{
-			moveVal.y -= 1.f;
-		}
+	if (inputXFlag && inputYFlag)
+	{
+		constexpr float val = 1.f / 1.41421356f;
+
+		inputVal = XMFLOAT2(val, val);
 	}
 
 #pragma endregion 四方向入力キーボードとパッド十字ボタン
 
-#pragma region パッド
+	const bool moveYFlag = inputVal.y != 0.f;
+	const bool moveXFlag = inputVal.x != 0.f;
 
-	const bool isLStickX = input->isVaildPadLStickX();
-
-	const bool isLStickY = input->isVaildPadLStickY();
-
-	// 無効なら0にする
-	if (!isLStickX) { padInputRaito.x = 0.f; }
-	if (!isLStickY) { padInputRaito.y = 0.f; }
-
-	if (isLStickX || isLStickY)
+	if (moveYFlag || moveXFlag)
 	{
-		padInput = true;
+		// 移動する速さ
+		float speed = 90.f / DX12Base::ins()->getFPS();
 
-		moveVal.x += padInputRaito.x;
-		moveVal.y += padInputRaito.y;
-	}
-#pragma endregion パッド
-
-#pragma region 移動
-
-	if (moveVal.x != 0.f || moveVal.y != 0.f)
-	{
-		// ゆっくりかどうか
-		const bool slowFlag =
-			input->hitKey(DIK_LCONTROL) ||
-			input->getPadButton(Input::PAD::LEFT_THUMB);
-
-		// ダッシュするかどうか
-		const bool dashFlag = input->hitKey(DIK_LSHIFT) ||
-			input->getPadButton(Input::PAD::LB);
-
-		// 移動速度を設定
-		float moveSpeed = 90.f / dxBase->getFPS();
-		if (slowFlag)
+		// 高速と低速
+		if (input->hitKey(DIK_LCONTROL) ||
+			input->getPadButton(Input::PAD::LEFT_THUMB))
 		{
-			moveSpeed /= 2.f;
-		} else if (dashFlag)
+			speed /= 2.f;
+		} else if (input->hitKey(DIK_LSHIFT) ||
+				   input->getPadButton(Input::PAD::LB))
 		{
-			moveSpeed *= 2.f;
+			speed *= 2.f;
 		}
 
-		if (padInput)
+		// 移動させる
+		if (moveYFlag)
 		{
-			const float raito = sqrt(padInputRaito.x * padInputRaito.x +
-									 padInputRaito.y * padInputRaito.y);
-
-			moveSpeed *= raito;
-		}
-
-		// 大きさを移動速度にする
-		XMStoreFloat2(&moveVal, moveSpeed * XMVector2Normalize(XMLoadFloat2(&moveVal)));
-
-		// 横移動するなら
-		if (moveVal.x != 0.f)
-		{
-			// 移動可能範囲内なら
-			if (player->getPos().x + moveVal.x < 180.f &&
-				player->getPos().x + moveVal.x > -180.f)
+			player->moveUp(inputVal.y * speed);
+			if (inputVal.y > 0.f)
 			{
-				// 動く
-				player->moveRight(moveVal.x);
-
-				// 動いた方向の説明は消す
-				if (moveVal.x > 0.f)
-				{
-					operInst.at("D")->isInvisible = true;
-				} else if (moveVal.x < 0.f)
-				{
-					operInst.at("A")->isInvisible = true;
-				}
+				operInst.at("W")->isInvisible = true;
+			} else if (inputVal.y < 0.f)
+			{
+				operInst.at("S")->isInvisible = true;
 			}
 		}
-
-		// 縦移動するなら
-		if (moveVal.y != 0.f)
+		if (moveXFlag)
 		{
-			// 移動可能範囲内なら
-			if (player->getPos().y + moveVal.y < 150.f &&
-				player->getPos().y + moveVal.y > -15.f)
+			player->moveRight(inputVal.x * speed);
+			if (inputVal.x > 0.f)
 			{
-				// 動く
-				player->moveUp(moveVal.y);
-
-				// 動いた方向の説明は消す
-				if (moveVal.y > 0.f)
-				{
-					operInst.at("W")->isInvisible = true;
-				} else if (moveVal.y < 0.f)
-				{
-					operInst.at("S")->isInvisible = true;
-				}
+				operInst.at("D")->isInvisible = true;
+			} else if (inputVal.x < 0.f)
+			{
+				operInst.at("A")->isInvisible = true;
 			}
 		}
 	}
-
-#pragma endregion 移動
 }
 
 void RailShoot::updatePlayerShotTarget()
