@@ -314,6 +314,19 @@ void BossScene::update()
 
 void BossScene::update_start()
 {
+#ifdef _DEBUG
+	if (input->triggerKey(DIK_SPACE))
+	{
+		player->setPos(sceneChangeEndPos);
+		player->setRotation(sceneChangeEndRota);
+		camera->setEye2TargetLen(sceneChangeEndCamLen);
+
+		startAppearBoss();
+		return;
+	}
+#endif // _DEBUG
+
+
 	if (timer->getNowTime() > sceneChangeTime)
 	{
 		player->setPos(sceneChangeEndPos);
@@ -335,6 +348,19 @@ void BossScene::update_start()
 
 void BossScene::update_appearBoss()
 {
+
+	// デバッグ時はスペースで演出終了
+#ifdef _DEBUG
+
+	if (input->triggerKey(DIK_SPACE))
+	{
+		endAppearBoss();
+		return;
+	}
+
+#endif // _DEBUG
+
+
 	// 時間が来たら次へ進む
 	if (timer->getNowTime() > appearBossData->appearBossTime)
 	{
@@ -381,7 +407,7 @@ void BossScene::update_play()
 {
 #ifdef _DEBUG
 
-	if (Input::getInstance()->hitKey(DIK_SPACE))
+	if (Input::getInstance()->triggerKey(DIK_SPACE))
 	{
 		update_proc = std::bind(&BossScene::update_end<EndScene>, this);
 	}

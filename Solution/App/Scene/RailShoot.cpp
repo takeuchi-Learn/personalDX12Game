@@ -605,6 +605,16 @@ void RailShoot::update_start()
 
 void RailShoot::update_appearPlayer()
 {
+#ifdef _DEBUG
+	if (input->triggerKey(DIK_SPACE))
+	{
+		endAppearPlayer();
+
+		return;
+	}
+#endif // _DEBUG
+
+
 	const auto nowTime = appearPlayer->timer->getNowTime();
 
 	if (nowTime > appearPlayer->appearTime)
