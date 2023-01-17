@@ -69,6 +69,9 @@ public:
 	inline void setPos(const DirectX::XMFLOAT3& pos) { obj->position = pos; }
 	inline const DirectX::XMFLOAT3& getPos() const { return obj->position; }
 
+	inline void setCol(const DirectX::XMFLOAT4& col) { obj->color = col; }
+	inline const DirectX::XMFLOAT4& getCol() const { return obj->color; }
+
 	inline void setScaleF3(const DirectX::XMFLOAT3& scale) { obj->scale = scale; }
 	inline void setScale(float scale) { obj->scale = DirectX::XMFLOAT3(scale, scale, scale); }
 	inline const DirectX::XMFLOAT3& getScaleF3() const { return obj->scale; }

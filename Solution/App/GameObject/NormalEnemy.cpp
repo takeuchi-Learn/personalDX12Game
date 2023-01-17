@@ -25,9 +25,12 @@ void NormalEnemy::shot(const DirectX::XMFLOAT3& targetPos,
 	// 親を設定
 	i->setParent(obj->parent);
 
-	i->setScaleF3(XMFLOAT3(bulScale,
-						   bulScale,
+	// 大きさを設定
+	i->setScaleF3(XMFLOAT3(bulScale * 2.f,
+						   bulScale * 2.f,
 						   bulScale));
+
+	i->setCol(XMFLOAT4(0.25f, 1.f, 0.5f, 1.f));
 
 	// 速度を算出
 	const XMFLOAT3 velF3 = calcVel(targetPos, obj->position, vel);

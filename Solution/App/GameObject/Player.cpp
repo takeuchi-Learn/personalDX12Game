@@ -89,6 +89,7 @@ void Player::shot(Camera* camera,
 {
 	PlayerBullet& i = bul.emplace_front(camera, model, obj->position);
 	i.setScale(bulScale);
+	i.setCol(XMFLOAT4(1.f, 0.25f, 0.25f, 1.f));
 	i.setParent(obj->parent);
 	i.setLife(bulLife);
 	i.setSpeed(speed);
