@@ -168,6 +168,7 @@ class RailShoot
 	void update_start();
 	void update_appearPlayer();
 	void update_play();
+	void update_exitPlayer();
 	template<class NextScene>
 	void update_end();
 
@@ -206,6 +207,22 @@ class RailShoot
 	void endAppearPlayer();
 
 #pragma endregion 自機登場演出
+
+#pragma region 自機退場演出
+
+	struct ExitPlayer
+	{
+		startEnd<DirectX::XMFLOAT3> playerPos;
+		const Timer::timeType exitTime;
+		std::unique_ptr<Timer> timer;
+		startEnd<DirectX::XMFLOAT3> playerScale;
+	};
+	std::unique_ptr<ExitPlayer> exitPlayer;
+
+	void startExitPlayer();
+	void endExitPlayer();
+
+#pragma endregion 自機退場演出
 
 	void updateRailPos();
 	void movePlayer();

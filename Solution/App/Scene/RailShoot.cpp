@@ -847,7 +847,7 @@ void RailShoot::update_play()
 			// 敵がすべて消えたら次のシーンへ
 			if (enemyEmpty)
 			{
-				changeNextScene<BossScene>();
+				startExitPlayer();
 			}
 		}
 	}
@@ -863,6 +863,25 @@ void RailShoot::update_play()
 	++nowFrame;
 
 	updateRgbShift();
+}
+
+void RailShoot::update_exitPlayer()
+{
+	const auto nowTime = exitPlayer->timer->getNowTime();
+
+	if (nowTime >= exitPlayer->exitTime)
+	{
+		endExitPlayer();
+		return;
+	}
+
+	const float raito = (float)nowTime / (float)exitPlayer->exitTime;
+
+	player->setPos(lerp(exitPlayer->playerPos.start, exitPlayer->playerPos.end, raito));
+
+	player->setScaleF3(lerp(exitPlayer->playerScale.start, exitPlayer->playerScale.end, raito));
+
+	camera->setTarget(player->calcWorldPos());
 }
 
 template<class NextScene>
@@ -963,6 +982,34 @@ void RailShoot::endAppearPlayer()
 	}
 
 	update_proc = std::bind(&RailShoot::update_play, this);
+	appearPlayer.reset(nullptr);
+}
+
+void RailShoot::startExitPlayer()
+{
+	exitPlayer = std::make_unique<ExitPlayer>(ExitPlayer
+											  {
+												  .playerPos = {
+													  .start = player->getPos(),
+													  .end = XMFLOAT3(player->getPos().x, player->getPos().y, player->getPos().z + 100.f)
+												  },
+												  .exitTime = Timer::oneSec * 3,
+												  .timer = std::make_unique<Timer>(),
+												  .playerScale = {
+													  .start = player->getScaleF3(),
+													  .end = XMFLOAT3(0.f, 0.f, 0.f)
+												  }
+											  });
+	camera->setParentObj(nullptr);
+
+	update_proc = std::bind(&RailShoot::update_exitPlayer, this);
+	exitPlayer->timer->reset();
+}
+
+void RailShoot::endExitPlayer()
+{
+	exitPlayer.reset(nullptr);
+	changeNextScene<BossScene>();
 }
 
 void RailShoot::updateRailPos()
