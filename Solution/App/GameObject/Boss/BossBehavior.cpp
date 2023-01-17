@@ -56,20 +56,29 @@ NODE_RESULT BossBehavior::phase_attack()
 
 	if (nowShotFrame++ >= shotInterval)
 	{
-		const XMVECTOR velVec = XMVector3Normalize(boss->calcVelVec(boss, true));
+		const XMVECTOR directionVec = boss->calcVelVec(boss, true);
 
-		constexpr float angleMax = static_cast<float>(3.141592653589793 * (1.0 / 4.0));
+		constexpr float angleMax = static_cast<float>(3.141592653589793 * (1.0 / 8.0));
+
+		constexpr float oneRad = angleMax * 2.f / float(shotEnemyNum - 1);
+		constexpr float halfRad = oneRad / 2.f;
 
 		for (uint32_t i = 0ui32; i < shotEnemyNum; ++i)
 		{
-			const XMVECTOR vel = XMVector3Rotate(velVec,
-												 XMQuaternionRotationRollPitchYaw(0.f,
-																				  std::lerp(-angleMax,
-																							angleMax,
-																							(float)i / float(shotEnemyNum - 1)),
-																				  0.f));
+			// このfor文内での進行度
+			const float raito = (float)i / float(shotEnemyNum - 1);
 
-			boss->addSmallEnemy(vel, bulCol);
+			// 射出角度
+			// 二回に一回半分ずらす(これがないとあんま当たらん)
+			const float angle = angleMax + halfRad * float(1ui32 - (shotCount & 1));
+
+			// 弾の射出方向
+			const XMVECTOR direction = XMVector3Rotate(directionVec,
+													   XMQuaternionRotationRollPitchYaw(0.f,
+																						std::lerp(-angle, angle, raito),
+																						0.f));
+
+			boss->addSmallEnemy(direction, bulCol);
 		}
 		nowShotFrame = 0u;
 
