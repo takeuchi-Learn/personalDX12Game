@@ -264,6 +264,14 @@ void BossScene::start()
 	PostEffect::getInstance()->setVignIntensity(0.5f);
 	PostEffect::getInstance()->setSpeedLineIntensity(0.125f);
 
+
+
+	// 照準の位置を画面中央にする
+	input->setMousePos(WinAPI::window_width / 2, WinAPI::window_height / 2);
+	player->setAim2DPos(XMFLOAT2((float)WinAPI::window_width / 2.f, (float)WinAPI::window_height / 2.f));
+	aim2D->position.x = player->getAim2DPos().x;
+	aim2D->position.y = player->getAim2DPos().y;
+
 	for (auto& i : attackableEnemy)
 	{
 		i->setAlive(false);
@@ -858,14 +866,14 @@ void BossScene::movePlayer()
 		input->triggerPadButton(Input::PAD::X) ||
 		input->triggerPadButton(Input::PAD::Y))
 	{
-		XMFLOAT3 camRrota = camera->getRelativeRotaDeg();
+		XMFLOAT3 camRota = camera->getRelativeRotaDeg();
 
 		constexpr float angle = 20.f;
-		camRrota.x += playerUpTurn ? angle : -angle;
+		camRota.x += playerUpTurn ? angle : -angle;
 
 		playerUpTurn = !playerUpTurn;
 
-		camera->setRelativeRotaDeg(camRrota);
+		camera->setRelativeRotaDeg(camRota);
 	}
 
 	// パッドの入力値
@@ -874,108 +882,88 @@ void BossScene::movePlayer()
 #pragma region 四方向入力キーボードとパッド十字ボタン
 
 	// 移動
+	if (input->hitKey(DIK_W) || input->hitKey(DIK_UP) || input->getPadButton(Input::PAD::UP))
 	{
-		const bool hitW = input->hitKey(DIK_W) || input->hitKey(DIK_UP) || input->getPadButton(Input::PAD::UP);
-		const bool hitA = input->hitKey(DIK_A) || input->hitKey(DIK_LEFT) || input->getPadButton(Input::PAD::LEFT);
-		const bool hitS = input->hitKey(DIK_S) || input->hitKey(DIK_DOWN) || input->getPadButton(Input::PAD::DOWN);
-		const bool hitD = input->hitKey(DIK_D) || input->hitKey(DIK_RIGHT) || input->getPadButton(Input::PAD::RIGHT);
+		inputVal.y = 1.f;
+	} else if (input->hitKey(DIK_S) || input->hitKey(DIK_DOWN) || input->getPadButton(Input::PAD::DOWN))
+	{
+		inputVal.y = -1.f;
+	}
 
-		if (hitW)
-		{
-			inputVal.y = 1.f;
-		} else if (hitS)
-		{
-			inputVal.y = -1.f;
-		}
-
-		// 回転
-		if (hitA)
-		{
-			inputVal.x = -1.f;
-		} else if (hitD)
-		{
-			inputVal.x = 1.f;
-		}
+	// 回転
+	if (input->hitKey(DIK_A) || input->hitKey(DIK_LEFT) || input->getPadButton(Input::PAD::LEFT))
+	{
+		inputVal.x = -1.f;
+	} else if (input->hitKey(DIK_D) || input->hitKey(DIK_RIGHT) || input->getPadButton(Input::PAD::RIGHT))
+	{
+		inputVal.x = 1.f;
 	}
 
 #pragma endregion 四方向入力キーボードとパッド十字ボタン
 
-	// ゆっくりかどうか
-	const bool slowFlag =
-		input->hitKey(DIK_LCONTROL) ||
-		input->getPadButton(Input::PAD::LEFT_THUMB);
+	const bool moveYFlag = inputVal.y != 0.f;
+	const bool moveXFlag = inputVal.x != 0.f;
 
-	// ダッシュするかどうか
-	const bool dashFlag =
-		input->hitKey(DIK_LSHIFT) ||
-		input->getPadButton(Input::PAD::LB);
-
-	// 移動回転を反映
-	if (inputVal.y != 0.f)
+	if (moveYFlag || moveXFlag)
 	{
-		// 移動
-		float moveSpeed = inputVal.y * 90.f / DX12Base::ins()->getFPS();
+		// 移動する速さ
+		float speed = 90.f / DX12Base::ins()->getFPS();
 
-		if (slowFlag)
-		{
-			moveSpeed /= 2.f;
-		} else if (dashFlag)
-		{
-			moveSpeed *= 2.f;
-		}
-
-		// 移動させる
-		player->moveForward(moveSpeed);
-	}
-	if (inputVal.x != 0.f)
-	{
-		// 回転
-
-		// 左右の回転
-		float speed = inputVal.x * 30.f / DX12Base::ins()->getFPS();
-
-		// 左シフトと左コントロールで速度変更
-		if (input->hitKey(DIK_LCONTROL))
+		// 高速と低速
+		if (input->hitKey(DIK_LCONTROL) ||
+			input->getPadButton(Input::PAD::LEFT_THUMB))
 		{
 			speed /= 2.f;
-		} else if (dashFlag)
+		} else if (input->hitKey(DIK_LSHIFT) ||
+				   input->getPadButton(Input::PAD::LB))
 		{
 			speed *= 2.f;
 		}
 
-		XMFLOAT3 rota = player->getRotation();
-
-		// 回転させる
-		rota.y += speed;
-
-		player->setRotation(rota);
+		// 移動させる
+		if (moveYFlag)
+		{
+			player->moveForward(inputVal.y * speed);
+		}
+		if (moveXFlag)
+		{
+			player->moveRight(inputVal.x * speed);
+		}
 	}
 }
 
 void BossScene::moveAim2DPos()
 {
+	constexpr POINT center = POINT(WinAPI::window_width / 2,
+								   WinAPI::window_height / 2);
+
 	// マウスカーソルの位置をパッド入力に合わせてずらす
-	POINT pos = input->getMousePos();
+	const POINT pos = input->getMousePos();
+	input->setMousePos(center.x, center.y);
+
+	POINT posDiff = POINT(pos.x - center.x,
+						  pos.y - center.y);
 
 	// 右スティックの入力で速度を決める
 	XMFLOAT2 rStick = input->getPadRStickRaito();
-	float speed = 10.f;
+	float stickSpeed = 10.f;
 	if (input->getPadButton(Input::PAD::RIGHT_THUMB))
 	{
-		speed /= 2.f;
+		stickSpeed /= 2.f;
 	}
 
 	// 入力に合わせて移動
-	pos.x += static_cast<LONG>(rStick.x * speed);
-	pos.y += static_cast<LONG>(-rStick.y * speed);
+	posDiff.x += static_cast<LONG>(rStick.x * stickSpeed);
+	posDiff.y += static_cast<LONG>(-rStick.y * stickSpeed);
 
-	// 移動を反映
-	input->setMousePos(pos.x, pos.y);
+	// 自機回転速度
+	constexpr float rotaSpeed = 0.125f;
 
-	// 照準の位置をマウスカーソルに合わせる
-	player->setAim2DPos(XMFLOAT2((float)pos.x, (float)pos.y));
-	aim2D->position.x = player->getAim2DPos().x;
-	aim2D->position.y = player->getAim2DPos().y;
+	// 入力に合わせて回転
+	XMFLOAT3 rota = player->getRotation();
+	rota.x += rotaSpeed * posDiff.y;
+	rota.y += rotaSpeed * posDiff.x;
+	player->setRotation(rota);
 }
 
 void BossScene::drawFrontSprite()
