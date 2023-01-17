@@ -73,7 +73,6 @@ void TitleScene::update_normal()
 		input->triggerPadButton(Input::PAD::A) ||
 		input->triggerPadButton(Input::PAD::B))
 	{
-
 #ifdef _DEBUG
 
 		if (input->hitKey(DIK_LSHIFT))
@@ -84,7 +83,6 @@ void TitleScene::update_normal()
 		}
 
 #endif // _DEBUG
-
 
 		update_proc = std::bind(&TitleScene::update_end, this);
 		Sound::SoundPlayWave(shortBridge.get());

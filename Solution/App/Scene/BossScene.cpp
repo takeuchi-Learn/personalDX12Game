@@ -39,7 +39,6 @@ BossScene::BossScene() :
 	particleMgr(std::make_unique<ParticleMgr>(L"Resources/effect1.png", camera.get())),
 	playerHpBarWidMax(WinAPI::window_width * 0.25f)
 {
-
 #pragma region 音
 
 	killSe = std::make_unique<Sound>("Resources/SE/Sys_Set03-click.wav");
@@ -180,7 +179,6 @@ void BossScene::initBoss()
 	pos.y -= 0.75f;
 	bossParts[3]->setPos(pos);
 
-
 	pos = bossParts[4]->getPos();
 	pos.x -= 0.25f;
 	pos.y -= 0.75f;
@@ -264,8 +262,6 @@ void BossScene::start()
 	PostEffect::getInstance()->setVignIntensity(0.5f);
 	PostEffect::getInstance()->setSpeedLineIntensity(0.125f);
 
-
-
 	// 照準の位置を画面中央にする
 	input->setMousePos(WinAPI::window_width / 2, WinAPI::window_height / 2);
 	player->setAim2DPos(XMFLOAT2((float)WinAPI::window_width / 2.f, (float)WinAPI::window_height / 2.f));
@@ -285,15 +281,7 @@ void BossScene::start()
 
 void BossScene::update()
 {
-	{
-		// シーン遷移中も背景は回す
-		XMFLOAT2 shiftUv = back->getModelPt()->getShiftUv();
-		constexpr float shiftSpeed = 0.01f;
-
-		shiftUv.x += shiftSpeed / DX12Base::getInstance()->getFPS();
-
-		back->getModelPt()->setShivtUv(shiftUv);
-	}
+	rotaBackObj();
 
 	moveAim2DPos();
 
@@ -326,7 +314,6 @@ void BossScene::update_start()
 	}
 #endif // _DEBUG
 
-
 	if (timer->getNowTime() > sceneChangeTime)
 	{
 		player->setPos(sceneChangeEndPos);
@@ -348,7 +335,6 @@ void BossScene::update_start()
 
 void BossScene::update_appearBoss()
 {
-
 	// デバッグ時はスペースで演出終了
 #ifdef _DEBUG
 
@@ -359,7 +345,6 @@ void BossScene::update_appearBoss()
 	}
 
 #endif // _DEBUG
-
 
 	// 時間が来たら次へ進む
 	if (timer->getNowTime() > appearBossData->appearBossTime)
@@ -1003,6 +988,17 @@ void BossScene::moveAim2DPos()
 	rota.x += rotaSpeed * posDiff.y;
 	rota.y += rotaSpeed * posDiff.x;
 	player->setRotation(rota);
+}
+
+void BossScene::rotaBackObj()
+{
+	// シーン遷移中も背景は回す
+	XMFLOAT2 shiftUv = back->getModelPt()->getShiftUv();
+	constexpr float shiftSpeed = 0.01f;
+
+	shiftUv.x += shiftSpeed / DX12Base::getInstance()->getFPS();
+
+	back->getModelPt()->setShivtUv(shiftUv);
 }
 
 void BossScene::drawFrontSprite()

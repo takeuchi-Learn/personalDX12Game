@@ -20,4 +20,3 @@ public:
 	void update() override;
 	void drawFrontSprite() override;
 };
-

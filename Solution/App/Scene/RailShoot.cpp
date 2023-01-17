@@ -614,7 +614,6 @@ void RailShoot::update_appearPlayer()
 	}
 #endif // _DEBUG
 
-
 	const auto nowTime = appearPlayer->timer->getNowTime();
 
 	if (nowTime > appearPlayer->appearTime)

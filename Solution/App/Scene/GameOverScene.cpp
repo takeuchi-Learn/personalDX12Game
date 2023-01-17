@@ -13,7 +13,6 @@ GameOverScene::GameOverScene() :
 	gameOverGr = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/GameOverScene/gameOverGr.png"),
 										  spBase.get(),
 										  XMFLOAT2(0.f, 0.f));
-
 }
 
 void GameOverScene::update()

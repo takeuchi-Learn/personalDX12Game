@@ -104,7 +104,6 @@ private:
 
 #pragma endregion スプライト
 
-
 #pragma region ImGui定数
 
 	static constexpr ImGuiWindowFlags winFlags =
@@ -173,6 +172,8 @@ private:
 
 	// 照準の位置を移動
 	void moveAim2DPos();
+
+	void rotaBackObj();
 
 #pragma region updateの中身
 
