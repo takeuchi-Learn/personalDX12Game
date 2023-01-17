@@ -171,6 +171,9 @@ private:
 
 	void movePlayer();
 
+	// 照準の位置を移動
+	void moveAim2DPos();
+
 #pragma region updateの中身
 
 	// update_何とか関数を格納する

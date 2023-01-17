@@ -287,28 +287,7 @@ void BossScene::update()
 		back->getModelPt()->setShivtUv(shiftUv);
 	}
 
-	{
-		// マウスカーソルの位置をパッド入力に合わせてずらす
-		POINT pos = input->getMousePos();
-
-		XMFLOAT2 rStick = input->getPadRStickRaito();
-		float speed = 10.f;
-		if (input->getPadButton(Input::PAD::RIGHT_THUMB))
-		{
-			speed /= 2.f;
-		}
-
-		pos.x += static_cast<LONG>(rStick.x * speed);
-		pos.y += static_cast<LONG>(-rStick.y * speed);
-
-		input->setMousePos(pos.x, pos.y);
-	}
-
-	// 照準の位置をマウスカーソルに合わせる
-	player->setAim2DPos(XMFLOAT2((float)input->getMousePos().x,
-								 (float)input->getMousePos().y));
-	aim2D->position.x = player->getAim2DPos().x;
-	aim2D->position.y = player->getAim2DPos().y;
+	moveAim2DPos();
 
 	// 更新処理本体
 	update_proc();
@@ -971,6 +950,32 @@ void BossScene::movePlayer()
 
 		player->setRotation(rota);
 	}
+}
+
+void BossScene::moveAim2DPos()
+{
+	// マウスカーソルの位置をパッド入力に合わせてずらす
+	POINT pos = input->getMousePos();
+
+	// 右スティックの入力で速度を決める
+	XMFLOAT2 rStick = input->getPadRStickRaito();
+	float speed = 10.f;
+	if (input->getPadButton(Input::PAD::RIGHT_THUMB))
+	{
+		speed /= 2.f;
+	}
+
+	// 入力に合わせて移動
+	pos.x += static_cast<LONG>(rStick.x * speed);
+	pos.y += static_cast<LONG>(-rStick.y * speed);
+
+	// 移動を反映
+	input->setMousePos(pos.x, pos.y);
+
+	// 照準の位置をマウスカーソルに合わせる
+	player->setAim2DPos(XMFLOAT2((float)pos.x, (float)pos.y));
+	aim2D->position.x = player->getAim2DPos().x;
+	aim2D->position.y = player->getAim2DPos().y;
 }
 
 void BossScene::drawFrontSprite()
