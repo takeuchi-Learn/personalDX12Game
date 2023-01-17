@@ -1300,11 +1300,10 @@ void RailShoot::drawFrontSprite()
 
 	ImGui::Begin("レールシューティング", nullptr, DX12Base::imGuiWinFlagsDef);
 	ImGui::Text("");
-	ImGui::Text("自機体力 : %u / %u", player->getHp(), playerHpMax);
-	ImGui::Text("自機位置 : %.2f %.2f %.2f",
-				player->getPos().x,
-				player->getPos().y,
-				player->getPos().z);
+	ImGui::Text("自機体力 : %.2f%%(%u / %u)",
+				(float)player->getHp() / (float)playerHpMax * 100.f,
+				player->getHp(),
+				playerHpMax);
 	ImGui::End();
 
 	spriteBase->drawStart(dxBase->getCmdList());

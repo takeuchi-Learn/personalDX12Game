@@ -1013,16 +1013,16 @@ void BossScene::drawFrontSprite()
 	ImGui::PushFont(dxBase->getBigImFont());
 	ImGui::Text("イボを撃ち潰せ！");
 	ImGui::PopFont();
-	ImGui::Text("ボスの弾は迎撃せよ！");
+	ImGui::Text("ボスの弾は迎撃可能！");
 	ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x,
 								   ImGui::GetWindowPos().y + ImGui::GetWindowSize().y));
 	ImGui::SetNextWindowSize(ImVec2(ImGui::GetWindowWidth(), 150));
 	ImGui::End();
 
 	ImGui::Begin("操作", nullptr, winFlags);
-	ImGui::Text("WS : 移動");
-	ImGui::Text("AD : 回転");
-	ImGui::Text("左シフト + 移動 or 回転 : ダッシュ");
+	ImGui::Text("WASD : 移動");
+	ImGui::Text("左Shift : ダッシュ");
+	ImGui::Text("左Ctrl : ゆっくり");
 	ImGui::Text("E : カメラ位置変更");
 	ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x,
 								   ImGui::GetWindowPos().y + ImGui::GetWindowSize().y));
@@ -1030,12 +1030,16 @@ void BossScene::drawFrontSprite()
 	ImGui::End();
 
 	ImGui::Begin("情報", nullptr, winFlags);
-	ImGui::Text("自機体力 : %.2f%%", (float)player->getHp() / (float)playerHpMax * 100.f);
+	ImGui::Text("自機体力 : %.2f%%(%u / %u)",
+				(float)player->getHp() / (float)playerHpMax * 100.f,
+				player->getHp(),
+				playerHpMax);
 	if (boss->getAlive())
 	{
+		const uint32_t bossHp = calcBossHp();
 		ImGui::Text("ボスHP : %.2f%% (%u)",
-					(float)calcBossHp() / (float)bossHpMax * 100.f,
-					boss->getHp());
+					(float)bossHp / (float)bossHpMax * 100.f,
+					bossHp);
 	}
 	ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x,
 								   ImGui::GetWindowPos().y + ImGui::GetWindowSize().y));
