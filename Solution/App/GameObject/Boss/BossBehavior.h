@@ -40,7 +40,7 @@ private:
 	uint32_t nowShotFrame = 0u;
 	static inline constexpr uint32_t shotNumMax = 15u;
 	uint32_t shotNum = 0u;
-	static inline constexpr uint32_t shoEnemyNum = 5;
+	static inline constexpr uint32_t shotEnemyNum = 2;
 
 #pragma endregion 弾発射関係
 

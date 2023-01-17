@@ -56,7 +56,7 @@ NODE_RESULT BossBehavior::phase_attack()
 
 	if (nowShotFrame++ >= shotInterval)
 	{
-		for (uint32_t i = 0; i < shoEnemyNum; ++i)
+		for (uint32_t i = 0; i < shotEnemyNum; ++i)
 		{
 			boss->addSmallEnemy();
 		}
