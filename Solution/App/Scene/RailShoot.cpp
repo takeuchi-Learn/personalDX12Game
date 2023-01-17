@@ -991,7 +991,7 @@ void RailShoot::startExitPlayer()
 											  {
 												  .playerPos = {
 													  .start = player->getPos(),
-													  .end = XMFLOAT3(player->getPos().x, player->getPos().y, player->getPos().z + 100.f)
+													  .end = XMFLOAT3(player->getPos().x, player->getPos().y+1000.f, player->getPos().z + 1000.f)
 												  },
 												  .exitTime = Timer::oneSec * 3,
 												  .timer = std::make_unique<Timer>(),
