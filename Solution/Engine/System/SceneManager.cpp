@@ -15,13 +15,13 @@ SceneManager::SceneManager()
 void SceneManager::update()
 {
 	// 次のシーンがあったら
-	if (nextScene != nullptr)
+	if (nextScene)
 	{
 		// 今のシーンを削除し、次のシーンに入れ替える
 		nowScene = std::move(nextScene);
 
 		//次シーンの情報をクリア
-		nextScene.reset();
+		nextScene.reset(nullptr);
 
 		// 次のシーンの初期化処理
 		nowScene->start();

@@ -30,6 +30,7 @@ void NormalEnemy::shot(const DirectX::XMFLOAT3& targetPos,
 						   bulScale * 2.f,
 						   bulScale));
 
+	// 色を設定
 	i->setCol(XMFLOAT4(0.25f, 1.f, 0.5f, 1.f));
 
 	// 速度を算出
@@ -37,12 +38,10 @@ void NormalEnemy::shot(const DirectX::XMFLOAT3& targetPos,
 	i->setVel(velF3);
 
 	// 速度の向きに合わせて回転
-	{
-		const XMFLOAT2 rota = calcRotationSyncVelDeg(velF3);
-		i->setRotation(XMFLOAT3(rota.x,
-								rota.y,
-								obj->rotation.z));
-	}
+	const XMFLOAT2 rota = calcRotationSyncVelDeg(velF3);
+	i->setRotation(XMFLOAT3(rota.x,
+							rota.y,
+							obj->rotation.z));
 }
 
 #pragma region phase
@@ -88,62 +87,6 @@ void NormalEnemy::afterUpdate()
 	drawFlag = alive;
 
 	bul.remove_if([](std::unique_ptr<EnemyBullet>& i) { return !i->getAlive(); });
-
-	if (!targetObjPt)
-	{
-		for (auto& i : bul)
-		{
-			i->setVel(XMFLOAT3(0, 0, -1));
-
-			i->setRotation(XMFLOAT3(0, 180, 0));
-		}
-	} else
-	{
-		for (auto& i : bul)
-		{
-			// 補間する割合[0~1]
-			// 1だと回避不可能
-			// 調整項目
-			constexpr float raito = 0.02f;
-
-			const XMFLOAT3& nowVel = i->getVel();
-
-			// 速度の差分を取得
-			XMFLOAT3 nextVel = calcVel(targetObjPt->getPos(), i->getPos(), 2.f);
-			const float velLen = sqrtf(nextVel.x * nextVel.x +
-									   nextVel.y * nextVel.y +
-									   nextVel.z * nextVel.z);
-
-			// 大きさを1にする
-			nextVel.x /= velLen;
-			nextVel.y /= velLen;
-			nextVel.z /= velLen;
-
-			// 差分を取得
-			nextVel.x -= nowVel.x;
-			nextVel.y -= nowVel.y;
-			nextVel.z -= nowVel.z;
-
-			// 差分に速度の補間の割合を適用
-			nextVel.x *= velLen * raito;
-			nextVel.y *= velLen * raito;
-			nextVel.z *= velLen * raito;
-
-			// 前の速度に速度の差分を加算
-			nextVel.x += nowVel.x;
-			nextVel.y += nowVel.y;
-			nextVel.z += nowVel.z;
-
-			// 求めた速度を適用
-			i->setVel(nextVel);
-
-			// 進む向きに合わせて回転
-			const XMFLOAT2 rota = calcRotationSyncVelDeg(nextVel);
-			i->setRotation(XMFLOAT3(rota.x,
-									rota.y,
-									obj->rotation.z));
-		}
-	}
 }
 
 void NormalEnemy::additionalDraw(Light* light)

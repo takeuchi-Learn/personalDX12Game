@@ -1,7 +1,13 @@
-﻿#pragma once
+﻿/*****************************************************************//**
+ * \file   SceneManager.h
+ * \brief  シーンの管理をするクラス
+ *********************************************************************/
+
+#pragma once
 #include "GameScene.h"
 #include <memory>
 
+ /// @brief シーンの管理をする
 class SceneManager
 	: public GameScene
 {
