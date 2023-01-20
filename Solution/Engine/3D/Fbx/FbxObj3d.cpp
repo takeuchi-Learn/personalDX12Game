@@ -16,9 +16,9 @@ Camera* FbxObj3d::camera = nullptr;
 
 ComPtr<ID3D12RootSignature> FbxObj3d::rootsignature;
 std::vector<ComPtr<ID3D12PipelineState>> FbxObj3d::pipelinestate;
-uint8_t FbxObj3d::ppStateNum = 0U;
+size_t FbxObj3d::ppStateNum = 0U;
 
-uint8_t FbxObj3d::createGraphicsPipeline(const wchar_t* vsPath, const wchar_t* psPath)
+size_t FbxObj3d::createGraphicsPipeline(const wchar_t* vsPath, const wchar_t* psPath)
 {
 	ComPtr<ID3DBlob> vsBlob; // 頂点シェーダオブジェクト
 	ComPtr<ID3DBlob> psBlob;    // ピクセルシェーダオブジェクト
@@ -190,7 +190,7 @@ uint8_t FbxObj3d::createGraphicsPipeline(const wchar_t* vsPath, const wchar_t* p
 
 	// グラフィックスパイプラインの生成
 	pipelinestate.emplace_back();
-	ppStateNum = uint8_t(pipelinestate.size() - 1u);
+	ppStateNum = pipelinestate.size() - 1u;
 	result = dxBase->getDev()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(pipelinestate[ppStateNum].ReleaseAndGetAddressOf()));
 	assert(SUCCEEDED(result));
 

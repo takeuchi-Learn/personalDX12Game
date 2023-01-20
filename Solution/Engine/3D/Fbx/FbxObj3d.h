@@ -41,7 +41,7 @@ public:
 public:
 	static void setCamera(Camera* camera) { FbxObj3d::camera = camera; }
 
-	static uint8_t createGraphicsPipeline(const wchar_t* vsPath = L"Resources/shaders/FBXVS.hlsl",
+	static size_t createGraphicsPipeline(const wchar_t* vsPath = L"Resources/shaders/FBXVS.hlsl",
 										  const wchar_t* psPath = L"Resources/shaders/FBXPS.hlsl");
 
 private:
@@ -52,7 +52,7 @@ private:
 	static std::vector<ComPtr<ID3D12PipelineState>> pipelinestate;
 
 public:
-	static uint8_t ppStateNum;
+	static size_t ppStateNum;
 
 	// モデル未読み込み
 	FbxObj3d(bool animLoop = true);
