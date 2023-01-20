@@ -81,11 +81,14 @@ public:
 	struct ConstBufferDataB1
 	{
 		DirectX::XMFLOAT3 ambient;	// アンビエント
-		float pad1;		// パディング
+		float pad1{};		// パディング
 		DirectX::XMFLOAT3 diffuse;	// ディフューズ
-		float pad2;		// パディング
+		float pad2{};		// パディング
 		DirectX::XMFLOAT3 specular;	// スペキュラー
 		float alpha;	// アルファ
+		DirectX::XMFLOAT2 texTilling;
+		DirectX::XMFLOAT2 pad3{};	// パディング
+		DirectX::XMFLOAT2 shiftUv;
 	};
 
 private:
@@ -118,6 +121,10 @@ private:
 	D3D12_INDEX_BUFFER_VIEW ibView = {};
 	ComPtr<ID3D12DescriptorHeap> descHeapSRV;
 
+	// タイリングとuvずらし
+	DirectX::XMFLOAT2 texTilling{ 1, 1 };
+	DirectX::XMFLOAT2 shiftUv{ 0, 0 };
+
 	// ボーン配列
 	std::vector<Bone> bones;
 
@@ -143,7 +150,7 @@ public:
 
 	inline ID3D12Resource* getConstBuffB1() { return constBuffB1.Get(); }
 
-	FbxScene* getFbxScene() { return fbxScene; }
+	inline FbxScene* getFbxScene() { return fbxScene; }
 
 	FbxModel();
 	~FbxModel();
@@ -154,5 +161,7 @@ public:
 
 	const XMMATRIX& GetModelTransform() { return meshNode->globalTransform; }
 
-	std::vector<Bone>& getBones() { return bones; }
+	inline std::vector<Bone>& getBones() { return bones; }
+
+	inline const auto& getVertices() const { return vertices; }
 };

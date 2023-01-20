@@ -5,6 +5,9 @@
 
 #include "FbxLoader.h"
 #include "System/PostEffect.h"
+
+#include <3D/Obj/Object3d.h>
+
 using namespace Microsoft::WRL;
 using namespace DirectX;
 
@@ -17,7 +20,6 @@ uint8_t FbxObj3d::ppStateNum = 0U;
 
 uint8_t FbxObj3d::createGraphicsPipeline(const wchar_t* vsPath, const wchar_t* psPath)
 {
-	HRESULT result = S_FALSE;
 	ComPtr<ID3DBlob> vsBlob; // 頂点シェーダオブジェクト
 	ComPtr<ID3DBlob> psBlob;    // ピクセルシェーダオブジェクト
 	ComPtr<ID3DBlob> errorBlob; // エラーオブジェクト
@@ -25,7 +27,7 @@ uint8_t FbxObj3d::createGraphicsPipeline(const wchar_t* vsPath, const wchar_t* p
 	assert(dxBase);
 
 	// 頂点シェーダの読み込みとコンパイル
-	result = D3DCompileFromFile(
+	HRESULT result = D3DCompileFromFile(
 		vsPath,    // シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
@@ -269,19 +271,31 @@ void FbxObj3d::update()
 	matWorld *= matRot;
 	matWorld *= matTrans;
 
+	// 親子行動
+	if (parent)
+	{
+		matWorld *= parent->matWorld;
+	} else if (objParent)
+	{
+		matWorld *= objParent->getMatWorld();
+	}
+
 	const XMMATRIX& matViewProj = camera->getViewProjectionMatrix();
 	// モデルのメッシュのトランスフォーム
 	const XMMATRIX& modelTransform = model->GetModelTransform();
 	// カメラ座標
 	const XMFLOAT3& cameraPos = camera->getEye();
 
+	modelWorldMat = modelTransform * matWorld;
+
 	// 定数バッファへデータを転送
 	ConstBufferDataTransform* constMap = nullptr;
 	HRESULT result = constBuffTransform->Map(0, nullptr, (void**)&constMap);
 	if (SUCCEEDED(result))
 	{
+		constMap->color = color;
 		constMap->viewproj = matViewProj;
-		constMap->world = modelTransform * matWorld;
+		constMap->world = modelWorldMat;
 		constMap->cameraPos = cameraPos;
 		constBuffTransform->Unmap(0, nullptr);
 	}
@@ -301,15 +315,22 @@ void FbxObj3d::update()
 			bones[i].fbxCluster->GetLink()->EvaluateGlobalTransform(currentTime);
 		// XMMATRIXに変換
 		FbxLoader::convertMatrixFromFbx(&matCurrentPose, fbxCurrentPose);
+
 		// 合成してスキニング行列に
 		// メッシュノードのグローバルトランスフォーム *
 		// ボーンの初期姿勢の逆行列 *
 		// ボーンの今の姿勢 *
 		// メッシュノードのグローバルトランスフォームの逆行列
-		constMapSkin->bones[i] = model->GetModelTransform() *
-			bones[i].invInitialPose
-			* matCurrentPose
-			* XMMatrixInverse(nullptr, model->GetModelTransform());
+		constMapSkin->bones[i] =
+			model->GetModelTransform() *							/* メッシュのトランスフォーム */
+			bones[i].invInitialPose									/* 初期姿勢の逆 */
+			* matCurrentPose										/* 今の姿勢 */
+			* XMMatrixInverse(nullptr, model->GetModelTransform());	/* メッシュのトランスフォームの逆 */
+		/*
+		* 上の処理は、
+		* 初期姿勢からどれだけ動いたか
+		* を算出している
+		*/
 	}
 	constBuffSkin->Unmap(0, nullptr);
 }
@@ -317,7 +338,7 @@ void FbxObj3d::update()
 void FbxObj3d::draw(Light* light)
 {
 	//　モデルがないなら描画しない
-	if (model == nullptr) return;
+	if (!model) { return; }
 
 	assert(light != nullptr);
 
@@ -370,5 +391,18 @@ void FbxObj3d::playAnimation()
 void FbxObj3d::stopAnimation(bool resetPoseFlag)
 {
 	isPlay = false;
-	if (resetPoseFlag) currentTime = startTime;
+	if (resetPoseFlag) { currentTime = startTime; }
+}
+
+DirectX::XMFLOAT3 FbxObj3d::calcVertPos(size_t vertNum)
+{
+	assert(vertNum < model->getVertices().size());
+
+	const XMVECTOR wposVec = XMVector3Transform(XMLoadFloat3(&model->getVertices()[vertNum].pos),
+												modelWorldMat);
+
+	XMFLOAT3 wpos{};
+	XMStoreFloat3(&wpos, wposVec);
+
+	return wpos;
 }

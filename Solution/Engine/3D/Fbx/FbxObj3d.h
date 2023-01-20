@@ -2,16 +2,15 @@
 
 #include "FbxModel.h"
 
-#include <Windows.h>
 #include <wrl.h>
-#include <d3d12.h>
-#include <d3dx12.h>
 #include <DirectXMath.h>
 #include <string>
 #include <vector>
 
 #include "Camera/Camera.h"
 #include "3D/Light.h"
+
+class Object3d;
 
 class FbxObj3d
 {
@@ -28,6 +27,7 @@ public:
 
 	struct ConstBufferDataTransform
 	{
+		XMFLOAT4 color;
 		XMMATRIX viewproj;
 		XMMATRIX world;
 		XMFLOAT3 cameraPos;
@@ -65,27 +65,54 @@ public:
 
 	void drawWithUpdate(Light* light);
 
+#pragma region アクセッサ
+
+	inline const FbxModel* getModel() const { return model; }
 	inline void setModel(FbxModel* model) { this->model = model; }
 
-	inline const DirectX::XMFLOAT3& getScale() { return scale; }
+	inline const DirectX::XMFLOAT3& getScale() const { return scale; }
 	inline void setScale(const XMFLOAT3& scale) { this->scale = scale; }
 
-	inline const DirectX::XMFLOAT3& getPosition() { return position; }
+	inline const DirectX::XMFLOAT3& getPosition() const { return position; }
 	inline void setPosition(const XMFLOAT3& position) { this->position = position; }
 
+	inline const DirectX::XMFLOAT3& getRotation() const { return rotation; }
 	inline void setRotation(const XMFLOAT3& rotation) { this->rotation = rotation; }
+
+	// fbxとobj両方の親がいる場合、fbxが優先される
+	inline const FbxObj3d* getParent() const { return parent; }
+	// fbxとobj両方の親がいる場合、fbxが優先される
+	inline const Object3d* getObjParent() const { return objParent; }
+
+	// fbxとobj両方の親がいる場合、fbxが優先される
+	inline void setParent(FbxObj3d* parent) { this->parent = parent; }
+	// fbxとobj両方の親がいる場合、fbxが優先される
+	inline void setObjParent(Object3d* objParent) { this->objParent = objParent; }
+
+#pragma endregion アクセッサ
 
 	void playAnimation();
 	void stopAnimation(bool resetPoseFlag = true);
 
+	DirectX::XMFLOAT3 calcVertPos(size_t vertNum);
+
 protected:
+	FbxObj3d* parent = nullptr;
+	Object3d* objParent = nullptr;
+
 	ComPtr<ID3D12Resource> constBuffTransform;
+
+	XMFLOAT4 color = { 1, 1, 1, 1 };
 
 	XMFLOAT3 scale = { 1, 1, 1 };
 	XMFLOAT3 rotation = { 0, 0, 0 };
 	XMFLOAT3 position = { 0, 0, 0 };
-	XMMATRIX matWorld;
+	XMMATRIX matWorld{};
 	FbxModel* model = nullptr;
+
+	XMMATRIX modelWorldMat{};
+
+	std::vector<XMFLOAT3> posArr{};
 
 	// 定数バッファ(スキン)
 	ComPtr<ID3D12Resource> constBuffSkin;

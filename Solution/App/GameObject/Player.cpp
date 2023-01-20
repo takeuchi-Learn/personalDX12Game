@@ -7,7 +7,8 @@ Player::Player(Camera* camera,
 			   const DirectX::XMFLOAT3& pos,
 			   uint16_t hp)
 	: GameObj(camera, model, pos),
-	hp(hp)
+	hp(hp),
+	shotTargetObjPt(nullptr)
 {
 }
 

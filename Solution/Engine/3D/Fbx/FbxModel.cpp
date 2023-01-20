@@ -26,6 +26,8 @@ void FbxModel::transferConstBuffB1()
 		constMap->diffuse = diffuse;
 		constMap->specular = specular;
 		constMap->alpha = alpha;
+		constMap->texTilling = texTilling;
+		constMap->shiftUv = shiftUv;
 		constBuffB1->Unmap(0, nullptr);
 	}
 }

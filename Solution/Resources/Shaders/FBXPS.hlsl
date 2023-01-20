@@ -22,11 +22,11 @@ PSOutput main(VSOutput input)
 	float3 specular = pow(saturate(dot(reflect, eyeDir)), shininess) * m_specular; // 鏡面反射光
 
 	float4 shadeColor;
-	shadeColor.rgb = (ambient + diffuse + specular) * lightColor;
+	shadeColor.rgb = (ambient + diffuse + specular) * lightColor.rgb;
 	shadeColor.a = m_alpha;
 
-	float4 texcolor = float4(tex.Sample(smp, input.uv));
-	output.target0 = shadeColor * texcolor;
+	float4 texcolor = float4(tex.Sample(smp, input.uv * texTilling + shiftUv));
+	output.target0 = shadeColor * texcolor * color;
 	// target1を反転色にする
 	output.target1 = output.target0;
 
