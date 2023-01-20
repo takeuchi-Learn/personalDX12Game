@@ -27,15 +27,6 @@ public:
 		REVERSE
 	};
 
-	//パイプラインセット
-	struct PipelineSet
-	{
-		//パイプラインステートオブジェクト
-		ComPtr<ID3D12PipelineState> pipelinestate;
-		//ルートシグネチャ
-		ComPtr<ID3D12RootSignature> rootsignature;
-	};
-
 	// 定数バッファ用データ構造体B0
 	struct ConstBufferDataB0
 	{
@@ -50,8 +41,10 @@ public:
 	// --------------------
 private:
 	static DX12Base* dxBase;
-	static size_t ppSetDefNum;
-	static std::vector<Object3d::PipelineSet> ppSets;
+	static size_t ppStateDefNum;
+	static ComPtr<ID3D12RootSignature> rootsignature;
+	static std::vector<ComPtr<ID3D12PipelineState>> pipelinestate;
+	static size_t ppStateNum;
 
 	Camera* camera;
 
@@ -65,9 +58,9 @@ private:
 	}
 
 public:
-	static inline size_t getGraphicsPipeline() { return ppSetDefNum; }
+	static inline size_t getGraphicsPipeline() { return ppStateDefNum; }
 
-	static void startDraw(size_t ppSetNum = ppSetDefNum,
+	static void startDraw(size_t ppStateNum = ppStateDefNum,
 						  D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	static void staticInit();

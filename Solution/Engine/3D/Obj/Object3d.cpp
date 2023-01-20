@@ -11,8 +11,10 @@ using namespace DirectX;
 using namespace Microsoft::WRL;
 
 DX12Base* Object3d::dxBase = nullptr;
-size_t Object3d::ppSetDefNum = 0u;
-std::vector<Object3d::PipelineSet> Object3d::ppSets = {};
+size_t Object3d::ppStateDefNum = 0u;
+ComPtr<ID3D12RootSignature> Object3d::rootsignature{};
+std::vector<ComPtr<ID3D12PipelineState>> Object3d::pipelinestate{};
+size_t Object3d::ppStateNum = 0U;
 
 void Object3d::createTransferBufferB0(ComPtr<ID3D12Resource>& constBuffB0)
 {
@@ -113,10 +115,10 @@ void Object3d::drawWithUpdate(DX12Base* dxBase, Light* light)
 
 Object3d::~Object3d() {}
 
-void Object3d::startDraw(size_t ppSetNum, D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology)
+void Object3d::startDraw(size_t ppStateNum, D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology)
 {
-	dxBase->getCmdList()->SetPipelineState(ppSets[ppSetNum].pipelinestate.Get());
-	dxBase->getCmdList()->SetGraphicsRootSignature(ppSets[ppSetNum].rootsignature.Get());
+	dxBase->getCmdList()->SetPipelineState(pipelinestate[ppStateNum].Get());
+	dxBase->getCmdList()->SetGraphicsRootSignature(rootsignature.Get());
 	//プリミティブ形状を設定
 	dxBase->getCmdList()->IASetPrimitiveTopology(PrimitiveTopology);
 }
@@ -128,7 +130,7 @@ void Object3d::staticInit()
 
 	Object3d::dxBase = DX12Base::getInstance();
 
-	ppSetDefNum = createGraphicsPipeline();
+	ppStateDefNum = createGraphicsPipeline();
 
 	ObjModel::staticInit();
 }
@@ -307,30 +309,30 @@ size_t Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
 	//テクスチャサンプラーの設定
 	CD3DX12_STATIC_SAMPLER_DESC samplerDesc = CD3DX12_STATIC_SAMPLER_DESC(0);
 
-	Object3d::PipelineSet& pipelineSet = ppSets.emplace_back();
+	auto& pipelineSet = pipelinestate.emplace_back();
 
 	//ルートシグネチャの設定
 	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc{};
 	rootSignatureDesc.Init_1_0(_countof(rootparams), rootparams, 1, &samplerDesc, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 	ComPtr<ID3DBlob> rootSigBlob;
-	//バージョン自動判定でのシリアライズ
+	// バージョン自動判定のシリアライズ
 	result = D3DX12SerializeVersionedRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1_0, &rootSigBlob, &errorBlob);
-	//ルートシグネチャの生成
-	result = dxBase->getDev()->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(&pipelineSet.rootsignature));
-	if (FAILED(result))
-	{
-		assert(0);
-	}
-	// パイプラインにルートシグネチャをセット
-	gpipeline.pRootSignature = pipelineSet.rootsignature.Get();
+	// ルートシグネチャの生成
+	result = dxBase->getDev()->CreateRootSignature(0, rootSigBlob->GetBufferPointer(), rootSigBlob->GetBufferSize(), IID_PPV_ARGS(rootsignature.ReleaseAndGetAddressOf()));
+	assert(SUCCEEDED(result));
+
+	gpipeline.pRootSignature = rootsignature.Get();
 
 	//パイプラインステートの生成
-	result = dxBase->getDev()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(&pipelineSet.pipelinestate));
+	pipelinestate.emplace_back();
+	ppStateNum = pipelinestate.size() - 1u;
+	result = dxBase->getDev()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(pipelinestate[ppStateNum].ReleaseAndGetAddressOf()));
+	assert(SUCCEEDED(result));
 
 	if (FAILED(result))
 	{
 		assert(0);
 	}
 
-	return ppSets.size() - 1u;
+	return ppStateNum;
 }
