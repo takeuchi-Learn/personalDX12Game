@@ -11,7 +11,8 @@ using namespace DirectX;
 using namespace Microsoft::WRL;
 
 DX12Base* Object3d::dxBase = nullptr;
-Object3d::PipelineSet Object3d::ppSetDef{};
+size_t Object3d::ppSetDefNum = 0u;
+std::vector<Object3d::PipelineSet> Object3d::ppSets = {};
 
 void Object3d::createTransferBufferB0(ComPtr<ID3D12Resource>& constBuffB0)
 {
@@ -112,10 +113,10 @@ void Object3d::drawWithUpdate(DX12Base* dxBase, Light* light)
 
 Object3d::~Object3d() {}
 
-void Object3d::startDraw(Object3d::PipelineSet& ppSet, D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology)
+void Object3d::startDraw(size_t ppSetNum, D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology)
 {
-	dxBase->getCmdList()->SetPipelineState(ppSet.pipelinestate.Get());
-	dxBase->getCmdList()->SetGraphicsRootSignature(ppSet.rootsignature.Get());
+	dxBase->getCmdList()->SetPipelineState(ppSets[ppSetNum].pipelinestate.Get());
+	dxBase->getCmdList()->SetGraphicsRootSignature(ppSets[ppSetNum].rootsignature.Get());
 	//プリミティブ形状を設定
 	dxBase->getCmdList()->IASetPrimitiveTopology(PrimitiveTopology);
 }
@@ -127,14 +128,14 @@ void Object3d::staticInit()
 
 	Object3d::dxBase = DX12Base::getInstance();
 
-	ppSetDef = createGraphicsPipeline();
+	ppSetDefNum = createGraphicsPipeline();
 
 	ObjModel::staticInit();
 }
 
-Object3d::PipelineSet Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
-													   const wchar_t* vsShaderPath,
-													   const wchar_t* psShaderPath)
+size_t Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
+										const wchar_t* vsShaderPath,
+										const wchar_t* psShaderPath)
 {
 	HRESULT result = S_FALSE;
 
@@ -306,7 +307,7 @@ Object3d::PipelineSet Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
 	//テクスチャサンプラーの設定
 	CD3DX12_STATIC_SAMPLER_DESC samplerDesc = CD3DX12_STATIC_SAMPLER_DESC(0);
 
-	Object3d::PipelineSet pipelineSet{};
+	Object3d::PipelineSet& pipelineSet = ppSets.emplace_back();
 
 	//ルートシグネチャの設定
 	CD3DX12_VERSIONED_ROOT_SIGNATURE_DESC rootSignatureDesc{};
@@ -331,5 +332,5 @@ Object3d::PipelineSet Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
 		assert(0);
 	}
 
-	return pipelineSet;
+	return ppSets.size() - 1u;
 }

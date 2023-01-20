@@ -36,13 +36,6 @@ public:
 		ComPtr<ID3D12RootSignature> rootsignature;
 	};
 
-	// 頂点データ構造体
-	//struct Vertex {
-	//	XMFLOAT3 pos; // xyz座標
-	//	XMFLOAT3 normal; // 法線ベクトル
-	//	XMFLOAT2 uv; // uv座標
-	//};
-
 	// 定数バッファ用データ構造体B0
 	struct ConstBufferDataB0
 	{
@@ -57,7 +50,9 @@ public:
 	// --------------------
 private:
 	static DX12Base* dxBase;
-	static PipelineSet ppSetDef;
+	static size_t ppSetDefNum;
+	static std::vector<Object3d::PipelineSet> ppSets;
+
 	Camera* camera;
 
 	static void createTransferBufferB0(ComPtr<ID3D12Resource>& constBuff);
@@ -70,21 +65,18 @@ private:
 	}
 
 public:
-	// 頂点バッファの最大数
-	static const int constantBufferNum = 128;
+	static inline size_t getGraphicsPipeline() { return ppSetDefNum; }
 
-	static inline PipelineSet& getGraphicsPipeline() { return ppSetDef; }
-
-	static void startDraw(Object3d::PipelineSet& ppSet = getGraphicsPipeline(),
+	static void startDraw(size_t ppSetNum = ppSetDefNum,
 						  D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 	static void staticInit();
 
 	//3Dオブジェクト用パイプライン生成
 	// シェーダーモデル指定は "*s_5_0"
-	static Object3d::PipelineSet createGraphicsPipeline(BLEND_MODE blendMode = BLEND_MODE::ALPHA,
-														const wchar_t* vsShaderPath = L"Resources/Shaders/BasicVS.hlsl",
-														const wchar_t* psShaderPath = L"Resources/Shaders/BasicPS.hlsl");
+	static size_t createGraphicsPipeline(BLEND_MODE blendMode = BLEND_MODE::ALPHA,
+										 const wchar_t* vsShaderPath = L"Resources/Shaders/BasicVS.hlsl",
+										 const wchar_t* psShaderPath = L"Resources/Shaders/BasicPS.hlsl");
 
 	// --------------------
 	// (動的)メンバ

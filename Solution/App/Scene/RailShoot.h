@@ -54,7 +54,7 @@ class RailShoot
 	// 3Dオブジェクト
 	// --------------------
 	// 背景のパイプライン
-	Object3d::PipelineSet backPipelineSet;
+	size_t backPipelineSet;
 
 	// 背景と地面
 	std::unique_ptr<ObjSet> back;
