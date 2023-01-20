@@ -139,14 +139,12 @@ size_t Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
 										const wchar_t* vsShaderPath,
 										const wchar_t* psShaderPath)
 {
-	HRESULT result = S_FALSE;
-
 	ComPtr<ID3DBlob> vsBlob;	// 頂点シェーダオブジェクト
-	ComPtr<ID3DBlob> psBlob;		// ピクセルシェーダオブジェクト
+	ComPtr<ID3DBlob> psBlob;	// ピクセルシェーダオブジェクト
 	ComPtr<ID3DBlob> errorBlob;	// エラーオブジェクト
 
 	//頂点シェーダーの読み込みとコンパイル
-	result = D3DCompileFromFile(
+	HRESULT result = D3DCompileFromFile(
 		vsShaderPath,  // シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
@@ -212,9 +210,9 @@ size_t Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
 
 	// グラフィックスパイプライン設定
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC gpipeline{};
-	//頂点シェーダー、ピクセルシェーダ
 	gpipeline.VS = CD3DX12_SHADER_BYTECODE(vsBlob.Get());
 	gpipeline.PS = CD3DX12_SHADER_BYTECODE(psBlob.Get());
+
 	//標準的な設定(背面カリング、塗りつぶし、深度クリッピング有効)
 	gpipeline.SampleMask = D3D12_DEFAULT_SAMPLE_MASK; // 標準設定
 
@@ -326,11 +324,6 @@ size_t Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
 	ppStateNum = pipelinestate.size() - 1u;
 	result = dxBase->getDev()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(pipelinestate[ppStateNum].ReleaseAndGetAddressOf()));
 	assert(SUCCEEDED(result));
-
-	if (FAILED(result))
-	{
-		assert(0);
-	}
 
 	return ppStateNum;
 }
