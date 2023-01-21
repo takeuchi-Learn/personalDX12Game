@@ -42,7 +42,7 @@ public:
 	static void setCamera(Camera* camera) { FbxObj3d::camera = camera; }
 
 	static size_t createGraphicsPipeline(const wchar_t* vsPath = L"Resources/shaders/FBXVS.hlsl",
-										  const wchar_t* psPath = L"Resources/shaders/FBXPS.hlsl");
+										 const wchar_t* psPath = L"Resources/shaders/FBXPS.hlsl");
 
 private:
 	static DX12Base* dxBase;

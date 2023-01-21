@@ -23,7 +23,12 @@ private:
 
 	UINT postEff2Num = 0U;
 
+	bool exitGameFlag = false;
+
 public:
+	inline void exitGame() { exitGameFlag = true; }
+	inline bool getExitGameFlag() const { return exitGameFlag; }
+
 	inline UINT getPostEff2Num() { return postEff2Num; }
 
 	inline static SceneManager* getInstange()

@@ -90,15 +90,13 @@ bool Looper::loopUpdate()
 	// 入力情報の更新
 	Input::getInstance()->update();
 
-	// ESCで終了
-	if (Input::getInstance()->hitKey(DIK_ESCAPE)) return true;
-
 	// --------------------
 	// シーンマネージャーの更新
 	// --------------------
 	SceneManager::getInstange()->update();
 
-	return false;
+	// 終了するかどうかを返す
+	return SceneManager::getInstange()->getExitGameFlag();
 }
 
 bool Looper::loopDraw()
@@ -130,9 +128,7 @@ bool Looper::loopDraw()
 
 bool Looper::loop()
 {
-	if (loopUpdate()) return true;
+	if (loopUpdate()) { return true; }
 
-	if (loopDraw()) return true;
-
-	return false;
+	return loopDraw();
 }

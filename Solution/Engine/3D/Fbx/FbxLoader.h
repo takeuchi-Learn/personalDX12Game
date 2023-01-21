@@ -6,13 +6,19 @@
 #include <string>
 
 #include "FbxModel.h"
+#include <memory>
 
 class FbxLoader
 {
 public:
 	/// @brief シングルトンインスタンスの取得
 	/// @return インスタンス
-	static FbxLoader* GetInstance();
+	inline static FbxLoader* GetInstance()
+	{
+		static FbxLoader instance;
+		return &instance;
+	}
+	inline static auto* ins() { return GetInstance(); }
 
 private:
 	// privateなコンストラクタ（シングルトンパターン）

@@ -40,8 +40,8 @@ FbxModel::FbxModel()
 
 FbxModel::~FbxModel()
 {
-	// FBXシーンの開放
 	fbxScene->Destroy();
+	fbxScene = nullptr;
 }
 
 void FbxModel::createBuffers()

@@ -14,6 +14,19 @@ SceneManager::SceneManager()
 
 void SceneManager::update()
 {
+
+	// ESCで終了
+	if (Input::getInstance()->hitKey(DIK_ESCAPE))
+	{
+		// 今のシーンを削除
+		nowScene.reset(nullptr);
+
+		// 終了させる
+		exitGame();
+
+		return;
+	}
+
 	// 次のシーンがあったら
 	if (nextScene)
 	{

@@ -6,12 +6,6 @@ using namespace DirectX;
 const std::string FbxLoader::baseDir = "Resources/";
 const std::string FbxLoader::defaultTextureFileName = "white.png";
 
-FbxLoader* FbxLoader::GetInstance()
-{
-	static FbxLoader instance;
-	return &instance;
-}
-
 FbxLoader::FbxLoader()
 {
 	init();
@@ -70,26 +64,27 @@ FbxModel* FbxLoader::loadModelFromFile(const std::string& modelName)
 		assert(0);
 	}
 
-	// シーン生成
-	FbxScene* fbxScene = FbxScene::Create(fbxManager, "fbxScene");
-	//ロードした情報をインポート
-	fbxImporter->Import(fbxScene);
-
 	// モデル生成
-	FbxModel* model = new FbxModel();
+	auto model = new FbxModel();
 	model->name = modelName;
 
+	// シーン生成
+	model->fbxScene = FbxScene::Create(fbxManager, "fbxScene");
+
+	//ロードした情報をインポート
+	fbxImporter->Import(model->fbxScene);
+
 	// ノードの数を取得
-	int nodeCount = fbxScene->GetNodeCount();
+	int nodeCount = model->fbxScene->GetNodeCount();
 	// 予め必要分のメモリを確保し、アドレスのずれを予防
 	model->nodes.reserve(nodeCount);
 
 	// ルートノードから順に解析しモデルに流し込む
-	parseNodeRecursive(model, fbxScene->GetRootNode());
-
-	model->fbxScene = fbxScene;
+	parseNodeRecursive(model, model->fbxScene->GetRootNode());
 
 	model->createBuffers();
+
+	fbxImporter->Import(model->fbxScene);
 
 	return model;
 }
