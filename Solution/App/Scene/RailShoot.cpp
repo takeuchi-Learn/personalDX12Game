@@ -295,8 +295,7 @@ RailShoot::RailShoot()
 
 	constexpr const char modelName[] = "tori_model";
 	fbxModel.reset(FbxLoader::ins()->loadModelFromFile(modelName));
-	fbxObj.reset(new FbxObj3d(fbxModel.get(), true));
-	fbxObj->setCamera(camera.get());
+	fbxObj.reset(new FbxObj3d(camera.get(), fbxModel.get(), true));
 
 	// --------------------
 	// 背景と地面

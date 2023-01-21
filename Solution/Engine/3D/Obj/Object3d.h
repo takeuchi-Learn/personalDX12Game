@@ -46,8 +46,6 @@ private:
 	static std::vector<ComPtr<ID3D12PipelineState>> pipelinestate;
 	static size_t ppStateNum;
 
-	Camera* camera;
-
 	static void createTransferBufferB0(ComPtr<ID3D12Resource>& constBuff);
 
 	inline XMFLOAT3 subFloat3(const XMFLOAT3& left, const XMFLOAT3& right)
@@ -75,6 +73,8 @@ public:
 	// (動的)メンバ
 	// --------------------
 private:
+	Camera* camera = nullptr;
+
 	// 定数バッファ
 	ComPtr<ID3D12Resource> constBuffB0;
 	// ワールド変換行列
@@ -108,6 +108,13 @@ public:
 
 	inline const Camera* getCamera() const { return camera; }
 
+	inline XMFLOAT3 calcWorldPos() const
+	{
+		return XMFLOAT3(matWorld.r[3].m128_f32[0],
+						matWorld.r[3].m128_f32[1],
+						matWorld.r[3].m128_f32[2]);
+	}
+
 	XMFLOAT2 calcScreenPos();
 
 	// モデルは後から手動で読み込む(deleteも手動)
@@ -116,11 +123,11 @@ public:
 	// モデルデータもここで渡す(deleteは手動)
 	Object3d(Camera* camera, ObjModel* model);
 
+	~Object3d();
+
 	void update();
 
 	void draw(DX12Base* dxCom, Light* light);
 
 	void drawWithUpdate(DX12Base* dxCom, Light* light);
-
-	~Object3d();
 };

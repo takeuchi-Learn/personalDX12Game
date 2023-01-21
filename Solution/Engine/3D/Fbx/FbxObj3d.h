@@ -60,69 +60,12 @@ private:
 public:
 	static size_t ppStateNum;
 
-	// モデル未読み込み
-	FbxObj3d(bool animLoop = true);
-	// モデル読み込む
-	FbxObj3d(FbxModel* model, bool animLoop = true);
-
-	void init();	// コンストラクタ内で呼び出している
-	void update();
-	void draw(Light* light);
-
-	void drawWithUpdate(Light* light);
-
-	static void startDraw();
-
-#pragma region アクセッサ
-
-	inline const FbxModel* getModel() const { return model; }
-	inline void setModel(FbxModel* model) { this->model = model; }
-
-	inline const DirectX::XMFLOAT3& getScale() const { return scale; }
-	inline void setScale(const XMFLOAT3& scale) { this->scale = scale; }
-
-	inline const DirectX::XMFLOAT3& getPosition() const { return position; }
-	inline void setPosition(const XMFLOAT3& position) { this->position = position; }
-
-	inline const DirectX::XMFLOAT3& getRotation() const { return rotation; }
-	inline void setRotation(const XMFLOAT3& rotation) { this->rotation = rotation; }
-
-	// fbxとobj両方の親がいる場合、fbxが優先される
-	inline const FbxObj3d* getParent() const { return parent; }
-	// fbxとobj両方の親がいる場合、fbxが優先される
-	inline const Object3d* getObjParent() const { return objParent; }
-
-	// fbxとobj両方の親がいる場合、fbxが優先される
-	inline void setParent(FbxObj3d* parent) { this->parent = parent; }
-	// fbxとobj両方の親がいる場合、fbxが優先される
-	inline void setObjParent(Object3d* objParent) { this->objParent = objParent; }
-
-	inline void setCamera(Camera* camera) { this->camera = camera; }
-
-#pragma endregion アクセッサ
-
-	void playAnimation();
-	void stopAnimation(bool resetPoseFlag = true);
-
-	DirectX::XMFLOAT3 calcVertPos(size_t vertNum);
-
-	DirectX::XMFLOAT2 calcScreenPos();
-
 protected:
 	Camera* camera = nullptr;
 
-	FbxObj3d* parent = nullptr;
-	Object3d* objParent = nullptr;
-
 	ComPtr<ID3D12Resource> constBuffTransform;
 
-	XMFLOAT4 color = { 1, 1, 1, 1 };
-
-	XMFLOAT3 scale = { 1, 1, 1 };
-	XMFLOAT3 rotation = { 0, 0, 0 };
-	XMFLOAT3 position = { 0, 0, 0 };
 	XMMATRIX matWorld{};
-	FbxModel* model = nullptr;
 
 	XMMATRIX modelWorldMat{};
 
@@ -138,4 +81,52 @@ protected:
 	bool isPlay = false;
 
 	bool animLoop = true;
+
+public:
+	XMFLOAT4 color = { 1, 1, 1, 1 };
+
+	XMFLOAT3 scale = { 1, 1, 1 };
+	XMFLOAT3 rotation = { 0, 0, 0 };
+	XMFLOAT3 position = { 0, 0, 0 };
+
+	// fbxとobj両方の親がいる場合、fbxが優先される
+	FbxObj3d* parent = nullptr;
+	// fbxとobj両方の親がいる場合、fbxが優先される
+	Object3d* objParent = nullptr;
+
+	FbxModel* model = nullptr;
+
+public:
+
+	static void startDraw();
+
+	// モデル未読み込み
+	FbxObj3d(Camera* camera, bool animLoop = true);
+	// モデル読み込む
+	FbxObj3d(Camera* camera, FbxModel* model, bool animLoop = true);
+
+	void init();	// コンストラクタ内で呼び出している
+	void update();
+	void draw(Light* light);
+
+	void drawWithUpdate(Light* light);
+
+	void playAnimation();
+	void stopAnimation(bool resetPoseFlag = true);
+
+	inline XMFLOAT3 calcWorldPos() const
+	{
+		return XMFLOAT3(matWorld.r[3].m128_f32[0],
+						matWorld.r[3].m128_f32[1],
+						matWorld.r[3].m128_f32[2]);
+	}
+
+	DirectX::XMFLOAT2 calcScreenPos();
+
+	DirectX::XMFLOAT3 calcVertPos(size_t vertNum);
+
+#pragma region アクセッサ
+	inline void setCamera(Camera* camera) { this->camera = camera; }
+
+#pragma endregion アクセッサ
 };

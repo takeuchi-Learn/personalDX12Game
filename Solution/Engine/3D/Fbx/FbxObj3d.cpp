@@ -217,16 +217,19 @@ size_t FbxObj3d::createGraphicsPipeline(BLEND_MODE blendMode,
 	return ppStateNum;
 }
 
-FbxObj3d::FbxObj3d(bool animLoop) :
-	FbxObj3d(nullptr, animLoop)
+FbxObj3d::FbxObj3d(Camera* camera,
+				   bool animLoop) :
+	FbxObj3d(camera, nullptr, animLoop)
 {
 }
-FbxObj3d::FbxObj3d(FbxModel* model,
+FbxObj3d::FbxObj3d(Camera* camera,
+				   FbxModel* model,
 				   bool animLoop) :
+	camera(camera),
+	model(model),
 	animLoop(animLoop)
 {
 	init();
-	setModel(model);
 }
 
 void FbxObj3d::init()
