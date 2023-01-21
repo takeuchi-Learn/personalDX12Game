@@ -159,12 +159,6 @@ RailShoot::RailShoot()
 	spriteBase(std::make_unique<SpriteBase>(SpriteBase::BLEND_MODE::ALPHA)),
 
 	// --------------------
-	// 背景と地面
-	// --------------------
-	back(std::make_unique<ObjSet>(camera.get(), "Resources/back/", "back", true)),
-	ground(std::make_unique<ObjSet>(camera.get(), "Resources/ground", "ground", false)),
-
-	// --------------------
 	// 敵モデル
 	// --------------------
 	enemyModel(std::make_unique<ObjModel>("Resources/tori", "tori", 0U, true)),
@@ -180,7 +174,7 @@ RailShoot::RailShoot()
 	// --------------------
 	// レール現在位置のオブジェクト
 	// --------------------
-	railObj(std::make_unique<GameObj>(camera.get(), nullptr)),
+	railObj(std::make_unique<GameObj>(camera.get())),
 
 	// --------------------
 	// パーティクル
@@ -287,15 +281,16 @@ RailShoot::RailShoot()
 	// --------------------
 	// 自機初期化
 	// --------------------
-	player = std::make_unique<Player>(camera.get(), playerModel.get());
-	player->setScale(16.f);
-	player->setParent(railObj.get());
-	player->setPos(XMFLOAT3(0, 12.f, 0));
-	player->setHp(playerHpMax);
 
 	constexpr const char modelName[] = "tori_model";
 	fbxModel.reset(FbxLoader::ins()->loadModelFromFile(modelName));
 	fbxObj.reset(new FbxObj3d(camera.get(), fbxModel.get(), true));
+
+	player = std::make_unique<Player>(camera.get(), fbxModel.get());
+	player->setScale(16.f);
+	player->setParent(railObj.get());
+	player->setPos(XMFLOAT3(0, 12.f, 0));
+	player->setHp(playerHpMax);
 
 	// --------------------
 	// 背景と地面
@@ -303,19 +298,25 @@ RailShoot::RailShoot()
 
 	// 背景の天球
 	{
+		backModel.reset(new ObjModel("Resources/back/", "back", 0U, true));
+		backObj.reset(new Object3d(camera.get(), backModel.get()));
 		const float backScale = camera->getFarZ() * 0.9f;
-		back->setScale({ backScale, backScale, backScale });
+		backObj->scale = XMFLOAT3(backScale, backScale, backScale);
 	}
 
 	// 地面
 	{
-		constexpr UINT groundSize = 5000u;
-		ground->setPos(XMFLOAT3(0, -player->getScale() * 3.f, (float)groundSize));
 
-		ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
+		groundModel.reset(new ObjModel("Resources/ground", "ground"));
+		groundObj.reset(new Object3d(camera.get(), groundModel.get()));
+
+		constexpr UINT groundSize = 5000u;
+		groundObj->position = XMFLOAT3(0, -player->getScale() * 3.f, (float)groundSize);
+
+		groundObj->scale = XMFLOAT3(groundSize, groundSize, groundSize);
 
 		constexpr float tillingNum = groundSize / 32.f;
-		ground->getModelPt()->setTexTilling(XMFLOAT2(tillingNum, tillingNum));
+		groundModel->setTexTilling(XMFLOAT2(tillingNum, tillingNum));
 	}
 
 	// --------------------
@@ -401,8 +402,8 @@ RailShoot::RailShoot()
 			left->position = dest;
 			ring->position = dest;
 
-			right->position.y = ground->getPos().y + 16 * 16;
-			left->position.y = ground->getPos().y + 16 * 16;
+			right->position.y = groundObj->position.y + 16 * 16;
+			left->position.y = groundObj->position.y + 16 * 16;
 
 			// --------------------
 			// レーンの左右に配置する
@@ -469,7 +470,7 @@ void RailShoot::update()
 {
 #ifdef _DEBUG
 
-	if (input->hitKey(DIK_LSHIFT) && input->hitKey(DIK_SPACE))
+	if (input->hitKey(DIK_LSHIFT) && input->triggerKey(DIK_SPACE))
 	{
 		changeNextScene<BossScene>();
 	}
@@ -479,7 +480,7 @@ void RailShoot::update()
 	rotationBack();
 
 	// 背景オブジェクトの中心をカメラにする
-	back->setPos(camera->getEye());
+	backObj->position = camera->getEye();
 
 	// 主な処理
 	update_proc();
@@ -559,12 +560,12 @@ void RailShoot::updateRgbShift()
 void RailShoot::rotationBack()
 {
 	// シーン遷移中も背景は回す
-	XMFLOAT2 shiftUv = back->getModelPt()->getShiftUv();
+	XMFLOAT2 shiftUv = backModel->getShiftUv();
 	constexpr float shiftSpeed = 0.01f;
 
 	shiftUv.x += shiftSpeed / DX12Base::getInstance()->getFPS();
 
-	back->getModelPt()->setShivtUv(shiftUv);
+	backModel->setShivtUv(shiftUv);
 }
 
 void RailShoot::addEnemy(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& vel, float scale)
@@ -1273,11 +1274,9 @@ void RailShoot::updateAimCol()
 
 void RailShoot::drawObj3d()
 {
-	Object3d::startDraw(backPipelineSet);
-	back->drawWithUpdate(light.get());
+	backObj->drawWithUpdate(light.get(), backPipelineSet);
 
-	Object3d::startDraw();
-	ground->drawWithUpdate(light.get());
+	groundObj->drawWithUpdate(light.get());
 	player->drawWithUpdate(light.get());
 	for (auto& i : enemy)
 	{
@@ -1288,12 +1287,9 @@ void RailShoot::drawObj3d()
 	{
 		for (auto& x : y)
 		{
-			x->drawWithUpdate(DX12Base::ins(), light.get());
+			x->drawWithUpdate(light.get());
 		}
 	}
-
-	FbxObj3d::startDraw();
-	fbxObj->drawWithUpdate(light.get());
 
 	particleMgr->drawWithUpdate();
 }

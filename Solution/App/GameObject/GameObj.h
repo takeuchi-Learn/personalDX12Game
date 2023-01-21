@@ -3,13 +3,19 @@
 #include <memory>
 #include "System/DX12Base.h"
 #include "3D/Light.h"
-#include "3D/Obj/Object3d.h"
+
+#include <3D/BaseObj.h>
+#include <3D/Obj/Object3d.h>
+#include <3D/Fbx/FbxObj3d.h>
 
 /// @brief ゲームオブジェクト基底クラス
 class GameObj
 {
 protected:
-	std::unique_ptr<Object3d> obj;
+	BaseObj* obj = nullptr;
+
+	std::unique_ptr<Object3d> objObject;
+	std::unique_ptr<FbxObj3d> fbxObject;
 
 	bool alive = true;
 	bool drawFlag = true;
@@ -66,7 +72,7 @@ public:
 	inline bool getDrawFlag() const { return drawFlag; }
 	inline void setDrawFlag(bool drawFlag) { this->drawFlag = drawFlag; }
 
-	inline Object3d* getObj() const { return obj.get(); }
+	inline BaseObj* getObj() const { return obj; }
 
 	inline void setPos(const DirectX::XMFLOAT3& pos) { obj->position = pos; }
 	inline const DirectX::XMFLOAT3& getPos() const { return obj->position; }
@@ -104,6 +110,10 @@ public:
 	GameObj(Camera* camera,
 			ObjModel* model,
 			const DirectX::XMFLOAT3& pos = { 0,0,0 });
+	GameObj(Camera* camera,
+			FbxModel* model,
+			const DirectX::XMFLOAT3& pos = { 0,0,0 });
+	GameObj(Camera* camera);
 	~GameObj();
 
 	// drawWithUpdate関数の頭で呼ばれる

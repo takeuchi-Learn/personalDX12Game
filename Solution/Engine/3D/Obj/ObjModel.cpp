@@ -246,14 +246,9 @@ void ObjModel::init(const std::string& dirPath, const std::string& modelname, UI
 	}
 
 	// ファイルストリーム
-	std::ifstream file;
-	// .objファイルを開く
-	file.open(directoryPath + filename);
+	std::ifstream file(directoryPath + filename);
 	// ファイルオープン失敗をチェック
-	if (file.fail())
-	{
-		assert(0);
-	}
+	assert(!file.fail());
 
 	name = modelname;
 

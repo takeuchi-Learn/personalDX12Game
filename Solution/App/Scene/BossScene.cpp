@@ -211,18 +211,20 @@ void BossScene::initBackObj()
 													   L"Resources/Shaders/BackPS.hlsl");
 
 	// 背景の天球
-	back = std::make_unique<ObjSet>(camera.get(), "Resources/back/", "back", true);
+	backModel.reset(new ObjModel("Resources/back/", "back", 0U, true));
+	backObj.reset(new Object3d(camera.get(), backModel.get()));
 	const float backScale = camera->getFarZ() * 0.9f;
-	back->setScale({ backScale, backScale, backScale });
+	backObj->scale = XMFLOAT3(backScale, backScale, backScale);
 
 	// 地面
-	ground = std::make_unique<ObjSet>(camera.get(), "Resources/ground", "ground");
+	groundModel.reset(new ObjModel("Resources/ground", "ground"));
+	groundObj.reset(new Object3d(camera.get(), groundModel.get()));
 	constexpr UINT groundSize = 5000u;
-	ground->setPos(XMFLOAT3(0, -player->getScale() * 500.f, 0));
-	ground->setScale(XMFLOAT3(groundSize, groundSize, groundSize));
+	groundObj->position = XMFLOAT3(0, -player->getScale() * 500.f, 0);
+	groundObj->scale = XMFLOAT3(groundSize, groundSize, groundSize);
 
 	constexpr float tillingNum = (float)groundSize / 32.f;
-	ground->getModelPt()->setTexTilling(XMFLOAT2(tillingNum, tillingNum));
+	groundModel->setTexTilling(XMFLOAT2(tillingNum, tillingNum));
 }
 
 BossScene::CSVType BossScene::loadCsv(const std::string& csvFilePath, bool commentFlag, char divChar, const std::string& commentStartStr)
@@ -290,7 +292,7 @@ void BossScene::update()
 	camera->update();
 
 	// 背景オブジェクトの中心をカメラにする
-	back->setPos(camera->getEye());
+	backObj->position = camera->getEye();
 	// ライトはカメラの位置にする
 	light->setLightPos(camera->getEye());
 
@@ -721,11 +723,9 @@ void BossScene::endKillBoss()
 
 void BossScene::drawObj3d()
 {
-	Object3d::startDraw(backPipelineSet);
-	back->drawWithUpdate(light.get());
+	backObj->drawWithUpdate(light.get(), backPipelineSet);
 
-	Object3d::startDraw();
-	ground->drawWithUpdate(light.get());
+	groundObj->drawWithUpdate(light.get());
 
 	player->drawWithUpdate(light.get());
 
@@ -988,12 +988,12 @@ void BossScene::moveAim2DPos()
 void BossScene::rotaBackObj()
 {
 	// シーン遷移中も背景は回す
-	XMFLOAT2 shiftUv = back->getModelPt()->getShiftUv();
+	XMFLOAT2 shiftUv = backModel->getShiftUv();
 	constexpr float shiftSpeed = 0.01f;
 
 	shiftUv.x += shiftSpeed / DX12Base::getInstance()->getFPS();
 
-	back->getModelPt()->setShivtUv(shiftUv);
+	backModel->setShivtUv(shiftUv);
 }
 
 void BossScene::drawFrontSprite()

@@ -210,11 +210,11 @@ size_t FbxObj3d::createGraphicsPipeline(BLEND_MODE blendMode,
 
 	// グラフィックスパイプラインの生成
 	pipelinestate.emplace_back();
-	ppStateNum = pipelinestate.size() - 1u;
-	result = dxBase->getDev()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(pipelinestate[ppStateNum].ReleaseAndGetAddressOf()));
+	size_t num = pipelinestate.size() - 1u;
+	result = dxBase->getDev()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(pipelinestate[num].ReleaseAndGetAddressOf()));
 	assert(SUCCEEDED(result));
 
-	return ppStateNum;
+	return num;
 }
 
 FbxObj3d::FbxObj3d(Camera* camera,
@@ -264,7 +264,7 @@ void FbxObj3d::init()
 	}
 	constBuffSkin->Unmap(0, nullptr);
 
-	createGraphicsPipeline();
+	ppStateNum = createGraphicsPipeline();
 }
 
 void FbxObj3d::update()
@@ -341,12 +341,14 @@ void FbxObj3d::update()
 	constBuffSkin->Unmap(0, nullptr);
 }
 
-void FbxObj3d::draw(Light* light)
+void FbxObj3d::draw(Light* light, size_t ppState)
 {
 	//　モデルがないなら描画しない
 	if (!model) { return; }
 
 	assert(light);
+
+	startDraw(ppState);
 
 	// 定数バッファビューをセット
 	dxBase->getCmdList()->SetGraphicsRootConstantBufferView(0, constBuffTransform->GetGPUVirtualAddress());
@@ -361,16 +363,16 @@ void FbxObj3d::draw(Light* light)
 	model->draw();
 }
 
-void FbxObj3d::drawWithUpdate(Light* light)
+void FbxObj3d::drawWithUpdate(Light* light, size_t ppState)
 {
 	update();
-	draw(light);
+	draw(light, ppState);
 }
 
-void FbxObj3d::startDraw()
+void FbxObj3d::startDraw(size_t ppState)
 {
 	// パイプラインステートの設定
-	dxBase->getCmdList()->SetPipelineState(pipelinestate[ppStateNum].Get());
+	dxBase->getCmdList()->SetPipelineState(pipelinestate[ppState].Get());
 	// ルートシグネチャの設定
 	dxBase->getCmdList()->SetGraphicsRootSignature(rootsignature.Get());
 	// プリミティブ形状を設定

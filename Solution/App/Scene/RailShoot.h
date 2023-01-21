@@ -12,7 +12,6 @@
 #include "System/DX12Base.h"
 #include "Camera/CameraObj.h"
 #include "GameObject/Player.h"
-#include "3D/Obj/ObjSet.h"
 #include <Sound/Sound.h>
 
 #include <3D/Fbx/FbxObj3d.h>
@@ -60,8 +59,10 @@ class RailShoot
 	size_t backPipelineSet;
 
 	// 背景と地面
-	std::unique_ptr<ObjSet> back;
-	std::unique_ptr<ObjSet> ground;
+	std::unique_ptr<Object3d> backObj;
+	std::unique_ptr<ObjModel> backModel;
+	std::unique_ptr<Object3d> groundObj;
+	std::unique_ptr<ObjModel> groundModel;
 
 	// 敵
 	std::forward_list<std::unique_ptr<NormalEnemy>> enemy;

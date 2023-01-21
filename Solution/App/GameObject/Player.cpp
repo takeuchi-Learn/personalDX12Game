@@ -2,16 +2,6 @@
 #include <DirectXMath.h>
 using namespace DirectX;
 
-Player::Player(Camera* camera,
-			   ObjModel* model,
-			   const DirectX::XMFLOAT3& pos,
-			   uint16_t hp)
-	: GameObj(camera, model, pos),
-	hp(hp),
-	shotTargetObjPt(nullptr)
-{
-}
-
 XMVECTOR Player::getLookVec(float len)
 {
 	return XMVector3Rotate(XMVectorSet(0, 0, len, 1),

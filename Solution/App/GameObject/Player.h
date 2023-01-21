@@ -20,15 +20,12 @@ class Player
 
 	DirectX::XMFLOAT2 aim2DPos{};
 
-	GameObj* shotTargetObjPt;
+	GameObj* shotTargetObjPt = nullptr;
 
 	uint16_t hp;
 
 public:
-	Player(Camera* camera,
-		   ObjModel* model,
-		   const DirectX::XMFLOAT3& pos = { 0.f,0.f,0.f },
-		   uint16_t hp = 24u);
+	using GameObj::GameObj;
 
 	inline uint16_t getBulLife() const { return bulLife; }
 	inline void setBulLife(uint16_t bulLife) { this->bulLife = bulLife; }

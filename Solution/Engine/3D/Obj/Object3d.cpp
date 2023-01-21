@@ -11,10 +11,9 @@ using namespace DirectX;
 using namespace Microsoft::WRL;
 
 DX12Base* Object3d::dxBase = nullptr;
-size_t Object3d::ppStateDefNum = 0u;
+size_t Object3d::ppStateNum = 0u;
 ComPtr<ID3D12RootSignature> Object3d::rootsignature{};
 std::vector<ComPtr<ID3D12PipelineState>> Object3d::pipelinestate{};
-size_t Object3d::ppStateNum = 0U;
 
 void Object3d::createTransferBufferB0(ComPtr<ID3D12Resource>& constBuffB0)
 {
@@ -58,30 +57,32 @@ void Object3d::update()
 	}
 }
 
-void Object3d::draw(DX12Base* dxBase, Light* light)
+void Object3d::draw(Light* light, size_t ppState)
 {
+	startDraw(ppState);
+
 	// 定数バッファビューをセット
 	dxBase->getCmdList()->SetGraphicsRootConstantBufferView(0, constBuffB0->GetGPUVirtualAddress());
 
 	light->draw(3);
 
-	if (model != nullptr) model->draw(dxBase->getCmdList());
+	if (model) { model->draw(dxBase->getCmdList()); }
 }
 
-void Object3d::drawWithUpdate(DX12Base* dxBase, Light* light)
+void Object3d::drawWithUpdate(Light* light, size_t ppState)
 {
 	update();
-	draw(dxBase, light);
+	draw(light, ppState);
 }
 
 Object3d::~Object3d() {}
 
-void Object3d::startDraw(size_t ppStateNum, D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology)
+void Object3d::startDraw(size_t ppState)
 {
-	dxBase->getCmdList()->SetPipelineState(pipelinestate[ppStateNum].Get());
+	dxBase->getCmdList()->SetPipelineState(pipelinestate[ppState].Get());
 	dxBase->getCmdList()->SetGraphicsRootSignature(rootsignature.Get());
 	//プリミティブ形状を設定
-	dxBase->getCmdList()->IASetPrimitiveTopology(PrimitiveTopology);
+	dxBase->getCmdList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void Object3d::staticInit()
@@ -91,7 +92,7 @@ void Object3d::staticInit()
 
 	Object3d::dxBase = DX12Base::getInstance();
 
-	ppStateDefNum = createGraphicsPipeline();
+	ppStateNum = createGraphicsPipeline();
 
 	ObjModel::staticInit();
 }
@@ -281,7 +282,7 @@ size_t Object3d::createGraphicsPipeline(BaseObj::BLEND_MODE blendMode,
 
 	//パイプラインステートの生成
 	pipelinestate.emplace_back();
-	ppStateNum = pipelinestate.size() - 1u;
+	const size_t ppStateNum = pipelinestate.size() - 1u;
 	result = dxBase->getDev()->CreateGraphicsPipelineState(&gpipeline, IID_PPV_ARGS(pipelinestate[ppStateNum].ReleaseAndGetAddressOf()));
 	assert(SUCCEEDED(result));
 

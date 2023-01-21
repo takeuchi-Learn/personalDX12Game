@@ -201,9 +201,6 @@
     <ClCompile Include="App\GameObject\Player.cpp">
       <Filter>GameObject\Player</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\3D\Obj\ObjSet.cpp">
-      <Filter>Object共通\3Dオブジェクト</Filter>
-    </ClCompile>
     <ClCompile Include="App\Scene\RailShoot.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
@@ -340,9 +337,6 @@
     </ClInclude>
     <ClInclude Include="App\GameObject\Player.h">
       <Filter>GameObject\Player</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\3D\Obj\ObjSet.h">
-      <Filter>Object共通\3Dオブジェクト</Filter>
     </ClInclude>
     <ClInclude Include="App\Scene\RailShoot.h">
       <Filter>Scene</Filter>

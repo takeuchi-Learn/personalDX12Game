@@ -31,17 +31,14 @@ public:
 	// --------------------
 private:
 	static DX12Base* dxBase;
-	static size_t ppStateDefNum;
 	static ComPtr<ID3D12RootSignature> rootsignature;
 	static std::vector<ComPtr<ID3D12PipelineState>> pipelinestate;
-	static size_t ppStateNum;
 
 	static void createTransferBufferB0(ComPtr<ID3D12Resource>& constBuff);
 
-public:
-	static void startDraw(size_t ppStateNum = ppStateDefNum,
-						  D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	static void startDraw(size_t ppStateNum = ppStateNum);
 
+public:
 
 	//3Dオブジェクト用パイプライン生成
 	// シェーダーモデル指定は "*s_5_0"
@@ -49,7 +46,7 @@ public:
 										 const wchar_t* vsPath = L"Resources/Shaders/BasicVS.hlsl",
 										 const wchar_t* psPath = L"Resources/Shaders/BasicPS.hlsl");
 
-	static inline size_t getGraphicsPipeline() { return ppStateDefNum; }
+	static inline size_t getGraphicsPipeline() { return ppStateNum; }
 
 	static void staticInit();
 
@@ -78,7 +75,7 @@ public:
 
 	void update();
 
-	void draw(DX12Base* dxCom, Light* light);
+	void draw(Light* light, size_t ppState = ppStateNum);
 
-	void drawWithUpdate(DX12Base* dxCom, Light* light);
+	void drawWithUpdate(Light* light, size_t ppState = ppStateNum);
 };

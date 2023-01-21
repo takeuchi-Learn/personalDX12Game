@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <DirectXMath.h>
 #include <Camera/Camera.h>
+#include <3D/Light.h>
 
 class BaseObj
 {
@@ -32,6 +33,9 @@ protected:
 	XMMATRIX matTrans{};
 
 public:
+
+	static size_t ppStateNum;
+
 	// 色
 	XMFLOAT4 color = { 1, 1, 1, 1 };
 
@@ -73,5 +77,8 @@ public:
 	inline void setCamera(Camera* camera) { this->camera = camera; }
 
 #pragma endregion アクセッサ
+
+	virtual void update() = 0;
+	virtual void draw(Light* light, size_t ppState) = 0;
 };
 

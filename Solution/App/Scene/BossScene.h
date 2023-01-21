@@ -16,7 +16,6 @@
 #include "2D/Sprite.h"
 #include "GameObject/Player.h"
 #include "3D/Obj/Object3d.h"
-#include "3D/Obj/ObjSet.h"
 #include "3D/ParticleMgr.h"
 #include "GameObject/BaseEnemy.h"
 #include "GameObject/Boss/BossEnemy.h"
@@ -71,8 +70,11 @@ private:
 	size_t backPipelineSet;
 
 	// 背景と地面
-	std::unique_ptr<ObjSet> back;
-	std::unique_ptr<ObjSet> ground;
+	// 背景と地面
+	std::unique_ptr<Object3d> backObj;
+	std::unique_ptr<ObjModel> backModel;
+	std::unique_ptr<Object3d> groundObj;
+	std::unique_ptr<ObjModel> groundModel;
 
 	// 自機
 	std::unique_ptr<Player> player;

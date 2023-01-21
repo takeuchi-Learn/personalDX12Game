@@ -140,7 +140,6 @@
     <ClCompile Include="Engine\3D\Obj\Material.cpp" />
     <ClCompile Include="Engine\3D\Obj\Mesh.cpp" />
     <ClCompile Include="Engine\3D\Obj\ObjModel.cpp" />
-    <ClCompile Include="Engine\3D\Obj\ObjSet.cpp" />
     <ClCompile Include="App\GameObject\Player.cpp" />
     <ClCompile Include="App\GameObject\PlayerBullet.cpp" />
     <ClCompile Include="App\Scene\RailShoot.cpp" />
@@ -188,7 +187,6 @@
     <ClInclude Include="Engine\3D\Obj\Material.h" />
     <ClInclude Include="Engine\3D\Obj\Mesh.h" />
     <ClInclude Include="Engine\3D\Obj\ObjModel.h" />
-    <ClInclude Include="Engine\3D\Obj\ObjSet.h" />
     <ClInclude Include="App\GameObject\Player.h" />
     <ClInclude Include="App\GameObject\PlayerBullet.h" />
     <ClInclude Include="App\Scene\RailShoot.h" />

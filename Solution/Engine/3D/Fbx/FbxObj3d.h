@@ -39,10 +39,6 @@ private:
 	static std::vector<ComPtr<ID3D12PipelineState>> pipelinestate;
 
 public:
-	static size_t ppStateNum;
-
-public:
-	static void startDraw();
 
 	//3Dオブジェクト用パイプライン生成
 	// シェーダーモデル指定は "*s_5_0"
@@ -52,6 +48,7 @@ public:
 
 
 protected:
+	static void startDraw(size_t ppState = ppStateNum);
 
 	// 定数バッファ
 	ComPtr<ID3D12Resource> constBuffTransform;
@@ -91,9 +88,9 @@ public:
 
 	void init();	// コンストラクタ内で呼び出している
 	void update();
-	void draw(Light* light);
+	void draw(Light* light, size_t ppState = ppStateNum);
 
-	void drawWithUpdate(Light* light);
+	void drawWithUpdate(Light* light, size_t ppState = ppStateNum);
 
 	void playAnimation();
 	void stopAnimation(bool resetPoseFlag = true);
