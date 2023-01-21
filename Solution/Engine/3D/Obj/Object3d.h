@@ -48,26 +48,20 @@ private:
 
 	static void createTransferBufferB0(ComPtr<ID3D12Resource>& constBuff);
 
-	inline XMFLOAT3 subFloat3(const XMFLOAT3& left, const XMFLOAT3& right)
-	{
-		return XMFLOAT3(left.x - right.x,
-						left.y - right.y,
-						left.z - right.z);
-	}
-
 public:
-	static inline size_t getGraphicsPipeline() { return ppStateDefNum; }
-
 	static void startDraw(size_t ppStateNum = ppStateDefNum,
 						  D3D12_PRIMITIVE_TOPOLOGY PrimitiveTopology = D3D12_PRIMITIVE_TOPOLOGY::D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-	static void staticInit();
 
 	//3Dオブジェクト用パイプライン生成
 	// シェーダーモデル指定は "*s_5_0"
 	static size_t createGraphicsPipeline(BLEND_MODE blendMode = BLEND_MODE::ALPHA,
 										 const wchar_t* vsPath = L"Resources/Shaders/BasicVS.hlsl",
 										 const wchar_t* psPath = L"Resources/Shaders/BasicPS.hlsl");
+
+	static inline size_t getGraphicsPipeline() { return ppStateDefNum; }
+
+	static void staticInit();
 
 	// --------------------
 	// (動的)メンバ
@@ -78,19 +72,21 @@ private:
 	// 定数バッファ
 	ComPtr<ID3D12Resource> constBuffB0;
 	// ワールド変換行列
-	XMMATRIX matWorld;
+	XMMATRIX matWorld{};
 
 	XMMATRIX matScale{};
 	XMMATRIX matRot{};
 	XMMATRIX matTrans{};
 
 public:
+	// 色
 	XMFLOAT4 color = { 1, 1, 1, 1 };
 
 	// アフィン変換情報
-	XMFLOAT3 scale = { 1,1,1 };
-	XMFLOAT3 rotation = { 0,0,0 };
-	XMFLOAT3 position = { 0,0,0 };
+	XMFLOAT3 scale = { 1, 1, 1 };
+	XMFLOAT3 rotation = { 0, 0, 0 };
+	XMFLOAT3 position = { 0, 0, 0 };
+
 	// 親オブジェクトへのポインタ
 	Object3d* parent = nullptr;
 
@@ -100,6 +96,8 @@ public:
 	bool isBillboard = false;
 	bool isBillBoardY = false;// isBillboardがfalseの場合のみ機能する
 
+#pragma region アクセッサ
+
 	inline const XMMATRIX& getMatWorld() const { return matWorld; }
 
 	inline const XMMATRIX& getMatRota() const { return matRot; }
@@ -107,6 +105,8 @@ public:
 	inline const XMMATRIX& getMatTrans() const { return matTrans; }
 
 	inline const Camera* getCamera() const { return camera; }
+
+#pragma endregion アクセッサ
 
 	inline XMFLOAT3 calcWorldPos() const
 	{

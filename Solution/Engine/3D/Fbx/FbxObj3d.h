@@ -30,9 +30,6 @@ public:
 		REVERSE
 	};
 
-	// ボーンの最大数(hlslの定数と合わせる)
-	static const int MAX_BONES = 32;
-
 	struct ConstBufferDataTransform
 	{
 		XMFLOAT4 color;
@@ -41,16 +38,13 @@ public:
 		XMFLOAT3 cameraPos;
 	};
 
+	// ボーンの最大数(hlslの定数と合わせる)
+	static const int MAX_BONES = 32;
+
 	struct ConstBufferDataSkin
 	{
 		XMMATRIX bones[MAX_BONES];
 	};
-
-public:
-	static size_t createGraphicsPipeline(BLEND_MODE blendMode = BLEND_MODE::ALPHA,
-										 const wchar_t* vsPath = L"Resources/shaders/FBXVS.hlsl",
-										 const wchar_t* psPath = L"Resources/shaders/FBXPS.hlsl");
-
 private:
 	static DX12Base* dxBase;
 
@@ -60,12 +54,27 @@ private:
 public:
 	static size_t ppStateNum;
 
+public:
+	static void startDraw();
+
+	//3Dオブジェクト用パイプライン生成
+	// シェーダーモデル指定は "*s_5_0"
+	static size_t createGraphicsPipeline(BLEND_MODE blendMode = BLEND_MODE::ALPHA,
+										 const wchar_t* vsPath = L"Resources/shaders/FBXVS.hlsl",
+										 const wchar_t* psPath = L"Resources/shaders/FBXPS.hlsl");
+
+
 protected:
 	Camera* camera = nullptr;
 
+	// 定数バッファ
 	ComPtr<ID3D12Resource> constBuffTransform;
-
+	// ワールド変換行列
 	XMMATRIX matWorld{};
+
+	XMMATRIX matScale{};
+	XMMATRIX matRot{};
+	XMMATRIX matTrans{};
 
 	XMMATRIX modelWorldMat{};
 
@@ -83,8 +92,10 @@ protected:
 	bool animLoop = true;
 
 public:
+	// 色
 	XMFLOAT4 color = { 1, 1, 1, 1 };
 
+	// アフィン変換情報
 	XMFLOAT3 scale = { 1, 1, 1 };
 	XMFLOAT3 rotation = { 0, 0, 0 };
 	XMFLOAT3 position = { 0, 0, 0 };
@@ -94,6 +105,7 @@ public:
 	// fbxとobj両方の親がいる場合、fbxが優先される
 	Object3d* objParent = nullptr;
 
+	// モデルデータ
 	FbxModel* model = nullptr;
 
 	bool isBillboard = false;
@@ -101,7 +113,28 @@ public:
 
 public:
 
-	static void startDraw();
+#pragma region アクセッサ
+
+	inline const XMMATRIX& getMatWorld() const { return matWorld; }
+
+	inline const XMMATRIX& getMatRota() const { return matRot; }
+	inline const XMMATRIX& getMatScale() const { return matScale; }
+	inline const XMMATRIX& getMatTrans() const { return matTrans; }
+
+	inline void setCamera(Camera* camera) { this->camera = camera; }
+
+#pragma endregion アクセッサ
+
+	inline XMFLOAT3 calcWorldPos() const
+	{
+		return XMFLOAT3(matWorld.r[3].m128_f32[0],
+						matWorld.r[3].m128_f32[1],
+						matWorld.r[3].m128_f32[2]);
+	}
+
+	DirectX::XMFLOAT2 calcScreenPos();
+
+	DirectX::XMFLOAT3 calcVertPos(size_t vertNum);
 
 	// モデル未読み込み
 	FbxObj3d(Camera* camera, bool animLoop = true);
@@ -116,21 +149,4 @@ public:
 
 	void playAnimation();
 	void stopAnimation(bool resetPoseFlag = true);
-
-	inline XMFLOAT3 calcWorldPos() const
-	{
-		return XMFLOAT3(matWorld.r[3].m128_f32[0],
-						matWorld.r[3].m128_f32[1],
-						matWorld.r[3].m128_f32[2]);
-	}
-
-	DirectX::XMFLOAT2 calcScreenPos();
-
-	DirectX::XMFLOAT3 calcVertPos(size_t vertNum);
-
-#pragma region アクセッサ
-
-	inline void setCamera(Camera* camera) { this->camera = camera; }
-
-#pragma endregion アクセッサ
 };

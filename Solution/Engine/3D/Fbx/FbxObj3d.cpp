@@ -286,12 +286,12 @@ void FbxObj3d::update()
 		}
 	}
 
-	XMMATRIX matScale = XMMatrixScaling(scale.x, scale.y, scale.z);
-	XMMATRIX matRot = XMMatrixIdentity();
+	matScale = XMMatrixScaling(scale.x, scale.y, scale.z);
+	matRot = XMMatrixIdentity();
 	matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation.z));
 	matRot *= XMMatrixRotationX(XMConvertToRadians(rotation.x));
 	matRot *= XMMatrixRotationY(XMConvertToRadians(rotation.y));
-	XMMATRIX matTrans = XMMatrixTranslation(position.x, position.y, position.z);
+	matTrans = XMMatrixTranslation(position.x, position.y, position.z);
 
 	matWorld = XMMatrixIdentity();
 	matWorld *= matScale;
