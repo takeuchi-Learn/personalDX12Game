@@ -29,25 +29,14 @@ void Object3d::createTransferBufferB0(ComPtr<ID3D12Resource>& constBuffB0)
 	);
 }
 
-XMFLOAT2 Object3d::calcScreenPos()
-{
-	XMVECTOR screenPosVec = XMVector3Transform(matWorld.r[3],
-											   camera->getMatVPV());
-	screenPosVec /= XMVectorGetW(screenPosVec);
-	XMFLOAT2 screenPosF2{};
-	XMStoreFloat2(&screenPosF2, screenPosVec);
-
-	return screenPosF2;
-}
-
 Object3d::Object3d(Camera* camera)
-	: camera(camera), matWorld()
+	: BaseObj(camera)
 {
 	// 定数バッファの生成
 	createTransferBufferB0(constBuffB0);
 }
 Object3d::Object3d(Camera* camera, ObjModel* model)
-	: camera(camera), model(model), matWorld()
+	: BaseObj(camera), model(model)
 {
 	// 定数バッファの生成
 	createTransferBufferB0(constBuffB0);
@@ -55,35 +44,7 @@ Object3d::Object3d(Camera* camera, ObjModel* model)
 
 void Object3d::update()
 {
-	// スケール、回転、平行移動行列の計算
-	matScale = XMMatrixScaling(scale.x, scale.y, scale.z);
-	matRot = XMMatrixIdentity();
-	matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation.z));
-	matRot *= XMMatrixRotationX(XMConvertToRadians(rotation.x));
-	matRot *= XMMatrixRotationY(XMConvertToRadians(rotation.y));
-	matTrans = XMMatrixTranslation(position.x, position.y, position.z);
-
-	// ワールド行列の合成
-	matWorld = XMMatrixIdentity(); // 変形をリセット
-	matWorld *= matScale; // ワールド行列にスケーリングを反映
-	matWorld *= matRot; // ワールド行列に回転を反映
-	if (isBillboard)
-	{
-		const XMMATRIX& matBillBoard = camera->getBillboardMatrix();
-		matWorld *= matBillBoard;
-	} else if (isBillBoardY)
-	{
-		const XMMATRIX& matBillBoardY = camera->getBillboardMatrixY();
-		matWorld *= matBillBoardY;
-	}
-	matWorld *= matTrans; // ワールド行列に平行移動を反映
-
-	// 親オブジェクトがあれば
-	if (parent)
-	{
-		// 親オブジェクトのワールド行列を掛ける
-		matWorld *= parent->matWorld;
-	}
+	updateMatWorld();
 
 	// 定数バッファへデータ転送
 	ConstBufferDataB0* constMapB0 = nullptr;
@@ -135,7 +96,7 @@ void Object3d::staticInit()
 	ObjModel::staticInit();
 }
 
-size_t Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
+size_t Object3d::createGraphicsPipeline(BaseObj::BLEND_MODE blendMode,
 										const wchar_t* vsPath,
 										const wchar_t* psPath)
 {
@@ -220,25 +181,25 @@ size_t Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
 
 	switch (blendMode)
 	{
-	case Object3d::BLEND_MODE::ADD:
+	case BaseObj::BLEND_MODE::ADD:
 		//---加算
 		blenddesc.BlendOp = D3D12_BLEND_OP_ADD;				// 加算
 		blenddesc.SrcBlend = D3D12_BLEND_ONE;				// ソースの値を100%使う
 		blenddesc.DestBlend = D3D12_BLEND_ONE;				// デストの値を100%使う
 		break;
-	case Object3d::BLEND_MODE::SUB:
+	case BaseObj::BLEND_MODE::SUB:
 		//---減算
 		blenddesc.BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;	// デストからソースを減算
 		blenddesc.SrcBlend = D3D12_BLEND_ONE;				// ソースの値を100%使う
 		blenddesc.DestBlend = D3D12_BLEND_ONE;				// デストの値を100%使う
 		break;
-	case Object3d::BLEND_MODE::REVERSE:
+	case BaseObj::BLEND_MODE::REVERSE:
 		//---反転
 		blenddesc.BlendOp = D3D12_BLEND_OP_ADD;				// 加算
 		blenddesc.SrcBlend = D3D12_BLEND_INV_DEST_COLOR;	// 1.0 - デストカラーの値
 		blenddesc.DestBlend = D3D12_BLEND_ZERO;
 		break;
-	case Object3d::BLEND_MODE::ALPHA:
+	case BaseObj::BLEND_MODE::ALPHA:
 	default:
 		//--半透明合成
 		blenddesc.BlendOp = D3D12_BLEND_OP_ADD;				// 加算

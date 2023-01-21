@@ -53,8 +53,10 @@ public:
 		return velF3;
 	}
 
-	inline Object3d* getParent() { return obj->parent; }
-	inline void setParent(Object3d* parent) { obj->parent = parent; }
+#pragma region アクセッサ
+
+	inline BaseObj* getParent() { return obj->parent; }
+	inline void setParent(BaseObj* parent) { obj->parent = parent; }
 
 	inline bool getAlive() const { return alive; }
 	inline void setAlive(bool alive) { this->alive = alive; }
@@ -79,14 +81,6 @@ public:
 	/// @return Zのスケールを返す
 	inline float getScale() const { return obj->scale.z; }
 
-	/// @return 大きさベクトルの長さを返す
-	inline float calcScale() const
-	{
-		return std::sqrt(obj->scale.x * obj->scale.x +
-						 obj->scale.y * obj->scale.y +
-						 obj->scale.z * obj->scale.z);
-	}
-
 	inline const DirectX::XMFLOAT3& getRotation() const { return obj->rotation; }
 	inline void setRotation(const DirectX::XMFLOAT3& rota) { obj->rotation = rota; }
 
@@ -94,6 +88,16 @@ public:
 	inline const DirectX::XMMATRIX& getMatRota() const { return obj->getMatRota(); }
 	inline const DirectX::XMMATRIX& getMatScale() const { return obj->getMatScale(); }
 	inline const DirectX::XMMATRIX& getMatTrans() const { return obj->getMatTrans(); }
+
+#pragma endregion アクセッサ
+
+	/// @return 大きさベクトルの長さを返す
+	inline float calcScale() const
+	{
+		return std::sqrt(obj->scale.x * obj->scale.x +
+						 obj->scale.y * obj->scale.y +
+						 obj->scale.z * obj->scale.z);
+	}
 
 	inline DirectX::XMFLOAT3 calcWorldPos() const { return obj->calcWorldPos(); }
 

@@ -18,7 +18,7 @@ void PlayerBullet::additionalUpdate()
 			vel = GameObj::calcVel(targetObjPt->calcWorldPos(), this->calcWorldPos(), speed);
 
 			// 親がいればその回転を反映させる
-			if (const Object3d* parent = getParent())
+			if (const BaseObj* parent = getParent())
 			{
 				XMVECTOR velVec = XMVector3Rotate(XMLoadFloat3(&vel),
 												  XMQuaternionRotationMatrix(parent->getMatRota()));

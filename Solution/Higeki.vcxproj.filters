@@ -246,6 +246,9 @@
     <ClCompile Include="App\Scene\GameOverScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\3D\BaseObj.cpp">
+      <Filter>Object共通\3Dオブジェクト</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Camera\Camera.h">
@@ -388,6 +391,9 @@
     </ClInclude>
     <ClInclude Include="App\Scene\GameOverScene.h">
       <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\3D\BaseObj.h">
+      <Filter>Object共通\3Dオブジェクト</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

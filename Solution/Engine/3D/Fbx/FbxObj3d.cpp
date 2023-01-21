@@ -225,7 +225,7 @@ FbxObj3d::FbxObj3d(Camera* camera,
 FbxObj3d::FbxObj3d(Camera* camera,
 				   FbxModel* model,
 				   bool animLoop) :
-	camera(camera),
+	BaseObj(camera),
 	model(model),
 	animLoop(animLoop)
 {
@@ -286,34 +286,7 @@ void FbxObj3d::update()
 		}
 	}
 
-	matScale = XMMatrixScaling(scale.x, scale.y, scale.z);
-	matRot = XMMatrixIdentity();
-	matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation.z));
-	matRot *= XMMatrixRotationX(XMConvertToRadians(rotation.x));
-	matRot *= XMMatrixRotationY(XMConvertToRadians(rotation.y));
-	matTrans = XMMatrixTranslation(position.x, position.y, position.z);
-
-	matWorld = XMMatrixIdentity();
-	matWorld *= matScale;
-	matWorld *= matRot;
-	if (isBillboard)
-	{
-		matWorld *= camera->getBillboardMatrix();
-	} else if (isBillBoardY)
-	{
-		matWorld *= camera->getBillboardMatrixY();
-	}
-	matWorld *= matTrans; // ワールド行列に平行移動を反映
-
-	// 親オブジェクトがあれば
-	if (parent)
-	{
-		// 親オブジェクトのワールド行列を掛ける
-		matWorld *= parent->matWorld;
-	} else if (objParent)
-	{
-		matWorld *= objParent->getMatWorld();
-	}
+	updateMatWorld();
 
 	// モデルのメッシュのトランスフォーム
 	const XMMATRIX& modelTransform = model->GetModelTransform();
@@ -443,15 +416,4 @@ DirectX::XMFLOAT3 FbxObj3d::calcVertPos(size_t vertNum)
 	XMStoreFloat3(&wpos, wposVec);
 
 	return wpos;
-}
-
-DirectX::XMFLOAT2 FbxObj3d::calcScreenPos()
-{
-	XMVECTOR screenPosVec = XMVector3Transform(matWorld.r[3],
-											   camera->getMatVPV());
-	screenPosVec /= XMVectorGetW(screenPosVec);
-	XMFLOAT2 screenPosF2{};
-	XMStoreFloat2(&screenPosF2, screenPosVec);
-
-	return screenPosF2;
 }

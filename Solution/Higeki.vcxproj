@@ -118,6 +118,7 @@
     <ClCompile Include="App\GameObject\Boss\BossEnemy.cpp" />
     <ClCompile Include="App\GameObject\EnemyMgr.cpp" />
     <ClCompile Include="App\GameObject\Boss\BossBehavior.cpp" />
+    <ClCompile Include="Engine\3D\BaseObj.cpp" />
     <ClCompile Include="Engine\Camera\Camera.cpp" />
     <ClCompile Include="Engine\Camera\CameraObj.cpp" />
     <ClCompile Include="Engine\Collision\Collision.cpp" />
@@ -165,6 +166,7 @@
     <ClInclude Include="App\GameObject\Boss\BossEnemy.h" />
     <ClInclude Include="App\GameObject\EnemyMgr.h" />
     <ClInclude Include="App\GameObject\Boss\BossBehavior.h" />
+    <ClInclude Include="Engine\3D\BaseObj.h" />
     <ClInclude Include="Engine\BehaviorTree\BaseComposite.h" />
     <ClInclude Include="Engine\Camera\Camera.h" />
     <ClInclude Include="Engine\Camera\CameraObj.h" />
