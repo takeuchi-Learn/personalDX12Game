@@ -53,8 +53,28 @@ class TitleScene :
 	// --------------------
 	// シーン
 	// --------------------
+	struct MyThread
+	{
+		std::unique_ptr<std::thread> th;
+
+		inline void join()
+		{
+			if (th && th->joinable())
+			{
+				th->join();
+			}
+		}
+
+		~MyThread()
+		{
+			if (th && th->joinable())
+			{
+				th->join();
+			}
+		}
+	};
+	std::unique_ptr<MyThread> th;
 	std::unique_ptr<GameScene> nextScene;
-	std::unique_ptr<std::thread> th;
 
 	Input* input = nullptr;
 

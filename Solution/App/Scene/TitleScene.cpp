@@ -56,7 +56,8 @@ TitleScene::TitleScene()
 void TitleScene::start()
 {
 	// 次シーンの読み込み開始
-	th.reset(new std::thread([&] { nextScene = std::make_unique<RailShoot>(); }));
+	th.reset(new MyThread());
+	th->th.reset(new std::thread([&] { nextScene = std::make_unique<RailShoot>(); }));
 
 	Sound::SoundPlayWave(bgm.get(), XAUDIO2_LOOP_INFINITE, 0.2f);
 	timer->reset();
@@ -64,13 +65,6 @@ void TitleScene::start()
 
 TitleScene::~TitleScene()
 {
-	if (th)
-	{
-		if (th->joinable())
-		{
-			th->join();
-		}
-	}
 }
 
 void TitleScene::update()
@@ -87,6 +81,22 @@ void TitleScene::update_normal()
 		input->triggerPadButton(Input::PAD::A) ||
 		input->triggerPadButton(Input::PAD::B))
 	{
+
+#ifdef _DEBUG
+
+		if (input->hitKey(DIK_LSHIFT))
+		{
+			// 次シーンの読み込み終了を待つ
+			th->join();
+			// 次シーンへ進む
+			SceneManager::getInstange()->changeSceneFromInstance(nextScene);
+			update_proc = [] {};
+			
+			return;
+		}
+
+#endif // _DEBUG
+
 		update_proc = std::bind(&TitleScene::update_end, this);
 		Sound::SoundPlayWave(shortBridge.get());
 		Sound::SoundStopWave(bgm.get());
