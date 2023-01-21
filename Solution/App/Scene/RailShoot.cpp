@@ -10,6 +10,8 @@
 #include "Collision/Collision.h"
 #include "System/SceneManager.h"
 
+#include <3D/Fbx/FbxLoader.h>
+
 #ifdef min
 #undef min
 #endif // min
@@ -290,6 +292,11 @@ RailShoot::RailShoot()
 	player->setParent(railObj.get());
 	player->setPos(XMFLOAT3(0, 12.f, 0));
 	player->setHp(playerHpMax);
+
+	FbxObj3d::setCamera(camera.get());
+	constexpr const char modelName[] = "tori_model";
+	fbxModel.reset(FbxLoader::ins()->loadModelFromFile(modelName));
+	fbxObj.reset(new FbxObj3d(fbxModel.get(), true));
 
 	// --------------------
 	// 背景と地面
@@ -1285,6 +1292,9 @@ void RailShoot::drawObj3d()
 			x->drawWithUpdate(DX12Base::ins(), light.get());
 		}
 	}
+
+	FbxObj3d::startDraw();
+	fbxObj->drawWithUpdate(light.get());
 
 	particleMgr->drawWithUpdate();
 }

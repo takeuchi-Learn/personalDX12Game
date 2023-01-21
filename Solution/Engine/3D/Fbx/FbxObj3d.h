@@ -65,6 +65,8 @@ public:
 
 	void drawWithUpdate(Light* light);
 
+	static void startDraw();
+
 #pragma region アクセッサ
 
 	inline const FbxModel* getModel() const { return model; }

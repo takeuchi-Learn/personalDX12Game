@@ -15,6 +15,9 @@
 #include "3D/Obj/ObjSet.h"
 #include <Sound/Sound.h>
 
+#include <3D/Fbx/FbxObj3d.h>
+#include <3D/Fbx/FbxModel.h>
+
 /// @brief レールシューティングのシーン
 class RailShoot
 	: public GameScene
@@ -70,6 +73,10 @@ class RailShoot
 	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<ObjModel> playerBulModel;
 	uint16_t playerHpMax;
+
+	// fbx
+	std::unique_ptr<FbxModel> fbxModel;
+	std::unique_ptr<FbxObj3d> fbxObj;
 
 	// レールの現在位置を示すオブジェクト
 	std::unique_ptr<GameObj> railObj;

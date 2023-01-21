@@ -228,9 +228,6 @@
     <ClCompile Include="App\GameObject\BaseEnemy.cpp">
       <Filter>GameObject\Enemy</Filter>
     </ClCompile>
-    <ClCompile Include="App\Scene\BaseStage.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
     <ClCompile Include="App\GameObject\EnemyMgr.cpp">
       <Filter>GameObject</Filter>
     </ClCompile>
@@ -367,9 +364,6 @@
     </ClInclude>
     <ClInclude Include="App\GameObject\BaseEnemy.h">
       <Filter>GameObject\Enemy</Filter>
-    </ClInclude>
-    <ClInclude Include="App\Scene\BaseStage.h">
-      <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="App\GameObject\EnemyMgr.h">
       <Filter>GameObject</Filter>

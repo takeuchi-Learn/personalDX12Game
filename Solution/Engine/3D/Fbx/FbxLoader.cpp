@@ -381,7 +381,7 @@ void FbxLoader::parseSkin(FbxModel* model,
 		//ボーンを追加し、関連したボーンの参照を得る
 		bones.emplace_back(FbxModel::Bone(boneName));
 		FbxModel::Bone& bone = bones.back();
-		// 自作ボーンとBXのボーンを紐づける
+		// 自作ボーンとFBXのボーンを紐づける
 		bone.fbxCluster = fbxCluster;
 		// FBXから初期姿勢行列を取得
 		FbxAMatrix fbxMat;

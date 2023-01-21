@@ -317,9 +317,9 @@ void FbxObj3d::update()
 		// メッシュノードのグローバルトランスフォームの逆行列
 		constMapSkin->bones[i] =
 			model->GetModelTransform() *							/* メッシュのトランスフォーム */
-			bones[i].invInitialPose									/* 初期姿勢の逆 */
-			* matCurrentPose										/* 今の姿勢 */
-			* XMMatrixInverse(nullptr, model->GetModelTransform());	/* メッシュのトランスフォームの逆 */
+			bones[i].invInitialPose	 *								/* 初期姿勢の逆 */
+			matCurrentPose *										/* 今の姿勢 */
+			XMMatrixInverse(nullptr, model->GetModelTransform());	/* メッシュのトランスフォームの逆 */
 		/*
 		* 上の処理は、
 		* 初期姿勢からどれだけ動いたか
@@ -334,14 +334,8 @@ void FbxObj3d::draw(Light* light)
 	//　モデルがないなら描画しない
 	if (!model) { return; }
 
-	assert(light != nullptr);
+	assert(light);
 
-	// パイプラインステートの設定
-	dxBase->getCmdList()->SetPipelineState(pipelinestate[ppStateNum].Get());
-	// ルートシグネチャの設定
-	dxBase->getCmdList()->SetGraphicsRootSignature(rootsignature.Get());
-	// プリミティブ形状を設定
-	dxBase->getCmdList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	// 定数バッファビューをセット
 	dxBase->getCmdList()->SetGraphicsRootConstantBufferView(0, constBuffTransform->GetGPUVirtualAddress());
 	// --- 第一引数はcreateGraphicsPipeliine内rootparamsの該当する要素番号
@@ -359,6 +353,16 @@ void FbxObj3d::drawWithUpdate(Light* light)
 {
 	update();
 	draw(light);
+}
+
+void FbxObj3d::startDraw()
+{
+	// パイプラインステートの設定
+	dxBase->getCmdList()->SetPipelineState(pipelinestate[ppStateNum].Get());
+	// ルートシグネチャの設定
+	dxBase->getCmdList()->SetGraphicsRootSignature(rootsignature.Get());
+	// プリミティブ形状を設定
+	dxBase->getCmdList()->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 }
 
 void FbxObj3d::playAnimation()
