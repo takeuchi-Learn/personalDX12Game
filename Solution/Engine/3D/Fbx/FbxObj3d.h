@@ -22,6 +22,14 @@ protected:
 	using XMMATRIX = DirectX::XMMATRIX;
 
 public:
+	enum class BLEND_MODE : short
+	{
+		ALPHA,
+		ADD,
+		SUB,
+		REVERSE
+	};
+
 	// ボーンの最大数(hlslの定数と合わせる)
 	static const int MAX_BONES = 32;
 
@@ -41,7 +49,8 @@ public:
 public:
 	static void setCamera(Camera* camera) { FbxObj3d::camera = camera; }
 
-	static size_t createGraphicsPipeline(const wchar_t* vsPath = L"Resources/shaders/FBXVS.hlsl",
+	static size_t createGraphicsPipeline(BLEND_MODE blendMode = BLEND_MODE::ALPHA,
+										 const wchar_t* vsPath = L"Resources/shaders/FBXVS.hlsl",
 										 const wchar_t* psPath = L"Resources/shaders/FBXPS.hlsl");
 
 private:

@@ -18,7 +18,8 @@ ComPtr<ID3D12RootSignature> FbxObj3d::rootsignature;
 std::vector<ComPtr<ID3D12PipelineState>> FbxObj3d::pipelinestate;
 size_t FbxObj3d::ppStateNum = 0U;
 
-size_t FbxObj3d::createGraphicsPipeline(const wchar_t* vsPath,
+size_t FbxObj3d::createGraphicsPipeline(BLEND_MODE blendMode,
+										const wchar_t* vsPath,
 										const wchar_t* psPath)
 {
 	assert(dxBase);
@@ -98,11 +99,34 @@ size_t FbxObj3d::createGraphicsPipeline(const wchar_t* vsPath,
 	blenddesc.SrcBlendAlpha = D3D12_BLEND_ONE;
 	blenddesc.DestBlendAlpha = D3D12_BLEND_ZERO;
 
-	//--半透明合成
-	blenddesc.BlendOp = D3D12_BLEND_OP_ADD;
-	blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;
-	blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
-
+	switch (blendMode)
+	{
+	case FbxObj3d::BLEND_MODE::ADD:
+		//---加算
+		blenddesc.BlendOp = D3D12_BLEND_OP_ADD;				// 加算
+		blenddesc.SrcBlend = D3D12_BLEND_ONE;				// ソースの値を100%使う
+		blenddesc.DestBlend = D3D12_BLEND_ONE;				// デストの値を100%使う
+		break;
+	case FbxObj3d::BLEND_MODE::SUB:
+		//---減算
+		blenddesc.BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;	// デストからソースを減算
+		blenddesc.SrcBlend = D3D12_BLEND_ONE;				// ソースの値を100%使う
+		blenddesc.DestBlend = D3D12_BLEND_ONE;				// デストの値を100%使う
+		break;
+	case FbxObj3d::BLEND_MODE::REVERSE:
+		//---反転
+		blenddesc.BlendOp = D3D12_BLEND_OP_ADD;				// 加算
+		blenddesc.SrcBlend = D3D12_BLEND_INV_DEST_COLOR;	// 1.0 - デストカラーの値
+		blenddesc.DestBlend = D3D12_BLEND_ZERO;
+		break;
+	case FbxObj3d::BLEND_MODE::ALPHA:
+	default:
+		//--半透明合成
+		blenddesc.BlendOp = D3D12_BLEND_OP_ADD;				// 加算
+		blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;			// ソースのアルファ値
+		blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;	// デストの値を100%使う
+		break;
+	}
 	// ブレンドステートの設定
 	for (UINT i = 0, maxSize = _countof(gpipeline.BlendState.RenderTarget);
 		 i < PostEffect::renderTargetNum && i < maxSize;

@@ -136,8 +136,8 @@ void Object3d::staticInit()
 }
 
 size_t Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
-										const wchar_t* vsShaderPath,
-										const wchar_t* psShaderPath)
+										const wchar_t* vsPath,
+										const wchar_t* psPath)
 {
 	ComPtr<ID3DBlob> vsBlob;	// 頂点シェーダオブジェクト
 	ComPtr<ID3DBlob> psBlob;	// ピクセルシェーダオブジェクト
@@ -145,7 +145,7 @@ size_t Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
 
 	//頂点シェーダーの読み込みとコンパイル
 	HRESULT result = D3DCompileFromFile(
-		vsShaderPath,  // シェーダファイル名
+		vsPath,  // シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "vs_5_0", // エントリーポイント名、シェーダーモデル指定
@@ -170,7 +170,7 @@ size_t Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
 
 	// ピクセルシェーダの読み込みとコンパイル
 	result = D3DCompileFromFile(
-		psShaderPath,   // シェーダファイル名
+		psPath,   // シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "ps_5_0", // エントリーポイント名、シェーダーモデル指定
@@ -239,11 +239,6 @@ size_t Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
 		blenddesc.DestBlend = D3D12_BLEND_ZERO;
 		break;
 	case Object3d::BLEND_MODE::ALPHA:
-		//--半透明合成
-		blenddesc.BlendOp = D3D12_BLEND_OP_ADD;				// 加算
-		blenddesc.SrcBlend = D3D12_BLEND_SRC_ALPHA;			// ソースのアルファ値
-		blenddesc.DestBlend = D3D12_BLEND_INV_SRC_ALPHA;	// デストの値を100%使う
-		break;
 	default:
 		//--半透明合成
 		blenddesc.BlendOp = D3D12_BLEND_OP_ADD;				// 加算

@@ -68,8 +68,8 @@ public:
 	//3Dオブジェクト用パイプライン生成
 	// シェーダーモデル指定は "*s_5_0"
 	static size_t createGraphicsPipeline(BLEND_MODE blendMode = BLEND_MODE::ALPHA,
-										 const wchar_t* vsShaderPath = L"Resources/Shaders/BasicVS.hlsl",
-										 const wchar_t* psShaderPath = L"Resources/Shaders/BasicPS.hlsl");
+										 const wchar_t* vsPath = L"Resources/Shaders/BasicVS.hlsl",
+										 const wchar_t* psPath = L"Resources/Shaders/BasicPS.hlsl");
 
 	// --------------------
 	// (動的)メンバ
