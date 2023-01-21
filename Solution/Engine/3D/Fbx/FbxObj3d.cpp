@@ -296,23 +296,29 @@ void FbxObj3d::update()
 	matWorld = XMMatrixIdentity();
 	matWorld *= matScale;
 	matWorld *= matRot;
-	matWorld *= matTrans;
+	if (isBillboard)
+	{
+		matWorld *= camera->getBillboardMatrix();
+	} else if (isBillBoardY)
+	{
+		matWorld *= camera->getBillboardMatrixY();
+	}
+	matWorld *= matTrans; // ワールド行列に平行移動を反映
 
-	// 親子行動
+	// 親オブジェクトがあれば
 	if (parent)
 	{
+		// 親オブジェクトのワールド行列を掛ける
 		matWorld *= parent->matWorld;
 	} else if (objParent)
 	{
 		matWorld *= objParent->getMatWorld();
 	}
 
-	const XMMATRIX& matViewProj = camera->getViewProjectionMatrix();
 	// モデルのメッシュのトランスフォーム
 	const XMMATRIX& modelTransform = model->GetModelTransform();
-	// カメラ座標
-	const XMFLOAT3& cameraPos = camera->getEye();
 
+	// モデルメッシュを考慮したワールド行列
 	modelWorldMat = modelTransform * matWorld;
 
 	// 定数バッファへデータを転送
@@ -320,10 +326,10 @@ void FbxObj3d::update()
 	HRESULT result = constBuffTransform->Map(0, nullptr, (void**)&constMap);
 	if (SUCCEEDED(result))
 	{
-		constMap->color = color;
-		constMap->viewproj = matViewProj;
+		constMap->color = color; // RGBA
+		constMap->viewproj = camera->getViewProjectionMatrix();
 		constMap->world = modelWorldMat;
-		constMap->cameraPos = cameraPos;
+		constMap->cameraPos = camera->getEye();
 		constBuffTransform->Unmap(0, nullptr);
 	}
 
@@ -430,8 +436,7 @@ DirectX::XMFLOAT3 FbxObj3d::calcVertPos(size_t vertNum)
 {
 	assert(vertNum < model->getVertices().size());
 
-	const XMVECTOR wposVec = XMVector3Transform(XMLoadFloat3(&model->getVertices()[vertNum].pos),
-												modelWorldMat);
+	const XMVECTOR wposVec = XMLoadFloat3(&model->getVertices()[vertNum].pos)*modelWorldMat;
 
 	XMFLOAT3 wpos{};
 	XMStoreFloat3(&wpos, wposVec);

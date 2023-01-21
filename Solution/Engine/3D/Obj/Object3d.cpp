@@ -79,7 +79,7 @@ void Object3d::update()
 	matWorld *= matTrans; // ワールド行列に平行移動を反映
 
 	// 親オブジェクトがあれば
-	if (parent != nullptr)
+	if (parent)
 	{
 		// 親オブジェクトのワールド行列を掛ける
 		matWorld *= parent->matWorld;

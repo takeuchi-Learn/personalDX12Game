@@ -96,6 +96,9 @@ public:
 
 	FbxModel* model = nullptr;
 
+	bool isBillboard = false;
+	bool isBillBoardY = false;// isBillboardがfalseの場合のみ機能する
+
 public:
 
 	static void startDraw();
@@ -126,6 +129,7 @@ public:
 	DirectX::XMFLOAT3 calcVertPos(size_t vertNum);
 
 #pragma region アクセッサ
+
 	inline void setCamera(Camera* camera) { this->camera = camera; }
 
 #pragma endregion アクセッサ
