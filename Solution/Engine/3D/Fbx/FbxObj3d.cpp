@@ -436,7 +436,8 @@ DirectX::XMFLOAT3 FbxObj3d::calcVertPos(size_t vertNum)
 {
 	assert(vertNum < model->getVertices().size());
 
-	const XMVECTOR wposVec = XMLoadFloat3(&model->getVertices()[vertNum].pos)*modelWorldMat;
+	const XMVECTOR wposVec = XMVector3Transform(XMLoadFloat3(&model->getVertices()[vertNum].pos),
+												modelWorldMat);
 
 	XMFLOAT3 wpos{};
 	XMStoreFloat3(&wpos, wposVec);
