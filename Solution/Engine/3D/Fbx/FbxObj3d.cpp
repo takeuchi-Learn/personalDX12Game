@@ -12,7 +12,6 @@ using namespace Microsoft::WRL;
 using namespace DirectX;
 
 DX12Base* FbxObj3d::dxBase = DX12Base::getInstance();
-Camera* FbxObj3d::camera = nullptr;
 
 ComPtr<ID3D12RootSignature> FbxObj3d::rootsignature;
 std::vector<ComPtr<ID3D12PipelineState>> FbxObj3d::pipelinestate;
@@ -155,6 +154,8 @@ size_t FbxObj3d::createGraphicsPipeline(BLEND_MODE blendMode,
 	CD3DX12_DESCRIPTOR_RANGE descRangeSRV{};
 	descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0); // t0 レジスタ
 
+#pragma region OBJとの相違点
+
 	// ルートパラメータ
 	CD3DX12_ROOT_PARAMETER rootparams[5]{};
 	// CBV（座標変換行列用）
@@ -167,6 +168,7 @@ size_t FbxObj3d::createGraphicsPipeline(BLEND_MODE blendMode,
 	rootparams[4].InitAsConstantBufferView(2);
 
 	// 頂点レイアウト
+	// --- 頂点シェーダーの引数と対応
 	D3D12_INPUT_ELEMENT_DESC inputLayout[] = {
 		{ // xy座標
 			"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
@@ -184,6 +186,8 @@ size_t FbxObj3d::createGraphicsPipeline(BLEND_MODE blendMode,
 			"BONEWEIGHTS", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,0
 		},
 	};
+
+#pragma endregion OBJとの相違点
 
 	gpipeline.InputLayout.pInputElementDescs = inputLayout;
 	gpipeline.InputLayout.NumElements = _countof(inputLayout);
@@ -213,11 +217,13 @@ size_t FbxObj3d::createGraphicsPipeline(BLEND_MODE blendMode,
 	return ppStateNum;
 }
 
-FbxObj3d::FbxObj3d(bool animLoop) : animLoop(animLoop)
+FbxObj3d::FbxObj3d(bool animLoop) :
+	FbxObj3d(nullptr, animLoop)
 {
-	init();
 }
-FbxObj3d::FbxObj3d(FbxModel* model, bool animLoop) : animLoop(animLoop)
+FbxObj3d::FbxObj3d(FbxModel* model,
+				   bool animLoop) :
+	animLoop(animLoop)
 {
 	init();
 	setModel(model);
@@ -341,7 +347,7 @@ void FbxObj3d::update()
 		// メッシュノードのグローバルトランスフォームの逆行列
 		constMapSkin->bones[i] =
 			model->GetModelTransform() *							/* メッシュのトランスフォーム */
-			bones[i].invInitialPose	 *								/* 初期姿勢の逆 */
+			bones[i].invInitialPose *								/* 初期姿勢の逆 */
 			matCurrentPose *										/* 今の姿勢 */
 			XMMatrixInverse(nullptr, model->GetModelTransform());	/* メッシュのトランスフォームの逆 */
 		/*
@@ -428,4 +434,15 @@ DirectX::XMFLOAT3 FbxObj3d::calcVertPos(size_t vertNum)
 	XMStoreFloat3(&wpos, wposVec);
 
 	return wpos;
+}
+
+DirectX::XMFLOAT2 FbxObj3d::calcScreenPos()
+{
+	XMVECTOR screenPosVec = XMVector3Transform(matWorld.r[3],
+											   camera->getMatVPV());
+	screenPosVec /= XMVectorGetW(screenPosVec);
+	XMFLOAT2 screenPosF2{};
+	XMStoreFloat2(&screenPosF2, screenPosVec);
+
+	return screenPosF2;
 }

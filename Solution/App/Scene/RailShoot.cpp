@@ -293,10 +293,10 @@ RailShoot::RailShoot()
 	player->setPos(XMFLOAT3(0, 12.f, 0));
 	player->setHp(playerHpMax);
 
-	FbxObj3d::setCamera(camera.get());
 	constexpr const char modelName[] = "tori_model";
 	fbxModel.reset(FbxLoader::ins()->loadModelFromFile(modelName));
 	fbxObj.reset(new FbxObj3d(fbxModel.get(), true));
+	fbxObj->setCamera(camera.get());
 
 	// --------------------
 	// 背景と地面
@@ -363,9 +363,9 @@ RailShoot::RailShoot()
 		{
 			laneWall[y].resize(3);
 
-			auto& right = laneWall[y][0] = std::make_unique<Object3d>(camera.get(), wallModel.get(), wallModelTexNum);
-			auto& left = laneWall[y][1] = std::make_unique<Object3d>(camera.get(), wallModel.get(), wallModelTexNum);
-			auto& ring = laneWall[y][2] = std::make_unique<Object3d>(camera.get(), ringModel.get(), wallModelTexNum);
+			auto& right = laneWall[y][0] = std::make_unique<Object3d>(camera.get(), wallModel.get());
+			auto& left = laneWall[y][1] = std::make_unique<Object3d>(camera.get(), wallModel.get());
+			auto& ring = laneWall[y][2] = std::make_unique<Object3d>(camera.get(), ringModel.get());
 
 			// --------------------
 			// オブジェクトの大きさを変更

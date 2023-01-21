@@ -85,8 +85,6 @@ private:
 	XMMATRIX matTrans{};
 
 public:
-	UINT texNum = 0;
-
 	XMFLOAT4 color = { 1, 1, 1, 1 };
 
 	// アフィン変換情報
@@ -104,8 +102,6 @@ public:
 
 	inline const XMMATRIX& getMatWorld() const { return matWorld; }
 
-	//void setTexture(ID3D12Device* dev, const UINT newTexNum);
-
 	inline const XMMATRIX& getMatRota() const { return matRot; }
 	inline const XMMATRIX& getMatScale() const { return matScale; }
 	inline const XMMATRIX& getMatTrans() const { return matTrans; }
@@ -118,7 +114,7 @@ public:
 	Object3d(Camera* camera);
 
 	// モデルデータもここで渡す(deleteは手動)
-	Object3d(Camera* camera, ObjModel* model, const UINT texNum);
+	Object3d(Camera* camera, ObjModel* model);
 
 	void update();
 

@@ -6,7 +6,7 @@ ObjSet::ObjSet(Camera* camera,
 			   bool smoothing)
 {
 	model = std::make_unique<ObjModel>(dirPath, name, 0U, smoothing);
-	obj.resize(1u, Object3d(camera, model.get(), 0U));
+	obj.resize(1u, Object3d(camera, model.get()));
 }
 
 void ObjSet::drawWithUpdate(Light* light)

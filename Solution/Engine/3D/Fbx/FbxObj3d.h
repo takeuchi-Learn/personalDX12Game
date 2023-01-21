@@ -47,15 +47,12 @@ public:
 	};
 
 public:
-	static void setCamera(Camera* camera) { FbxObj3d::camera = camera; }
-
 	static size_t createGraphicsPipeline(BLEND_MODE blendMode = BLEND_MODE::ALPHA,
 										 const wchar_t* vsPath = L"Resources/shaders/FBXVS.hlsl",
 										 const wchar_t* psPath = L"Resources/shaders/FBXPS.hlsl");
 
 private:
 	static DX12Base* dxBase;
-	static Camera* camera;
 
 	static ComPtr<ID3D12RootSignature> rootsignature;
 	static std::vector<ComPtr<ID3D12PipelineState>> pipelinestate;
@@ -100,6 +97,8 @@ public:
 	// fbxとobj両方の親がいる場合、fbxが優先される
 	inline void setObjParent(Object3d* objParent) { this->objParent = objParent; }
 
+	inline void setCamera(Camera* camera) { this->camera = camera; }
+
 #pragma endregion アクセッサ
 
 	void playAnimation();
@@ -107,7 +106,11 @@ public:
 
 	DirectX::XMFLOAT3 calcVertPos(size_t vertNum);
 
+	DirectX::XMFLOAT2 calcScreenPos();
+
 protected:
+	Camera* camera = nullptr;
+
 	FbxObj3d* parent = nullptr;
 	Object3d* objParent = nullptr;
 

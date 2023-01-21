@@ -17,7 +17,7 @@ public:
 
 	inline ObjModel* getModelPt() { return model.get(); }
 
-	inline void addObj(Camera* camera) { obj.emplace_back(camera, model.get(), 0U); }
+	inline void addObj(Camera* camera) { obj.emplace_back(camera, model.get()); }
 
 	inline const DirectX::XMMATRIX& getMatWorld(UINT num = 0U) { return obj[num].getMatWorld(); }
 

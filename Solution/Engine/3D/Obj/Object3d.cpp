@@ -46,8 +46,8 @@ Object3d::Object3d(Camera* camera)
 	// 定数バッファの生成
 	createTransferBufferB0(constBuffB0);
 }
-Object3d::Object3d(Camera* camera, ObjModel* model, const UINT texNum)
-	: camera(camera), model(model), texNum(texNum), matWorld()
+Object3d::Object3d(Camera* camera, ObjModel* model)
+	: camera(camera), model(model), matWorld()
 {
 	// 定数バッファの生成
 	createTransferBufferB0(constBuffB0);
@@ -275,6 +275,8 @@ size_t Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
 	CD3DX12_DESCRIPTOR_RANGE descRangeSRV{};
 	descRangeSRV.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);//t0レジスタ
 
+#pragma region FBXとの相違点
+
 	//ルートパラメータの設定
 	CD3DX12_ROOT_PARAMETER rootparams[4]{};
 	rootparams[0].InitAsConstantBufferView(0); //定数バッファビューとして初期化(b0レジスタ)
@@ -295,6 +297,8 @@ size_t Object3d::createGraphicsPipeline(BLEND_MODE blendMode,
 			"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0
 		}
 	};
+
+#pragma endregion FBXとの相違点
 
 	gpipeline.InputLayout.pInputElementDescs = inputLayout;
 	gpipeline.InputLayout.NumElements = _countof(inputLayout);
