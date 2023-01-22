@@ -15,7 +15,8 @@ DX12Base* FbxObj3d::dxBase = DX12Base::getInstance();
 
 ComPtr<ID3D12RootSignature> FbxObj3d::rootsignature;
 std::vector<ComPtr<ID3D12PipelineState>> FbxObj3d::pipelinestate;
-size_t FbxObj3d::ppStateNum = 0U;
+
+size_t FbxObj3d::ppStateNum = 0u;
 
 size_t FbxObj3d::createGraphicsPipeline(BLEND_MODE blendMode,
 										const wchar_t* vsPath,

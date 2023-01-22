@@ -12,6 +12,8 @@
 class GameObj
 {
 protected:
+	size_t ppStateNum;
+
 	BaseObj* obj = nullptr;
 
 	std::unique_ptr<Object3d> objObject;

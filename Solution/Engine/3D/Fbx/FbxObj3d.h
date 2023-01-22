@@ -39,6 +39,7 @@ private:
 	static std::vector<ComPtr<ID3D12PipelineState>> pipelinestate;
 
 public:
+	static size_t ppStateNum;
 
 	//3Dオブジェクト用パイプライン生成
 	// シェーダーモデル指定は "*s_5_0"

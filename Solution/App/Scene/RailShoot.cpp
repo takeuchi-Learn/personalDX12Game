@@ -281,12 +281,7 @@ RailShoot::RailShoot()
 	// --------------------
 	// 自機初期化
 	// --------------------
-
-	constexpr const char modelName[] = "tori_model";
-	fbxModel.reset(FbxLoader::ins()->loadModelFromFile(modelName));
-	fbxObj.reset(new FbxObj3d(camera.get(), fbxModel.get(), true));
-
-	player = std::make_unique<Player>(camera.get(), fbxModel.get());
+	player = std::make_unique<Player>(camera.get(), playerModel.get());
 	player->setScale(16.f);
 	player->setParent(railObj.get());
 	player->setPos(XMFLOAT3(0, 12.f, 0));
@@ -570,7 +565,7 @@ void RailShoot::rotationBack()
 
 void RailShoot::addEnemy(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& vel, float scale)
 {
-	auto& i = enemy.emplace_front(new NormalEnemy(camera.get(), enemyModel.get(), enemyBulModel.get(), pos));
+	auto& i = enemy.emplace_front(std::make_shared<NormalEnemy>(camera.get(), enemyModel.get(), enemyBulModel.get(), pos));
 	i->setScale(scale);
 	i->setVel(vel);
 	i->setTargetObj(player.get());
@@ -754,7 +749,7 @@ void RailShoot::update_play()
 		input->triggerPadButton(Input::PAD::B))
 	{
 		updatePlayerShotTarget();
-		if (player->getShotTarget())
+		if (!player->getShotTarget().expired())
 		{
 			constexpr float bulSpeed = 2.f;
 			player->shot(camera.get(), playerBulModel.get(), bulSpeed);
@@ -1193,7 +1188,7 @@ void RailShoot::updatePlayerShotTarget()
 
 	// 遠い敵を調べるためのもの
 	float nowEnemyDistance{};
-	NormalEnemy* farthestEnemyPt = nullptr;
+	std::weak_ptr<NormalEnemy> farthestEnemyPt;
 	float farthestEnemyLen = 1.f;
 
 	// 照準の中の敵の方へ弾を飛ばす
@@ -1220,7 +1215,7 @@ void RailShoot::updatePlayerShotTarget()
 			// 照準の中で最も遠い敵なら情報を取っておく
 			if (farthestEnemyLen < nowEnemyDistance)
 			{
-				farthestEnemyPt = i.get();
+				farthestEnemyPt = i;
 				farthestEnemyLen = nowEnemyDistance;
 			}
 		}
@@ -1228,12 +1223,12 @@ void RailShoot::updatePlayerShotTarget()
 
 	// 照準の中に敵がいればそこへ弾を出す
 	// いなければターゲットはいない
-	if (farthestEnemyPt != nullptr)
+	if (farthestEnemyPt.expired())
 	{
-		player->setShotTarget(farthestEnemyPt);
+		player->deleteShotTarget();
 	} else
 	{
-		player->setShotTarget(nullptr);
+		player->setShotTarget(farthestEnemyPt);
 	}
 }
 

@@ -60,7 +60,7 @@ private:
 	uint16_t bossHpMax{};
 
 	std::unique_ptr<ObjModel> bossPartsModel;
-	std::vector<std::unique_ptr<BaseEnemy>> bossParts;
+	std::vector<std::shared_ptr<BaseEnemy>> bossParts;
 
 #pragma endregion ボス
 
@@ -83,7 +83,7 @@ private:
 	uint16_t playerHpMax;
 
 	// 攻撃可能な敵リスト
-	std::forward_list<BaseEnemy*> attackableEnemy;
+	std::forward_list<std::weak_ptr<BaseEnemy>> attackableEnemy;
 
 	// パーティクル
 	std::unique_ptr<ParticleMgr> particleMgr;
@@ -166,7 +166,7 @@ private:
 	void updateRgbShift();
 
 	/// @return 照準内に敵がいるかどうか
-	bool addShotTarget(const std::forward_list<BaseEnemy*>& enemy,
+	bool addShotTarget(const std::forward_list<std::weak_ptr<BaseEnemy>>& enemy,
 					   const DirectX::XMFLOAT2& aim2DPosMin,
 					   const DirectX::XMFLOAT2& aim2DPosMax);
 

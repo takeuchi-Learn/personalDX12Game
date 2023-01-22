@@ -50,7 +50,7 @@ public:
 
 private:
 	ObjModel* smallEnemyModel = nullptr;
-	std::forward_list<std::unique_ptr<BaseEnemy>> smallEnemy;
+	std::forward_list<std::shared_ptr<BaseEnemy>> smallEnemy;
 	float smallEnemyMoveSpeed = 2.f;
 
 	static const inline uint32_t bulLife = 900u;

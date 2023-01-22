@@ -143,7 +143,7 @@ void BossScene::initBoss()
 	bossParts.resize(8);
 	for (auto& i : bossParts)
 	{
-		i = std::make_unique<BaseEnemy>(camera.get(), bossPartsModel.get());
+		i = std::make_shared<BaseEnemy>(camera.get(), bossPartsModel.get());
 
 		// ボス本体を親とする
 		i->setParent(boss->getObj());
@@ -158,7 +158,7 @@ void BossScene::initBoss()
 		bossHpMax += hp;
 
 		// 攻撃可能な敵リストに追加
-		attackableEnemy.emplace_front(i.get());
+		attackableEnemy.emplace_front(i);
 	}
 	XMFLOAT3 pos{};
 
@@ -272,7 +272,7 @@ void BossScene::start()
 
 	for (auto& i : attackableEnemy)
 	{
-		i->setAlive(false);
+		i.lock()->setAlive(false);
 	}
 
 	// bgm鳴らす
@@ -419,17 +419,17 @@ void BossScene::update_play()
 		const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + aim2D->getSize().x / 2.f,
 										   input->getMousePos().y + aim2D->getSize().y / 2.f);
 
-		std::forward_list<BaseEnemy*> inAim2DEnemy = attackableEnemy;
+		std::forward_list<std::weak_ptr<BaseEnemy>> inAim2DEnemy = attackableEnemy;
 		for (auto& i : boss->getSmallEnemyList())
 		{
-			inAim2DEnemy.emplace_front(i.get());
+			inAim2DEnemy.emplace_front(i);
 		}
 		addShotTarget(inAim2DEnemy, aim2DMin, aim2DMax);
 
 		// --------------------
 		// 弾発射
 		// --------------------
-		if (player->getShotTarget())
+		if (!player->getShotTarget().expired())
 		{
 			if (input->triggerMouseButton(Input::MOUSE::LEFT) ||
 				input->triggerPadButton(Input::PAD::RB) ||
@@ -446,11 +446,14 @@ void BossScene::update_play()
 		// --------------------
 		for (auto& e : attackableEnemy)
 		{
-			// いない敵は判定しない
-			if (!e->getAlive()) { continue; }
+			if (e.expired()) { continue; }
+			auto i = e.lock();
 
-			const CollisionShape::Sphere enemy(XMLoadFloat3(&e->calcWorldPos()),
-											   e->getScale());
+			// いない敵は判定しない
+			if (!i->getAlive()) { continue; }
+
+			const CollisionShape::Sphere enemy(XMLoadFloat3(&i->calcWorldPos()),
+											   i->getScale());
 
 			for (auto& pb : player->getBulArr())
 			{
@@ -468,16 +471,16 @@ void BossScene::update_play()
 
 					// 敵はダメージを受ける
 					// hpが0になったらさよなら
-					if (e->damage(1u, true))
+					if (i->damage(1u, true))
 					{
-						e->setDrawFlag(false);
+						i->setDrawFlag(false);
 						// 赤エフェクトを出す
-						createParticle(e->calcWorldPos(), 128U, 16.f, 16.f, XMFLOAT3(1.f, 0.25f, 0.25f));
+						createParticle(i->calcWorldPos(), 128U, 16.f, 16.f, XMFLOAT3(1.f, 0.25f, 0.25f));
 						Sound::SoundPlayWave(killSe.get(), 0, 0.2f);
 					} else
 					{
 						// シアンエフェクトを出す
-						createParticle(e->calcWorldPos(), 96U, 12.f, 12.f, XMFLOAT3(0.25f, 1.f, 1.f));
+						createParticle(i->calcWorldPos(), 96U, 12.f, 12.f, XMFLOAT3(0.25f, 1.f, 1.f));
 						Sound::SoundPlayWave(bossDamageSe.get(), 0, 0.2f);
 					}
 				}
@@ -665,7 +668,8 @@ void BossScene::endAppearBoss()
 	boss->setAlive(true);
 	for (auto& i : attackableEnemy)
 	{
-		i->setAlive(true);
+
+		i.lock()->setAlive(true);
 	}
 
 	// カメラを自機に戻す
@@ -731,7 +735,7 @@ void BossScene::drawObj3d()
 
 	for (auto& i : attackableEnemy)
 	{
-		i->drawWithUpdate(light.get());
+		i.lock()->drawWithUpdate(light.get());
 	}
 
 	boss->drawWithUpdate(light.get());
@@ -812,18 +816,19 @@ void BossScene::updateRgbShift()
 	}
 }
 
-bool BossScene::addShotTarget(const std::forward_list<BaseEnemy*>& enemy,
+bool BossScene::addShotTarget(const std::forward_list<std::weak_ptr<BaseEnemy>>& enemy,
 							  const DirectX::XMFLOAT2& aim2DPosMin,
 							  const DirectX::XMFLOAT2& aim2DPosMax)
 {
 	// 遠い敵を調べるためのもの
 	float nowEnemyDistance{};
-	BaseEnemy* farthestEnemyPt = nullptr;
+	std::weak_ptr<BaseEnemy> farthestEnemyPt;
 	float farthestEnemyLen = 1.f;
 
 	// 照準の中の敵の方へ弾を飛ばす
-	for (BaseEnemy* i : enemy)
+	for (auto& e : enemy)
 	{
+		auto i = e.lock();
 		// いない敵は無視
 		if (!i->getAlive()) { continue; }
 
@@ -853,16 +858,16 @@ bool BossScene::addShotTarget(const std::forward_list<BaseEnemy*>& enemy,
 
 	// 照準の中に敵がいればそこへ弾を出す
 	// いなければターゲットはいない
-	player->setShotTarget(farthestEnemyPt);
-
-	if (farthestEnemyPt)
+	if (farthestEnemyPt.expired())
 	{
-		aim2D->color = XMFLOAT4(1, 0, 0, 1);
-		return true;
+		player->deleteShotTarget();
+		aim2D->color = XMFLOAT4(1, 1, 1, 1);
+		return false;
 	}
 
-	aim2D->color = XMFLOAT4(1, 1, 1, 1);
-	return false;
+	player->setShotTarget(farthestEnemyPt);
+	aim2D->color = XMFLOAT4(1, 0, 0, 1);
+	return true;
 }
 
 void BossScene::movePlayer()

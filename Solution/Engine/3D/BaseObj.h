@@ -34,8 +34,6 @@ protected:
 
 public:
 
-	static size_t ppStateNum;
-
 	// 色
 	XMFLOAT4 color = { 1, 1, 1, 1 };
 

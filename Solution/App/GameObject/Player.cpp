@@ -88,7 +88,7 @@ void Player::shot(Camera* camera,
 	XMStoreFloat3(&tmp, XMVector3Transform(XMVectorSet(0, 0, speed, 1), obj->getMatRota()));
 	i.setVel(tmp);
 
-	if (shotTargetObjPt)
+	if (!shotTargetObjPt.expired())
 	{
 		i.setTargetObjPt(shotTargetObjPt);
 	}

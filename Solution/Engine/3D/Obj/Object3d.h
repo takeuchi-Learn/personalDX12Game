@@ -39,6 +39,7 @@ private:
 	static void startDraw(size_t ppStateNum = ppStateNum);
 
 public:
+	static size_t ppStateNum;
 
 	//3Dオブジェクト用パイプライン生成
 	// シェーダーモデル指定は "*s_5_0"

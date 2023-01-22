@@ -10,12 +10,13 @@ void PlayerBullet::additionalUpdate()
 		alive = false;
 	}
 
-	if (alive)
+	if (alive && !targetObjPt.expired())
 	{
-		if (targetObjPt && targetObjPt->getAlive())
+		auto target = targetObjPt.lock();
+		if (target->getAlive())
 		{
 			// 自機から攻撃対象へ向かう方向のベクトル
-			vel = GameObj::calcVel(targetObjPt->calcWorldPos(), this->calcWorldPos(), speed);
+			vel = GameObj::calcVel(target->calcWorldPos(), this->calcWorldPos(), speed);
 
 			// 親がいればその回転を反映させる
 			if (const BaseObj* parent = getParent())

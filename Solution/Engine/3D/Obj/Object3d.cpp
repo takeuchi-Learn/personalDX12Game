@@ -11,9 +11,10 @@ using namespace DirectX;
 using namespace Microsoft::WRL;
 
 DX12Base* Object3d::dxBase = nullptr;
-size_t Object3d::ppStateNum = 0u;
 ComPtr<ID3D12RootSignature> Object3d::rootsignature{};
 std::vector<ComPtr<ID3D12PipelineState>> Object3d::pipelinestate{};
+
+size_t Object3d::ppStateNum = 0u;
 
 void Object3d::createTransferBufferB0(ComPtr<ID3D12Resource>& constBuffB0)
 {

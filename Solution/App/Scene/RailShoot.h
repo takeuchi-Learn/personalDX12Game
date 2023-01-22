@@ -65,7 +65,7 @@ class RailShoot
 	std::unique_ptr<ObjModel> groundModel;
 
 	// 敵
-	std::forward_list<std::unique_ptr<NormalEnemy>> enemy;
+	std::forward_list<std::shared_ptr<NormalEnemy>> enemy;
 	std::unique_ptr<ObjModel> enemyModel;
 	std::unique_ptr<ObjModel> enemyBulModel;
 
@@ -74,10 +74,6 @@ class RailShoot
 	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<ObjModel> playerBulModel;
 	uint16_t playerHpMax;
-
-	// fbx
-	std::unique_ptr<FbxModel> fbxModel;
-	std::unique_ptr<FbxObj3d> fbxObj;
 
 	// レールの現在位置を示すオブジェクト
 	std::unique_ptr<GameObj> railObj;

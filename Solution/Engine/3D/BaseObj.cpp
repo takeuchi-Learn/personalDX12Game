@@ -1,7 +1,5 @@
 ﻿#include "BaseObj.h"
 
-size_t BaseObj::ppStateNum = 0u;
-
 using namespace DirectX;
 
 void BaseObj::updateMatWorld()
