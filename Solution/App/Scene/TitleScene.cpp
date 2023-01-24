@@ -56,8 +56,8 @@ TitleScene::TitleScene()
 void TitleScene::start()
 {
 	// 次シーンの読み込み開始
-	th.reset(new MyThread());
-	th->th.reset(new std::thread([&] { nextScene = std::make_unique<RailShoot>(); }));
+	sceneThread.reset(new MyThread());
+	sceneThread->thread.reset(new std::thread([&] { nextScene = std::make_unique<RailShoot>(); }));
 
 	Sound::SoundPlayWave(bgm.get(), XAUDIO2_LOOP_INFINITE, 0.2f);
 	timer->reset();
@@ -86,7 +86,7 @@ void TitleScene::update_normal()
 		if (input->hitKey(DIK_LSHIFT))
 		{
 			// 次シーンの読み込み終了を待つ
-			th->join();
+			sceneThread->join();
 			// 次シーンへ進む
 			SceneManager::getInstange()->changeSceneFromInstance(nextScene);
 			update_proc = [] {};
@@ -111,7 +111,7 @@ void TitleScene::update_end()
 		titlePos.y = static_cast<float>(WinAPI::window_height + 1);
 
 		// 次シーンの読み込み終了を待つ
-		th->join();
+		sceneThread->join();
 		// 次シーンへ進む
 		SceneManager::getInstange()->changeSceneFromInstance(nextScene);
 	} else
