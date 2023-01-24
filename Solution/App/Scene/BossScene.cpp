@@ -668,7 +668,6 @@ void BossScene::endAppearBoss()
 	boss->setAlive(true);
 	for (auto& i : attackableEnemy)
 	{
-
 		i.lock()->setAlive(true);
 	}
 

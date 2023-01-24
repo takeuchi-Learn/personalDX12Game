@@ -14,7 +14,6 @@ SceneManager::SceneManager()
 
 void SceneManager::update()
 {
-
 	// ESCで終了
 	if (Input::getInstance()->hitKey(DIK_ESCAPE))
 	{

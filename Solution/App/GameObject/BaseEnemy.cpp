@@ -29,7 +29,6 @@ void BaseEnemy::additionalUpdate()
 	beforeUpdate();
 	if (alive)
 	{
-
 		phase();
 
 		movePos(vel);

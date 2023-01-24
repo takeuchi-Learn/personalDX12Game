@@ -301,7 +301,6 @@ RailShoot::RailShoot()
 
 	// 地面
 	{
-
 		groundModel.reset(new ObjModel("Resources/ground", "ground"));
 		groundObj.reset(new Object3d(camera.get(), groundModel.get()));
 

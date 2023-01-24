@@ -49,7 +49,6 @@ class TitleScene :
 	// --------------------
 	std::unique_ptr<DebugText> debugText;
 
-
 	// --------------------
 	// シーン
 	// --------------------

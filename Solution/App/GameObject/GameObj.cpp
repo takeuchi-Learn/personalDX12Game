@@ -17,7 +17,7 @@ GameObj::GameObj(Camera* camera,
 				 FbxModel* model,
 				 const DirectX::XMFLOAT3& pos)
 	: fbxObject(std::make_unique<FbxObj3d>(camera,
-										  model)),
+										   model)),
 	ppStateNum(FbxObj3d::ppStateNum)
 {
 	obj = fbxObject.get();

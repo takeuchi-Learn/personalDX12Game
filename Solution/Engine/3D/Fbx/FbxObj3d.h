@@ -47,13 +47,11 @@ public:
 										 const wchar_t* vsPath = L"Resources/shaders/FBXVS.hlsl",
 										 const wchar_t* psPath = L"Resources/shaders/FBXPS.hlsl");
 
-
 protected:
 	static void startDraw(size_t ppState = ppStateNum);
 
 	// 定数バッファ
 	ComPtr<ID3D12Resource> constBuffTransform;
-
 
 	XMMATRIX modelWorldMat{};
 

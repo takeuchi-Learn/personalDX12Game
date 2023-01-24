@@ -81,7 +81,6 @@ void TitleScene::update_normal()
 		input->triggerPadButton(Input::PAD::A) ||
 		input->triggerPadButton(Input::PAD::B))
 	{
-
 #ifdef _DEBUG
 
 		if (input->hitKey(DIK_LSHIFT))
@@ -91,7 +90,7 @@ void TitleScene::update_normal()
 			// 次シーンへ進む
 			SceneManager::getInstange()->changeSceneFromInstance(nextScene);
 			update_proc = [] {};
-			
+
 			return;
 		}
 

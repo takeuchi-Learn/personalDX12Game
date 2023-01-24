@@ -79,4 +79,3 @@ public:
 	virtual void update() = 0;
 	virtual void draw(Light* light, size_t ppState) = 0;
 };
-
