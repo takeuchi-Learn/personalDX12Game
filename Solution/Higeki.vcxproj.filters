@@ -126,9 +126,6 @@
     <ClCompile Include="Engine\Collision\CollisionShape.cpp">
       <Filter>Collision</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\System\GameScene.cpp">
-      <Filter>System</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\System\main.cpp">
       <Filter>System</Filter>
     </ClCompile>

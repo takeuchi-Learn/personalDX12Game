@@ -29,19 +29,19 @@ float3 getBloomPixel(SamplerState smp, float2 uv, float2 texPixelSize)
 
 float3 getBloom(SamplerState smp, float2 uv, float2 texPixelSize)
 {
-	float3 bloom = float3(0.f, 0.f, 0.f);
+	float3 bloomNum = float3(0.f, 0.f, 0.f);
 	float2 off = float2(1.f, 1.f) * texPixelSize * bloomR;
-	bloom += getBloomPixel(smp, uv + off * float2(-1.f, -1.f), texPixelSize * bloomR) * 0.292893f;
-	bloom += getBloomPixel(smp, uv + off * float2(-1.f, 0.f), texPixelSize * bloomR) * 0.5f;
-	bloom += getBloomPixel(smp, uv + off * float2(-1.f, 1.f), texPixelSize * bloomR) * 0.292893f;
-	bloom += getBloomPixel(smp, uv + off * float2(0.f, -1.f), texPixelSize * bloomR) * 0.5f;
-	bloom += getBloomPixel(smp, uv + off * float2(0.f, 0.f), texPixelSize * bloomR) * 1.f;
-	bloom += getBloomPixel(smp, uv + off * float2(0.f, 1.f), texPixelSize * bloomR) * 0.5f;
-	bloom += getBloomPixel(smp, uv + off * float2(1.f, -1.f), texPixelSize * bloomR) * 0.292893f;
-	bloom += getBloomPixel(smp, uv + off * float2(1.f, 0.f), texPixelSize * bloomR) * 0.5f;
-	bloom += getBloomPixel(smp, uv + off * float2(1.f, 1.f), texPixelSize * bloomR) * 0.292893f;
-	bloom /= 4.171573f;
-	return bloom;
+	bloomNum += getBloomPixel(smp, uv + off * float2(-1.f, -1.f), texPixelSize * bloomR) * 0.3f;
+	bloomNum += getBloomPixel(smp, uv + off * float2(-1.f, 0.f), texPixelSize * bloomR) * 0.5f;
+	bloomNum += getBloomPixel(smp, uv + off * float2(-1.f, 1.f), texPixelSize * bloomR) * 0.3f;
+	bloomNum += getBloomPixel(smp, uv + off * float2(0.f, -1.f), texPixelSize * bloomR) * 0.5f;
+	bloomNum += getBloomPixel(smp, uv + off * float2(0.f, 0.f), texPixelSize * bloomR);
+	bloomNum += getBloomPixel(smp, uv + off * float2(0.f, 1.f), texPixelSize * bloomR) * 0.5f;
+	bloomNum += getBloomPixel(smp, uv + off * float2(1.f, -1.f), texPixelSize * bloomR) * 0.3f;
+	bloomNum += getBloomPixel(smp, uv + off * float2(1.f, 0.f), texPixelSize * bloomR) * 0.5f;
+	bloomNum += getBloomPixel(smp, uv + off * float2(1.f, 1.f), texPixelSize * bloomR) * 0.3f;
+	bloomNum /= 4.f;
+	return bloomNum;
 }
 
 float4 bloom(SamplerState smp, float2 uv, float intensity = 1.f)
@@ -209,7 +209,7 @@ float4 main(VSOutput input) : SV_TARGET
 	drawCol.rgb = floor(drawCol.rgb * colourNum) / colourNum;
 	
 	// ブルーム
-	drawCol.rgb += bloom(smp, uv);
+	drawCol.rgb += bloom(smp, uv).rgb;
 
 	return drawCol;
 }

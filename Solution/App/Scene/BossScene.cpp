@@ -259,6 +259,19 @@ BossScene::CSVType BossScene::loadCsv(const std::string& csvFilePath, bool comme
 	return csvData;
 }
 
+uint32_t BossScene::calcBossHp() const
+{
+	uint32_t bossHp = 0ui32;
+	for (auto& i : bossParts)
+	{
+		if (i->getAlive())
+		{
+			bossHp += (uint32_t)i->getHp();
+		}
+	}
+	return bossHp;
+}
+
 void BossScene::start()
 {
 	PostEffect::getInstance()->setVignIntensity(0.5f);

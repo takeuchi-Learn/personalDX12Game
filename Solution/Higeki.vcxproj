@@ -132,7 +132,6 @@
     <ClCompile Include="Engine\3D\Fbx\FbxLoader.cpp" />
     <ClCompile Include="Engine\3D\Fbx\FbxModel.cpp" />
     <ClCompile Include="Engine\3D\Fbx\FbxObj3d.cpp" />
-    <ClCompile Include="Engine\System\GameScene.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
     <ClCompile Include="Engine\3D\Light.cpp" />
     <ClCompile Include="Engine\System\Looper.cpp" />
