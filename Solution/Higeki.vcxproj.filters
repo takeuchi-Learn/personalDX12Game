@@ -453,5 +453,6 @@
     <None Include="Resources\Shaders\Back.hlsli">
       <Filter>シェーダーファイル\Back</Filter>
     </None>
+    <None Include=".editorconfig" />
   </ItemGroup>
 </Project>

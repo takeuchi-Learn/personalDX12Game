@@ -294,6 +294,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include=".editorconfig" />
     <None Include="Resources\Shaders\Back.hlsli" />
     <None Include="Resources\Shaders\Basic.hlsli" />
     <None Include="Resources\Shaders\FBX.hlsli" />
