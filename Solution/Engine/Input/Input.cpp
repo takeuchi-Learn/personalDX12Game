@@ -14,8 +14,7 @@ Input::Input()
 }
 
 Input::~Input()
-{
-}
+{}
 
 void Input::init()
 {

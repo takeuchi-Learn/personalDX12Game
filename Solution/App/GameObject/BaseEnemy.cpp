@@ -8,8 +8,7 @@ BaseEnemy::BaseEnemy(Camera* camera,
 	camera(camera),
 	hp(hp),
 	phase([] {})
-{
-}
+{}
 
 bool BaseEnemy::damage(uint16_t damegeNum, bool killFlag)
 {

@@ -33,8 +33,7 @@ void BaseObj::updateMatWorld()
 
 BaseObj::BaseObj(Camera* camera) :
 	camera(camera)
-{
-}
+{}
 
 XMFLOAT2 BaseObj::calcScreenPos()
 {

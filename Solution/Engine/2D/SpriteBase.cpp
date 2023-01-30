@@ -249,14 +249,18 @@ UINT SpriteBase::loadTexture(const wchar_t* filename, DirectX::XMFLOAT2* pTexSiz
 		nullptr,
 		IID_PPV_ARGS(&texBuff[nowTexNum]));
 
-	// テクスチャバッファにデータ転送
-	result = texBuff[nowTexNum]->WriteToSubresource(
-		0,
-		nullptr, // 全領域へコピー
-		img->pixels,    // 元データアドレス
-		(UINT)img->rowPitch,    // 1ラインサイズ
-		(UINT)img->slicePitch   // 1枚サイズ
-	);
+	for (size_t i = 0; i < metadata.mipLevels; ++i)
+	{
+		const Image* img = scratchImg.GetImage(i, 0, 0);
+		// テクスチャバッファにデータ転送
+		result = texBuff[nowTexNum]->WriteToSubresource(
+			(UINT)i,
+			nullptr, // 全領域へコピー
+			img->pixels,    // 元データアドレス
+			(UINT)img->rowPitch,    // 1ラインサイズ
+			(UINT)img->slicePitch   // 1枚サイズ
+		);
+	}
 
 	// シェーダリソースビュー設定
 	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{}; // 設定構造体

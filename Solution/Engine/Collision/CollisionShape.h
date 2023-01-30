@@ -16,8 +16,7 @@ namespace CollisionShape
 
 		Sphere(const DirectX::XMVECTOR& center = { 0,0,0,1 }, float r = 1.f)
 			: center(center), radius(r)
-		{
-		}
+		{}
 	};
 
 	// 平面
@@ -31,8 +30,7 @@ namespace CollisionShape
 		Plane(const DirectX::XMVECTOR& normal = { 0, 1, 0, 0 },
 			  float distance = 0.f)
 			: normal(normal), distance(distance)
-		{
-		}
+		{}
 	};
 
 	// 法線付き三角形(時計回りが表)
@@ -51,8 +49,7 @@ namespace CollisionShape
 				 const DirectX::XMVECTOR& p2 = { 0, 1, 0, 1 },
 				 const DirectX::XMVECTOR& normal = { 0, 0, 1, 1 })
 			:p0(p0), p1(p1), p2(p2), normal(normal)
-		{
-		}
+		{}
 
 		// 法線の計算
 		void ComputeNormal();
@@ -69,8 +66,7 @@ namespace CollisionShape
 		Ray(const DirectX::XMVECTOR& start = { 0, 0, 0, 1 },
 			const DirectX::XMVECTOR& dir = { 1, 0, 0, 0 })
 			: start(start), dir(dir)
-		{
-		}
+		{}
 	};
 
 	// 直方体(AABB)
@@ -82,8 +78,7 @@ namespace CollisionShape
 		AABB(const DirectX::XMVECTOR& minPos = { 0, 0, 0, 1 },
 			 const DirectX::XMVECTOR& maxPos = { 1, 1, 1, 1 })
 			:minPos(minPos), maxPos(maxPos)
-		{
-		}
+		{}
 	};
 
 	// カプセル
@@ -97,8 +92,7 @@ namespace CollisionShape
 				const DirectX::XMVECTOR& ePos = { 0, 1, 0, 1 },
 				float r = 1.f)
 			: startPos(sPos), endPos(ePos), radius(r)
-		{
-		}
+		{}
 	};
 }
 

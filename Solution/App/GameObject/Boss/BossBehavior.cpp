@@ -108,5 +108,4 @@ BossBehavior::BossBehavior(BossEnemy* boss) :
 
 BossBehavior::BossBehavior() :
 	BossBehavior(nullptr)
-{
-}
+{}

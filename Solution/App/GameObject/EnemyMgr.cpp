@@ -11,8 +11,7 @@ void EnemyMgr::smallEnemy_Approach(BaseEnemy* enemy,
 EnemyMgr::EnemyMgr(Camera* camera, Light* light) :
 	camera(camera),
 	light(light)
-{
-}
+{}
 
 void EnemyMgr::addSmallEnemy(ObjModel* model, const DirectX::XMFLOAT3& pos)
 {

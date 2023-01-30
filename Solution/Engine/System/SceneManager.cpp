@@ -53,5 +53,4 @@ void SceneManager::drawFrontSprite()
 }
 
 SceneManager::~SceneManager()
-{
-}
+{}

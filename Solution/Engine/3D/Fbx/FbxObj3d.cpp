@@ -221,8 +221,7 @@ size_t FbxObj3d::createGraphicsPipeline(BLEND_MODE blendMode,
 FbxObj3d::FbxObj3d(Camera* camera,
 				   bool animLoop) :
 	FbxObj3d(camera, nullptr, animLoop)
-{
-}
+{}
 FbxObj3d::FbxObj3d(Camera* camera,
 				   FbxModel* model,
 				   bool animLoop) :

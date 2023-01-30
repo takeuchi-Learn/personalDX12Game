@@ -84,8 +84,7 @@ void ParticleMgr::init(const wchar_t* texFilePath)
 
 ParticleMgr::ParticleMgr() :
 	ParticleMgr(L"Resources/white.png", nullptr)
-{
-}
+{}
 
 ParticleMgr::ParticleMgr(const wchar_t* texFilePath,
 						 Camera* camera) :
@@ -479,22 +478,6 @@ void ParticleMgr::LoadTexture(const wchar_t* filePath)
 		filePath, WIC_FLAGS_NONE,
 		&metadata, scratchImg);
 	assert(SUCCEEDED(result));
-
-	ScratchImage mipChain{};
-	// ミップマップ生成
-	result = GenerateMipMaps(
-		scratchImg.GetImages(),
-		scratchImg.GetImageCount(),
-		scratchImg.GetMetadata(),
-		TEX_FILTER_DEFAULT,
-		0,
-		mipChain);
-
-	if (SUCCEEDED(result))
-	{
-		scratchImg = std::move(mipChain);
-		metadata = scratchImg.GetMetadata();
-	}
 
 	const Image* img = scratchImg.GetImage(0, 0, 0); // 生データ抽出
 

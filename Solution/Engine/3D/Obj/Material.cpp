@@ -60,8 +60,6 @@ void Material::loadTexture(const std::string& directoryPath, UINT texNum,
 		metadata = scratchImg.GetMetadata();
 	}
 
-	const Image* img = scratchImg.GetImage(0, 0, 0); // 生データ抽出
-
 	// リソース設定
 	CD3DX12_RESOURCE_DESC texresDesc = CD3DX12_RESOURCE_DESC::Tex2D(
 		metadata.format,
@@ -81,14 +79,19 @@ void Material::loadTexture(const std::string& directoryPath, UINT texNum,
 		IID_PPV_ARGS(&texbuff[texNum]));
 	assert(SUCCEEDED(result));
 
-	// テクスチャバッファにデータ転送
-	result = texbuff[texNum]->WriteToSubresource(
-		0,
-		nullptr, // 全領域へコピー
-		img->pixels,    // 元データアドレス
-		(UINT)img->rowPitch,  // 1ラインサイズ
-		(UINT)img->slicePitch // 1枚サイズ
-	);
+	for (size_t i = 0; i < metadata.mipLevels; ++i)
+	{
+		const Image* img = scratchImg.GetImage(i, 0, 0);
+		// テクスチャバッファにデータ転送
+		result = texbuff[texNum]->WriteToSubresource(
+			(UINT)i,
+			nullptr,				// 全領域へコピー
+			img->pixels,			// 元データアドレス
+			(UINT)img->rowPitch,	// 1ラインサイズ
+			(UINT)img->slicePitch	// 1枚サイズ
+		);
+	}
+
 	assert(SUCCEEDED(result));
 
 	// シェーダリソースビュー作成

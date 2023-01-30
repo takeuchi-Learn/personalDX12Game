@@ -8,10 +8,8 @@
 using namespace std::chrono;
 
 Timer::~Timer()
-{
-}
+{}
 
 Timer::Timer() :
 	startTimeDir(steady_clock::now())
-{
-}
+{}

@@ -93,8 +93,6 @@ void Sprite::create(ID3D12Device* dev, int window_width, int window_height,
 					UINT texNumber, const SpriteBase* spriteCommon, XMFLOAT2 anchorpoint,
 					bool isFlipX, bool isFlipY)
 {
-	HRESULT result = S_FALSE;
-
 	// テクスチャ番号をコピー
 	this->texNumber = texNumber;
 
@@ -120,7 +118,7 @@ void Sprite::create(ID3D12Device* dev, int window_width, int window_height,
 	}
 
 	// 頂点バッファ生成
-	result = dev->CreateCommittedResource(
+	HRESULT result = dev->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 		D3D12_HEAP_FLAG_NONE,
 		&CD3DX12_RESOURCE_DESC::Buffer(sizeof(vertices)),

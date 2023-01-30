@@ -140,8 +140,7 @@ class RailShoot
 					 const DirectX::XMFLOAT3& pos,
 					 const DirectX::XMFLOAT3& vel)
 			: popFrame(popFrame), pos(pos), vel(vel)
-		{
-		}
+		{}
 	};
 
 	std::forward_list<std::unique_ptr<PopEnemyData>> enemyPopData;

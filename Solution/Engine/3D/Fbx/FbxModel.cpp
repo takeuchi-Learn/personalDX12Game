@@ -117,14 +117,20 @@ void FbxModel::createBuffers()
 		nullptr,
 		IID_PPV_ARGS(&texBuff)
 	);
-	// テクスチャバッファにデータ転送
-	result = texBuff->WriteToSubresource(
-		0,
-		nullptr,
-		img->pixels,
-		(UINT)img->rowPitch,
-		(UINT)img->slicePitch
-	);
+
+	for (size_t i = 0; i < metadata.mipLevels; ++i)
+	{
+		const auto* img = scratchImg.GetImage(i, 0, 0);
+		// テクスチャバッファにデータ転送
+		result = texBuff->WriteToSubresource(
+			(UINT)i,
+			nullptr,				// 全領域へコピー
+			img->pixels,			// 元データアドレス
+			(UINT)img->rowPitch,	// 1ラインサイズ
+			(UINT)img->slicePitch	// 1枚サイズ
+		);
+	}
+
 	// SRV用デスクリプタヒープを生成
 	D3D12_DESCRIPTOR_HEAP_DESC descHeapDesc = {};
 	descHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;

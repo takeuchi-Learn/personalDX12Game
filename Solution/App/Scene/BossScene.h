@@ -253,7 +253,6 @@ private:
 					const std::string& commentStartStr = "//");
 
 	uint32_t calcBossHp() const;
-	
 
 #pragma endregion その他
 

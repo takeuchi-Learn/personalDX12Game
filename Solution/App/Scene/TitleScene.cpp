@@ -64,8 +64,7 @@ void TitleScene::start()
 }
 
 TitleScene::~TitleScene()
-{
-}
+{}
 
 void TitleScene::update()
 {
