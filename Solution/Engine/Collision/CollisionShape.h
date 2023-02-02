@@ -6,8 +6,11 @@
 
 namespace CollisionShape
 {
+	struct BaseShape {};
+
 	// 球
-	struct Sphere
+	struct Sphere :
+		public BaseShape
 	{
 		// 中心座標
 		DirectX::XMVECTOR center = { 0, 0, 0, 1 };
@@ -20,7 +23,8 @@ namespace CollisionShape
 	};
 
 	// 平面
-	struct Plane
+	struct Plane :
+		public BaseShape
 	{
 		// 法線ベクトル
 		DirectX::XMVECTOR normal = { 0, 1, 0, 0 };
@@ -34,7 +38,8 @@ namespace CollisionShape
 	};
 
 	// 法線付き三角形(時計回りが表)
-	class Triangle
+	class Triangle :
+		public BaseShape
 	{
 	public:
 		//頂点情報3つ
@@ -56,7 +61,8 @@ namespace CollisionShape
 	};
 
 	// レイ(半直線)
-	struct Ray
+	struct Ray :
+		public BaseShape
 	{
 		// 始点
 		DirectX::XMVECTOR start = { 0, 0, 0, 1 };
@@ -70,7 +76,8 @@ namespace CollisionShape
 	};
 
 	// 直方体(AABB)
-	struct AABB
+	struct AABB :
+		public BaseShape
 	{
 		DirectX::XMVECTOR minPos{};
 		DirectX::XMVECTOR maxPos{ 1, 1, 1, 1 };
@@ -82,7 +89,8 @@ namespace CollisionShape
 	};
 
 	// カプセル
-	struct Capsule
+	struct Capsule :
+		public BaseShape
 	{
 		DirectX::XMVECTOR startPos{};
 		DirectX::XMVECTOR endPos{ 0, 1, 0, 1 };
