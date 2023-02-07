@@ -44,7 +44,13 @@ NODE_RESULT BossBehavior::phase_leave()
 	}
 
 	// 大きさを反映
-	boss->moveAndRota(boss->moveSpeed, -velVec);
+	boss->move(boss->moveSpeed, -velVec);
+
+	// 速度に合わせて回転
+	XMFLOAT3 velF3{};
+	XMStoreFloat3(&velF3, velVec);
+	const XMFLOAT2 rotaDeg = GameObj::calcRotationSyncVelDeg(velF3);
+	boss->setRotation(XMFLOAT3(rotaDeg.x, rotaDeg.y, boss->getRotation().z));
 
 	return NODE_RESULT::SUCCESS;
 }

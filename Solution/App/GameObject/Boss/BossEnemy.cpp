@@ -16,6 +16,16 @@ DirectX::XMVECTOR BossEnemy::calcVelVec(GameObj* me, bool moveYFlag)
 	return velVec;
 }
 
+void BossEnemy::move(float moveSpeed, const DirectX::XMVECTOR& velVec)
+{
+	// 大きさを反映した速度をXMFLOAT3に変換
+	XMFLOAT3 vel{};
+	XMStoreFloat3(&vel, XMVector3Normalize(velVec) * moveSpeed);
+
+	// 移動
+	setVel(vel);
+}
+
 void BossEnemy::moveAndRota(float moveSpeed, const DirectX::XMVECTOR& velVec)
 {
 	// 大きさを反映した速度をXMFLOAT3に変換
