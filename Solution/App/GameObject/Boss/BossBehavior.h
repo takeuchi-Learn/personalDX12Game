@@ -41,7 +41,7 @@ private:
 	uint32_t nowShotFrame = 0u;
 	static inline constexpr uint32_t shotCountMax = 15u;
 	uint32_t shotCount = 0u;
-	static inline constexpr uint32_t shotEnemyNum = 15;
+	static inline constexpr uint32_t shotEnemyNum = 15u;
 
 	static inline constexpr DirectX::XMFLOAT4 bulCol =
 		DirectX::XMFLOAT4(1, 0.25f, 0.125f, 1.f);
