@@ -283,6 +283,8 @@ void BossScene::start()
 	aim2D->position.x = player->getAim2DPos().x;
 	aim2D->position.y = player->getAim2DPos().y;
 
+	aim2D->isInvisible = true;
+
 	for (auto& i : attackableEnemy)
 	{
 		i.lock()->setAlive(false);

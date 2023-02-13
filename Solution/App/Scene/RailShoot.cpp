@@ -446,6 +446,12 @@ RailShoot::RailShoot()
 
 void RailShoot::start()
 {
+	aim2D->isInvisible = true;
+	for (auto& i : operInst)
+	{
+		i.second->isInvisible = true;
+	}
+
 	// カメラは固定カメラ
 	initFixedCam(appearPPosStart, appearPPosEnd);
 
@@ -983,12 +989,21 @@ void RailShoot::endAppearPlayer()
 		i.second->isInvisible = false;
 	}
 
+	// 照準を表示
+	aim2D->isInvisible = false;
+
 	update_proc = std::bind(&RailShoot::update_play, this);
 	appearPlayer.reset(nullptr);
 }
 
 void RailShoot::startExitPlayer()
 {
+	aim2D->isInvisible = true;
+	for (auto& i : operInst)
+	{
+		if (!i.second->isInvisible) { i.second->isInvisible = true; }
+	}
+
 	exitPlayer = std::make_unique<ExitPlayer>(ExitPlayer
 											  {
 												  .playerPos = {
