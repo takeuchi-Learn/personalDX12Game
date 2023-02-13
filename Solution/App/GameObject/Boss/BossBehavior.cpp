@@ -7,7 +7,7 @@ using namespace DirectX;
 NODE_RESULT BossBehavior::phase_approach()
 {
 	// 違うフェーズなら実行しない
-	if (phase != PHASE::APPROACH) { return NODE_RESULT::FAIL; }
+	if (phase != &BossBehavior::phase_approach) { return NODE_RESULT::FAIL; }
 
 	const XMVECTOR velVec = boss->calcVelVec(boss);
 
@@ -16,7 +16,7 @@ NODE_RESULT BossBehavior::phase_approach()
 	{
 		// todo ここで近接攻撃を開始(攻撃関数へ遷移)
 		boss->addSmallEnemyHoming(bulCol);
-		phase = PHASE::LEAVE;
+		phase = &BossBehavior::phase_leave;
 		return NODE_RESULT::SUCCESS;
 	}
 
@@ -29,7 +29,7 @@ NODE_RESULT BossBehavior::phase_approach()
 NODE_RESULT BossBehavior::phase_leave()
 {
 	// 違うフェーズなら実行しない
-	if (phase != PHASE::LEAVE) { return NODE_RESULT::FAIL; }
+	if (phase != &BossBehavior::phase_leave) { return NODE_RESULT::FAIL; }
 
 	const XMVECTOR velVec = boss->calcVelVec(boss);
 
@@ -37,7 +37,7 @@ NODE_RESULT BossBehavior::phase_leave()
 	if (XMVectorGetX(XMVector3Length(velVec)) > boss->getScaleF3().x * 5.f)
 	{
 		// ここで遠距離攻撃を開始(攻撃関数へ遷移)
-		phase = PHASE::ATTACK;
+		phase = &BossBehavior::phase_attack;
 		nowShotFrame = shotInterval;
 		shotCount = 0u;
 		return NODE_RESULT::SUCCESS;
@@ -58,7 +58,7 @@ NODE_RESULT BossBehavior::phase_leave()
 NODE_RESULT BossBehavior::phase_attack()
 {
 	// 違うフェーズなら実行しない
-	if (phase != PHASE::ATTACK) { return NODE_RESULT::FAIL; }
+	if (phase != &BossBehavior::phase_attack) { return NODE_RESULT::FAIL; }
 
 	if (nowShotFrame++ >= shotInterval)
 	{
@@ -107,7 +107,7 @@ NODE_RESULT BossBehavior::phase_attack()
 		{
 			// 指定回数打っていたらフェーズを変える
 			shotCount = 0;
-			phase = PHASE::APPROACH;
+			phase = &BossBehavior::phase_approach;
 		}
 	}
 
@@ -117,7 +117,7 @@ NODE_RESULT BossBehavior::phase_attack()
 BossBehavior::BossBehavior(BossEnemy* boss) :
 	boss(boss),
 	rootNode(std::make_unique<Selector>()),
-	phase(PHASE::APPROACH)
+	phase(&BossBehavior::phase_approach)
 {
 	// 各フェーズを登録
 	rootNode->addChild(std::bind(&BossBehavior::phase_approach, this));

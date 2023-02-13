@@ -15,16 +15,6 @@ class BossEnemy;
 /// @brief ボスの行動
 class BossBehavior
 {
-public:
-
-	/// @brief ボスのフェーズ
-	enum class PHASE : uint8_t
-	{
-		APPROACH,	/// 接近
-		LEAVE,		/// 離脱
-		ATTACK,		/// 攻撃
-	};
-
 private:
 	// ---------------
 	// メンバ変数
@@ -33,7 +23,7 @@ private:
 	BossEnemy* boss;
 	std::unique_ptr<Selector> rootNode;
 
-	PHASE phase;
+	NODE_RESULT(BossBehavior::* phase)();
 
 #pragma region 弾発射関係
 
@@ -69,7 +59,7 @@ public:
 
 	/// @brief 現在のフェーズを取得
 	/// @return 現在のフェーズ
-	inline PHASE getPhase() const { return phase; }
+	inline const auto getPhase() const { return phase; }
 
 	/// @brief ルートノードを実行実行
 	/// @return 実行結果
