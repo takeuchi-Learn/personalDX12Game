@@ -133,7 +133,9 @@ void BossScene::initEnemy()
 
 void BossScene::initBoss()
 {
-	boss->setScale(100.f);
+	constexpr float bossScale = 100.f;
+
+	boss->setScale(bossScale);
 	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 300));
 	boss->setRotation(XMFLOAT3(0, 180.f, 0));
 	boss->setTargetObj(player.get());
@@ -143,17 +145,63 @@ void BossScene::initBoss()
 
 	// ボスのパーツ
 	bossPartsModel = std::make_unique<ObjModel>("Resources/koshi", "koshi", 0U, false);
-	bossParts.resize(8);
+
+	// 肩
+	bossParts.emplace_back(std::make_shared<BaseEnemy>(camera.get(), bossPartsModel.get()));
+	XMFLOAT3 pos = bossParts.back()->getPos();
+	pos.x += 0.25f;
+	pos.y += 0.5f;
+	bossParts.back()->setPos(pos);
+
+	bossParts.emplace_back(std::make_shared<BaseEnemy>(camera.get(), bossPartsModel.get()));
+	pos = bossParts.back()->getPos();
+	pos.x -= 0.25f;
+	pos.y += 0.5f;
+	bossParts.back()->setPos(pos);
+
+	// 足
+	bossParts.emplace_back(std::make_shared<BaseEnemy>(camera.get(), bossPartsModel.get()));
+	pos = bossParts.back()->getPos();
+	pos.x += 0.25f;
+	pos.y -= 0.75f;
+	bossParts.back()->setPos(pos);
+
+	bossParts.emplace_back(std::make_shared<BaseEnemy>(camera.get(), bossPartsModel.get()));
+	pos = bossParts.back()->getPos();
+	pos.x -= 0.25f;
+	pos.y -= 0.75f;
+	bossParts.back()->setPos(pos);
+
+	// 脚
+	bossParts.emplace_back(std::make_shared<BaseEnemy>(camera.get(), bossPartsModel.get()));
+	pos = bossParts.back()->getPos();
+	pos.x += 0.25f;
+	pos.y -= 0.25f;
+	pos.z -= 0.125f;
+	bossParts.back()->setPos(pos);
+
+	bossParts.emplace_back(std::make_shared<BaseEnemy>(camera.get(), bossPartsModel.get()));
+	pos = bossParts.back()->getPos();
+	pos.x -= 0.25f;
+	pos.y -= 0.25f;
+	pos.z -= 0.125f;
+	bossParts.back()->setPos(pos);
+
+	// 頭
+	bossParts.emplace_back(std::make_shared<BaseEnemy>(camera.get(), bossPartsModel.get()));
+	pos = bossParts.back()->getPos();
+	pos.y += 0.875f;
+	pos.z += 0.5f;
+	bossParts.back()->setPos(pos);
+
 	for (auto& i : bossParts)
 	{
-		i = std::make_shared<BaseEnemy>(camera.get(), bossPartsModel.get());
-
 		// ボス本体を親とする
 		i->setParent(boss->getObj());
 
 		// 大きさを変更
-		constexpr float scale = 0.1f;
-		i->setScale(scale);
+		constexpr float bossPartsScale = 10.f / bossScale;
+		i->setScale(bossPartsScale);
 
 		// 体力を設定
 		constexpr uint16_t hp = 10ui16;
@@ -163,48 +211,6 @@ void BossScene::initBoss()
 		// 攻撃可能な敵リストに追加
 		attackableEnemy.emplace_front(i);
 	}
-	XMFLOAT3 pos{};
-
-	// 肩
-	pos = bossParts[1]->getPos();
-	pos.x += 0.25f;
-	pos.y += 0.5f;
-	bossParts[1]->setPos(pos);
-
-	pos = bossParts[2]->getPos();
-	pos.x -= 0.25f;
-	pos.y += 0.5f;
-	bossParts[2]->setPos(pos);
-
-	// 足
-	pos = bossParts[3]->getPos();
-	pos.x += 0.25f;
-	pos.y -= 0.75f;
-	bossParts[3]->setPos(pos);
-
-	pos = bossParts[4]->getPos();
-	pos.x -= 0.25f;
-	pos.y -= 0.75f;
-	bossParts[4]->setPos(pos);
-
-	// 脚
-	pos = bossParts[5]->getPos();
-	pos.x += 0.25f;
-	pos.y -= 0.25f;
-	pos.z -= 0.125f;
-	bossParts[5]->setPos(pos);
-
-	pos = bossParts[6]->getPos();
-	pos.x -= 0.25f;
-	pos.y -= 0.25f;
-	pos.z -= 0.125f;
-	bossParts[6]->setPos(pos);
-
-	// 頭
-	pos = bossParts[7]->getPos();
-	pos.y += 0.875f;
-	pos.z += 0.5f;
-	bossParts[7]->setPos(pos);
 }
 
 void BossScene::initBackObj()
