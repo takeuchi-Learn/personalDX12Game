@@ -25,10 +25,6 @@
 class BossScene :
 	public GameScene
 {
-public:
-	// std::stringの2次元配列(vector)
-	using CSVType = std::vector<std::vector<std::string>>;
-
 private:
 
 #pragma region シーン内共通
@@ -41,9 +37,6 @@ private:
 	std::unique_ptr<Light> light;
 
 	std::unique_ptr<Timer> timer;
-
-	// 敵発生スクリプトのCSVデータ
-	CSVType csvData;
 
 #pragma endregion シーン内共通
 
@@ -248,11 +241,6 @@ private:
 #pragma endregion 初期化
 
 #pragma region その他
-
-	CSVType loadCsv(const std::string& csvFilePath,
-					bool commentFlag = true,
-					char divChar = ',',
-					const std::string& commentStartStr = "//");
 
 	uint32_t calcBossHp() const;
 

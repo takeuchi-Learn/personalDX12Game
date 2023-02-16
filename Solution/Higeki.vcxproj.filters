@@ -243,6 +243,9 @@
     <ClCompile Include="Engine\3D\BaseObj.cpp">
       <Filter>Object共通\3Dオブジェクト</Filter>
     </ClCompile>
+    <ClCompile Include="Engine\Util\Util.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Camera\Camera.h">
@@ -385,6 +388,9 @@
     </ClInclude>
     <ClInclude Include="Engine\3D\BaseObj.h">
       <Filter>Object共通\3Dオブジェクト</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine\Util\Util.h">
+      <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

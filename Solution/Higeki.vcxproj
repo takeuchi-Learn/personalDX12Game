@@ -157,6 +157,7 @@
     <ClCompile Include="Engine\BehaviorTree\Sequencer.cpp" />
     <ClCompile Include="Engine\BehaviorTree\Selector.cpp" />
     <ClCompile Include="App\Scene\GameOverScene.cpp" />
+    <ClCompile Include="Engine\Util\Util.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="App\Scene\BossScene.h" />
@@ -206,6 +207,7 @@
     <ClInclude Include="Engine\BehaviorTree\Sequencer.h" />
     <ClInclude Include="Engine\BehaviorTree\Selector.h" />
     <ClInclude Include="App\Scene\GameOverScene.h" />
+    <ClInclude Include="Engine\Util\Util.h" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\BackPS.hlsl">
