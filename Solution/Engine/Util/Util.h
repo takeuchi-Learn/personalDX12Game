@@ -14,9 +14,6 @@ public:
 	/// @brief std::stringの2次元配列(vector)
 	using CSVType = std::vector<std::vector<std::string>>;
 
-	/// @brief 敵発生スクリプトのCSVデータ
-	CSVType csvData;
-
 	// @brief loadCsvの入力をstd::stringにしたもの
 	// @return 読み込んだcsvの中身。失敗したらデフォルトコンストラクタで初期化された空のvector2次元配列が返る
 	// @param commentFlag //で始まる行を無視するかどうか(trueで無視)
