@@ -109,6 +109,24 @@ public:
 
 	inline DirectX::XMFLOAT3 calcWorldPos() const { return obj->calcWorldPos(); }
 
+	/// @brief 視線方向に前進
+	/// @param moveVel 移動量
+	/// @param moveYFlag Y方向に移動するか
+	void moveForward(float moveVel, bool moveYFlag = false);
+
+	/// @brief 右に移動。前進処理のベクトルを右に90度傾けた移動。
+	/// @param moveVel 移動量
+	/// @param moveYFlag Y方向に移動するか
+	void moveRight(float moveVel, bool moveYFlag = false);
+
+	void moveParentRight(float moveVel, bool moveYFlag = false);
+
+	/// @brief 上に移動。前進処理のベクトルを上に90度傾けた移動。
+	/// @param moveVel 移動量
+	void moveUp(float moveVel);
+
+	void moveParentUp(float moveVel);
+
 	GameObj(Camera* camera,
 			ObjModel* model,
 			const DirectX::XMFLOAT3& pos = { 0,0,0 });

@@ -23,56 +23,6 @@ bool Player::damage(uint16_t damegeNum, bool killFlag)
 	return false;
 }
 
-void Player::moveForward(float moveVel, bool moveYFlag)
-{
-	// Z方向のベクトルを、自機の向いている向きに回転
-	XMVECTOR velVec = XMVector3Transform(XMVectorSet(0, 0, moveVel, 1), obj->getMatRota());
-
-	// Y方向に移動しないならY成分を消す
-	if (!moveYFlag)
-	{
-		// absがあるのは、大きさのみ指定したいから。
-		// absがないと、moveVelがマイナスの場合に
-		// マイナス * マイナスでプラスになってしまう
-		velVec = XMVectorScale(XMVector3Normalize(XMVectorSetY(velVec, 0.f)),
-							   std::abs(moveVel));
-	}
-
-	obj->position.x += XMVectorGetX(velVec);
-	obj->position.y += XMVectorGetY(velVec);
-	obj->position.z += XMVectorGetZ(velVec);
-}
-
-void Player::moveRight(float moveVel, bool moveYFlag)
-{
-	// X方向のベクトルを、自機の向いている向きに回転
-	XMVECTOR velVec = XMVector3Transform(XMVectorSet(moveVel, 0, 0, 1), obj->getMatRota());
-
-	// Y方向に移動しないならY成分を消す
-	if (!moveYFlag)
-	{
-		// absがあるのは、大きさのみ指定したいから。
-		// absがないと、moveVelがマイナスの場合に
-		// マイナス * マイナスでプラスになってしまう
-		velVec = XMVectorScale(XMVector3Normalize(XMVectorSetY(velVec, 0.f)),
-							   std::abs(moveVel));
-	}
-
-	obj->position.x += XMVectorGetX(velVec);
-	obj->position.y += XMVectorGetY(velVec);
-	obj->position.z += XMVectorGetZ(velVec);
-}
-
-void Player::moveUp(float moveVel)
-{
-	// Y方向のベクトルを、自機の向いている向きに回転
-	XMVECTOR velVec = XMVector3Transform(XMVectorSet(0, moveVel, 0, 1), obj->getMatRota());
-
-	obj->position.x += XMVectorGetX(velVec);
-	obj->position.y += XMVectorGetY(velVec);
-	obj->position.z += XMVectorGetZ(velVec);
-}
-
 void Player::shot(Camera* camera,
 				  ObjModel* model,
 				  float speed,

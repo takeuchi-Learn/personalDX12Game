@@ -148,45 +148,39 @@ WORD Input::padThumbToDPad(SHORT sThumbX, SHORT sThumbY, SHORT sDeadZone)
 DirectX::XMFLOAT2 Input::getPadLStickRaito() const
 {
 	const bool isLStickX = this->isVaildPadLStickX();
-
 	const bool isLStickY = this->isVaildPadLStickY();
 
 	DirectX::XMFLOAT2 inputRaito = DirectX::XMFLOAT2(0.f, 0.f);
 
-	const SHORT inputValX = getPadLStickX();
-	const SHORT inputValY = getPadLStickY();
-
 	if (isLStickX)
 	{
-		inputRaito.x = (float)inputValX / 32767.f;
+		inputRaito.x = (float)getPadLStickX() / 32767.f;
 	}
 	if (isLStickY)
 	{
-		inputRaito.y = (float)inputValY / 32767.f;
+		inputRaito.y = (float)getPadLStickY() / 32767.f;
 	}
+
 
 	return inputRaito;
 }
 
 DirectX::XMFLOAT2 Input::getPadRStickRaito() const
 {
-	const bool isLStickX = this->isVaildPadRStickX();
-
-	const bool isLStickY = this->isVaildPadRStickY();
+	const bool isRStickX = this->isVaildPadRStickX();
+	const bool isRStickY = this->isVaildPadRStickY();
 
 	DirectX::XMFLOAT2 inputRaito = DirectX::XMFLOAT2(0.f, 0.f);
 
-	const SHORT inputValX = getPadRStickX();
-	const SHORT inputValY = getPadRStickY();
+	if (isRStickX)
+	{
+		inputRaito.x = (float)getPadRStickX() / 32767.f;
+	}
+	if (isRStickY)
+	{
+		inputRaito.y = (float)getPadRStickY() / 32767.f;
+	}
 
-	if (isLStickX)
-	{
-		inputRaito.x = (float)inputValX / 32767.f;
-	}
-	if (isLStickY)
-	{
-		inputRaito.y = (float)inputValY / 32767.f;
-	}
 
 	return inputRaito;
 }

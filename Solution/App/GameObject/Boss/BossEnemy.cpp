@@ -5,7 +5,7 @@ using namespace DirectX;
 
 DirectX::XMVECTOR BossEnemy::calcVelVec(GameObj* me, bool moveYFlag)
 {
-	XMVECTOR velVec = XMLoadFloat3(&targetObj->getPos()) - XMLoadFloat3(&me->getPos());
+	XMVECTOR velVec = XMLoadFloat3(&targetObj->calcWorldPos()) - XMLoadFloat3(&me->getPos());
 
 	if (!moveYFlag)
 	{

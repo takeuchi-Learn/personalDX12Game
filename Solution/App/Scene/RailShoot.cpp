@@ -1085,37 +1085,40 @@ void RailShoot::movePlayer()
 	// パッドの入力値
 	XMFLOAT2 inputVal = input->getPadLStickRaito();
 
+	// 無効な入力は0にする
+	if (!input->isVaildPadLStickX())
+	{
+		inputVal.x = 0.f;
+	}
+	if (!input->isVaildPadLStickY())
+	{
+		inputVal.y = 0.f;
+	}
+
 #pragma region 四方向入力キーボードとパッド十字ボタン
 
-	bool inputXFlag = false, inputYFlag = false;
-
-	// 移動
-	if (input->hitKey(DIK_W) || input->hitKey(DIK_UP) || input->getPadButton(Input::PAD::UP))
+	// 上下
+	if (inputVal.y == 0.f)
 	{
-		inputVal.y = 1.f;
-		inputYFlag = true;
-	} else if (input->hitKey(DIK_S) || input->hitKey(DIK_DOWN) || input->getPadButton(Input::PAD::DOWN))
-	{
-		inputVal.y = -1.f;
-		inputYFlag = true;
+		if (input->hitKey(DIK_W) || input->hitKey(DIK_UP) || input->getPadButton(Input::PAD::UP))
+		{
+			inputVal.y = 1.f;
+		} else if (input->hitKey(DIK_S) || input->hitKey(DIK_DOWN) || input->getPadButton(Input::PAD::DOWN))
+		{
+			inputVal.y = -1.f;
+		}
 	}
 
-	// 回転
-	if (input->hitKey(DIK_A) || input->hitKey(DIK_LEFT) || input->getPadButton(Input::PAD::LEFT))
+	// 左右
+	if (inputVal.x == 0.f)
 	{
-		inputVal.x = -1.f;
-		inputYFlag = true;
-	} else if (input->hitKey(DIK_D) || input->hitKey(DIK_RIGHT) || input->getPadButton(Input::PAD::RIGHT))
-	{
-		inputVal.x = 1.f;
-		inputYFlag = true;
-	}
-
-	if (inputXFlag && inputYFlag)
-	{
-		constexpr float val = 1.f / 1.41421356f;
-
-		inputVal = XMFLOAT2(val, val);
+		if (input->hitKey(DIK_A) || input->hitKey(DIK_LEFT) || input->getPadButton(Input::PAD::LEFT))
+		{
+			inputVal.x = -1.f;
+		} else if (input->hitKey(DIK_D) || input->hitKey(DIK_RIGHT) || input->getPadButton(Input::PAD::RIGHT))
+		{
+			inputVal.x = 1.f;
+		}
 	}
 
 #pragma endregion 四方向入力キーボードとパッド十字ボタン
@@ -1123,8 +1126,23 @@ void RailShoot::movePlayer()
 	const bool moveYFlag = inputVal.y != 0.f;
 	const bool moveXFlag = inputVal.x != 0.f;
 
-	if (moveYFlag || moveXFlag)
+	auto playerRot = XMFLOAT3(0.f, player->getRotation().y, 0.f);
+
+	if (moveXFlag || moveYFlag)
 	{
+		// 入力値を0~1にする
+		const float len = std::sqrt(
+			inputVal.x * inputVal.x +
+			inputVal.y * inputVal.y
+		);
+		if (len > 1.f)
+		{
+			inputVal.x /= len;
+			inputVal.y /= len;
+		}
+
+		XMFLOAT2 moveVal = XMFLOAT2(0.f, 0.f);
+
 		// 移動する速さ
 		float speed = 90.f / DX12Base::ins()->getFPS();
 
@@ -1160,7 +1178,8 @@ void RailShoot::movePlayer()
 			}
 			if (moveFlag)
 			{
-				player->moveUp(inputVal.y * speed);
+				playerRot.x = 45.f * -inputVal.y;
+				moveVal.y += inputVal.y * speed;
 			}
 		}
 		if (moveXFlag)
@@ -1183,10 +1202,17 @@ void RailShoot::movePlayer()
 			}
 			if (moveFlag)
 			{
-				player->moveRight(inputVal.x * speed);
+				playerRot.z = 45.f * -inputVal.x;
+				moveVal.x += inputVal.x * speed;
 			}
 		}
+
+		XMFLOAT3 pos = player->getPos();
+		pos.x += moveVal.x;
+		pos.y += moveVal.y;
+		player->setPos(pos);
 	}
+	player->setRotation(playerRot);
 }
 
 void RailShoot::updatePlayerShotTarget()

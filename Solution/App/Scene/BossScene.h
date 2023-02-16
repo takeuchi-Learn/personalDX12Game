@@ -76,6 +76,8 @@ private:
 	std::unique_ptr<Object3d> groundObj;
 	std::unique_ptr<ObjModel> groundModel;
 
+	std::unique_ptr<GameObj> playerParent;
+
 	// 自機
 	std::unique_ptr<Player> player;
 	std::unique_ptr<ObjModel> playerModel;

@@ -55,7 +55,7 @@ BossScene::BossScene() :
 	initGameObj();
 
 	// カメラの親を自機にする
-	camera->setParentObj(player.get());
+	camera->setParentObj(playerParent.get());
 
 	initBackObj();
 
@@ -104,7 +104,10 @@ void BossScene::initPlayer()
 	playerBulModel = std::make_unique<ObjModel>("Resources/bullet", "bullet", 0U, true);
 	playerHpMax = 20U;
 
+	playerParent = std::make_unique<GameObj>(camera.get());
 	player = std::make_unique<Player>(camera.get(), playerModel.get(), XMFLOAT3(0.f, 0.f, 0.f));
+
+	player->setParent(playerParent.get());
 	// 大きさを設定
 	player->setScale(10.f);
 
@@ -117,9 +120,9 @@ void BossScene::initPlayer()
 	sceneChangeStartPos = XMFLOAT3(0.f, 500.f, 0.f);
 	sceneChangeEndPos = XMFLOAT3(0.f, 0.f, 0.f);
 
-	sceneChangeStartRota = player->getRotation();
+	sceneChangeStartRota = playerParent->getRotation();
 	sceneChangeStartRota.y += 90.f;
-	sceneChangeEndRota = player->getRotation();
+	sceneChangeEndRota = playerParent->getRotation();
 }
 
 void BossScene::initEnemy()
@@ -322,8 +325,8 @@ void BossScene::update_start()
 #ifdef _DEBUG
 	if (input->triggerKey(DIK_SPACE))
 	{
-		player->setPos(sceneChangeEndPos);
-		player->setRotation(sceneChangeEndRota);
+		playerParent->setPos(sceneChangeEndPos);
+		playerParent->setRotation(sceneChangeEndRota);
 		camera->setEye2TargetLen(sceneChangeEndCamLen);
 
 		startAppearBoss();
@@ -333,8 +336,8 @@ void BossScene::update_start()
 
 	if (timer->getNowTime() > sceneChangeTime)
 	{
-		player->setPos(sceneChangeEndPos);
-		player->setRotation(sceneChangeEndRota);
+		playerParent->setPos(sceneChangeEndPos);
+		playerParent->setRotation(sceneChangeEndRota);
 		camera->setEye2TargetLen(sceneChangeEndCamLen);
 
 		startAppearBoss();
@@ -343,8 +346,8 @@ void BossScene::update_start()
 
 	const float raito = (float)timer->getNowTime() / (float)sceneChangeTime;
 
-	player->setPos(lerp(sceneChangeStartPos, sceneChangeEndPos, raito));
-	player->setRotation(lerp(sceneChangeStartRota, sceneChangeEndRota, raito));
+	playerParent->setPos(lerp(sceneChangeStartPos, sceneChangeEndPos, raito));
+	playerParent->setRotation(lerp(sceneChangeStartRota, sceneChangeEndRota, raito));
 
 	const float camLen = std::lerp(sceneChangeStartCamLen, sceneChangeEndCamLen, raito);
 	camera->setEye2TargetLen(camLen);
@@ -507,7 +510,7 @@ void BossScene::update_play()
 		// --------------------
 		if (player->getAlive())
 		{
-			const CollisionShape::Sphere pCol(XMLoadFloat3(&player->getPos()),
+			const CollisionShape::Sphere pCol(XMLoadFloat3(&player->calcWorldPos()),
 											  player->getScale());
 
 			for (auto& i : boss->getSmallEnemyList())
@@ -745,6 +748,7 @@ void BossScene::drawObj3d()
 
 	groundObj->drawWithUpdate(light.get());
 
+	playerParent->update();
 	player->drawWithUpdate(light.get());
 
 	for (auto& i : attackableEnemy)
@@ -904,37 +908,40 @@ void BossScene::movePlayer()
 	// パッドの入力値
 	XMFLOAT2 inputVal = input->getPadLStickRaito();
 
+	// 無効な入力は0にする
+	if (!input->isVaildPadLStickX())
+	{
+		inputVal.x = 0.f;
+	}
+	if (!input->isVaildPadLStickY())
+	{
+		inputVal.y = 0.f;
+	}
+
 #pragma region 四方向入力キーボードとパッド十字ボタン
 
-	bool inputXFlag = false, inputYFlag = false;
-
-	// 移動
-	if (input->hitKey(DIK_W) || input->hitKey(DIK_UP) || input->getPadButton(Input::PAD::UP))
+	// 上下
+	if (inputVal.y == 0.f)
 	{
-		inputVal.y = 1.f;
-		inputYFlag = true;
-	} else if (input->hitKey(DIK_S) || input->hitKey(DIK_DOWN) || input->getPadButton(Input::PAD::DOWN))
-	{
-		inputVal.y = -1.f;
-		inputYFlag = true;
+		if (input->hitKey(DIK_W) || input->hitKey(DIK_UP) || input->getPadButton(Input::PAD::UP))
+		{
+			inputVal.y = 1.f;
+		} else if (input->hitKey(DIK_S) || input->hitKey(DIK_DOWN) || input->getPadButton(Input::PAD::DOWN))
+		{
+			inputVal.y = -1.f;
+		}
 	}
 
-	// 回転
-	if (input->hitKey(DIK_A) || input->hitKey(DIK_LEFT) || input->getPadButton(Input::PAD::LEFT))
+	// 左右
+	if (inputVal.x == 0.f)
 	{
-		inputVal.x = -1.f;
-		inputYFlag = true;
-	} else if (input->hitKey(DIK_D) || input->hitKey(DIK_RIGHT) || input->getPadButton(Input::PAD::RIGHT))
-	{
-		inputVal.x = 1.f;
-		inputYFlag = true;
-	}
-
-	if (inputXFlag && inputYFlag)
-	{
-		constexpr float val = 1.f / 1.41421356f;
-
-		inputVal = XMFLOAT2(val, val);
+		if (input->hitKey(DIK_A) || input->hitKey(DIK_LEFT) || input->getPadButton(Input::PAD::LEFT))
+		{
+			inputVal.x = -1.f;
+		} else if (input->hitKey(DIK_D) || input->hitKey(DIK_RIGHT) || input->getPadButton(Input::PAD::RIGHT))
+		{
+			inputVal.x = 1.f;
+		}
 	}
 
 #pragma endregion 四方向入力キーボードとパッド十字ボタン
@@ -942,8 +949,21 @@ void BossScene::movePlayer()
 	const bool moveYFlag = inputVal.y != 0.f;
 	const bool moveXFlag = inputVal.x != 0.f;
 
+	float playerRot = 0.f;
+
 	if (moveYFlag || moveXFlag)
 	{
+		// 入力値を0~1にする
+		const float len = std::sqrt(
+			inputVal.x * inputVal.x +
+			inputVal.y * inputVal.y
+		);
+		if (len > 1.f)
+		{
+			inputVal.x /= len;
+			inputVal.y /= len;
+		}
+
 		// 移動する速さ
 		float speed = 90.f / DX12Base::ins()->getFPS();
 
@@ -961,13 +981,18 @@ void BossScene::movePlayer()
 		// 移動させる
 		if (moveYFlag)
 		{
-			player->moveForward(inputVal.y * speed);
+			playerParent->moveForward(inputVal.y * speed);
+
 		}
 		if (moveXFlag)
 		{
-			player->moveRight(inputVal.x * speed);
+			playerParent->moveRight(inputVal.x * speed);
+			playerRot = 45.f * -inputVal.x;
 		}
 	}
+	player->setRotation(XMFLOAT3(player->getRotation().x,
+								 player->getRotation().y,
+								 playerRot));
 }
 
 void BossScene::moveAim2DPos()
@@ -998,10 +1023,10 @@ void BossScene::moveAim2DPos()
 	constexpr float rotaSpeed = 0.125f;
 
 	// 入力に合わせて回転
-	XMFLOAT3 rota = player->getRotation();
+	XMFLOAT3 rota = playerParent->getRotation();
 	rota.x += rotaSpeed * posDiff.y;
 	rota.y += rotaSpeed * posDiff.x;
-	player->setRotation(rota);
+	playerParent->setRotation(rota);
 }
 
 void BossScene::rotaBackObj()
@@ -1060,6 +1085,14 @@ void BossScene::drawFrontSprite()
 					(float)bossHp / (float)bossHpMax * 100.f,
 					bossHp);
 	}
+	ImGui::Text("親%.1f,%.1f,%.1f",
+				playerParent->getRotation().x,
+				playerParent->getRotation().y,
+				playerParent->getRotation().z);
+	ImGui::Text("子%.1f,%.1f,%.1f",
+				player->getRotation().x,
+				player->getRotation().y,
+				player->getRotation().z);
 	ImGui::SetNextWindowPos(ImVec2(ImGui::GetWindowPos().x,
 								   ImGui::GetWindowPos().y + ImGui::GetWindowSize().y));
 	ImGui::End();

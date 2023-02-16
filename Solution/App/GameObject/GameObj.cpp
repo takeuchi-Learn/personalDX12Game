@@ -2,6 +2,99 @@
 
 using namespace DirectX;
 
+
+void GameObj::moveForward(float moveVel, bool moveYFlag)
+{
+	// Z方向のベクトルを、自機の向いている向きに回転
+	XMVECTOR velVec = XMVector3Transform(XMVectorSet(0, 0, moveVel, 1), obj->getMatRota());
+
+	// Y方向に移動しないならY成分を消す
+	if (!moveYFlag)
+	{
+		// absがあるのは、大きさのみ指定したいから。
+		// absがないと、moveVelがマイナスの場合に
+		// マイナス * マイナスでプラスになってしまう
+		velVec = XMVectorScale(XMVector3Normalize(XMVectorSetY(velVec, 0.f)),
+							   std::abs(moveVel));
+	}
+
+	obj->position.x += XMVectorGetX(velVec);
+	obj->position.y += XMVectorGetY(velVec);
+	obj->position.z += XMVectorGetZ(velVec);
+}
+
+void GameObj::moveRight(float moveVel, bool moveYFlag)
+{
+	// X方向のベクトルを、自機の向いている向きに回転
+	XMVECTOR velVec = XMVector3Transform(XMVectorSet(moveVel, 0, 0, 1), obj->getMatRota());
+
+	// Y方向に移動しないならY成分を消す
+	if (!moveYFlag)
+	{
+		// absがあるのは、大きさのみ指定したいから。
+		// absがないと、moveVelがマイナスの場合に
+		// マイナス * マイナスでプラスになってしまう
+		velVec = XMVectorScale(XMVector3Normalize(XMVectorSetY(velVec, 0.f)),
+							   std::abs(moveVel));
+	}
+
+	obj->position.x += XMVectorGetX(velVec);
+	obj->position.y += XMVectorGetY(velVec);
+	obj->position.z += XMVectorGetZ(velVec);
+}
+
+void GameObj::moveParentRight(float moveVel, bool moveYFlag)
+{
+	if (!obj->parent)
+	{
+		moveRight(moveVel, moveYFlag);
+		return;
+	}
+
+	// X方向のベクトルを、自機の向いている向きに回転
+	XMVECTOR velVec = XMVector3Transform(XMVectorSet(moveVel, 0, 0, 1), obj->parent->getMatRota());
+
+	// Y方向に移動しないならY成分を消す
+	if (!moveYFlag)
+	{
+		// absがあるのは、大きさのみ指定したいから。
+		// absがないと、moveVelがマイナスの場合に
+		// マイナス * マイナスでプラスになってしまう
+		velVec = XMVectorScale(XMVector3Normalize(XMVectorSetY(velVec, 0.f)),
+							   std::abs(moveVel));
+	}
+
+	obj->position.x += XMVectorGetX(velVec);
+	obj->position.y += XMVectorGetY(velVec);
+	obj->position.z += XMVectorGetZ(velVec);
+}
+
+void GameObj::moveUp(float moveVel)
+{
+	// Y方向のベクトルを、自機の向いている向きに回転
+	XMVECTOR velVec = XMVector3Transform(XMVectorSet(0, moveVel, 0, 1), obj->getMatRota());
+
+	obj->position.x += XMVectorGetX(velVec);
+	obj->position.y += XMVectorGetY(velVec);
+	obj->position.z += XMVectorGetZ(velVec);
+}
+
+void GameObj::moveParentUp(float moveVel)
+{
+	if (!obj->parent)
+	{
+		moveUp(moveVel);
+		return;
+	}
+
+	// Y方向のベクトルを、自機の向いている向きに回転
+	XMVECTOR velVec = XMVector3Transform(XMVectorSet(0, moveVel, 0, 1), obj->parent->getMatRota());
+
+	obj->position.x += XMVectorGetX(velVec);
+	obj->position.y += XMVectorGetY(velVec);
+	obj->position.z += XMVectorGetZ(velVec);
+}
+
 GameObj::GameObj(Camera* camera,
 				 ObjModel* model,
 				 const DirectX::XMFLOAT3& pos)
