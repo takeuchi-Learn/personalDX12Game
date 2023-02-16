@@ -775,13 +775,13 @@ void RailShoot::update_play()
 		{
 			if (!pb.getAlive()) { continue; }
 
-			pBulCol = Sphere(XMLoadFloat3(&pb.getPos()), pb.getScale());
+			pBulCol = Sphere(XMLoadFloat3(&pb.calcWorldPos()), pb.getScale());
 
 			for (auto& e : enemy)
 			{
 				if (e->getAlive()
 					&& Collision::CheckHit(pBulCol,
-										   Sphere(XMLoadFloat3(&e->getPos()),
+										   Sphere(XMLoadFloat3(&e->calcWorldPos()),
 												  e->getScale())))
 				{
 					// パーティクルを生成
@@ -801,7 +801,7 @@ void RailShoot::update_play()
 		// --------------------
 		if (player->getAlive())
 		{
-			const Sphere playerCol(XMLoadFloat3(&player->getPos()), player->getScale());
+			const Sphere playerCol(XMLoadFloat3(&player->calcWorldPos()), player->getScale());
 
 			for (auto& e : enemy)
 			{
@@ -812,7 +812,7 @@ void RailShoot::update_play()
 
 					// 自機と敵の弾が当たっていたら
 					if (Collision::CheckHit(playerCol,
-											Sphere(XMLoadFloat3(&eb->getPos()),
+											Sphere(XMLoadFloat3(&eb->calcWorldPos()),
 												   eb->getScaleF3().z)))
 					{
 						// 当たった敵弾は消す
