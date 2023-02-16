@@ -146,56 +146,34 @@ void BossScene::initBoss()
 	// ボスのパーツ
 	bossPartsModel = std::make_unique<ObjModel>("Resources/koshi", "koshi", 0U, false);
 
-	// 肩
-	bossParts.emplace_back(std::make_shared<BaseEnemy>(camera.get(), bossPartsModel.get()));
-	XMFLOAT3 pos = bossParts.back()->getPos();
-	pos.x += 0.25f;
-	pos.y += 0.5f;
-	bossParts.back()->setPos(pos);
-
-	bossParts.emplace_back(std::make_shared<BaseEnemy>(camera.get(), bossPartsModel.get()));
-	pos = bossParts.back()->getPos();
-	pos.x -= 0.25f;
-	pos.y += 0.5f;
-	bossParts.back()->setPos(pos);
-
-	// 足
-	bossParts.emplace_back(std::make_shared<BaseEnemy>(camera.get(), bossPartsModel.get()));
-	pos = bossParts.back()->getPos();
-	pos.x += 0.25f;
-	pos.y -= 0.75f;
-	bossParts.back()->setPos(pos);
-
-	bossParts.emplace_back(std::make_shared<BaseEnemy>(camera.get(), bossPartsModel.get()));
-	pos = bossParts.back()->getPos();
-	pos.x -= 0.25f;
-	pos.y -= 0.75f;
-	bossParts.back()->setPos(pos);
-
-	// 脚
-	bossParts.emplace_back(std::make_shared<BaseEnemy>(camera.get(), bossPartsModel.get()));
-	pos = bossParts.back()->getPos();
-	pos.x += 0.25f;
-	pos.y -= 0.25f;
-	pos.z -= 0.125f;
-	bossParts.back()->setPos(pos);
-
-	bossParts.emplace_back(std::make_shared<BaseEnemy>(camera.get(), bossPartsModel.get()));
-	pos = bossParts.back()->getPos();
-	pos.x -= 0.25f;
-	pos.y -= 0.25f;
-	pos.z -= 0.125f;
-	bossParts.back()->setPos(pos);
-
-	// 頭
-	bossParts.emplace_back(std::make_shared<BaseEnemy>(camera.get(), bossPartsModel.get()));
-	pos = bossParts.back()->getPos();
-	pos.y += 0.875f;
-	pos.z += 0.5f;
-	bossParts.back()->setPos(pos);
-
-	for (auto& i : bossParts)
+	// パーツの位置をファイルから読み込む
+	std::vector<DirectX::XMFLOAT3> bossPartsData;
+	const auto bpdCsv = loadCsv("Resources/bossPartsData.csv");
+	for (auto& y : bpdCsv)
 	{
+		// 空行を飛ばす
+		if (y.empty()) { continue; }
+
+		// 列数
+		const auto size = y.size();
+
+		XMFLOAT3 pos{};
+		if (size >= 1u) { pos.x = std::stof(y[0]); }
+		if (size >= 2u) { pos.y = std::stof(y[1]); }
+		if (size >= 3u) { pos.z = std::stof(y[2]); }
+
+		bossPartsData.emplace_back(pos);
+	}
+
+	// 全要素の設定
+	bossParts.reserve(bossPartsData.size());
+	for (auto& bpd : bossPartsData)
+	{
+		auto& i = bossParts.emplace_back(std::make_shared<BaseEnemy>(camera.get(), bossPartsModel.get()));
+
+		// 位置を設定
+		i->setPos(bpd);
+
 		// ボス本体を親とする
 		i->setParent(boss->getObj());
 
