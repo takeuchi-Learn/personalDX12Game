@@ -1,10 +1,10 @@
 ﻿#include "Selector.h"
 
-NODE_RESULT Selector::run()
+NODE_RESULT Selector::mainProc()
 {
 	for (Task& i : child)
 	{
-		if (i() == NODE_RESULT::SUCCESS)
+		if (i.run() == NODE_RESULT::SUCCESS)
 		{
 			return NODE_RESULT::SUCCESS;
 		}

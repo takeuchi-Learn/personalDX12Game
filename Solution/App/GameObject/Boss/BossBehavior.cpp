@@ -120,9 +120,9 @@ BossBehavior::BossBehavior(BossEnemy* boss) :
 	phase(&BossBehavior::phase_approach)
 {
 	// 各フェーズを登録
-	rootNode->addChild(std::bind(&BossBehavior::phase_approach, this));
-	rootNode->addChild(std::bind(&BossBehavior::phase_leave, this));
-	rootNode->addChild(std::bind(&BossBehavior::phase_attack, this));
+	rootNode->addChild(Task(std::bind(&BossBehavior::phase_approach, this)));
+	rootNode->addChild(Task(std::bind(&BossBehavior::phase_leave, this)));
+	rootNode->addChild(Task(std::bind(&BossBehavior::phase_attack, this)));
 }
 
 BossBehavior::BossBehavior() :

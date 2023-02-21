@@ -5,8 +5,7 @@
 class Selector :
 	public BaseComposite
 {
+	NODE_RESULT mainProc() override;
 public:
-	/// @brief 実行
-	/// @return 成功したかどうか
-	NODE_RESULT run() override;
+	using BaseComposite::BaseComposite;
 };

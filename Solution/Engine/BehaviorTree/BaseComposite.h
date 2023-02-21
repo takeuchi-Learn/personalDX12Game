@@ -15,15 +15,28 @@ enum class NODE_RESULT : uint8_t
 };
 
 /// @brief タスククラス
-using Task = std::function<NODE_RESULT()>;
+class Task
+{
+	std::function<NODE_RESULT()> proc;
+
+public:
+	Task(const std::function<NODE_RESULT()>& proc) : proc(proc) {}
+
+	inline NODE_RESULT run() { return proc(); }
+};
 
 /// @brief コンポジット基底クラス
-class BaseComposite
+class BaseComposite :
+	public Task
 {
+protected:
+	/// @brief 子ノード
+	std::list<Task> child;
+
+	virtual NODE_RESULT mainProc() = 0;
+
 public:
-	/// @brief 実行
-	/// @return 成功したかどうか
-	virtual NODE_RESULT run() = 0;
+	BaseComposite() : Task(std::bind(&BaseComposite::mainProc, this)) {}
 
 	/// @brief 子ノードを後ろ追加
 	/// @param func 子ノードに入れる関数
@@ -36,8 +49,4 @@ public:
 	{
 		return child;
 	}
-
-protected:
-	/// @brief 子ノード
-	std::list<Task> child;
 };
