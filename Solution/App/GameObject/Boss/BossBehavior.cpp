@@ -60,58 +60,58 @@ NODE_RESULT BossBehavior::phase_attack()
 	// 違うフェーズなら実行しない
 	if (phase != &BossBehavior::phase_attack) { return NODE_RESULT::FAIL; }
 
-	if (nowShotFrame++ >= shotInterval)
+	// 撃つ時間がまだなら何もしない
+	if (nowShotFrame++ < shotInterval) { return NODE_RESULT::RUNNING; }
+	// 撃つ時間が来たらフレームをリセット
+	nowShotFrame = 0u;
+
+	// 指定回数打っていたらフェーズを変える
+	if (shotCount >= shotCountMax)
 	{
-		const XMVECTOR directionVec = boss->calcVelVec(boss, true);
+		shotCount = 0;
+		phase = &BossBehavior::phase_approach;
+		return NODE_RESULT::SUCCESS;
+	}
+	// 撃った回数を加算
+	++shotCount;
 
-		// -これ~これの範囲で発射
-		constexpr float angleMax = static_cast<float>(3.141592653589793 * (1.0 / 8.0));
-		constexpr float angleMaxDeg = XMConvertToDegrees(angleMax);
-		// 発射する範囲の角度
-		constexpr float allAngleDeg = angleMaxDeg * 2.f;
+	// 攻撃対象へ向かうベクトル
+	const XMVECTOR directionVec = boss->calcVelVec(boss, true);
 
-		constexpr float oneRad = angleMax * 2.f / float(shotEnemyNum - 1);
-		constexpr float halfRad = oneRad / 2.f;
+	// -これ~これの範囲で発射
+	constexpr float angleMax = static_cast<float>(3.141592653589793 * (1.0 / 8.0));
+	constexpr float angleMaxDeg = XMConvertToDegrees(angleMax);
+	// 発射する範囲の角度
+	constexpr float allAngleDeg = angleMaxDeg * 2.f;
 
-		for (uint32_t i = 0ui32; i < shotEnemyNum; ++i)
+	constexpr float oneRad = angleMax * 2.f / float(shotEnemyNum - 1);
+	constexpr float halfRad = oneRad / 2.f;
+
+	for (uint32_t i = 0ui32; i < shotEnemyNum; ++i)
+	{
+		// このfor文内での進行度
+		const float raito = (float)i / float(shotEnemyNum - 1);
+
+		// 射出角度
+		XMFLOAT2 angle = XMFLOAT2(-angleMax, angleMax);
+		// 二回に一回半分ずらす(これがないとあんま当たらん)
+		if (shotCount & 1)
 		{
-			// このfor文内での進行度
-			const float raito = (float)i / float(shotEnemyNum - 1);
-
-			// 射出角度
-			XMFLOAT2 angle = XMFLOAT2(-angleMax, angleMax);
-			// 二回に一回半分ずらす(これがないとあんま当たらん)
-			if (shotCount & 1)
-			{
-				angle.x += halfRad;
-				angle.y += halfRad;
-			}
-
-			// 弾の射出方向
-			const XMVECTOR direction = XMVector3Rotate(directionVec,
-													   XMQuaternionRotationRollPitchYaw(0.f,
-																						std::lerp(angle.x, angle.y, raito),
-																						0.f));
-
-			// 指定方向に弾を発射
-			boss->addSmallEnemy(direction, bulCol);
+			angle.x += halfRad;
+			angle.y += halfRad;
 		}
-		// 全部打ち終わったらフレームをリセット
-		nowShotFrame = 0u;
 
-		// 指定回数打ったか判定
-		if (shotCount < shotCountMax)
-		{
-			++shotCount;
-		} else
-		{
-			// 指定回数打っていたらフェーズを変える
-			shotCount = 0;
-			phase = &BossBehavior::phase_approach;
-		}
+		// 弾の射出方向
+		const XMVECTOR direction = XMVector3Rotate(directionVec,
+												   XMQuaternionRotationRollPitchYaw(0.f,
+																					std::lerp(angle.x, angle.y, raito),
+																					0.f));
+
+		// 指定方向に弾を発射
+		boss->addSmallEnemy(direction, bulCol);
 	}
 
-	return NODE_RESULT::SUCCESS;
+	return NODE_RESULT::RUNNING;
 }
 
 BossBehavior::BossBehavior(BossEnemy* boss) :
