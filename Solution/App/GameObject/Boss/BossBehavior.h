@@ -12,8 +12,9 @@
 
 class BossEnemy;
 
-/// @brief ボスの行動
-class BossBehavior
+/// @brief ボスの行動。セレクター(成功で終了)を継承している。
+class BossBehavior :
+	public Selector
 {
 private:
 	// ---------------
@@ -21,7 +22,6 @@ private:
 	// ---------------
 
 	BossEnemy* boss;
-	std::unique_ptr<Selector> rootNode;
 
 	NODE_RESULT(BossBehavior::* phase)();
 
@@ -60,8 +60,4 @@ public:
 	/// @brief 現在のフェーズを取得
 	/// @return 現在のフェーズ
 	inline const auto getPhase() const { return phase; }
-
-	/// @brief ルートノードを実行実行
-	/// @return 実行結果
-	inline NODE_RESULT run() { return rootNode->run(); }
 };

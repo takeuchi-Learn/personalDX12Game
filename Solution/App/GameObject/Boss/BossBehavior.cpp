@@ -115,14 +115,14 @@ NODE_RESULT BossBehavior::phase_attack()
 }
 
 BossBehavior::BossBehavior(BossEnemy* boss) :
+	Selector(),
 	boss(boss),
-	rootNode(std::make_unique<Selector>()),
 	phase(&BossBehavior::phase_approach)
 {
 	// 各フェーズを登録
-	rootNode->addChild(Task(std::bind(&BossBehavior::phase_approach, this)));
-	rootNode->addChild(Task(std::bind(&BossBehavior::phase_leave, this)));
-	rootNode->addChild(Task(std::bind(&BossBehavior::phase_attack, this)));
+	addChild(Task(std::bind(phase, this)));
+	addChild(Task(std::bind(&BossBehavior::phase_leave, this)));
+	addChild(Task(std::bind(&BossBehavior::phase_attack, this)));
 }
 
 BossBehavior::BossBehavior() :
