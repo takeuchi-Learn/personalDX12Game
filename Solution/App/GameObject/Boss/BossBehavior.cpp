@@ -1,6 +1,7 @@
 ﻿#include "BossBehavior.h"
 #include <GameObject/Boss/BossEnemy.h>
 #include <DirectXMath.h>
+#include <Util/Util.h>
 
 using namespace DirectX;
 
@@ -12,7 +13,7 @@ NODE_RESULT BossBehavior::phase_approach()
 	if (XMVectorGetX(XMVector3Length(velVec)) < boss->getScale())
 	{
 		// 弾を一つ撃って次の行動へ進む
-		boss->addSmallEnemyHoming(bulCol);
+		boss->addSmallEnemyHoming(fanShotData.bulCol);
 		return NODE_RESULT::SUCCESS;
 	}
 
@@ -47,13 +48,13 @@ NODE_RESULT BossBehavior::phase_leave()
 NODE_RESULT BossBehavior::phase_attack()
 {
 	// 撃つ時間がまだなら何もしない
-	if (nowShotFrame++ < shotInterval) { return NODE_RESULT::RUNNING; }
+	if (nowShotFrame++ < fanShotData.interval) { return NODE_RESULT::RUNNING; }
 	nowShotFrame = 0u;
 
 	// 指定回数撃ったら次の行動へ
-	if (shotCount >= shotCountMax)
+	if (shotCount >= fanShotData.countMax)
 	{
-		nowShotFrame = shotInterval;
+		nowShotFrame = fanShotData.interval;
 		shotCount = 0;
 		return NODE_RESULT::SUCCESS;
 	}
@@ -62,15 +63,15 @@ NODE_RESULT BossBehavior::phase_attack()
 	// -これ~これの範囲で発射
 	constexpr float angleMax = static_cast<float>(3.141592653589793 * (1.0 / 8.0));
 	// 二回に一回ずらす値
-	constexpr float halfRad = angleMax / float(shotEnemyNum - 1);
+	const float halfRad = angleMax / float(fanShotData.shotNum - 1u);
 
 	// 攻撃対象へ向かうベクトル
 	const XMVECTOR directionVec = boss->calcVelVec(boss, true);
 
-	for (uint32_t i = 0ui32; i < shotEnemyNum; ++i)
+	for (uint32_t i = 0ui32; i < fanShotData.shotNum; ++i)
 	{
 		// このfor文内での進行度
-		const float raito = (float)i / float(shotEnemyNum - 1);
+		const float raito = (float)i / float(fanShotData.shotNum - 1);
 
 		// 射出角度
 		XMFLOAT2 angle = XMFLOAT2(-angleMax, angleMax);
@@ -88,7 +89,7 @@ NODE_RESULT BossBehavior::phase_attack()
 																					0.f));
 
 		// 指定方向に弾を発射
-		boss->addSmallEnemy(direction, bulCol);
+		boss->addSmallEnemy(direction, fanShotData.bulCol);
 	}
 
 	return NODE_RESULT::RUNNING;
@@ -96,10 +97,24 @@ NODE_RESULT BossBehavior::phase_attack()
 
 BossBehavior::BossBehavior(BossEnemy* boss) :
 	Sequencer(),
-	boss(boss),
-	nowShotFrame(shotInterval),
-	shotCount(0u)
+	boss(boss)
 {
+	const auto data = Util::loadCsv("Resources/fanShotData.csv");
+
+	fanShotData =
+		FanShotData{
+		.interval = std::stoul(data[0][0]),
+		.countMax = std::stoul(data[1][0]),
+		.shotNum = std::stoul(data[2][0]),
+		.bulCol = XMFLOAT4(std::stof(data[3][0]),
+						   std::stof(data[3][1]),
+						   std::stof(data[3][2]),
+						   std::stof(data[3][3]))
+	};
+
+	nowShotFrame = fanShotData.interval;
+	shotCount = 0u;
+
 	// 各フェーズを登録
 	addChild(Task(std::bind(&BossBehavior::phase_approach, this)));
 	addChild(Task(std::bind(&BossBehavior::phase_leave, this)));

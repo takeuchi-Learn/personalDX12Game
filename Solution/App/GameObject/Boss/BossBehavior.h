@@ -25,14 +25,19 @@ private:
 
 #pragma region 弾発射関係
 
-	static inline constexpr uint32_t shotInterval = 60u;
-	uint32_t nowShotFrame = 0u;
-	static inline constexpr uint32_t shotCountMax = 15u;
-	uint32_t shotCount = 0u;
-	static inline constexpr uint32_t shotEnemyNum = 15u;
+	struct FanShotData
+	{
+		uint32_t interval{};
+		uint32_t countMax{};
+		uint32_t shotNum{};
+		DirectX::XMFLOAT4 bulCol{};
+	};
 
-	static inline constexpr DirectX::XMFLOAT4 bulCol =
-		DirectX::XMFLOAT4(1, 0.25f, 0.125f, 1.f);
+	FanShotData fanShotData{};
+
+	uint32_t nowShotFrame = 0u;
+	uint32_t shotCount = 0u;
+
 
 #pragma endregion 弾発射関係
 
@@ -54,8 +59,4 @@ public:
 	/// @brief ボスをセット
 	/// @param boss ボスのポインタ
 	inline void setBoss(BossEnemy* boss) { this->boss = boss; }
-
-	/// @brief 現在のフェーズを取得
-	/// @return 現在のフェーズ
-	//inline const auto getPhase() const { return phase; }
 };
