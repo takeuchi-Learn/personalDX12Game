@@ -28,7 +28,7 @@ NODE_RESULT BossBehavior::phase_leave()
 	const XMVECTOR velVec = boss->calcVelVec(boss);
 
 	// 一定距離離れたら次の行動へ
-	if (XMVectorGetX(XMVector3Length(velVec)) > boss->getScaleF3().x * 5.f)
+	if (XMVectorGetX(XMVector3Length(velVec)) > boss->getScaleF3().z * 5.f)
 	{
 		return NODE_RESULT::SUCCESS;
 	}

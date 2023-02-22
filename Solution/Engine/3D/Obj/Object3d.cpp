@@ -60,6 +60,9 @@ void Object3d::update()
 
 void Object3d::draw(Light* light, size_t ppState)
 {
+	if (!drawFlag) { return; }
+	if (!model) { return; }
+
 	startDraw(ppState);
 
 	// 定数バッファビューをセット
@@ -67,7 +70,7 @@ void Object3d::draw(Light* light, size_t ppState)
 
 	light->draw(3);
 
-	if (model) { model->draw(dxBase->getCmdList()); }
+	model->draw(dxBase->getCmdList());
 }
 
 void Object3d::drawWithUpdate(Light* light, size_t ppState)

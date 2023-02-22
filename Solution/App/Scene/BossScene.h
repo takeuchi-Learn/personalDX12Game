@@ -62,7 +62,10 @@ private:
 	// 背景のパイプライン
 	size_t backPipelineSet;
 
-	// 背景と地面
+	// 体力バー
+	std::unique_ptr<ObjModel> hpBarModel;
+	std::unordered_map<std::string, std::unique_ptr<Object3d>> hpBar;
+
 	// 背景と地面
 	std::unique_ptr<Object3d> backObj;
 	std::unique_ptr<ObjModel> backModel;
@@ -90,10 +93,6 @@ private:
 	std::unique_ptr<SpriteBase> spBase;
 
 	std::unique_ptr<Sprite> aim2D;
-
-	inline static constexpr DirectX::XMFLOAT2 hpGrSizeMax = DirectX::XMFLOAT2(WinAPI::window_width * 0.75f,
-																			  WinAPI::window_height / 40.f);
-	std::unique_ptr<Sprite> bossHpGr;
 
 	const float playerHpBarWidMax;
 	std::unique_ptr<Sprite> playerHpBar;
@@ -171,6 +170,8 @@ private:
 	void moveAim2DPos();
 
 	void rotaBackObj();
+
+	void updateBossHpBar();
 
 #pragma region updateの中身
 

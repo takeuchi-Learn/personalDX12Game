@@ -47,6 +47,8 @@ public:
 	bool isBillboard = false;
 	bool isBillBoardY = false;// isBillboardがfalseの場合のみ機能する
 
+	bool drawFlag = true;
+
 protected:
 	void updateMatWorld();
 

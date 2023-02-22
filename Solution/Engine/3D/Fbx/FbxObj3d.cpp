@@ -343,6 +343,8 @@ void FbxObj3d::update()
 
 void FbxObj3d::draw(Light* light, size_t ppState)
 {
+	if (!drawFlag) { return; }
+
 	//　モデルがないなら描画しない
 	if (!model) { return; }
 

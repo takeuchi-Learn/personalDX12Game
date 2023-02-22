@@ -63,9 +63,6 @@ public:
 	//モデルデータ
 	ObjModel* model = nullptr;
 
-	bool isBillboard = false;
-	bool isBillBoardY = false;// isBillboardがfalseの場合のみ機能する
-
 	// モデルは後から手動で読み込む(deleteも手動)
 	Object3d(Camera* camera);
 
