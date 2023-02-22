@@ -12,18 +12,16 @@
 
 class BossEnemy;
 
-/// @brief ボスの行動。セレクター(成功で終了)を継承している。
+/// @brief ボスの行動。シーケンサー(失敗で終了)を継承している。
 class BossBehavior :
-	public Selector
+	public Sequencer
 {
 private:
 	// ---------------
 	// メンバ変数
 	// ---------------
 
-	BossEnemy* boss;
-
-	NODE_RESULT(BossBehavior::* phase)();
+	BossEnemy* boss = nullptr;
 
 #pragma region 弾発射関係
 
@@ -59,5 +57,5 @@ public:
 
 	/// @brief 現在のフェーズを取得
 	/// @return 現在のフェーズ
-	inline const auto getPhase() const { return phase; }
+	//inline const auto getPhase() const { return phase; }
 };

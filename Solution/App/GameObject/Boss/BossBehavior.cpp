@@ -6,86 +6,66 @@ using namespace DirectX;
 
 NODE_RESULT BossBehavior::phase_approach()
 {
-	// 違うフェーズなら実行しない
-	if (phase != &BossBehavior::phase_approach) { return NODE_RESULT::FAIL; }
-
 	const XMVECTOR velVec = boss->calcVelVec(boss);
 
-	// 一定距離より近ければ遠ざかる
+	// 一定距離近づけば次の行動へ
 	if (XMVectorGetX(XMVector3Length(velVec)) < boss->getScale())
 	{
-		// todo ここで近接攻撃を開始(攻撃関数へ遷移)
+		// 弾を一つ撃って次の行動へ進む
 		boss->addSmallEnemyHoming(bulCol);
-		phase = &BossBehavior::phase_leave;
 		return NODE_RESULT::SUCCESS;
 	}
 
-	// 大きさを反映
+	// 接近する
 	boss->moveAndRota(boss->moveSpeed, velVec);
 
-	return NODE_RESULT::SUCCESS;
+	return NODE_RESULT::RUNNING;
 }
 
 NODE_RESULT BossBehavior::phase_leave()
 {
-	// 違うフェーズなら実行しない
-	if (phase != &BossBehavior::phase_leave) { return NODE_RESULT::FAIL; }
-
 	const XMVECTOR velVec = boss->calcVelVec(boss);
 
-	// 一定距離より遠ければ近づく
+	// 一定距離離れたら次の行動へ
 	if (XMVectorGetX(XMVector3Length(velVec)) > boss->getScaleF3().x * 5.f)
 	{
-		// ここで遠距離攻撃を開始(攻撃関数へ遷移)
-		phase = &BossBehavior::phase_attack;
-		nowShotFrame = shotInterval;
-		shotCount = 0u;
 		return NODE_RESULT::SUCCESS;
 	}
 
-	// 大きさを反映
+	// 離れていく
 	boss->move(boss->moveSpeed, -velVec);
 
-	// 速度に合わせて回転
+	// 移動方向に合わせて回転
 	XMFLOAT3 velF3{};
 	XMStoreFloat3(&velF3, velVec);
 	const XMFLOAT2 rotaDeg = GameObj::calcRotationSyncVelDeg(velF3);
 	boss->setRotation(XMFLOAT3(rotaDeg.x, rotaDeg.y, boss->getRotation().z));
 
-	return NODE_RESULT::SUCCESS;
+	return NODE_RESULT::RUNNING;
 }
 
 NODE_RESULT BossBehavior::phase_attack()
 {
-	// 違うフェーズなら実行しない
-	if (phase != &BossBehavior::phase_attack) { return NODE_RESULT::FAIL; }
-
 	// 撃つ時間がまだなら何もしない
 	if (nowShotFrame++ < shotInterval) { return NODE_RESULT::RUNNING; }
-	// 撃つ時間が来たらフレームをリセット
 	nowShotFrame = 0u;
 
-	// 指定回数打っていたらフェーズを変える
+	// 指定回数撃ったら次の行動へ
 	if (shotCount >= shotCountMax)
 	{
+		nowShotFrame = shotInterval;
 		shotCount = 0;
-		phase = &BossBehavior::phase_approach;
 		return NODE_RESULT::SUCCESS;
 	}
-	// 撃った回数を加算
 	++shotCount;
-
-	// 攻撃対象へ向かうベクトル
-	const XMVECTOR directionVec = boss->calcVelVec(boss, true);
 
 	// -これ~これの範囲で発射
 	constexpr float angleMax = static_cast<float>(3.141592653589793 * (1.0 / 8.0));
-	constexpr float angleMaxDeg = XMConvertToDegrees(angleMax);
-	// 発射する範囲の角度
-	constexpr float allAngleDeg = angleMaxDeg * 2.f;
+	// 二回に一回ずらす値
+	constexpr float halfRad = angleMax / float(shotEnemyNum - 1);
 
-	constexpr float oneRad = angleMax * 2.f / float(shotEnemyNum - 1);
-	constexpr float halfRad = oneRad / 2.f;
+	// 攻撃対象へ向かうベクトル
+	const XMVECTOR directionVec = boss->calcVelVec(boss, true);
 
 	for (uint32_t i = 0ui32; i < shotEnemyNum; ++i)
 	{
@@ -115,12 +95,13 @@ NODE_RESULT BossBehavior::phase_attack()
 }
 
 BossBehavior::BossBehavior(BossEnemy* boss) :
-	Selector(),
+	Sequencer(),
 	boss(boss),
-	phase(&BossBehavior::phase_approach)
+	nowShotFrame(shotInterval),
+	shotCount(0u)
 {
 	// 各フェーズを登録
-	addChild(Task(std::bind(phase, this)));
+	addChild(Task(std::bind(&BossBehavior::phase_approach, this)));
 	addChild(Task(std::bind(&BossBehavior::phase_leave, this)));
 	addChild(Task(std::bind(&BossBehavior::phase_attack, this)));
 }
