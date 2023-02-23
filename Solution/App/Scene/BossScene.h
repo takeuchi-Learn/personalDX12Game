@@ -95,8 +95,7 @@ private:
 	std::unique_ptr<Sprite> aim2D;
 
 	const float playerHpBarWidMax;
-	std::unique_ptr<Sprite> playerHpBar;
-	std::unique_ptr<Sprite> playerHpBarEdge;
+	float playerHpBarNowRaito = 0.f;
 
 #pragma endregion スプライト
 
