@@ -75,32 +75,6 @@ void RailShoot::loadEnemyScript()
 	}
 }
 
-XMVECTOR RailShoot::splinePosition(const std::vector<XMVECTOR>& points,
-								   const size_t& startIndex,
-								   float t)
-{
-	if (startIndex < 1) { return points[1]; }
-
-	{
-		size_t n = points.size() - 2;
-		if (startIndex > n) { return points[n]; }
-	}
-
-	XMVECTOR p0 = points[startIndex - 1];
-	XMVECTOR p1 = points[startIndex];
-	XMVECTOR p2 = points[startIndex + 1];
-	XMVECTOR p3 = points[startIndex + 2];
-
-	XMVECTOR position = {
-		2 * p1 + (-p0 + p2) * t +
-		(2 * p0 - 5 * p1 + 4 * p2 - p3) * (t * t) +
-		(-p0 + 3 * p1 - 3 * p2 + p3) * (t * t * t)
-	};
-	position *= 0.5f;
-
-	return position;
-}
-
 RailShoot::RailShoot()
 	: dxBase(DX12Base::getInstance()),
 	input(Input::getInstance()),
@@ -353,7 +327,7 @@ RailShoot::RailShoot()
 			}
 
 			// スプライン補間でレーンの位置を求める
-			XMStoreFloat3(&dest, splinePosition(splinePoint, (size_t)startIndex, startIndexRaito));
+			XMStoreFloat3(&dest, Util::splinePosition(splinePoint, (size_t)startIndex, startIndexRaito));
 			right->position = dest;
 			left->position = dest;
 			ring->position = dest;
@@ -1012,7 +986,7 @@ void RailShoot::updateRailPos()
 	// 更新後の位置を算出
 	XMFLOAT3 pos{};
 	XMStoreFloat3(&pos,
-				  splinePosition(splinePoint,
+				  Util::splinePosition(splinePoint,
 								 splineIndex,
 								 raito));
 	// 位置を反映

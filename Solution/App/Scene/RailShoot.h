@@ -14,9 +14,6 @@
 #include "GameObject/Player.h"
 #include <Sound/Sound.h>
 
-#include <3D/Fbx/FbxObj3d.h>
-#include <3D/Fbx/FbxModel.h>
-
 #include <Util/Util.h>
 
 /// @brief レールシューティングのシーン
@@ -228,8 +225,4 @@ public:
 	void drawFrontSprite() override;
 
 	~RailShoot();
-
-	static DirectX::XMVECTOR splinePosition(const std::vector<DirectX::XMVECTOR>& points,
-											const size_t& startIndex,
-											float t);
 };

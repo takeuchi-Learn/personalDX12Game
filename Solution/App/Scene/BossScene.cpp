@@ -1009,9 +1009,12 @@ void BossScene::drawFrontSprite()
 	spBase->drawStart(DX12Base::ins()->getCmdList());
 	aim2D->drawWithUpdate(DX12Base::ins(), spBase.get());
 
+	constexpr auto winSize = XMFLOAT2(WinAPI::window_width / 4.f,
+									  WinAPI::window_height / 8.f);
+
 	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x,
 								   fstWinPos.y));
-	ImGui::SetNextWindowSize(ImVec2(300.f, 100.f));
+	ImGui::SetNextWindowSize(ImVec2(winSize.x, winSize.y));
 
 	ImGui::Begin("ボス戦", nullptr, winFlags);
 	ImGui::PushFont(dxBase->getBigImFont());

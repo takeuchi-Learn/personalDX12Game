@@ -2,6 +2,8 @@
 #include <fstream>
 #include <sstream>
 
+using namespace DirectX;
+
 Util::CSVType Util::loadCsv(const std::string& csvFilePath,
 							bool commentFlag,
 							char divChar,
@@ -38,4 +40,28 @@ Util::CSVType Util::loadCsv(const std::string& csvFilePath,
 	}
 
 	return csvData;
+}
+
+DirectX::XMVECTOR Util::splinePosition(const std::vector<DirectX::XMVECTOR>& points, const size_t& startIndex, float t)
+{
+	if (startIndex < 1) { return points[1]; }
+
+	{
+		size_t n = points.size() - 2;
+		if (startIndex > n) { return points[n]; }
+	}
+
+	XMVECTOR p0 = points[startIndex - 1];
+	XMVECTOR p1 = points[startIndex];
+	XMVECTOR p2 = points[startIndex + 1];
+	XMVECTOR p3 = points[startIndex + 2];
+
+	XMVECTOR position =
+	{
+		2 * p1 + (-p0 + p2) * t +
+		(2 * p0 - 5 * p1 + 4 * p2 - p3) * (t * t) +
+		(-p0 + 3 * p1 - 3 * p2 + p3) * (t * t * t)
+	};
+
+	return position * 0.5f;
 }
