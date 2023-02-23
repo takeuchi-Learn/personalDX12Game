@@ -291,6 +291,11 @@ void BossScene::update_start()
 
 	const float camLen = std::lerp(sceneChangeStartCamLen, sceneChangeEndCamLen, raito);
 	camera->setEye2TargetLen(camLen);
+
+	// 体力バー
+	float barRaito = 1.f - raito;
+	barRaito *= barRaito * barRaito * barRaito;
+	playerHpBarNowRaito = 1.f - barRaito;
 }
 
 void BossScene::update_appearBoss()
@@ -340,17 +345,14 @@ void BossScene::update_appearBoss()
 	hpBar.at("boss")->scale.x = std::lerp(appearBossData->startBossHpGrScale,
 										  appearBossData->endBossHpGrScale,
 										  barRaito);
-
-	playerHpBarNowRaito = std::lerp(appearBossData->startPlayerHpGrScale,
-									appearBossData->endPlayerHpGrScale,
-									barRaito);
 }
 
 void BossScene::update_play()
 {
 #ifdef _DEBUG
 
-	if (Input::getInstance()->triggerKey(DIK_SPACE))
+	if (Input::getInstance()->hitKey(DIK_LSHIFT) &&
+		Input::getInstance()->triggerKey(DIK_SPACE))
 	{
 		update_proc = std::bind(&BossScene::update_end<EndScene>, this);
 	}
@@ -601,8 +603,6 @@ void BossScene::startAppearBoss()
 				.endBossHpGrScale = boss->getScaleF3().x,
 				.startCamAngle = angle,
 				.endCamAngle = angle + 360.f,
-				.startPlayerHpGrScale = 0.f,
-				.endPlayerHpGrScale = 1.f
 			}
 	);
 
@@ -628,7 +628,6 @@ void BossScene::endAppearBoss()
 	camera->setEye2TargetLen(camParam->eye2TargetLen);
 
 	hpBar.at("boss")->scale.x = appearBossData->endBossHpGrScale;
-	playerHpBarNowRaito = appearBossData->endPlayerHpGrScale;
 
 	// 関数を変える
 	update_proc = std::bind(&BossScene::update_play, this);
