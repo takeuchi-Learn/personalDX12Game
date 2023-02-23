@@ -29,6 +29,32 @@ class RailShoot
 
 	std::unique_ptr<Timer> timer;
 
+
+#pragma region ImGui
+
+	static constexpr ImGuiWindowFlags winFlags =
+		// リサイズ不可
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoResize |
+		// タイトルバー無し
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar |
+		// 設定を.iniに出力しない
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoSavedSettings |
+		// 移動不可
+		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove;
+	//// スクロールバーを常に表示
+	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysHorizontalScrollbar |
+	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar;
+
+	// 最初のウインドウの位置を指定
+	static constexpr DirectX::XMFLOAT2 fstWinPos =
+		DirectX::XMFLOAT2((float)WinAPI::window_width * 0.02f,
+						  (float)WinAPI::window_height * 0.02f);
+
+	static constexpr inline float playerHpBarWidMax = (float)WinAPI::window_width / 4.f;
+	float playerHpBarNowRaito = 0.f;
+
+#pragma endregion
+
 #pragma region 音
 
 	std::unique_ptr<Sound> killSe;
@@ -43,9 +69,6 @@ class RailShoot
 	std::unique_ptr<DebugText> debugText;
 
 	std::unique_ptr<Sprite> aim2D;
-	std::unique_ptr<Sprite> hpBar;
-	std::unique_ptr<Sprite> hpBarEdge;
-	const float hpBarWidMax;
 
 	// 操作説明
 	std::unordered_map<std::string, std::unique_ptr<Sprite>> operInst;

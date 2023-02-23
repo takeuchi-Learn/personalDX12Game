@@ -131,29 +131,8 @@ RailShoot::RailShoot()
 
 	aim2D(new Sprite(spriteBase->loadTexture(L"Resources/aimPos.png"),
 					 spriteBase.get())),
-
-	hpBar(new Sprite(spriteBase->loadTexture(L"Resources/hpBar.png"),
-					 spriteBase.get(),
-					 XMFLOAT2(0.f, 1.f))),
-	hpBarEdge(new Sprite(spriteBase->loadTexture(L"Resources/hpBar.png"),
-						 spriteBase.get(),
-						 XMFLOAT2(0.f, 1.f))),
-	hpBarWidMax(WinAPI::window_width * 0.25f),
 	operInstPosR(WinAPI::window_width * 0.1f)
 {
-	hpBar->color = XMFLOAT4(0, 0.5f, 1, 1);
-	hpBar->position = XMFLOAT3(WinAPI::window_width / 20.f, WinAPI::window_height, 0.f);
-	{
-		XMFLOAT2 size = hpBar->getSize();
-		size.x = hpBarWidMax;
-		size.y = (float)WinAPI::window_height / 32.f;
-		hpBar->setSize(size);
-
-		hpBar->position.y -= size.y;
-	}
-	hpBarEdge->position = hpBar->position;
-	hpBarEdge->setSize(hpBar->getSize());
-
 	// 操作説明
 	constexpr XMFLOAT3 centerPos = XMFLOAT3(WinAPI::window_width / 2.f, WinAPI::window_height * 0.75f, 0.f);
 
@@ -569,6 +548,14 @@ void RailShoot::update_appearPlayer()
 
 	const float raito = (float)nowTime / (float)appearPlayer->appearTime;
 
+	// 体力バー
+	{
+		float barRaito = 1.f - raito;
+		barRaito *= barRaito * barRaito * barRaito;
+		barRaito = 1.f - barRaito;
+		playerHpBarNowRaito = std::lerp(0.f, 1.f, barRaito);
+	}
+
 	const XMFLOAT3 nowPos = lerp(appearPlayer->playerPos.start,
 								 appearPlayer->playerPos.end,
 								 raito);
@@ -665,11 +652,11 @@ void RailShoot::update_play()
 	enemyPopData.remove_if([&](std::unique_ptr<PopEnemyData>& i)
 						   {
 							   const bool ended = nowFrame >= i->popFrame;
-	if (ended)
-	{
-		addEnemy(i->pos, i->vel);
-	}
-	return ended;
+							   if (ended)
+							   {
+								   addEnemy(i->pos, i->vel);
+							   }
+							   return ended;
 						   });
 
 	// --------------------
@@ -797,8 +784,7 @@ void RailShoot::update_play()
 	}
 
 	// 自機の体力バーの大きさを変更
-	hpBar->setSize(XMFLOAT2((float)player->getHp() / (float)playerHpMax * hpBarWidMax,
-							hpBar->getSize().y));
+	playerHpBarNowRaito = (float)player->getHp() / (float)playerHpMax;
 
 	// ライトはカメラの位置にする
 	light->setLightPos(camera->getEye());
@@ -821,11 +807,24 @@ void RailShoot::update_exitPlayer()
 
 	const float raito = (float)nowTime / (float)exitPlayer->exitTime;
 
+	const XMFLOAT3 prePos = player->getPos();
 	player->setPos(lerp(exitPlayer->playerPos.start, exitPlayer->playerPos.end, raito));
 
 	player->setScaleF3(lerp(exitPlayer->playerScale.start, exitPlayer->playerScale.end, raito));
 
 	camera->setTarget(player->calcWorldPos());
+
+	XMFLOAT3 vel = player->getPos();
+	vel.x -= prePos.x;
+	vel.y -= prePos.y;
+	vel.z -= prePos.z;
+
+	const XMFLOAT3 preRot = player->getRotation();
+	XMFLOAT2 rot = GameObj::calcRotationSyncVelDeg(vel);
+
+	player->setRotation(XMFLOAT3(std::lerp(preRot.x, rot.x, raito),
+								 std::lerp(preRot.y, rot.y, raito),
+								 std::lerp(preRot.z, 0.f, raito)));
 }
 
 template<class NextScene>
@@ -892,6 +891,9 @@ void RailShoot::startAppearPlayer()
 		}
 	);
 
+	// 体力バーの大きさ
+	playerHpBarNowRaito = 0.f;
+
 	// カメラ設定
 	initFixedCam(appearPPosStart, appearPPosEnd);
 
@@ -907,6 +909,8 @@ void RailShoot::startAppearPlayer()
 
 void RailShoot::endAppearPlayer()
 {
+	playerHpBarNowRaito = 1.f;
+
 	// 自機を演出終了位置に置く
 	player->setPos(appearPlayer->playerPos.end);
 
@@ -937,7 +941,7 @@ void RailShoot::startExitPlayer()
 	aim2D->isInvisible = true;
 	for (auto& i : operInst)
 	{
-		if (!i.second->isInvisible) { i.second->isInvisible = true; }
+		i.second->isInvisible = true;
 	}
 
 	exitPlayer = std::make_unique<ExitPlayer>(ExitPlayer
@@ -987,8 +991,8 @@ void RailShoot::updateRailPos()
 	XMFLOAT3 pos{};
 	XMStoreFloat3(&pos,
 				  Util::splinePosition(splinePoint,
-								 splineIndex,
-								 raito));
+									   splineIndex,
+									   raito));
 	// 位置を反映
 	railObj->setPos(pos);
 
@@ -1267,6 +1271,18 @@ void RailShoot::drawObj3d()
 
 void RailShoot::drawFrontSprite()
 {
+
+	spriteBase->drawStart(dxBase->getCmdList());
+
+	aim2D->drawWithUpdate(dxBase, spriteBase.get());
+
+	for (auto& i : operInst)
+	{
+		i.second->drawWithUpdate(DX12Base::ins(), spriteBase.get());
+	}
+
+	debugText->DrawAll(dxBase, spriteBase.get());
+
 	// 最初のウインドウの位置を指定
 	constexpr XMFLOAT2 fstWinPos = XMFLOAT2((float)WinAPI::window_width * 0.02f,
 											(float)WinAPI::window_height * 0.02f);
@@ -1282,19 +1298,40 @@ void RailShoot::drawFrontSprite()
 				playerHpMax);
 	ImGui::End();
 
-	spriteBase->drawStart(dxBase->getCmdList());
-
-	hpBarEdge->drawWithUpdate(dxBase, spriteBase.get());
-	hpBar->drawWithUpdate(dxBase, spriteBase.get());
-
-	aim2D->drawWithUpdate(dxBase, spriteBase.get());
-
-	for (auto& i : operInst)
+	// 自機の体力バー
+	if (0.f < playerHpBarNowRaito)
 	{
-		i.second->drawWithUpdate(DX12Base::ins(), spriteBase.get());
-	}
+		// 自機体力
+		constexpr float barHei = (float)WinAPI::window_height / 32.f;
+		constexpr XMFLOAT2 posLT_F2 = XMFLOAT2(WinAPI::window_width / 20.f,
+											   WinAPI::window_height - barHei * 2.f);
 
-	debugText->DrawAll(dxBase, spriteBase.get());
+		// 左上の位置
+		ImVec2 posLT = ImVec2(posLT_F2.x, posLT_F2.y);
+
+		ImGui::SetNextWindowPos(posLT);
+		ImGui::SetNextWindowSize(ImVec2(playerHpBarWidMax, barHei));
+
+		ImGui::Begin("自機体力", nullptr, winFlags);
+		const ImVec2 size = ImGui::GetWindowSize();
+		auto posRB = ImVec2(posLT.x + size.x * playerHpBarNowRaito,
+				   posLT.y + size.y);
+
+		// 余白を少し残す
+		const float shiftValX = playerHpBarWidMax / 40.f;
+		constexpr float shiftValY = barHei / 4.f;
+		posLT.x += shiftValX;
+		posLT.y += shiftValY;
+		posRB.x -= shiftValX;
+		posRB.y -= shiftValY;
+
+		ImGui::GetWindowDrawList()->AddRectFilled(
+			posLT, posRB,
+			ImU32(0xfff8f822)
+		);
+
+		ImGui::End();
+	}
 }
 
 RailShoot::~RailShoot()
