@@ -784,7 +784,9 @@ void RailShoot::update_play()
 	}
 
 	// 自機の体力バーの大きさを変更
-	playerHpBarNowRaito = (float)player->getHp() / (float)playerHpMax;
+	playerHpBarNowRaito = std::lerp(playerHpBarNowRaito,
+									(float)player->getHp() / (float)playerHpMax,
+									0.5f);
 
 	// ライトはカメラの位置にする
 	light->setLightPos(camera->getEye());
