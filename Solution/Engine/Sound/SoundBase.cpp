@@ -1,6 +1,8 @@
 ﻿#include "SoundBase.h"
 #include <cassert>
 
+#pragma comment(lib,"xaudio2.lib")
+
 SoundBase::SoundBase()
 {
 	// XAudioエンジンのインスタンスを生成

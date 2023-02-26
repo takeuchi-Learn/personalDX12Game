@@ -51,4 +51,18 @@ public:
 			std::lerp(s.z, e.z, t)
 		);
 	}
+
+	/// @brief バウンドするような動きのイージング
+	/// @param t 進行度
+	/// @return イージングされた値
+	inline static float easeOutBounce(float t)
+	{
+		constexpr float n1 = 7.5625f;
+		constexpr float d1 = 2.75f;
+
+		if (t < 1.f / d1) { return n1 * t * t; }
+		if (t < 2.f / d1) { return n1 * (t -= 1.5f / d1) * t + 0.75f; }
+		if (t < 2.5f / d1) { return n1 * (t -= 2.25f / d1) * t + 0.9375f; }
+		return n1 * (t -= 2.625f / d1) * t + 0.984375f;
+	}
 };

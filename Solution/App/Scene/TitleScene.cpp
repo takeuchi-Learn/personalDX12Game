@@ -3,22 +3,9 @@
 #include "RailShoot.h"
 #include "System/SceneManager.h"
 #include <DirectXMath.h>
+#include <Util/Util.h>
 
 using namespace DirectX;
-
-namespace
-{
-	inline float easeOutBounce(float t)
-	{
-		constexpr float n1 = 7.5625f;
-		constexpr float d1 = 2.75f;
-
-		if (t < 1.f / d1) { return n1 * t * t; }
-		if (t < 2.f / d1) { return n1 * (t -= 1.5f / d1) * t + 0.75f; }
-		if (t < 2.5f / d1) { return n1 * (t -= 2.25f / d1) * t + 0.9375f; }
-		return n1 * (t -= 2.625f / d1) * t + 0.984375f;
-	}
-}
 
 TitleScene::TitleScene()
 	: timer(std::make_unique<Timer>()),
@@ -117,7 +104,7 @@ void TitleScene::update_end()
 	{
 		titlePos.y = std::lerp(0.f,
 							   (float)WinAPI::window_height,
-							   easeOutBounce(raito));
+							   Util::easeOutBounce(raito));
 	}
 	titleLogo->position.y = titlePos.y;
 	titleOther->position.y = titlePos.y;

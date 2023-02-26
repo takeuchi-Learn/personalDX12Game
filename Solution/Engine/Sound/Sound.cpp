@@ -2,9 +2,6 @@
 
 #include "SoundBase.h"
 
-#pragma comment(lib,"xaudio2.lib")
-
-//#include <sstream>
 #include <fstream>
 #include <cassert>
 
