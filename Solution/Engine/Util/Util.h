@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <DirectXMath.h>
+#include <cmath>
 
  /// @brief 汎用的な機能を入れるユーティリティクラス
 class Util
@@ -34,4 +35,20 @@ public:
 	static DirectX::XMVECTOR splinePosition(const std::vector<DirectX::XMVECTOR>& points,
 											const size_t& startIndex,
 											float t);
+
+	/// @brief 各要素をstd::lerpで線形補間する
+	/// @param s 始点
+	/// @param e 終点
+	/// @param t 進行度
+	/// @return 線形補間されたもの
+	inline static DirectX::XMFLOAT3 lerp(const DirectX::XMFLOAT3& s,
+										 const DirectX::XMFLOAT3& e,
+										 float t)
+	{
+		return DirectX::XMFLOAT3(
+			std::lerp(s.x, e.x, t),
+			std::lerp(s.y, e.y, t),
+			std::lerp(s.z, e.z, t)
+		);
+	}
 };

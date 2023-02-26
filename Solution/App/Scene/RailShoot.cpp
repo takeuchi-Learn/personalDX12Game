@@ -51,13 +51,6 @@ namespace
 		lhs.z -= rhs.z;
 	}
 
-	constexpr XMFLOAT3 lerp(const XMFLOAT3& r, const XMFLOAT3& l, float t)
-	{
-		return XMFLOAT3(std::lerp(r.x, l.x, t),
-						std::lerp(r.y, l.y, t),
-						std::lerp(r.z, l.z, t));
-	}
-
 	constexpr XMFLOAT3 killEffCol = XMFLOAT3(1.f, 0.25f, 0.25f);
 	constexpr XMFLOAT3 noKillEffCol = XMFLOAT3(0.25f, 1.f, 1.f);
 }
@@ -524,7 +517,7 @@ void RailShoot::update_appearPlayer()
 		playerHpBarNowRaito = std::lerp(0.f, 1.f, barRaito);
 	}
 
-	const XMFLOAT3 nowPos = lerp(appearPlayer->playerPos.start,
+	const XMFLOAT3 nowPos = Util::lerp(appearPlayer->playerPos.start,
 								 appearPlayer->playerPos.end,
 								 raito);
 
@@ -532,9 +525,9 @@ void RailShoot::update_appearPlayer()
 
 	camera->setTarget(player->calcWorldPos());
 
-	player->setScaleF3(lerp(appearPlayer->playerScale.start,
-							appearPlayer->playerScale.end,
-							raito));
+	player->setScaleF3(Util::lerp(appearPlayer->playerScale.start,
+								  appearPlayer->playerScale.end,
+								  raito));
 
 	// 1->0->1と進む
 	const float fogRaito = 2.f * (std::max(raito, 0.5f) - std::min(raito, 0.5f));
@@ -778,9 +771,9 @@ void RailShoot::update_exitPlayer()
 	const float raito = (float)nowTime / (float)exitPlayer->exitTime;
 
 	const XMFLOAT3 prePos = player->getPos();
-	player->setPos(lerp(exitPlayer->playerPos.start, exitPlayer->playerPos.end, raito));
+	player->setPos(Util::lerp(exitPlayer->playerPos.start, exitPlayer->playerPos.end, raito));
 
-	player->setScaleF3(lerp(exitPlayer->playerScale.start, exitPlayer->playerScale.end, raito));
+	player->setScaleF3(Util::lerp(exitPlayer->playerScale.start, exitPlayer->playerScale.end, raito));
 
 	camera->setTarget(player->calcWorldPos());
 
@@ -829,7 +822,7 @@ void RailShoot::update_end()
 void RailShoot::initFixedCam(const XMFLOAT3& startPos,
 							 const XMFLOAT3& endPos)
 {
-	XMFLOAT3 eye = lerp(startPos, endPos, 0.5f);
+	XMFLOAT3 eye = Util::lerp(startPos, endPos, 0.5f);
 	eye.x += player->getScaleF3().x * 1.5f;
 	camera->setEye(eye);
 	camera->setParentObj(nullptr);

@@ -18,15 +18,6 @@ using namespace DirectX;
 
 namespace
 {
-	inline XMFLOAT3 lerp(const XMFLOAT3& s, const XMFLOAT3& e, float t)
-	{
-		return XMFLOAT3(
-			std::lerp(s.x, e.x, t),
-			std::lerp(s.y, e.y, t),
-			std::lerp(s.z, e.z, t)
-		);
-	}
-
 	constexpr XMFLOAT3 killEffCol = XMFLOAT3(1.f, 0.25f, 0.25f);
 	constexpr XMFLOAT3 noKillEffCol = XMFLOAT3(0.25f, 1.f, 1.f);
 }
@@ -289,8 +280,8 @@ void BossScene::update_start()
 
 	const float raito = (float)timer->getNowTime() / (float)sceneChangeTime;
 
-	playerParent->setPos(lerp(sceneChangeStartPos, sceneChangeEndPos, raito));
-	playerParent->setRotation(lerp(sceneChangeStartRota, sceneChangeEndRota, raito));
+	playerParent->setPos(Util::lerp(sceneChangeStartPos, sceneChangeEndPos, raito));
+	playerParent->setRotation(Util::lerp(sceneChangeStartRota, sceneChangeEndRota, raito));
 
 	const float camLen = std::lerp(sceneChangeStartCamLen, sceneChangeEndCamLen, raito);
 	camera->setEye2TargetLen(camLen);
