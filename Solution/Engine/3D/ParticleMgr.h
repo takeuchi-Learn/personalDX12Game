@@ -94,6 +94,15 @@ private:
 
 	static const int vertexCount = 0x10000;
 
+public:
+	static void createParticle(ParticleMgr* particleMgr,
+							   const XMFLOAT3& pos,
+							   const uint16_t particleNum = 10U,
+							   const float startScale = 1.f,
+							   const float vel = 5.f,
+							   const XMFLOAT3& startCol = { 1.f, 1.f, 0.25f },
+							   const XMFLOAT3& endCol = { 1.f, 0.f, 1.f });
+
 	// メンバ変数
 private:
 	// デスクリプタサイズ

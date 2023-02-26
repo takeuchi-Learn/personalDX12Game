@@ -26,6 +26,9 @@ namespace
 			std::lerp(s.z, e.z, t)
 		);
 	}
+
+	constexpr XMFLOAT3 killEffCol = XMFLOAT3(1.f, 0.25f, 0.25f);
+	constexpr XMFLOAT3 noKillEffCol = XMFLOAT3(0.25f, 1.f, 1.f);
 }
 
 #pragma region 初期化
@@ -433,12 +436,12 @@ void BossScene::update_play()
 					{
 						i->setDrawFlag(false);
 						// 赤エフェクトを出す
-						createParticle(i->calcWorldPos(), 128U, 16.f, 16.f, XMFLOAT3(1.f, 0.25f, 0.25f));
+						ParticleMgr::createParticle(particleMgr.get(), i->calcWorldPos(), 128U, 16.f, 16.f, killEffCol);
 						Sound::SoundPlayWave(killSe.get(), 0, 0.2f);
 					} else
 					{
 						// シアンエフェクトを出す
-						createParticle(i->calcWorldPos(), 96U, 12.f, 12.f, XMFLOAT3(0.25f, 1.f, 1.f));
+						ParticleMgr::createParticle(particleMgr.get(), i->calcWorldPos(), 96U, 12.f, 12.f, noKillEffCol);
 						Sound::SoundPlayWave(bossDamageSe.get(), 0, 0.2f);
 					}
 				}
@@ -503,7 +506,7 @@ void BossScene::update_play()
 					pb.kill();
 
 					// エフェクトを出す
-					createParticle(e->calcWorldPos(), 16U, 8.f, 4.f, XMFLOAT3(1.f, 0.25f, 0.25f));
+					ParticleMgr::createParticle(particleMgr.get(), e->calcWorldPos(), 16U, 8.f, 4.f, killEffCol);
 
 					Sound::SoundPlayWave(killSe.get(), 0, 0.2f);
 				}
@@ -559,7 +562,7 @@ void BossScene::update_killBoss()
 	}
 
 	// パーティクルを毎フレーム出す
-	createParticle(boss->calcWorldPos(), 32U, 16.f, 16.f);
+	ParticleMgr::createParticle(particleMgr.get(), boss->calcWorldPos(), 32U, 16.f, 16.f);
 }
 
 template<class NextScene>
@@ -701,42 +704,6 @@ void BossScene::drawObj3d()
 	}
 
 	particleMgr->drawWithUpdate();
-}
-
-void BossScene::createParticle(const DirectX::XMFLOAT3& pos,
-							   const uint16_t particleNum,
-							   const float startScale,
-							   const float vel,
-							   const DirectX::XMFLOAT3& startCol,
-							   const DirectX::XMFLOAT3& endCol)
-{
-	for (uint16_t i = 0U; i < particleNum; ++i)
-	{
-		const float theata = RandomNum::getRandf(0.f, XM_PI);
-		const float phi = RandomNum::getRandf(0.f, XM_PI * 2.f);
-		const float r = RandomNum::getRandf(0.f, vel);
-
-		const XMFLOAT3 vel{
-			r * dxBase->nearSin(theata) * dxBase->nearCos(phi),
-			r * dxBase->nearCos(theata),
-			r * dxBase->nearSin(theata) * dxBase->nearSin(phi)
-		};
-
-		constexpr float accNum = 10.f;
-		const XMFLOAT3 acc = XMFLOAT3(vel.x / accNum,
-									  vel.y / accNum,
-									  vel.z / accNum);
-
-		constexpr Timer::timeType life = Timer::oneSec / Timer::timeType(4);
-		constexpr float endScale = 0.f;
-		constexpr float startRota = 0.f, endRota = 0.f;
-
-		// 追加
-		particleMgr->add(life, pos, vel, acc,
-						 startScale, endScale,
-						 startRota, endRota,
-						 startCol, endCol);
-	}
 }
 
 void BossScene::startRgbShift()

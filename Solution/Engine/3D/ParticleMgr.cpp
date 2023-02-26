@@ -2,6 +2,8 @@
 
 #include "System/PostEffect.h"
 
+#include <Util/RandomNum.h>
+
 #include <d3dcompiler.h>
 #include <DirectXTex.h>
 
@@ -80,6 +82,43 @@ void ParticleMgr::init(const wchar_t* texFilePath)
 		nullptr,
 		IID_PPV_ARGS(&constBuff));
 	assert(SUCCEEDED(result));
+}
+
+void ParticleMgr::createParticle(ParticleMgr* particleMgr,
+								 const XMFLOAT3& pos,
+								 const uint16_t particleNum,
+								 const float startScale,
+								 const float vel,
+								 const XMFLOAT3& startCol,
+								 const XMFLOAT3& endCol)
+{
+	for (uint16_t i = 0U; i < particleNum; ++i)
+	{
+		const float theata = RandomNum::getRandf(0.f, XM_PI);
+		const float phi = RandomNum::getRandf(0.f, XM_PI * 2.f);
+		const float r = RandomNum::getRandf(0.f, vel);
+
+		const XMFLOAT3 vel{
+			r * dxBase->nearSin(theata) * dxBase->nearCos(phi),
+			r * dxBase->nearCos(theata),
+			r * dxBase->nearSin(theata) * dxBase->nearSin(phi)
+		};
+
+		constexpr float accNum = 10.f;
+		const XMFLOAT3 acc = XMFLOAT3(vel.x / accNum,
+									  vel.y / accNum,
+									  vel.z / accNum);
+
+		constexpr Timer::timeType life = Timer::oneSec / Timer::timeType(4);
+		constexpr float endScale = 0.f;
+		constexpr float startRota = 0.f, endRota = 0.f;
+
+		// 追加
+		particleMgr->add(life, pos, vel, acc,
+						 startScale, endScale,
+						 startRota, endRota,
+						 startCol, endCol);
+	}
 }
 
 ParticleMgr::ParticleMgr() :

@@ -152,11 +152,6 @@ class RailShoot
 	std::forward_list<std::unique_ptr<PopEnemyData>> enemyPopData;
 	uint16_t nowFrame = 0u;
 
-	void createParticle(const DirectX::XMFLOAT3& pos,
-						const uint16_t particleNum = 10U,
-						const float startScale = 1.f,
-						const float vel = 5.f);
-
 	void startRgbShift();
 	void updateRgbShift();
 

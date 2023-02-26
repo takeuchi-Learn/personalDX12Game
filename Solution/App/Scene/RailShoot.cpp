@@ -57,6 +57,9 @@ namespace
 						std::lerp(r.y, l.y, t),
 						std::lerp(r.z, l.z, t));
 	}
+
+	constexpr XMFLOAT3 killEffCol = XMFLOAT3(1.f, 0.25f, 0.25f);
+	constexpr XMFLOAT3 noKillEffCol = XMFLOAT3(0.25f, 1.f, 1.f);
 }
 
 void RailShoot::loadEnemyScript()
@@ -408,41 +411,6 @@ void RailShoot::update()
 	camera->update();
 }
 
-void RailShoot::createParticle(const DirectX::XMFLOAT3& pos,
-							   const uint16_t particleNum,
-							   const float startScale,
-							   const float vel)
-{
-	for (uint16_t i = 0U; i < particleNum; ++i)
-	{
-		const float theata = RandomNum::getRandf(0.f, XM_PI);
-		const float phi = RandomNum::getRandf(0.f, XM_PI * 2.f);
-		const float r = RandomNum::getRandf(0.f, vel);
-
-		const XMFLOAT3 vel{
-			r * dxBase->nearSin(theata) * dxBase->nearCos(phi),
-			r * dxBase->nearCos(theata),
-			r * dxBase->nearSin(theata) * dxBase->nearSin(phi)
-		};
-
-		constexpr float accNum = 10.f;
-		const XMFLOAT3 acc = XMFLOAT3(vel.x / accNum,
-									  vel.y / accNum,
-									  vel.z / accNum);
-
-		constexpr XMFLOAT3 startCol = XMFLOAT3(1, 1, 0.25f), endCol = XMFLOAT3(1, 0, 1);
-		constexpr Timer::timeType life = Timer::oneSec / 4;
-		constexpr float endScale = 0.f;
-		constexpr float startRota = 0.f, endRota = 0.f;
-
-		// 追加
-		particleMgr->add(life, pos, vel, acc,
-						 startScale, endScale,
-						 startRota, endRota,
-						 startCol, endCol);
-	}
-}
-
 void RailShoot::startRgbShift()
 {
 	rgbShiftFlag = true;
@@ -709,7 +677,7 @@ void RailShoot::update_play()
 				{
 					// パーティクルを生成
 					XMFLOAT3 pos = e->calcWorldPos();
-					createParticle(pos, 98U, 32.f, 16.f);
+					ParticleMgr::createParticle(particleMgr.get(), pos, 98U, 32.f, 16.f, killEffCol);
 					// 敵も自機弾もさよなら
 					pb.kill();
 					e->damage(1u, true);
