@@ -290,6 +290,7 @@ void BossScene::update_start()
 	float barRaito = 1.f - raito;
 	barRaito *= barRaito * barRaito * barRaito;
 	playerHpBarNowRaito = 1.f - barRaito;
+	playerFrontHpBarNowRaito = playerHpBarNowRaito;
 }
 
 void BossScene::update_appearBoss()
@@ -529,8 +530,8 @@ void BossScene::update_play()
 
 	// 自機の体力バーの大きさを変更
 	float oldLen = playerHpBarNowRaito;
-	float nowLen = (float)player->getHp() / (float)playerHpMax;
-	playerHpBarNowRaito = std::lerp(oldLen, nowLen, 0.5f);
+	playerFrontHpBarNowRaito = (float)player->getHp() / (float)playerHpMax;
+	playerHpBarNowRaito = std::lerp(oldLen, playerFrontHpBarNowRaito, 0.125f);
 }
 
 void BossScene::update_killBoss()
@@ -1009,6 +1010,12 @@ void BossScene::drawFrontSprite()
 
 		ImGui::GetWindowDrawList()->AddRectFilled(
 			posLT, posRB,
+			ImU32(0xff0000ff)
+		);
+
+		ImGui::GetWindowDrawList()->AddRectFilled(
+			posLT, ImVec2(posLT.x + size.x * playerFrontHpBarNowRaito - shiftValX * 2.f,
+						  posLT.y + size.y - shiftValY * 2.f),
 			ImU32(0xfff8f822)
 		);
 

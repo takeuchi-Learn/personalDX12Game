@@ -96,6 +96,7 @@ private:
 
 	const float playerHpBarWidMax;
 	float playerHpBarNowRaito = 0.f;
+	float playerFrontHpBarNowRaito = 0.f;
 
 #pragma endregion スプライト
 
