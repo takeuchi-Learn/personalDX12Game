@@ -1010,7 +1010,7 @@ void BossScene::drawFrontSprite()
 
 		ImGui::GetWindowDrawList()->AddRectFilled(
 			posLT, posRB,
-			ImU32(0xff0000ff)
+			ImU32(0xf82222f8)
 		);
 
 		ImGui::GetWindowDrawList()->AddRectFilled(
