@@ -52,6 +52,7 @@ class RailShoot
 
 	static constexpr inline float playerHpBarWidMax = (float)WinAPI::window_width / 4.f;
 	float playerHpBarNowRaito = 0.f;
+	float playerFrontHpBarNowRaito = 0.f;
 
 #pragma endregion
 

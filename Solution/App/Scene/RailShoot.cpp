@@ -515,6 +515,7 @@ void RailShoot::update_appearPlayer()
 		barRaito *= barRaito * barRaito * barRaito;
 		barRaito = 1.f - barRaito;
 		playerHpBarNowRaito = std::lerp(0.f, 1.f, barRaito);
+		playerFrontHpBarNowRaito = playerHpBarNowRaito;
 	}
 
 	const XMFLOAT3 nowPos = Util::lerp(appearPlayer->playerPos.start,
@@ -745,9 +746,10 @@ void RailShoot::update_play()
 	}
 
 	// 自機の体力バーの大きさを変更
+	playerFrontHpBarNowRaito = (float)player->getHp() / (float)playerHpMax;
 	playerHpBarNowRaito = std::lerp(playerHpBarNowRaito,
-									(float)player->getHp() / (float)playerHpMax,
-									0.5f);
+									playerFrontHpBarNowRaito,
+									0.125f);
 
 	// ライトはカメラの位置にする
 	light->setLightPos(camera->getEye());
@@ -856,6 +858,7 @@ void RailShoot::startAppearPlayer()
 
 	// 体力バーの大きさ
 	playerHpBarNowRaito = 0.f;
+	playerFrontHpBarNowRaito = 0.f;
 
 	// カメラ設定
 	initFixedCam(appearPPosStart, appearPPosEnd);
@@ -873,6 +876,7 @@ void RailShoot::startAppearPlayer()
 void RailShoot::endAppearPlayer()
 {
 	playerHpBarNowRaito = 1.f;
+	playerFrontHpBarNowRaito = 1.f;
 
 	// 自機を演出終了位置に置く
 	player->setPos(appearPlayer->playerPos.end);
@@ -1271,8 +1275,9 @@ void RailShoot::drawFrontSprite()
 
 		// 左上の位置
 		ImVec2 posLT = ImVec2(posLT_F2.x, posLT_F2.y);
+		const ImVec2 winPosLT = posLT;
 
-		ImGui::SetNextWindowPos(posLT);
+		ImGui::SetNextWindowPos(winPosLT);
 		ImGui::SetNextWindowSize(ImVec2(playerHpBarWidMax, barHei));
 
 		ImGui::Begin("自機体力", nullptr, winFlags);
@@ -1290,6 +1295,12 @@ void RailShoot::drawFrontSprite()
 
 		ImGui::GetWindowDrawList()->AddRectFilled(
 			posLT, posRB,
+			ImU32(0xff0000ff)
+		);
+
+		ImGui::GetWindowDrawList()->AddRectFilled(
+			posLT, ImVec2(posLT.x + size.x * playerFrontHpBarNowRaito - shiftValX * 2.f,
+						  posLT.y + size.y - shiftValY * 2.f),
 			ImU32(0xfff8f822)
 		);
 
