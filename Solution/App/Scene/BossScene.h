@@ -94,7 +94,7 @@ private:
 
 	std::unique_ptr<Sprite> aim2D;
 
-	const float playerHpBarWidMax;
+	inline static constexpr float playerHpBarWidMax = WinAPI::window_width * 0.25f;
 	float playerHpBarNowRaito = 0.f;
 	float playerFrontHpBarNowRaito = 0.f;
 

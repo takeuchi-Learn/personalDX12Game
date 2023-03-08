@@ -18,6 +18,11 @@ using namespace DirectX;
 
 namespace
 {
+	inline ImVec2 f2ToIV2(const XMFLOAT2& f2)
+	{
+		return ImVec2(f2.x, f2.y);
+	}
+
 	constexpr XMFLOAT3 killEffCol = XMFLOAT3(1.f, 0.25f, 0.25f);
 	constexpr XMFLOAT3 noKillEffCol = XMFLOAT3(0.25f, 1.f, 1.f);
 }
@@ -31,8 +36,7 @@ BossScene::BossScene() :
 	camera(std::make_unique<CameraObj>(nullptr)),
 	light(std::make_unique<Light>()),
 	update_proc(std::bind(&BossScene::update_start, this)),
-	particleMgr(std::make_unique<ParticleMgr>(L"Resources/effect1.png", camera.get())),
-	playerHpBarWidMax(WinAPI::window_width * 0.25f)
+	particleMgr(std::make_unique<ParticleMgr>(L"Resources/effect1.png", camera.get()))
 {
 #pragma region 音
 
@@ -67,9 +71,6 @@ void BossScene::initSprite()
 
 void BossScene::initGameObj()
 {
-	bossModel = std::make_unique<ObjModel>("Resources/tori", "tori");
-	boss = std::make_unique<BossEnemy>(camera.get(), bossModel.get());
-
 	initPlayer();
 
 	initEnemy();
@@ -115,7 +116,10 @@ void BossScene::initEnemy()
 
 void BossScene::initBoss()
 {
-	constexpr float bossScale = 100.f;
+	constexpr float bossScale = 1.f;
+
+	bossModel = std::make_unique<ObjModel>("Resources/tori", "tori");
+	boss = std::make_unique<BossEnemy>(camera.get(), nullptr);
 
 	boss->setScale(bossScale);
 	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 300));
@@ -129,58 +133,69 @@ void BossScene::initBoss()
 	bossPartsModel = std::make_unique<ObjModel>("Resources/koshi", "koshi", 0U, false);
 
 	// パーツの位置をファイルから読み込む
-	std::vector<DirectX::XMFLOAT3> bossPartsData;
-	const auto bpdCsv = Util::loadCsv("Resources/bossPartsData.csv");
-	for (auto& y : bpdCsv)
 	{
-		// 空行を飛ばす
-		if (y.empty()) { continue; }
-
-		// 列数
-		const auto size = y.size();
-
-		XMFLOAT3 pos{};
-		if (size >= 1u)
+		struct BossPartsData
 		{
-			pos.x = std::stof(y[0]);
+			XMFLOAT3 pos;
+			float scale;
+		};
+		std::forward_list<BossPartsData> bossPartsData;
+		const auto bpdCsv = Util::loadCsv("Resources/bossPartsData.csv");
+		for (auto& y : bpdCsv)
+		{
+			// 空行を飛ばす
+			if (y.empty()) { continue; }
 
-			if (size >= 2u)
+			// 列数
+			const auto size = y.size();
+
+			XMFLOAT3 pos{};
+			float scale = 1.f;
+			if (size >= 1u)
 			{
-				pos.y = std::stof(y[1]);
+				pos.x = std::stof(y[0]);
 
-				if (size >= 3u)
+				if (size >= 2u)
 				{
-					pos.z = std::stof(y[2]);
+					pos.y = std::stof(y[1]);
+
+					if (size >= 3u)
+					{
+						pos.z = std::stof(y[2]);
+
+						if (size >= 4u)
+						{
+							scale = std::stof(y[3]);
+						}
+					}
 				}
 			}
+
+			bossPartsData.emplace_front(BossPartsData{ .pos = pos, .scale = scale });
 		}
 
-		bossPartsData.emplace_back(pos);
-	}
+		// 全要素の設定
+		for (auto& bpd : bossPartsData)
+		{
+			auto& i = bossParts.emplace_back(std::make_shared<BaseEnemy>(camera.get(), bossPartsModel.get()));
 
-	// 全要素の設定
-	bossParts.reserve(bossPartsData.size());
-	for (auto& bpd : bossPartsData)
-	{
-		auto& i = bossParts.emplace_back(std::make_shared<BaseEnemy>(camera.get(), bossPartsModel.get()));
+			// 位置を設定
+			i->setPos(bpd.pos);
 
-		// 位置を設定
-		i->setPos(bpd);
+			// ボス本体を親とする
+			i->setParent(boss->getObj());
 
-		// ボス本体を親とする
-		i->setParent(boss->getObj());
+			// 大きさを変更
+			i->setScale(bpd.scale);
 
-		// 大きさを変更
-		constexpr float bossPartsScale = 10.f / bossScale;
-		i->setScale(bossPartsScale);
+			// 体力を設定
+			constexpr uint16_t hp = 10ui16;
+			i->setHp(hp);
+			bossHpMax += hp;
 
-		// 体力を設定
-		constexpr uint16_t hp = 10ui16;
-		i->setHp(hp);
-		bossHpMax += hp;
-
-		// 攻撃可能な敵リストに追加
-		attackableEnemy.emplace_front(i);
+			// 攻撃可能な敵リストに追加
+			attackableEnemy.emplace_front(i);
+		}
 	}
 }
 
@@ -602,11 +617,11 @@ void BossScene::startAppearBoss()
 	appearBossData =
 		std::make_unique<AppearBossData>(
 			AppearBossData{
-				.appearBossTime = static_cast<float>(Timer::oneSec * 5),
+				.appearBossTime = static_cast<float>(Timer::oneSec) * 5.f,
 				.startCamLen = camParam->eye2TargetLen,
 				.endCamLen = camParam->eye2TargetLen * 4.f,
 				.startBossHpGrScale = 0.f,
-				.endBossHpGrScale = boss->getScaleF3().x,
+				.endBossHpGrScale = 100.f,
 				.startCamAngle = angle,
 				.endCamAngle = angle + 360.f,
 			}
@@ -996,37 +1011,39 @@ void BossScene::drawFrontSprite()
 	if (0.f < playerHpBarNowRaito)
 	{
 		// 自機体力
-		constexpr float barHei = (float)WinAPI::window_height / 32.f;
-		constexpr XMFLOAT2 posLT_F2 = XMFLOAT2(WinAPI::window_width / 20.f,
-											   WinAPI::window_height - barHei * 2.f);
+		constexpr XMFLOAT2 hpWinSize = XMFLOAT2(playerHpBarWidMax, (float)WinAPI::window_height / 32.f);
+		constexpr XMFLOAT2 hpWinPosLT = XMFLOAT2(WinAPI::window_width / 20.f,
+												 WinAPI::window_height - hpWinSize.y * 2.f);
 
-		// 左上の位置
-		ImVec2 posLT = ImVec2(posLT_F2.x, posLT_F2.y);
+		// 縁の大きさ
+		constexpr XMFLOAT2 shiftVal = XMFLOAT2(hpWinSize.x / 40.f, hpWinSize.y / 4.f);
 
-		ImGui::SetNextWindowPos(posLT);
-		ImGui::SetNextWindowSize(ImVec2(playerHpBarWidMax, barHei));
+		// 余白を少し残す
+		constexpr auto posLT = XMFLOAT2(hpWinPosLT.x + shiftVal.x,
+										hpWinPosLT.y + shiftVal.y);
+
+		// ウインドウの位置と大きさを指定
+		ImGui::SetNextWindowPos(f2ToIV2(hpWinPosLT));
+		ImGui::SetNextWindowSize(f2ToIV2(hpWinSize));
 
 		ImGui::Begin("自機体力", nullptr, winFlags);
 		const ImVec2 size = ImGui::GetWindowSize();
-		auto posRB = ImVec2(posLT.x + size.x * playerHpBarNowRaito,
-				   posLT.y + size.y);
 
-		// 余白を少し残す
-		const float shiftValX = playerHpBarWidMax / 40.f;
-		constexpr float shiftValY = barHei / 4.f;
-		posLT.x += shiftValX;
-		posLT.y += shiftValY;
-		posRB.x -= shiftValX;
-		posRB.y -= shiftValY;
+		// ウインドウ内のバーの大きさ
+		const ImVec2 barSize = ImVec2(size.x - shiftVal.x * 2.f,
+									  size.y - shiftVal.y * 2.f);
 
 		ImGui::GetWindowDrawList()->AddRectFilled(
-			posLT, posRB,
-			ImU32(0xf82222f8)
+			f2ToIV2(posLT),
+			ImVec2(posLT.x + barSize.x * playerHpBarNowRaito,
+				   posLT.y + barSize.y),
+			ImU32(0xff2222f8)
 		);
 
 		ImGui::GetWindowDrawList()->AddRectFilled(
-			posLT, ImVec2(posLT.x + size.x * playerFrontHpBarNowRaito - shiftValX * 2.f,
-						  posLT.y + size.y - shiftValY * 2.f),
+			f2ToIV2(posLT),
+			ImVec2(posLT.x + barSize.x * playerFrontHpBarNowRaito,
+				   posLT.y + barSize.y),
 			ImU32(0xfff8f822)
 		);
 

@@ -10,7 +10,7 @@ NODE_RESULT BossBehavior::phase_approach()
 	const XMVECTOR velVec = boss->calcVelVec(boss);
 
 	// 一定距離近づけば次の行動へ
-	if (XMVectorGetX(XMVector3Length(velVec)) < boss->getScale())
+	if (XMVectorGetX(XMVector3Length(velVec)) < 100.f)
 	{
 		// 弾を一つ撃って次の行動へ進む
 		boss->addSmallEnemyHoming(fanShotData.bulCol);
@@ -28,7 +28,7 @@ NODE_RESULT BossBehavior::phase_leave()
 	const XMVECTOR velVec = boss->calcVelVec(boss);
 
 	// 一定距離離れたら次の行動へ
-	if (XMVectorGetX(XMVector3Length(velVec)) > boss->getScaleF3().z * 5.f)
+	if (XMVectorGetX(XMVector3Length(velVec)) > 500.f)
 	{
 		return NODE_RESULT::SUCCESS;
 	}

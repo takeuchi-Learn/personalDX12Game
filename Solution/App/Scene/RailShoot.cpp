@@ -24,6 +24,11 @@ using namespace DirectX;
 
 namespace
 {
+	inline ImVec2 f2ToIV2(const XMFLOAT2& f2)
+	{
+		return ImVec2(f2.x, f2.y);
+	}
+
 	inline XMFLOAT3 operator+(const XMFLOAT3& r, const XMFLOAT3& l)
 	{
 		return XMFLOAT3(r.x + l.x,
@@ -1238,7 +1243,6 @@ void RailShoot::drawObj3d()
 
 void RailShoot::drawFrontSprite()
 {
-
 	spriteBase->drawStart(dxBase->getCmdList());
 
 	aim2D->drawWithUpdate(dxBase, spriteBase.get());
@@ -1251,10 +1255,8 @@ void RailShoot::drawFrontSprite()
 	debugText->DrawAll(dxBase, spriteBase.get());
 
 	// 最初のウインドウの位置を指定
-	constexpr XMFLOAT2 fstWinPos = XMFLOAT2((float)WinAPI::window_width * 0.02f,
-											(float)WinAPI::window_height * 0.02f);
-	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x,
-								   fstWinPos.y));
+	constexpr XMFLOAT2 fstWinPos = XMFLOAT2((float)WinAPI::window_width / 50.f, (float)WinAPI::window_height / 50.f);
+	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x, fstWinPos.y));
 	ImGui::SetNextWindowSize(ImVec2(256.f, 128.f));
 
 	ImGui::Begin("レールシューティング", nullptr, DX12Base::imGuiWinFlagsDef);
@@ -1269,38 +1271,39 @@ void RailShoot::drawFrontSprite()
 	if (0.f < playerHpBarNowRaito)
 	{
 		// 自機体力
-		constexpr float barHei = (float)WinAPI::window_height / 32.f;
-		constexpr XMFLOAT2 posLT_F2 = XMFLOAT2(WinAPI::window_width / 20.f,
-											   WinAPI::window_height - barHei * 2.f);
+		constexpr XMFLOAT2 hpWinSize = XMFLOAT2(playerHpBarWidMax, (float)WinAPI::window_height / 32.f);
+		constexpr XMFLOAT2 hpWinPosLT = XMFLOAT2(WinAPI::window_width / 20.f,
+												 WinAPI::window_height - hpWinSize.y * 2.f);
 
-		// 左上の位置
-		ImVec2 posLT = ImVec2(posLT_F2.x, posLT_F2.y);
-		const ImVec2 winPosLT = posLT;
+		// 縁の大きさ
+		constexpr XMFLOAT2 shiftVal = XMFLOAT2(hpWinSize.x / 40.f, hpWinSize.y / 4.f);
 
-		ImGui::SetNextWindowPos(winPosLT);
-		ImGui::SetNextWindowSize(ImVec2(playerHpBarWidMax, barHei));
+		// 余白を少し残す
+		constexpr auto posLT = XMFLOAT2(hpWinPosLT.x + shiftVal.x,
+										hpWinPosLT.y + shiftVal.y);
+
+		// ウインドウの位置と大きさを指定
+		ImGui::SetNextWindowPos(f2ToIV2(hpWinPosLT));
+		ImGui::SetNextWindowSize(f2ToIV2(hpWinSize));
 
 		ImGui::Begin("自機体力", nullptr, winFlags);
 		const ImVec2 size = ImGui::GetWindowSize();
-		auto posRB = ImVec2(posLT.x + size.x * playerHpBarNowRaito,
-				   posLT.y + size.y);
 
-		// 余白を少し残す
-		const float shiftValX = playerHpBarWidMax / 40.f;
-		constexpr float shiftValY = barHei / 4.f;
-		posLT.x += shiftValX;
-		posLT.y += shiftValY;
-		posRB.x -= shiftValX;
-		posRB.y -= shiftValY;
+		// ウインドウ内のバーの大きさ
+		const ImVec2 barSize = ImVec2(size.x - shiftVal.x * 2.f,
+									  size.y - shiftVal.y * 2.f);
 
 		ImGui::GetWindowDrawList()->AddRectFilled(
-			posLT, posRB,
-			ImU32(0xf82222f8)
+			f2ToIV2(posLT),
+			ImVec2(posLT.x + barSize.x * playerHpBarNowRaito,
+				   posLT.y + barSize.y),
+			ImU32(0xff2222f8)
 		);
 
 		ImGui::GetWindowDrawList()->AddRectFilled(
-			posLT, ImVec2(posLT.x + size.x * playerFrontHpBarNowRaito - shiftValX * 2.f,
-						  posLT.y + size.y - shiftValY * 2.f),
+			f2ToIV2(posLT),
+			ImVec2(posLT.x + barSize.x * playerFrontHpBarNowRaito,
+				   posLT.y + barSize.y),
 			ImU32(0xfff8f822)
 		);
 
