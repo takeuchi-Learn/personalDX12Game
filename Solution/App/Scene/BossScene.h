@@ -111,9 +111,9 @@ private:
 		ImGuiWindowFlags_::ImGuiWindowFlags_NoSavedSettings |
 		// 移動不可
 		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove;
-	//// スクロールバーを常に表示
-	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysHorizontalScrollbar |
-	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar;
+	//	// スクロールバーを常に表示
+	//	ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysHorizontalScrollbar |
+	//	ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar;
 
 	// 最初のウインドウの位置を指定
 	static constexpr DirectX::XMFLOAT2 fstWinPos =

@@ -41,14 +41,26 @@ private:
 
 #pragma endregion 弾発射関係
 
+#pragma region 回転フェーズ
+
+	struct RotationPhaseData
+	{
+		uint32_t countMax = 60;
+		DirectX::XMFLOAT3 rotaMax = DirectX::XMFLOAT3(0, 360, 0);
+	};
+	RotationPhaseData rotationPhaseData{};
+	uint32_t rotaPhaseNowCount = 0;
+
+#pragma endregion 回転フェーズ
+
+
 private:
 	// ---------------
 	// priavteメンバ関数
 	// ---------------
 
-	NODE_RESULT phase_approach();
-	NODE_RESULT phase_leave();
-	NODE_RESULT phase_attack();
+	NODE_RESULT phase_Rotation();
+	NODE_RESULT phase_fanShapeAttack();
 
 public:
 	BossBehavior(BossEnemy* boss);
