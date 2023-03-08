@@ -85,7 +85,9 @@ NODE_RESULT BossBehavior::phase_attack()
 		// 弾の射出方向
 		const XMVECTOR direction = XMVector3Rotate(directionVec,
 												   XMQuaternionRotationRollPitchYaw(0.f,
-																					std::lerp(angle.x, angle.y, raito),
+																					std::lerp(angle.x,
+																							  angle.y,
+																							  raito),
 																					0.f));
 
 		// 指定方向に弾を発射

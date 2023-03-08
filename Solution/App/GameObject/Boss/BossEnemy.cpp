@@ -16,7 +16,7 @@ DirectX::XMVECTOR BossEnemy::calcVelVec(GameObj* me, bool moveYFlag)
 	return velVec;
 }
 
-void BossEnemy::move(float moveSpeed, const DirectX::XMVECTOR& velVec)
+void BossEnemy::move(float moveSpeed, const DirectX::XMVECTOR& velVec, DirectX::XMFLOAT3* velBuf)
 {
 	// 大きさを反映した速度をXMFLOAT3に変換
 	XMFLOAT3 vel{};
@@ -24,16 +24,23 @@ void BossEnemy::move(float moveSpeed, const DirectX::XMVECTOR& velVec)
 
 	// 移動
 	setVel(vel);
+
+	if (velBuf)
+	{
+		*velBuf = vel;
+	}
 }
 
-void BossEnemy::moveAndRota(float moveSpeed, const DirectX::XMVECTOR& velVec)
+void BossEnemy::moveAndRota(float moveSpeed, const DirectX::XMVECTOR& velVec, DirectX::XMFLOAT3* velBuf)
 {
-	// 大きさを反映した速度をXMFLOAT3に変換
+	// 大きさを反映した速度
 	XMFLOAT3 vel{};
-	XMStoreFloat3(&vel, XMVector3Normalize(velVec) * moveSpeed);
+	move(moveSpeed, velVec, &vel);
 
-	// 移動
-	setVel(vel);
+	if (velBuf)
+	{
+		*velBuf = vel;
+	}
 
 	// 速度に合わせて回転
 	const XMFLOAT2 rotaDeg = GameObj::calcRotationSyncVelDeg(vel);
@@ -91,15 +98,15 @@ void BossEnemy::addSmallEnemyHoming(const DirectX::XMFLOAT4& color)
 		[&]
 		{
 			XMVECTOR velVec = calcVelVec(i.get(), true);
-		velVec = XMVector3Normalize(velVec);
+			velVec = XMVector3Normalize(velVec);
 
-		const XMVECTOR oldVec = XMVector3Normalize(XMLoadFloat3(&i->getVel()));
+			const XMVECTOR oldVec = XMVector3Normalize(XMLoadFloat3(&i->getVel()));
 
-		velVec = smallEnemyMoveSpeed * XMVectorLerp(oldVec, velVec, 0.05f);
+			velVec = smallEnemyMoveSpeed * XMVectorLerp(oldVec, velVec, 0.05f);
 
-		XMFLOAT3 vel{};
-		XMStoreFloat3(&vel, velVec);
-		i->setVel(vel);
+			XMFLOAT3 vel{};
+			XMStoreFloat3(&vel, velVec);
+			i->setVel(vel);
 		}
 		);
 }

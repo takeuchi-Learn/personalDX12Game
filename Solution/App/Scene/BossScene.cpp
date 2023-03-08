@@ -140,9 +140,20 @@ void BossScene::initBoss()
 		const auto size = y.size();
 
 		XMFLOAT3 pos{};
-		if (size >= 1u) { pos.x = std::stof(y[0]); }
-		if (size >= 2u) { pos.y = std::stof(y[1]); }
-		if (size >= 3u) { pos.z = std::stof(y[2]); }
+		if (size >= 1u)
+		{
+			pos.x = std::stof(y[0]);
+
+			if (size >= 2u)
+			{
+				pos.y = std::stof(y[1]);
+
+				if (size >= 3u)
+				{
+					pos.z = std::stof(y[2]);
+				}
+			}
+		}
 
 		bossPartsData.emplace_back(pos);
 	}

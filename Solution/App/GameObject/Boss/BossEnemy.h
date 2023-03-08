@@ -28,8 +28,12 @@ class BossEnemy :
 	/// @return 原点->ボスのベクトル
 	DirectX::XMVECTOR calcVelVec(GameObj* me, bool moveYFlag = false);
 
-	void move(float moveSpeed, const DirectX::XMVECTOR& velVec);
-	void moveAndRota(float moveSpeed, const DirectX::XMVECTOR& velVec);
+	/// @return 移動速度
+	void move(float moveSpeed, const DirectX::XMVECTOR& velVec, DirectX::XMFLOAT3* velBuf = nullptr);
+
+	/// @brief move()した後に移動方向を向く
+	/// @return 移動速度
+	void moveAndRota(float moveSpeed, const DirectX::XMVECTOR& velVec, DirectX::XMFLOAT3* velBuf = nullptr);
 
 	void afterUpdate() override;
 	void additionalDraw(Light* light) override;
