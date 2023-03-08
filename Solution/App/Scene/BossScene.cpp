@@ -116,16 +116,13 @@ void BossScene::initEnemy()
 
 void BossScene::initBoss()
 {
-	constexpr float bossScale = 1.f;
-
-	bossModel = std::make_unique<ObjModel>("Resources/tori", "tori");
+	bossSmlEnemyModel = std::make_unique<ObjModel>("Resources/tori", "tori");
 	boss = std::make_unique<BossEnemy>(camera.get(), nullptr);
 
-	boss->setScale(bossScale);
-	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 300));
+	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 800));
 	boss->setRotation(XMFLOAT3(0, 180.f, 0));
 	boss->setTargetObj(player.get());
-	boss->setSmallEnemyModel(bossModel.get());
+	boss->setSmallEnemyModel(bossSmlEnemyModel.get());
 	boss->getObj()->color = XMFLOAT4(2, 0.5f, 0.25f, 1);
 	boss->setAlive(false);
 
@@ -265,6 +262,9 @@ void BossScene::update()
 
 	moveAim2DPos();
 
+	// RGBずらしの更新
+	updateRgbShift();
+
 	// 更新処理本体
 	update_proc();
 	camera->update();
@@ -379,8 +379,6 @@ void BossScene::update_play()
 	}
 
 #endif // _DEBUG
-
-	updateRgbShift();
 
 	if (player->getAlive())
 	{

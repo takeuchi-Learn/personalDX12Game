@@ -48,7 +48,7 @@ private:
 
 #pragma region ボス
 
-	std::unique_ptr<ObjModel> bossModel;
+	std::unique_ptr<ObjModel> bossSmlEnemyModel;
 	std::unique_ptr<BossEnemy> boss;
 	uint16_t bossHpMax{};
 

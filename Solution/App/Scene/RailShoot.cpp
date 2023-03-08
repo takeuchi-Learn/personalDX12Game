@@ -398,6 +398,9 @@ void RailShoot::update()
 	// 背景オブジェクトの中心をカメラにする
 	backObj->position = camera->getEye();
 
+	// RGBずらしの更新
+	updateRgbShift();
+
 	// 主な処理
 	update_proc();
 
@@ -761,8 +764,6 @@ void RailShoot::update_play()
 
 	// 今のフレームを進める
 	++nowFrame;
-
-	updateRgbShift();
 }
 
 void RailShoot::update_exitPlayer()

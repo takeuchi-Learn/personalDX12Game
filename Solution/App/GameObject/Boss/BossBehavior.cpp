@@ -10,7 +10,6 @@ NODE_RESULT BossBehavior::phase_Rotation()
 	if (rotaPhaseNowCount++ > rotationPhaseData.countMax)
 	{
 		rotaPhaseNowCount = 0ui32;
-		boss->setRotation(XMFLOAT3(0, 0, 0));
 		return NODE_RESULT::SUCCESS;
 	}
 

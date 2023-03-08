@@ -45,7 +45,7 @@ private:
 
 	struct RotationPhaseData
 	{
-		uint32_t countMax = 60;
+		uint32_t countMax = 120;
 		DirectX::XMFLOAT3 rotaMax = DirectX::XMFLOAT3(0, 360, 0);
 	};
 	RotationPhaseData rotationPhaseData{};
