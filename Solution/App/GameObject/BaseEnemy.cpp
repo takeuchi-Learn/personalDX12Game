@@ -31,8 +31,6 @@ void BaseEnemy::additionalUpdate()
 		phase();
 
 		movePos(vel);
-
-		life == 0u ? kill() : --life;
 	}
 	afterUpdate();
 }

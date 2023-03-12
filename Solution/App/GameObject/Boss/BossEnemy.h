@@ -54,8 +54,22 @@ public:
 #pragma region 弾関係
 
 private:
+	class SmallEnemy :
+		public BaseEnemy
+	{
+		uint32_t life = UINT32_MAX;
+
+	public:
+		using BaseEnemy::BaseEnemy;
+
+		inline uint32_t getLife() const { return life; }
+		inline void setLife(uint32_t life) { this->life = life; }
+
+		void afterUpdate() override;
+	};
+
+	std::forward_list<std::shared_ptr<SmallEnemy>> smallEnemy;
 	ObjModel* smallEnemyModel = nullptr;
-	std::forward_list<std::shared_ptr<BaseEnemy>> smallEnemy;
 	float smallEnemyMoveSpeed = 2.f;
 
 	static const inline uint32_t bulLife = 900u;

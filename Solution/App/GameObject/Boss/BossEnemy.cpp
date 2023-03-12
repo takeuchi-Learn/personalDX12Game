@@ -79,7 +79,7 @@ BossEnemy::BossEnemy(Camera* camera,
 // 弾関係
 void BossEnemy::addSmallEnemyHoming(const DirectX::XMFLOAT4& color)
 {
-	auto& i = smallEnemy.emplace_front(std::make_shared<BaseEnemy>(camera, smallEnemyModel));
+	auto& i = smallEnemy.emplace_front(std::make_shared<SmallEnemy>(camera, smallEnemyModel));
 	i->setScale(10.f);
 	i->setParent(this->getParent());
 	i->setPos(this->getPos());
@@ -118,7 +118,7 @@ void BossEnemy::addSmallEnemy(const DirectX::XMVECTOR& direction,
 	assert(!XMVector3Equal(direction, XMVectorZero()));
 	assert(!XMVector3IsInfinite(direction));
 
-	auto& i = smallEnemy.emplace_front(std::make_shared<BaseEnemy>(camera, smallEnemyModel));
+	auto& i = smallEnemy.emplace_front(std::make_shared<SmallEnemy>(camera, smallEnemyModel));
 	i->setScale(10.f);
 	i->setParent(this->getParent());
 	i->setPos(this->getPos());
@@ -130,4 +130,12 @@ void BossEnemy::addSmallEnemy(const DirectX::XMVECTOR& direction,
 	XMFLOAT3 vel{};
 	XMStoreFloat3(&vel, velVec);
 	i->setVel(vel);
+}
+
+void BossEnemy::SmallEnemy::afterUpdate()
+{
+	if (alive)
+	{
+		life == 0u ? kill() : --life;
+	}
 }

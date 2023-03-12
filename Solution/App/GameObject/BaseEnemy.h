@@ -20,8 +20,6 @@ protected:
 
 	Camera* camera = nullptr;
 
-	uint32_t life = UINT32_MAX;
-
 	virtual void beforeUpdate() {}
 	virtual void afterUpdate() {}
 
@@ -39,9 +37,6 @@ public:
 			  ObjModel* model,
 			  const DirectX::XMFLOAT3& pos = { 0,0,0 },
 			  uint16_t hp = 1ui16);
-
-	inline void setLife(uint32_t life) { this->life = life; }
-	inline uint32_t getLife() const { return life; }
 
 	inline void setHp(uint16_t hp) { this->hp = hp; }
 	inline uint16_t getHp() const { return hp; }
