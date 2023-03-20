@@ -28,17 +28,17 @@ NODE_RESULT BossBehavior::phase_Rotation()
 NODE_RESULT BossBehavior::phase_fanShapeAttack()
 {
 	// 撃つ時間がまだなら何もしない
-	if (nowShotFrame++ < fanShotData.interval) { return NODE_RESULT::RUNNING; }
-	nowShotFrame = 0u;
+	if (fanShotData.shotFrame.nowVal++ < fanShotData.shotFrame.MaxVal) { return NODE_RESULT::RUNNING; }
+	fanShotData.shotFrame.nowVal = 0u;
 
 	// 指定回数撃ったら次の行動へ
-	if (shotCount >= fanShotData.countMax)
+	if (fanShotData.count.nowVal >= fanShotData.count.MaxVal)
 	{
-		nowShotFrame = fanShotData.interval;
-		shotCount = 0;
+		fanShotData.shotFrame.nowVal = fanShotData.shotFrame.MaxVal;
+		fanShotData.count.nowVal = 0;
 		return NODE_RESULT::SUCCESS;
 	}
-	++shotCount;
+	++fanShotData.count.nowVal;
 
 	// -これ~これの範囲で発射
 	constexpr float angleMax = static_cast<float>(3.141592653589793 * (1.0 / 8.0));
@@ -56,7 +56,7 @@ NODE_RESULT BossBehavior::phase_fanShapeAttack()
 		// 射出角度
 		XMFLOAT2 angle = XMFLOAT2(-angleMax, angleMax);
 		// 二回に一回半分ずらす(これがないとあんま当たらん)
-		if (shotCount & 1)
+		if (fanShotData.count.nowVal & 1)
 		{
 			angle.x += halfRad;
 			angle.y += halfRad;
@@ -85,8 +85,8 @@ BossBehavior::BossBehavior(BossEnemy* boss) :
 
 	fanShotData =
 		FanShotData{
-		.interval = std::stoul(data[0][0]),
-		.countMax = std::stoul(data[1][0]),
+		.shotFrame = {.MaxVal = std::stoul(data[0][0]), .nowVal = 0u },
+		.count = {.MaxVal = std::stoul(data[1][0]), .nowVal = 0u},
 		.shotNum = std::stoul(data[2][0]),
 		.bulCol = XMFLOAT4(std::stof(data[3][0]),
 						   std::stof(data[3][1]),
@@ -94,8 +94,7 @@ BossBehavior::BossBehavior(BossEnemy* boss) :
 						   std::stof(data[3][3]))
 	};
 
-	nowShotFrame = fanShotData.interval;
-	shotCount = 0u;
+	fanShotData.shotFrame.nowVal = fanShotData.shotFrame.MaxVal;
 
 	// 各フェーズを登録
 	addChild(Task(std::bind(&BossBehavior::phase_Rotation, this)));

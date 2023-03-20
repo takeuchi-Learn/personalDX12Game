@@ -25,19 +25,22 @@ private:
 
 #pragma region 弾発射関係
 
+	template<class T>
+	struct MaxNow
+	{
+		T MaxVal;
+		T nowVal;
+	};
+
 	struct FanShotData
 	{
-		uint32_t interval{};
-		uint32_t countMax{};
+		MaxNow<uint32_t> shotFrame{};
+		MaxNow<uint32_t> count{};
 		uint32_t shotNum{};
 		DirectX::XMFLOAT4 bulCol{};
 	};
 
 	FanShotData fanShotData{};
-
-	uint32_t nowShotFrame = 0u;
-	uint32_t shotCount = 0u;
-
 
 #pragma endregion 弾発射関係
 

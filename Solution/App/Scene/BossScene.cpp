@@ -972,7 +972,6 @@ void BossScene::drawFrontSprite()
 	ImGui::PushFont(dxBase->getBigImFont());
 	ImGui::Text("イボを撃ち潰せ！");
 	ImGui::PopFont();
-	ImGui::Text("ボスの弾は迎撃可能！");
 	ImGui::End();
 
 	// 自機の体力バー

@@ -112,8 +112,8 @@ void BossEnemy::addBulHoming(const DirectX::XMFLOAT4& color)
 }
 
 void BossEnemy::addBul(const DirectX::XMVECTOR& direction,
-							  const DirectX::XMFLOAT3& scale,
-							  const DirectX::XMFLOAT4& color)
+					   const DirectX::XMFLOAT3& scale,
+					   const DirectX::XMFLOAT4& color)
 {
 	// 0ベクトルだと向きが無いので除外
 	assert(!XMVector3Equal(direction, XMVectorZero()));
