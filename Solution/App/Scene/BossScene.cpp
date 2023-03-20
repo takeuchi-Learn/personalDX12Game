@@ -116,13 +116,13 @@ void BossScene::initEnemy()
 
 void BossScene::initBoss()
 {
-	bossSmlEnemyModel = std::make_unique<ObjModel>("Resources/tori", "tori");
+	bossBulModel = std::make_unique<ObjModel>("Resources/sphere", "sphere");
 	boss = std::make_unique<BossEnemy>(camera.get(), nullptr);
 
 	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 800));
 	boss->setRotation(XMFLOAT3(0, 180.f, 0));
 	boss->setTargetObj(player.get());
-	boss->setSmallEnemyModel(bossSmlEnemyModel.get());
+	boss->setBulModel(bossBulModel.get());
 	boss->getObj()->color = XMFLOAT4(2, 0.5f, 0.25f, 1);
 	boss->setAlive(false);
 
@@ -397,7 +397,7 @@ void BossScene::update_play()
 										   input->getMousePos().y + aim2D->getSize().y / 2.f);
 
 		std::forward_list<std::weak_ptr<BaseEnemy>> inAim2DEnemy = attackableEnemy;
-		for (auto& i : boss->getSmallEnemyList())
+		for (auto& i : boss->getBulList())
 		{
 			inAim2DEnemy.emplace_front(i);
 		}
@@ -472,7 +472,7 @@ void BossScene::update_play()
 			const CollisionShape::Sphere pCol(XMLoadFloat3(&player->calcWorldPos()),
 											  player->getScale());
 
-			for (auto& i : boss->getSmallEnemyList())
+			for (auto& i : boss->getBulList())
 			{
 				// いなければ判定しない
 				if (!i->getAlive()) { continue; }
@@ -495,36 +495,6 @@ void BossScene::update_play()
 					{
 						startRgbShift();
 					}
-				}
-			}
-		}
-
-		// --------------------
-		// 自機弾とボス弾(雑魚敵)の当たり判定
-		// --------------------
-		for (auto& pb : player->getBulArr())
-		{
-			if (!pb.getAlive()) { continue; }
-
-			const CollisionShape::Sphere bul(XMLoadFloat3(&pb.calcWorldPos()),
-											 pb.getScaleF3().z);
-
-			for (auto& e : boss->getSmallEnemyList())
-			{
-				if (!e->getAlive()) { continue; }
-
-				const CollisionShape::Sphere enemy(XMLoadFloat3(&e->calcWorldPos()),
-												   e->getScale());
-
-				if (Collision::CheckHit(bul, enemy))
-				{
-					e->damage(1u, true);
-					pb.kill();
-
-					// エフェクトを出す
-					ParticleMgr::createParticle(particleMgr.get(), e->calcWorldPos(), 16U, 8.f, 4.f, killEffCol);
-
-					Sound::SoundPlayWave(killSe.get(), 0, 0.2f);
 				}
 			}
 		}

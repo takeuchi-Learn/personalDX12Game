@@ -50,7 +50,7 @@ void BossEnemy::moveAndRota(float moveSpeed, const DirectX::XMVECTOR& velVec, Di
 void BossEnemy::afterUpdate()
 {
 	// 死んだ弾は消す
-	for (auto& i : smallEnemy)
+	for (auto& i : bul)
 	{
 		i->setDrawFlag(i->getAlive());
 	}
@@ -58,7 +58,7 @@ void BossEnemy::afterUpdate()
 
 void BossEnemy::additionalDraw(Light* light)
 {
-	for (auto& i : smallEnemy)
+	for (auto& i : bul)
 	{
 		i->drawWithUpdate(light);
 	}
@@ -77,9 +77,9 @@ BossEnemy::BossEnemy(Camera* camera,
 }
 
 // 弾関係
-void BossEnemy::addSmallEnemyHoming(const DirectX::XMFLOAT4& color)
+void BossEnemy::addBulHoming(const DirectX::XMFLOAT4& color)
 {
-	auto& i = smallEnemy.emplace_front(std::make_shared<SmallEnemy>(camera, smallEnemyModel));
+	auto& i = bul.emplace_front(std::make_shared<Bul>(camera, bulModel));
 	i->setScale(10.f);
 	i->setParent(this->getParent());
 	i->setPos(this->getPos());
@@ -92,7 +92,7 @@ void BossEnemy::addSmallEnemyHoming(const DirectX::XMFLOAT4& color)
 																			XM_PIDIV2,
 																			0.f));
 	XMFLOAT3 vel{};
-	XMStoreFloat3(&vel, right * smallEnemyMoveSpeed);
+	XMStoreFloat3(&vel, right * bulMoveSpeed);
 	i->setVel(vel);
 	i->setPhase(
 		[&]
@@ -102,7 +102,7 @@ void BossEnemy::addSmallEnemyHoming(const DirectX::XMFLOAT4& color)
 
 			const XMVECTOR oldVec = XMVector3Normalize(XMLoadFloat3(&i->getVel()));
 
-			velVec = smallEnemyMoveSpeed * XMVectorLerp(oldVec, velVec, 0.05f);
+			velVec = bulMoveSpeed * XMVectorLerp(oldVec, velVec, 0.05f);
 
 			XMFLOAT3 vel{};
 			XMStoreFloat3(&vel, velVec);
@@ -111,28 +111,29 @@ void BossEnemy::addSmallEnemyHoming(const DirectX::XMFLOAT4& color)
 		);
 }
 
-void BossEnemy::addSmallEnemy(const DirectX::XMVECTOR& direction,
+void BossEnemy::addBul(const DirectX::XMVECTOR& direction,
+							  const DirectX::XMFLOAT3& scale,
 							  const DirectX::XMFLOAT4& color)
 {
 	// 0ベクトルだと向きが無いので除外
 	assert(!XMVector3Equal(direction, XMVectorZero()));
 	assert(!XMVector3IsInfinite(direction));
 
-	auto& i = smallEnemy.emplace_front(std::make_shared<SmallEnemy>(camera, smallEnemyModel));
-	i->setScale(10.f);
+	auto& i = bul.emplace_front(std::make_shared<Bul>(camera, bulModel));
+	i->setScaleF3(scale);
 	i->setParent(this->getParent());
 	i->setPos(this->getPos());
 	i->setHp(1u);
 	i->setLife(bulLife);
 	i->setCol(color);
 
-	XMVECTOR velVec = smallEnemyMoveSpeed * XMVector3Normalize(direction);
+	XMVECTOR velVec = bulMoveSpeed * XMVector3Normalize(direction);
 	XMFLOAT3 vel{};
 	XMStoreFloat3(&vel, velVec);
 	i->setVel(vel);
 }
 
-void BossEnemy::SmallEnemy::afterUpdate()
+void BossEnemy::Bul::afterUpdate()
 {
 	if (alive)
 	{

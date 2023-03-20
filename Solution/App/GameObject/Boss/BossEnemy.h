@@ -54,7 +54,7 @@ public:
 #pragma region 弾関係
 
 private:
-	class SmallEnemy :
+	class Bul :
 		public BaseEnemy
 	{
 		uint32_t life = UINT32_MAX;
@@ -68,29 +68,30 @@ private:
 		void afterUpdate() override;
 	};
 
-	std::forward_list<std::shared_ptr<SmallEnemy>> smallEnemy;
-	ObjModel* smallEnemyModel = nullptr;
-	float smallEnemyMoveSpeed = 2.f;
+	std::forward_list<std::shared_ptr<Bul>> bul;
+	ObjModel* bulModel = nullptr;
+	float bulMoveSpeed = 2.f;
 
 	static const inline uint32_t bulLife = 900u;
 
 public:
 	/// @brief 弾として出された小さい敵の数を算出
 	/// @return 小さい敵の数
-	inline size_t calcSmallEnemyNum() const { return std::distance(smallEnemy.begin(), smallEnemy.end()); }
+	inline size_t calcBulNum() const { return std::distance(bul.begin(), bul.end()); }
 
-	inline const auto& getSmallEnemyList() const { return smallEnemy; }
+	inline const auto& getBulList() const { return bul; }
 
-	inline ObjModel* getSmallEnemyModel() { return smallEnemyModel; }
-	inline void setSmallEnemyModel(ObjModel* model) { smallEnemyModel = model; }
+	inline ObjModel* getBulModel() { return bulModel; }
+	inline void setBulModel(ObjModel* model) { bulModel = model; }
 
 	/// @brief 小さい敵を弾として出す
-	void addSmallEnemyHoming(const DirectX::XMFLOAT4& color = DirectX::XMFLOAT4(1.f,
+	void addBulHoming(const DirectX::XMFLOAT4& color = DirectX::XMFLOAT4(1.f,
 																				1.f,
 																				1.f,
 																				1.f));
 
-	void addSmallEnemy(const DirectX::XMVECTOR& direction,
+	void addBul(const DirectX::XMVECTOR& direction,
+					   const DirectX::XMFLOAT3& scale = DirectX::XMFLOAT3(10, 10, 10),
 					   const DirectX::XMFLOAT4& color = DirectX::XMFLOAT4(1.f,
 																		  1.f,
 																		  1.f,
