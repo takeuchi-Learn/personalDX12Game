@@ -23,14 +23,14 @@ private:
 
 	BossEnemy* boss = nullptr;
 
-#pragma region 弾発射関係
-
 	template<class T>
 	struct MaxNow
 	{
-		T MaxVal;
+		T maxVal;
 		T nowVal;
 	};
+
+#pragma region 弾発射関係
 
 	struct FanShotData
 	{
@@ -48,11 +48,10 @@ private:
 
 	struct RotationPhaseData
 	{
-		uint32_t countMax = 120;
+		MaxNow<uint32_t> count = MaxNow<uint32_t>{ .maxVal = 120, .nowVal = 0 };
 		DirectX::XMFLOAT3 rotaMax = DirectX::XMFLOAT3(0, 360, 0);
 	};
 	RotationPhaseData rotationPhaseData{};
-	uint32_t rotaPhaseNowCount = 0;
 
 #pragma endregion 回転フェーズ
 

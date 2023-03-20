@@ -7,13 +7,13 @@ using namespace DirectX;
 
 NODE_RESULT BossBehavior::phase_Rotation()
 {
-	if (rotaPhaseNowCount++ > rotationPhaseData.countMax)
+	if (rotationPhaseData.count.nowVal++ > rotationPhaseData.count.maxVal)
 	{
-		rotaPhaseNowCount = 0ui32;
+		rotationPhaseData.count.nowVal = 0ui32;
 		return NODE_RESULT::SUCCESS;
 	}
 
-	const float raito = (float)rotaPhaseNowCount / (float)rotationPhaseData.countMax;
+	const float raito = (float)rotationPhaseData.count.nowVal / (float)rotationPhaseData.count.maxVal;
 
 	XMFLOAT3 rot{};
 	rot.x = std::lerp(0.f, rotationPhaseData.rotaMax.x, raito);
@@ -28,13 +28,13 @@ NODE_RESULT BossBehavior::phase_Rotation()
 NODE_RESULT BossBehavior::phase_fanShapeAttack()
 {
 	// 撃つ時間がまだなら何もしない
-	if (fanShotData.shotFrame.nowVal++ < fanShotData.shotFrame.MaxVal) { return NODE_RESULT::RUNNING; }
+	if (fanShotData.shotFrame.nowVal++ < fanShotData.shotFrame.maxVal) { return NODE_RESULT::RUNNING; }
 	fanShotData.shotFrame.nowVal = 0u;
 
 	// 指定回数撃ったら次の行動へ
-	if (fanShotData.count.nowVal >= fanShotData.count.MaxVal)
+	if (fanShotData.count.nowVal >= fanShotData.count.maxVal)
 	{
-		fanShotData.shotFrame.nowVal = fanShotData.shotFrame.MaxVal;
+		fanShotData.shotFrame.nowVal = fanShotData.shotFrame.maxVal;
 		fanShotData.count.nowVal = 0;
 		return NODE_RESULT::SUCCESS;
 	}
@@ -85,8 +85,8 @@ BossBehavior::BossBehavior(BossEnemy* boss) :
 
 	fanShotData =
 		FanShotData{
-		.shotFrame = {.MaxVal = std::stoul(data[0][0]), .nowVal = 0u },
-		.count = {.MaxVal = std::stoul(data[1][0]), .nowVal = 0u},
+		.shotFrame = {.maxVal = std::stoul(data[0][0]), .nowVal = 0u },
+		.count = {.maxVal = std::stoul(data[1][0]), .nowVal = 0u},
 		.shotNum = std::stoul(data[2][0]),
 		.bulCol = XMFLOAT4(std::stof(data[3][0]),
 						   std::stof(data[3][1]),
@@ -94,7 +94,7 @@ BossBehavior::BossBehavior(BossEnemy* boss) :
 						   std::stof(data[3][3]))
 	};
 
-	fanShotData.shotFrame.nowVal = fanShotData.shotFrame.MaxVal;
+	fanShotData.shotFrame.nowVal = fanShotData.shotFrame.maxVal;
 
 	// 各フェーズを登録
 	addChild(Task(std::bind(&BossBehavior::phase_Rotation, this)));
