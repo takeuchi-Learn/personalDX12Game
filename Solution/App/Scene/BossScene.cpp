@@ -396,12 +396,7 @@ void BossScene::update_play()
 		const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + aim2D->getSize().x / 2.f,
 										   input->getMousePos().y + aim2D->getSize().y / 2.f);
 
-		std::forward_list<std::weak_ptr<BaseEnemy>> inAim2DEnemy = attackableEnemy;
-		for (auto& i : boss->getBulList())
-		{
-			inAim2DEnemy.emplace_front(i);
-		}
-		addShotTarget(inAim2DEnemy, aim2DMin, aim2DMax);
+		addShotTarget(attackableEnemy, aim2DMin, aim2DMax);
 
 		// --------------------
 		// 弾発射

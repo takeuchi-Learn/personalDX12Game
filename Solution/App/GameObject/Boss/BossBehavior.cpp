@@ -71,7 +71,7 @@ NODE_RESULT BossBehavior::phase_fanShapeAttack()
 																					0.f));
 
 		// 指定方向に弾を発射
-		boss->addBul(direction, XMFLOAT3(10, 100, 10), fanShotData.bulCol);
+		boss->addBul(direction, XMFLOAT3(5, 100, 5), fanShotData.bulCol);
 	}
 
 	return NODE_RESULT::RUNNING;
