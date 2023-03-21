@@ -5,7 +5,7 @@
 
 using namespace DirectX;
 
-NODE_RESULT BossBehavior::phase_Rotation()
+NODE_RESULT BossBehavior::phase_Rotation(const DirectX::XMFLOAT3& rotaMax)
 {
 	if (rotationPhaseData.count.nowVal++ > rotationPhaseData.count.maxVal)
 	{
@@ -16,9 +16,9 @@ NODE_RESULT BossBehavior::phase_Rotation()
 	const float raito = (float)rotationPhaseData.count.nowVal / (float)rotationPhaseData.count.maxVal;
 
 	XMFLOAT3 rot{};
-	rot.x = std::lerp(0.f, rotationPhaseData.rotaMax.x, raito);
-	rot.y = std::lerp(0.f, rotationPhaseData.rotaMax.y, raito);
-	rot.z = std::lerp(0.f, rotationPhaseData.rotaMax.z, raito);
+	rot.x = std::lerp(0.f, rotaMax.x, raito);
+	rot.y = std::lerp(0.f, rotaMax.y, raito);
+	rot.z = std::lerp(0.f, rotaMax.z, raito);
 
 	boss->setRotation(rot);
 
@@ -71,8 +71,33 @@ NODE_RESULT BossBehavior::phase_fanShapeAttack()
 																					0.f));
 
 		// 指定方向に弾を発射
-		boss->addBul(direction, XMFLOAT3(5, 100, 5), fanShotData.bulCol);
+		constexpr XMFLOAT3 scale = XMFLOAT3(5, 100, 5);
+		boss->addBul(direction, scale, fanShotData.bulCol, 2.f);
 	}
+
+	return NODE_RESULT::RUNNING;
+}
+
+NODE_RESULT BossBehavior::phase_singleShotAttack()
+{
+	if (singleShotData->shotFrame.nowVal++ < singleShotData->shotFrame.maxVal) { return NODE_RESULT::RUNNING; }
+
+	if (singleShotData->count.nowVal >= singleShotData->count.maxVal)
+	{
+		singleShotData->shotFrame.nowVal = singleShotData->shotFrame.maxVal;
+		singleShotData->count.nowVal = 0;
+		return NODE_RESULT::SUCCESS;
+	}
+	singleShotData->shotFrame.nowVal = 0u;
+	++singleShotData->count.nowVal;
+
+	// 攻撃対象へ向かうベクトル
+	const XMVECTOR directionVec = boss->calcVelVec(boss, true);
+
+	constexpr float scaleVal = 10.f;
+	constexpr XMFLOAT3 scale = XMFLOAT3(scaleVal, scaleVal, scaleVal);
+	constexpr float speed = 10.f;
+	boss->addBul(directionVec, scale, singleShotData->bulCol, speed);
 
 	return NODE_RESULT::RUNNING;
 }
@@ -96,9 +121,28 @@ BossBehavior::BossBehavior(BossEnemy* boss) :
 
 	fanShotData.shotFrame.nowVal = fanShotData.shotFrame.maxVal;
 
+	singleShotData = std::make_unique<SingleShotData>(
+		SingleShotData{
+			.shotFrame = {.maxVal = 60, .nowVal = 0},
+			.count = {.maxVal = 5, .nowVal = 0},
+			.bulCol = XMFLOAT4(std::stof(data[3][0]),
+							   std::stof(data[3][1]),
+							   std::stof(data[3][2]),
+							   std::stof(data[3][3]))
+		}
+	);
+
 	// 各フェーズを登録
-	addChild(Task(std::bind(&BossBehavior::phase_Rotation, this)));
-	addChild(Task(std::bind(&BossBehavior::phase_fanShapeAttack, this)));
+	fanShapePhase = std::make_unique<Sequencer>();
+	fanShapePhase->addChild(Task(std::bind(&BossBehavior::phase_Rotation, this, XMFLOAT3(0, 360*2, 0))));
+	fanShapePhase->addChild(Task(std::bind(&BossBehavior::phase_fanShapeAttack, this)));
+
+	singleShotPhase = std::make_unique<Sequencer>();
+	singleShotPhase->addChild(Task(std::bind(&BossBehavior::phase_Rotation, this, XMFLOAT3(360, -360, 0))));
+	singleShotPhase->addChild(Task(std::bind(&BossBehavior::phase_singleShotAttack, this)));
+
+	addChild(*fanShapePhase);
+	addChild(*singleShotPhase);
 }
 
 BossBehavior::BossBehavior() :

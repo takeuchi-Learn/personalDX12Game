@@ -30,6 +30,25 @@ private:
 		T nowVal;
 	};
 
+#pragma region 単発攻撃
+
+	std::unique_ptr<Sequencer> singleShotPhase;
+
+	struct SingleShotData
+	{
+		MaxNow<uint32_t> shotFrame{};
+		MaxNow<uint32_t> count{};
+		DirectX::XMFLOAT4 bulCol{};
+	};
+
+	std::unique_ptr<SingleShotData> singleShotData;
+
+#pragma endregion 単発攻撃
+
+#pragma region 扇形攻撃
+
+	std::unique_ptr<Sequencer> fanShapePhase;
+
 #pragma region 弾発射関係
 
 	struct FanShotData
@@ -49,11 +68,12 @@ private:
 	struct RotationPhaseData
 	{
 		MaxNow<uint32_t> count = MaxNow<uint32_t>{ .maxVal = 120, .nowVal = 0 };
-		DirectX::XMFLOAT3 rotaMax = DirectX::XMFLOAT3(0, 360, 0);
 	};
 	RotationPhaseData rotationPhaseData{};
 
 #pragma endregion 回転フェーズ
+
+#pragma endregion 扇形攻撃
 
 
 private:
@@ -61,8 +81,9 @@ private:
 	// priavteメンバ関数
 	// ---------------
 
-	NODE_RESULT phase_Rotation();
+	NODE_RESULT phase_Rotation(const DirectX::XMFLOAT3& rotaMax = DirectX::XMFLOAT3(0, 360, 0));
 	NODE_RESULT phase_fanShapeAttack();
+	NODE_RESULT phase_singleShotAttack();
 
 public:
 	BossBehavior(BossEnemy* boss);

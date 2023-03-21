@@ -70,7 +70,7 @@ private:
 
 	std::forward_list<std::shared_ptr<Bul>> bul;
 	ObjModel* bulModel = nullptr;
-	float bulMoveSpeed = 2.f;
+	//float bulMoveSpeed = 2.f;
 
 	static const inline uint32_t bulLife = 900u;
 
@@ -85,17 +85,13 @@ public:
 	inline void setBulModel(ObjModel* model) { bulModel = model; }
 
 	/// @brief 小さい敵を弾として出す
-	void addBulHoming(const DirectX::XMFLOAT4& color = DirectX::XMFLOAT4(1.f,
-																				1.f,
-																				1.f,
-																				1.f));
+	void addBulHoming(const DirectX::XMFLOAT4& color = DirectX::XMFLOAT4(1.f, 1.f, 1.f, 1.f),
+					  float moveSpeed = 2.f);
 
 	void addBul(const DirectX::XMVECTOR& direction,
-					   const DirectX::XMFLOAT3& scale = DirectX::XMFLOAT3(10, 10, 10),
-					   const DirectX::XMFLOAT4& color = DirectX::XMFLOAT4(1.f,
-																		  1.f,
-																		  1.f,
-																		  1.f));
+				const DirectX::XMFLOAT3& scale = DirectX::XMFLOAT3(10, 10, 10),
+				const DirectX::XMFLOAT4& color = DirectX::XMFLOAT4(1.f, 1.f, 1.f, 1.f),
+				float moveSpeed = 2.f);
 
 #pragma endregion 弾関係
 };

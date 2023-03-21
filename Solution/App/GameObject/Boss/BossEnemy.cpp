@@ -77,7 +77,7 @@ BossEnemy::BossEnemy(Camera* camera,
 }
 
 // 弾関係
-void BossEnemy::addBulHoming(const DirectX::XMFLOAT4& color)
+void BossEnemy::addBulHoming(const DirectX::XMFLOAT4& color, float moveSpeed)
 {
 	auto& i = bul.emplace_front(std::make_shared<Bul>(camera, bulModel));
 	i->setScale(10.f);
@@ -92,7 +92,7 @@ void BossEnemy::addBulHoming(const DirectX::XMFLOAT4& color)
 																			XM_PIDIV2,
 																			0.f));
 	XMFLOAT3 vel{};
-	XMStoreFloat3(&vel, right * bulMoveSpeed);
+	XMStoreFloat3(&vel, right * moveSpeed);
 	i->setVel(vel);
 	i->setPhase(
 		[&]
@@ -102,7 +102,7 @@ void BossEnemy::addBulHoming(const DirectX::XMFLOAT4& color)
 
 			const XMVECTOR oldVec = XMVector3Normalize(XMLoadFloat3(&i->getVel()));
 
-			velVec = bulMoveSpeed * XMVectorLerp(oldVec, velVec, 0.05f);
+			velVec = moveSpeed * XMVectorLerp(oldVec, velVec, 0.05f);
 
 			XMFLOAT3 vel{};
 			XMStoreFloat3(&vel, velVec);
@@ -113,7 +113,8 @@ void BossEnemy::addBulHoming(const DirectX::XMFLOAT4& color)
 
 void BossEnemy::addBul(const DirectX::XMVECTOR& direction,
 					   const DirectX::XMFLOAT3& scale,
-					   const DirectX::XMFLOAT4& color)
+					   const DirectX::XMFLOAT4& color,
+					   float moveSpeed)
 {
 	// 0ベクトルだと向きが無いので除外
 	assert(!XMVector3Equal(direction, XMVectorZero()));
@@ -127,7 +128,7 @@ void BossEnemy::addBul(const DirectX::XMVECTOR& direction,
 	i->setLife(bulLife);
 	i->setCol(color);
 
-	XMVECTOR velVec = bulMoveSpeed * XMVector3Normalize(direction);
+	XMVECTOR velVec = moveSpeed * XMVector3Normalize(direction);
 	XMFLOAT3 vel{};
 	XMStoreFloat3(&vel, velVec);
 	i->setVel(vel);
