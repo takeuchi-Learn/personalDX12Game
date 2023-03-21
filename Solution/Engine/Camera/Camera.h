@@ -18,6 +18,7 @@ protected:
 	static DX12Base* dxBase;
 
 private:
+	XMVECTOR cameraAxisZ{};
 	XMMATRIX matViewPort{};
 	// ビュー行列
 	XMMATRIX matView = DirectX::XMMatrixIdentity();
@@ -30,7 +31,7 @@ private:
 	// ビュー射影行列
 	XMMATRIX matViewProjection = DirectX::XMMatrixIdentity();
 	// VPV行列
-	XMMATRIX matVPV = DirectX::XMMatrixIdentity();;
+	XMMATRIX matVPV = DirectX::XMMatrixIdentity();
 	// ビュー行列ダーティフラグ
 	bool viewDirty = false;
 	// 射影行列ダーティフラグ
@@ -46,7 +47,7 @@ private:
 
 	float nearZ = 0.1f;
 	float farZ = 1000.f;
-	float fogAngleYRad = DirectX::XM_PI / 3.f;
+	float fogAngleYRad = DirectX::XM_PI / 3.f;;
 
 	// --------------------
 	// メンバ関数
@@ -65,6 +66,10 @@ private:
 	virtual void postUpdate() {};
 
 public:
+	/// @brief 視線ベクトルを取得
+	/// @return 視線ベクトル
+	inline const XMVECTOR& getEyeVec() const { return cameraAxisZ; }
+
 	inline const XMMATRIX& getViewPortMatrix() const { return matViewPort; }
 
 	// ビュー行列の取得

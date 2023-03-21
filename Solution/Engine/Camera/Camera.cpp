@@ -40,7 +40,7 @@ void Camera::updateViewMatrix()
 	XMVECTOR upVector = XMLoadFloat3(&up);
 
 	// カメラZ軸（視線方向）
-	XMVECTOR cameraAxisZ = XMVectorSubtract(targetPosition, eyePosition);
+	cameraAxisZ = XMVectorSubtract(targetPosition, eyePosition);
 	// 0ベクトルだと向きが無い除外
 	assert(!XMVector3Equal(cameraAxisZ, XMVectorZero()));
 	assert(!XMVector3IsInfinite(cameraAxisZ));
