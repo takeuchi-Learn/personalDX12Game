@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include "GameObj.h"
+#include <GameObject/GameObj.h>
 
 /// @brief 自機の弾クラス
 class PlayerBullet

@@ -11,7 +11,8 @@
 #include "Input/Input.h"
 #include "System/DX12Base.h"
 #include "Camera/CameraObj.h"
-#include "GameObject/Player.h"
+#include "GameObject/Player/Player.h"
+#include <GameObject/Player/Reticle.h>
 #include <Sound/Sound.h>
 
 #include <Util/Util.h>
@@ -69,7 +70,10 @@ class RailShoot
 	std::unique_ptr<SpriteBase> spriteBase;
 	std::unique_ptr<DebugText> debugText;
 
-	std::unique_ptr<Sprite> aim2D;
+	const UINT aimGrNum;
+	std::unique_ptr<Sprite> cursorGr;
+
+	std::forward_list<Reticle> reticle;
 
 	// 操作説明
 	std::unordered_map<std::string, std::unique_ptr<Sprite>> operInst;
@@ -232,8 +236,6 @@ class RailShoot
 	void updateRailPos();
 	void movePlayer();
 	void updatePlayerShotTarget(const DirectX::XMFLOAT2& aim2DMin, const DirectX::XMFLOAT2& aim2DMax);
-
-	void updateAimCol(const DirectX::XMFLOAT2& aim2DMin, const DirectX::XMFLOAT2& aim2DMax);
 
 public:
 	RailShoot();

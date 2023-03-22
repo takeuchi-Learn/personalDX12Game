@@ -65,8 +65,8 @@ void BossScene::initSprite()
 {
 	spBase = std::make_unique<SpriteBase>();
 
-	aim2D = std::make_unique<Sprite>(spBase->loadTexture(L"Resources/aimPos.png"),
-									 spBase.get());
+	aimGrNum = spBase->loadTexture(L"Resources/aimPos.png");
+	cursorGr = std::make_unique<Sprite>(aimGrNum, spBase.get());
 }
 
 void BossScene::initGameObj()
@@ -240,10 +240,10 @@ void BossScene::start()
 	// 照準の位置を画面中央にする
 	input->setMousePos(WinAPI::window_width / 2, WinAPI::window_height / 2);
 	player->setAim2DPos(XMFLOAT2((float)WinAPI::window_width / 2.f, (float)WinAPI::window_height / 2.f));
-	aim2D->position.x = player->getAim2DPos().x;
-	aim2D->position.y = player->getAim2DPos().y;
+	cursorGr->position.x = player->getAim2DPos().x;
+	cursorGr->position.y = player->getAim2DPos().y;
 
-	aim2D->isInvisible = true;
+	cursorGr->isInvisible = true;
 
 	for (auto& i : attackableEnemy)
 	{
@@ -395,12 +395,12 @@ void BossScene::update_play()
 			input->hitPadButton(Input::PAD::A) ||
 			input->hitPadButton(Input::PAD::B))
 		{
-			aim2D->color = XMFLOAT4(1, 0, 0, 1);
+			cursorGr->color = XMFLOAT4(1, 0, 0, 1);
 
-			const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - aim2D->getSize().x / 2.f,
-											  input->getMousePos().y - aim2D->getSize().y / 2.f);
-			const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + aim2D->getSize().x / 2.f,
-											   input->getMousePos().y + aim2D->getSize().y / 2.f);
+			const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - cursorGr->getSize().x / 2.f,
+											  input->getMousePos().y - cursorGr->getSize().y / 2.f);
+			const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + cursorGr->getSize().x / 2.f,
+											   input->getMousePos().y + cursorGr->getSize().y / 2.f);
 
 			addShotTarget(attackableEnemy, aim2DMin, aim2DMax);
 
@@ -424,8 +424,9 @@ void BossScene::update_play()
 			if (shotFlag)
 			{
 				player->deleteShotTarget();
+				reticle.clear();
 
-				aim2D->color = XMFLOAT4(1, 1, 1, 1);
+				cursorGr->color = XMFLOAT4(1, 1, 1, 1);
 			}
 		}
 
@@ -575,7 +576,7 @@ void BossScene::update_end()
 void BossScene::startAppearBoss()
 {
 	// 照準は非表示
-	aim2D->isInvisible = true;
+	cursorGr->isInvisible = true;
 
 	// カメラの情報を取っておく
 	camParam =
@@ -613,7 +614,7 @@ void BossScene::startAppearBoss()
 void BossScene::endAppearBoss()
 {
 	// 照準を表示
-	aim2D->isInvisible = false;
+	cursorGr->isInvisible = false;
 
 	// ボス行動開始
 	boss->setAlive(true);
@@ -636,7 +637,7 @@ void BossScene::endAppearBoss()
 void BossScene::startKillBoss()
 {
 	// 照準は消す
-	aim2D->isInvisible = true;
+	cursorGr->isInvisible = true;
 
 	// ボスの体力は消す
 	hpBar.at("boss")->drawFlag = false;
@@ -759,8 +760,15 @@ bool BossScene::addShotTarget(const std::forward_list<std::weak_ptr<BaseEnemy>>&
 			aim2DPosMax.y >= screenEnemyPos.y)
 		{
 
-			player->addShotTarget(i);
+			if (player->addShotTarget(i))
+			{
+				auto& ref = reticle.emplace_front();
+				ref.sprite = std::make_unique<Sprite>(aimGrNum, spBase.get());
+				ref.target = i;
+				const auto size = ref.sprite->getSize();
+				ref.sprite->setSize(XMFLOAT2(size.x / 2.f, size.y / 2.f));
 			shotFlag = true;
+			}
 		}
 	}
 
@@ -947,7 +955,13 @@ void BossScene::updateBossHpBar()
 void BossScene::drawFrontSprite()
 {
 	spBase->drawStart(DX12Base::ins()->getCmdList());
-	aim2D->drawWithUpdate(DX12Base::ins(), spBase.get());
+
+	for (auto& i : reticle)
+	{
+		i.drawWithUpdate(spBase.get());
+	}
+
+	cursorGr->drawWithUpdate(DX12Base::ins(), spBase.get());
 
 	constexpr auto winSize = XMFLOAT2(WinAPI::window_width / 4.f,
 									  WinAPI::window_height / 8.f);

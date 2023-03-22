@@ -6,7 +6,7 @@
 #include <forward_list>
 #include <vector>
 
-#include "GameObj.h"
+#include <GameObject/GameObj.h>
 
 /// @brief 自機クラス
 class Player
@@ -37,9 +37,11 @@ public:
 	XMVECTOR getLookVec(float len = 1.f);
 
 	inline const auto& getShotTarget() const { return shotTargetObjPt; }
-	inline void addShotTarget(std::weak_ptr<GameObj> targetPt)
+	/// @brief 重複無しで攻撃対象を追加
+	/// @return 追加したらtrue
+	inline bool addShotTarget(std::weak_ptr<GameObj> targetPt)
 	{
-		if (targetPt.expired()) { return; }
+		if (targetPt.expired()) { return false; }
 		auto target = targetPt.lock();
 
 		for (auto& i : shotTargetObjPt)
@@ -48,10 +50,11 @@ public:
 
 			if (target == i.lock())
 			{
-				return;
+				return false;
 			}
 		}
 		shotTargetObjPt.emplace_back(target);
+		return true;
 	}
 	inline void deleteShotTarget() { shotTargetObjPt.clear(); }
 

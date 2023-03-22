@@ -14,7 +14,8 @@
 #include "Util/Timer.h"
 #include "Camera/CameraObj.h"
 #include "2D/Sprite.h"
-#include "GameObject/Player.h"
+#include "GameObject/Player/Player.h"
+#include <GameObject/Player/Reticle.h>
 #include "3D/Obj/Object3d.h"
 #include "3D/ParticleMgr.h"
 #include "GameObject/BaseEnemy.h"
@@ -92,7 +93,10 @@ private:
 
 	std::unique_ptr<SpriteBase> spBase;
 
-	std::unique_ptr<Sprite> aim2D;
+	UINT aimGrNum{};
+	std::unique_ptr<Sprite> cursorGr;
+
+	std::forward_list<Reticle> reticle;
 
 	inline static constexpr float playerHpBarWidMax = WinAPI::window_width * 0.25f;
 	float playerHpBarNowRaito = 0.f;

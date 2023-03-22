@@ -129,11 +129,11 @@ RailShoot::RailShoot()
 	// --------------------
 	debugText(new DebugText(spriteBase->loadTexture(L"Resources/debugfont.png"),
 							spriteBase.get())),
-
-	aim2D(new Sprite(spriteBase->loadTexture(L"Resources/aimPos.png"),
-					 spriteBase.get())),
+	aimGrNum(spriteBase->loadTexture(L"Resources/aimPos.png")),
 	operInstPosR(WinAPI::window_width * 0.1f)
 {
+	cursorGr = std::make_unique<Sprite>(aimGrNum, spriteBase.get());
+
 	// 操作説明
 	constexpr XMFLOAT3 centerPos = XMFLOAT3(WinAPI::window_width / 2.f, WinAPI::window_height * 0.75f, 0.f);
 
@@ -361,7 +361,7 @@ RailShoot::RailShoot()
 
 void RailShoot::start()
 {
-	aim2D->isInvisible = true;
+	cursorGr->isInvisible = true;
 	for (auto& i : operInst)
 	{
 		i.second->isInvisible = true;
@@ -569,14 +569,14 @@ void RailShoot::update_play()
 	player->setAim2DPos(XMFLOAT2((float)input->getMousePos().x,
 								 (float)input->getMousePos().y));
 	// 照準の位置に照準画像を表示
-	aim2D->position = XMFLOAT3(player->getAim2DPos().x, player->getAim2DPos().y, 0.f);
+	cursorGr->position = XMFLOAT3(player->getAim2DPos().x, player->getAim2DPos().y, 0.f);
 
 	// 操作説明の位置
 	{
 		if (!operInst.at("Mouse_L")->isInvisible)
 		{
-			operInst.at("Mouse_L")->position = XMFLOAT3(aim2D->position.x,
-														aim2D->position.y,
+			operInst.at("Mouse_L")->position = XMFLOAT3(cursorGr->position.x,
+														cursorGr->position.y,
 														0);
 		}
 
@@ -641,17 +641,18 @@ void RailShoot::update_play()
 	// --------------------
 
 	// 照準の範囲
-	const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - aim2D->getSize().x / 2.f,
-									   input->getMousePos().y - aim2D->getSize().y / 2.f);
-	const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + aim2D->getSize().x / 2.f,
-									   input->getMousePos().y + aim2D->getSize().y / 2.f);
+	const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - cursorGr->getSize().x / 2.f,
+									   input->getMousePos().y - cursorGr->getSize().y / 2.f);
+	const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + cursorGr->getSize().x / 2.f,
+									   input->getMousePos().y + cursorGr->getSize().y / 2.f);
 
-	updateAimCol(aim2DMin, aim2DMax);
+	cursorGr->color = XMFLOAT4(1, 1, 1, 1);
 	if (input->hitMouseButton(Input::MOUSE::LEFT) ||
 		input->hitPadButton(Input::PAD::RB) ||
 		input->hitPadButton(Input::PAD::A) ||
 		input->hitPadButton(Input::PAD::B))
 	{
+		cursorGr->color = XMFLOAT4(1, 0, 0, 1);
 		updatePlayerShotTarget(aim2DMin, aim2DMax);
 
 	} else if (input->releaseTriggerMouseButton(Input::MOUSE::LEFT) ||
@@ -672,7 +673,11 @@ void RailShoot::update_play()
 			shotFlag = true;
 			operInst.at("Mouse_L")->isInvisible = true;
 		}
-		if (shotFlag) { player->deleteShotTarget(); }
+		if (shotFlag)
+		{
+			player->deleteShotTarget();
+			reticle.clear();
+		}
 	}
 
 	// --------------------
@@ -922,7 +927,7 @@ void RailShoot::endAppearPlayer()
 	}
 
 	// 照準を表示
-	aim2D->isInvisible = false;
+	cursorGr->isInvisible = false;
 
 	update_proc = std::bind(&RailShoot::update_play, this);
 	appearPlayer.reset(nullptr);
@@ -930,7 +935,7 @@ void RailShoot::endAppearPlayer()
 
 void RailShoot::startExitPlayer()
 {
-	aim2D->isInvisible = true;
+	cursorGr->isInvisible = true;
 	for (auto& i : operInst)
 	{
 		i.second->isInvisible = true;
@@ -1167,38 +1172,16 @@ void RailShoot::updatePlayerShotTarget(const XMFLOAT2& aim2DMin, const XMFLOAT2&
 			aim2DMax.x >= screenEnemyPos.x &&
 			aim2DMax.y >= screenEnemyPos.y)
 		{
-			player->addShotTarget(i);
+			if (player->addShotTarget(i))
+			{
+				auto& ref = reticle.emplace_front();
+				ref.sprite = std::make_unique<Sprite>(aimGrNum, spriteBase.get());
+				ref.target = i;
+				const auto size = ref.sprite->getSize();
+				ref.sprite->setSize(XMFLOAT2(size.x / 2.f, size.y / 2.f));
+			}
 		}
 	}
-}
-
-void RailShoot::updateAimCol(const XMFLOAT2& aim2DMin, const XMFLOAT2& aim2DMax)
-{
-	// スクリーン上の敵の位置格納変数
-	XMFLOAT2 screenEnemyPos{};
-
-	for (auto& i : enemy)
-	{
-		// いない敵は無視
-		if (!i->getAlive()) { continue; }
-
-		// 敵のスクリーン座標を取得
-		screenEnemyPos = i->getObj()->calcScreenPos();
-
-		// 敵が2D照準の中にいるかどうか
-		if (aim2DMin.x <= screenEnemyPos.x &&
-			aim2DMin.y <= screenEnemyPos.y &&
-			aim2DMax.x >= screenEnemyPos.x &&
-			aim2DMax.y >= screenEnemyPos.y)
-		{
-			// 敵がいれば色を変える
-			aim2D->color = XMFLOAT4(1, 0, 0, 1);
-			return;
-		}
-	}
-
-	// 照準内に敵がいない時の色
-	aim2D->color = XMFLOAT4(1, 1, 1, 1);
 }
 
 void RailShoot::drawObj3d()
@@ -1227,7 +1210,12 @@ void RailShoot::drawFrontSprite()
 {
 	spriteBase->drawStart(dxBase->getCmdList());
 
-	aim2D->drawWithUpdate(dxBase, spriteBase.get());
+	for (auto& i : reticle)
+	{
+		i.drawWithUpdate(spriteBase.get());
+	}
+
+	cursorGr->drawWithUpdate(dxBase, spriteBase.get());
 
 	for (auto& i : operInst)
 	{
