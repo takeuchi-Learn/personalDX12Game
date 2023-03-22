@@ -763,6 +763,7 @@ bool BossScene::addShotTarget(const std::forward_list<std::weak_ptr<BaseEnemy>>&
 			if (player->addShotTarget(i))
 			{
 				auto& ref = reticle.emplace_front();
+				ref.sprite->color = XMFLOAT4(1, 0, 0, 1);
 				ref.sprite = std::make_unique<Sprite>(aimGrNum, spBase.get());
 				ref.target = i;
 				const auto size = ref.sprite->getSize();

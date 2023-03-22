@@ -1179,6 +1179,7 @@ void RailShoot::updatePlayerShotTarget(const XMFLOAT2& aim2DMin, const XMFLOAT2&
 				ref.target = i;
 				const auto size = ref.sprite->getSize();
 				ref.sprite->setSize(XMFLOAT2(size.x / 2.f, size.y / 2.f));
+				ref.sprite->color = XMFLOAT4(1, 0, 0, 1);
 			}
 		}
 	}
