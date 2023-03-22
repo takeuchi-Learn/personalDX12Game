@@ -70,7 +70,6 @@ private:
 
 	std::forward_list<std::shared_ptr<Bul>> bul;
 	ObjModel* bulModel = nullptr;
-	//float bulMoveSpeed = 2.f;
 
 	static const inline uint32_t bulLife = 900u;
 

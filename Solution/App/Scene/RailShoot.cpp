@@ -234,7 +234,6 @@ RailShoot::RailShoot()
 	// --------------------
 
 	// レールの情報読み込み
-	/// todo 関数化
 	{
 		// 制御点の情報はCSVから読み込む
 		const auto csvData = Util::loadCsv("Resources/splinePos.csv", true, ',', "//");
@@ -553,9 +552,9 @@ void RailShoot::update_play()
 		// マウスカーソルの位置をパッド入力に合わせてずらす
 		POINT pos = input->getMousePos();
 
-		XMFLOAT2 rStick = input->getPadRStickRaito();
+		XMFLOAT2 rStick = input->hitPadRStickRaito();
 		float speed = 10.f;
-		if (input->getPadButton(Input::PAD::RIGHT_THUMB))
+		if (input->hitPadButton(Input::PAD::RIGHT_THUMB))
 		{
 			speed /= 2.f;
 		}
@@ -640,20 +639,40 @@ void RailShoot::update_play()
 	// --------------------
 	// 弾発射
 	// --------------------
-	updateAimCol();
-	if (input->triggerMouseButton(Input::MOUSE::LEFT) ||
-		input->triggerPadButton(Input::PAD::RB) ||
-		input->triggerPadButton(Input::PAD::A) ||
-		input->triggerPadButton(Input::PAD::B))
+
+	// 照準の範囲
+	const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - aim2D->getSize().x / 2.f,
+									   input->getMousePos().y - aim2D->getSize().y / 2.f);
+	const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + aim2D->getSize().x / 2.f,
+									   input->getMousePos().y + aim2D->getSize().y / 2.f);
+
+	updateAimCol(aim2DMin, aim2DMax);
+	if (input->hitMouseButton(Input::MOUSE::LEFT) ||
+		input->hitPadButton(Input::PAD::RB) ||
+		input->hitPadButton(Input::PAD::A) ||
+		input->hitPadButton(Input::PAD::B))
 	{
-		updatePlayerShotTarget();
-		if (!player->getShotTarget().expired())
+		updatePlayerShotTarget(aim2DMin, aim2DMax);
+
+	} else if (input->releaseTriggerMouseButton(Input::MOUSE::LEFT) ||
+			   input->releaseTriggerMouseButton(Input::PAD::RB) ||
+			   input->releaseTriggerMouseButton(Input::PAD::A) ||
+			   input->releaseTriggerMouseButton(Input::PAD::B))
+	{
+		bool shotFlag = false;
+		for (auto& i : player->getShotTarget())
 		{
+			if (i.expired()) { continue; }
+
+			if (!i.lock()->getAlive()) { continue; }
+
 			constexpr float bulSpeed = 2.f;
 			player->shot(camera.get(), playerBulModel.get(), bulSpeed);
 
+			shotFlag = true;
 			operInst.at("Mouse_L")->isInvisible = true;
 		}
+		if (shotFlag) { player->deleteShotTarget(); }
 	}
 
 	// --------------------
@@ -996,7 +1015,7 @@ void RailShoot::updateRailPos()
 void RailShoot::movePlayer()
 {
 	// パッドの入力値
-	XMFLOAT2 inputVal = input->getPadLStickRaito();
+	XMFLOAT2 inputVal = input->hitPadLStickRaito();
 
 	// 無効な入力は0にする
 	if (!input->isVaildPadLStickX())
@@ -1013,10 +1032,10 @@ void RailShoot::movePlayer()
 	// 上下
 	if (inputVal.y == 0.f)
 	{
-		if (input->hitKey(DIK_W) || input->hitKey(DIK_UP) || input->getPadButton(Input::PAD::UP))
+		if (input->hitKey(DIK_W) || input->hitKey(DIK_UP) || input->hitPadButton(Input::PAD::UP))
 		{
 			inputVal.y = 1.f;
-		} else if (input->hitKey(DIK_S) || input->hitKey(DIK_DOWN) || input->getPadButton(Input::PAD::DOWN))
+		} else if (input->hitKey(DIK_S) || input->hitKey(DIK_DOWN) || input->hitPadButton(Input::PAD::DOWN))
 		{
 			inputVal.y = -1.f;
 		}
@@ -1025,10 +1044,10 @@ void RailShoot::movePlayer()
 	// 左右
 	if (inputVal.x == 0.f)
 	{
-		if (input->hitKey(DIK_A) || input->hitKey(DIK_LEFT) || input->getPadButton(Input::PAD::LEFT))
+		if (input->hitKey(DIK_A) || input->hitKey(DIK_LEFT) || input->hitPadButton(Input::PAD::LEFT))
 		{
 			inputVal.x = -1.f;
-		} else if (input->hitKey(DIK_D) || input->hitKey(DIK_RIGHT) || input->getPadButton(Input::PAD::RIGHT))
+		} else if (input->hitKey(DIK_D) || input->hitKey(DIK_RIGHT) || input->hitPadButton(Input::PAD::RIGHT))
 		{
 			inputVal.x = 1.f;
 		}
@@ -1061,11 +1080,11 @@ void RailShoot::movePlayer()
 
 		// 高速と低速
 		if (input->hitKey(DIK_LCONTROL) ||
-			input->getPadButton(Input::PAD::LEFT_THUMB))
+			input->hitPadButton(Input::PAD::LEFT_THUMB))
 		{
 			speed /= 2.f;
 		} else if (input->hitKey(DIK_LSHIFT) ||
-				   input->getPadButton(Input::PAD::LB))
+				   input->hitPadButton(Input::PAD::LB))
 		{
 			speed *= 2.f;
 		}
@@ -1128,21 +1147,10 @@ void RailShoot::movePlayer()
 	player->setRotation(playerRot);
 }
 
-void RailShoot::updatePlayerShotTarget()
+void RailShoot::updatePlayerShotTarget(const XMFLOAT2& aim2DMin, const XMFLOAT2& aim2DMax)
 {
-	// 照準の範囲
-	const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - aim2D->getSize().x / 2.f,
-									   input->getMousePos().y - aim2D->getSize().y / 2.f);
-	const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + aim2D->getSize().x / 2.f,
-									   input->getMousePos().y + aim2D->getSize().y / 2.f);
-
 	// スクリーン上の敵の位置格納変数
 	XMFLOAT2 screenEnemyPos{};
-
-	// 遠い敵を調べるためのもの
-	float nowEnemyDistance{};
-	std::weak_ptr<NormalEnemy> farthestEnemyPt;
-	float farthestEnemyLen = 1.f;
 
 	// 照準の中の敵の方へ弾を飛ばす
 	for (auto& i : enemy)
@@ -1159,45 +1167,15 @@ void RailShoot::updatePlayerShotTarget()
 			aim2DMax.x >= screenEnemyPos.x &&
 			aim2DMax.y >= screenEnemyPos.y)
 		{
-			// 敵との距離を更新
-			nowEnemyDistance = std::sqrt(
-				std::pow(i->getPos().x - camera->getEye().x, 2.f) +
-				std::pow(i->getPos().y - camera->getEye().y, 2.f) +
-				std::pow(i->getPos().z - camera->getEye().z, 2.f)
-			);
-			// 照準の中で最も遠い敵なら情報を取っておく
-			if (farthestEnemyLen < nowEnemyDistance)
-			{
-				farthestEnemyPt = i;
-				farthestEnemyLen = nowEnemyDistance;
-			}
+			player->addShotTarget(i);
 		}
-	}
-
-	// 照準の中に敵がいればそこへ弾を出す
-	// いなければターゲットはいない
-	if (farthestEnemyPt.expired())
-	{
-		player->deleteShotTarget();
-	} else
-	{
-		player->setShotTarget(farthestEnemyPt);
 	}
 }
 
-void RailShoot::updateAimCol()
+void RailShoot::updateAimCol(const XMFLOAT2& aim2DMin, const XMFLOAT2& aim2DMax)
 {
-	// 照準の範囲
-	const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - aim2D->getSize().x / 2.f,
-									   input->getMousePos().y - aim2D->getSize().y / 2.f);
-	const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + aim2D->getSize().x / 2.f,
-									   input->getMousePos().y + aim2D->getSize().y / 2.f);
-
 	// スクリーン上の敵の位置格納変数
 	XMFLOAT2 screenEnemyPos{};
-
-	// 照準内に敵がいない時の色
-	aim2D->color = XMFLOAT4(1, 1, 1, 1);
 
 	for (auto& i : enemy)
 	{
@@ -1215,9 +1193,12 @@ void RailShoot::updateAimCol()
 		{
 			// 敵がいれば色を変える
 			aim2D->color = XMFLOAT4(1, 0, 0, 1);
-			break;
+			return;
 		}
 	}
+
+	// 照準内に敵がいない時の色
+	aim2D->color = XMFLOAT4(1, 1, 1, 1);
 }
 
 void RailShoot::drawObj3d()

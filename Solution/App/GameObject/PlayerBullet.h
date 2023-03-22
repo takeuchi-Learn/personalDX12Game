@@ -26,7 +26,7 @@ public:
 	inline uint16_t getLife() const { return life; }
 
 	inline const auto& getTargetObjPt() const { return targetObjPt; }
-	inline void setTargetObjPt(std::weak_ptr<GameObj>& target) { this->targetObjPt = target; }
+	inline void setTargetObjPt(std::weak_ptr<GameObj> target) { this->targetObjPt = target; }
 
 	inline float getSpeed() const { return speed; }
 	inline void setSpeed(float speed) { this->speed = speed; }

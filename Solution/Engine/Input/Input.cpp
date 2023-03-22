@@ -145,7 +145,7 @@ WORD Input::padThumbToDPad(SHORT sThumbX, SHORT sThumbY, SHORT sDeadZone)
 	return wButtons;
 }
 
-DirectX::XMFLOAT2 Input::getPadLStickRaito() const
+DirectX::XMFLOAT2 Input::hitPadLStickRaito() const
 {
 	const bool isLStickX = this->isVaildPadLStickX();
 	const bool isLStickY = this->isVaildPadLStickY();
@@ -154,18 +154,18 @@ DirectX::XMFLOAT2 Input::getPadLStickRaito() const
 
 	if (isLStickX)
 	{
-		inputRaito.x = (float)getPadLStickX() / 32767.f;
+		inputRaito.x = (float)hitPadLStickX() / 32767.f;
 	}
 	if (isLStickY)
 	{
-		inputRaito.y = (float)getPadLStickY() / 32767.f;
+		inputRaito.y = (float)hitPadLStickY() / 32767.f;
 	}
 
 
 	return inputRaito;
 }
 
-DirectX::XMFLOAT2 Input::getPadRStickRaito() const
+DirectX::XMFLOAT2 Input::hitPadRStickRaito() const
 {
 	const bool isRStickX = this->isVaildPadRStickX();
 	const bool isRStickY = this->isVaildPadRStickY();
@@ -174,11 +174,11 @@ DirectX::XMFLOAT2 Input::getPadRStickRaito() const
 
 	if (isRStickX)
 	{
-		inputRaito.x = (float)getPadRStickX() / 32767.f;
+		inputRaito.x = (float)hitPadRStickX() / 32767.f;
 	}
 	if (isRStickY)
 	{
-		inputRaito.y = (float)getPadRStickY() / 32767.f;
+		inputRaito.y = (float)hitPadRStickY() / 32767.f;
 	}
 
 

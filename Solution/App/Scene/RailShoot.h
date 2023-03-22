@@ -231,9 +231,9 @@ class RailShoot
 
 	void updateRailPos();
 	void movePlayer();
-	void updatePlayerShotTarget();
+	void updatePlayerShotTarget(const DirectX::XMFLOAT2& aim2DMin, const DirectX::XMFLOAT2& aim2DMax);
 
-	void updateAimCol();
+	void updateAimCol(const DirectX::XMFLOAT2& aim2DMin, const DirectX::XMFLOAT2& aim2DMax);
 
 public:
 	RailShoot();

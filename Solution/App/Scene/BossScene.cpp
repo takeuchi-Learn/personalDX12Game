@@ -388,28 +388,44 @@ void BossScene::update_play()
 		movePlayer();
 
 		// --------------------
-		// 照準に敵がいるかどうか
-		// --------------------
-
-		const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - aim2D->getSize().x / 2.f,
-										   input->getMousePos().y - aim2D->getSize().y / 2.f);
-		const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + aim2D->getSize().x / 2.f,
-										   input->getMousePos().y + aim2D->getSize().y / 2.f);
-
-		addShotTarget(attackableEnemy, aim2DMin, aim2DMax);
-
-		// --------------------
 		// 弾発射
 		// --------------------
-		if (!player->getShotTarget().expired())
+		if (input->hitMouseButton(Input::MOUSE::LEFT) ||
+			input->hitPadButton(Input::PAD::RB) ||
+			input->hitPadButton(Input::PAD::A) ||
+			input->hitPadButton(Input::PAD::B))
 		{
-			if (input->triggerMouseButton(Input::MOUSE::LEFT) ||
-				input->triggerPadButton(Input::PAD::RB) ||
-				input->triggerPadButton(Input::PAD::A) ||
-				input->triggerPadButton(Input::PAD::B))
+			aim2D->color = XMFLOAT4(1, 0, 0, 1);
+
+			const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - aim2D->getSize().x / 2.f,
+											  input->getMousePos().y - aim2D->getSize().y / 2.f);
+			const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + aim2D->getSize().x / 2.f,
+											   input->getMousePos().y + aim2D->getSize().y / 2.f);
+
+			addShotTarget(attackableEnemy, aim2DMin, aim2DMax);
+
+		} else if (input->releaseTriggerMouseButton(Input::MOUSE::LEFT) ||
+				   input->releaseTriggerMouseButton(Input::PAD::RB) ||
+				   input->releaseTriggerMouseButton(Input::PAD::A) ||
+				   input->releaseTriggerMouseButton(Input::PAD::B))
+		{
+			bool shotFlag = false;
+			for (auto& i : player->getShotTarget())
 			{
+				if (i.expired()) { continue; }
+
+				if (!i.lock()->getAlive()) { continue; }
+
 				constexpr float bulSpeed = 2.f;
 				player->shot(camera.get(), playerBulModel.get(), bulSpeed);
+
+				shotFlag = true;
+			}
+			if (shotFlag)
+			{
+				player->deleteShotTarget();
+
+				aim2D->color = XMFLOAT4(1, 1, 1, 1);
 			}
 		}
 
@@ -724,10 +740,7 @@ bool BossScene::addShotTarget(const std::forward_list<std::weak_ptr<BaseEnemy>>&
 							  const DirectX::XMFLOAT2& aim2DPosMin,
 							  const DirectX::XMFLOAT2& aim2DPosMax)
 {
-	// 遠い敵を調べるためのもの
-	float nowEnemyDistance{};
-	std::weak_ptr<BaseEnemy> farthestEnemyPt;
-	float farthestEnemyLen = 1.f;
+	bool shotFlag = false;
 
 	// 照準の中の敵の方へ弾を飛ばす
 	for (auto& e : enemy)
@@ -745,33 +758,13 @@ bool BossScene::addShotTarget(const std::forward_list<std::weak_ptr<BaseEnemy>>&
 			aim2DPosMax.x >= screenEnemyPos.x &&
 			aim2DPosMax.y >= screenEnemyPos.y)
 		{
-			// 敵との距離を更新
-			nowEnemyDistance = std::sqrt(
-				std::pow(i->getPos().x - camera->getEye().x, 2.f) +
-				std::pow(i->getPos().y - camera->getEye().y, 2.f) +
-				std::pow(i->getPos().z - camera->getEye().z, 2.f)
-			);
-			// 照準の中で最も遠い敵なら情報を取っておく
-			if (farthestEnemyLen < nowEnemyDistance)
-			{
-				farthestEnemyPt = i;
-				farthestEnemyLen = nowEnemyDistance;
-			}
+
+			player->addShotTarget(i);
+			shotFlag = true;
 		}
 	}
 
-	// 照準の中に敵がいればそこへ弾を出す
-	// いなければターゲットはいない
-	if (farthestEnemyPt.expired())
-	{
-		player->deleteShotTarget();
-		aim2D->color = XMFLOAT4(1, 1, 1, 1);
-		return false;
-	}
-
-	player->setShotTarget(farthestEnemyPt);
-	aim2D->color = XMFLOAT4(1, 0, 0, 1);
-	return true;
+	return !shotFlag;
 }
 
 void BossScene::movePlayer()
@@ -792,7 +785,7 @@ void BossScene::movePlayer()
 	}
 
 	// パッドの入力値
-	XMFLOAT2 inputVal = input->getPadLStickRaito();
+	XMFLOAT2 inputVal = input->hitPadLStickRaito();
 
 	// 無効な入力は0にする
 	if (!input->isVaildPadLStickX())
@@ -809,10 +802,10 @@ void BossScene::movePlayer()
 	// 上下
 	if (inputVal.y == 0.f)
 	{
-		if (input->hitKey(DIK_W) || input->hitKey(DIK_UP) || input->getPadButton(Input::PAD::UP))
+		if (input->hitKey(DIK_W) || input->hitKey(DIK_UP) || input->hitPadButton(Input::PAD::UP))
 		{
 			inputVal.y = 1.f;
-		} else if (input->hitKey(DIK_S) || input->hitKey(DIK_DOWN) || input->getPadButton(Input::PAD::DOWN))
+		} else if (input->hitKey(DIK_S) || input->hitKey(DIK_DOWN) || input->hitPadButton(Input::PAD::DOWN))
 		{
 			inputVal.y = -1.f;
 		}
@@ -821,10 +814,10 @@ void BossScene::movePlayer()
 	// 左右
 	if (inputVal.x == 0.f)
 	{
-		if (input->hitKey(DIK_A) || input->hitKey(DIK_LEFT) || input->getPadButton(Input::PAD::LEFT))
+		if (input->hitKey(DIK_A) || input->hitKey(DIK_LEFT) || input->hitPadButton(Input::PAD::LEFT))
 		{
 			inputVal.x = -1.f;
-		} else if (input->hitKey(DIK_D) || input->hitKey(DIK_RIGHT) || input->getPadButton(Input::PAD::RIGHT))
+		} else if (input->hitKey(DIK_D) || input->hitKey(DIK_RIGHT) || input->hitPadButton(Input::PAD::RIGHT))
 		{
 			inputVal.x = 1.f;
 		}
@@ -855,11 +848,11 @@ void BossScene::movePlayer()
 
 		// 高速と低速
 		if (input->hitKey(DIK_LCONTROL) ||
-			input->getPadButton(Input::PAD::LEFT_THUMB))
+			input->hitPadButton(Input::PAD::LEFT_THUMB))
 		{
 			speed /= 2.f;
 		} else if (input->hitKey(DIK_LSHIFT) ||
-				   input->getPadButton(Input::PAD::LB))
+				   input->hitPadButton(Input::PAD::LB))
 		{
 			speed *= 2.f;
 		}
@@ -893,9 +886,9 @@ void BossScene::moveAim2DPos()
 						  pos.y - center.y);
 
 	// 右スティックの入力で速度を決める
-	XMFLOAT2 rStick = input->getPadRStickRaito();
+	XMFLOAT2 rStick = input->hitPadRStickRaito();
 	float stickSpeed = 10.f;
-	if (input->getPadButton(Input::PAD::RIGHT_THUMB))
+	if (input->hitPadButton(Input::PAD::RIGHT_THUMB))
 	{
 		stickSpeed /= 2.f;
 	}

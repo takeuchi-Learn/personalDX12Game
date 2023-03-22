@@ -152,25 +152,25 @@ public:
 	{
 	public:
 		/// @brief 列挙型に使う型
-		using enumType = int;
+		using enumType = BYTE;
 
 		/// @brief 実際使われる列挙型
 		enum PADNUM : enumType
 		{
-			A = XINPUT_GAMEPAD_A,
-			B = XINPUT_GAMEPAD_B,
-			X = XINPUT_GAMEPAD_X,
-			Y = XINPUT_GAMEPAD_Y,
-			LB = XINPUT_GAMEPAD_LEFT_SHOULDER,
-			RB = XINPUT_GAMEPAD_RIGHT_SHOULDER,
-			UP = XINPUT_GAMEPAD_DPAD_UP,
-			DOWN = XINPUT_GAMEPAD_DPAD_DOWN,
-			LEFT = XINPUT_GAMEPAD_DPAD_LEFT,
-			RIGHT = XINPUT_GAMEPAD_DPAD_RIGHT,
-			LEFT_THUMB = XINPUT_GAMEPAD_LEFT_THUMB,
-			RIGHT_THUMB = XINPUT_GAMEPAD_RIGHT_THUMB,
-			START = XINPUT_GAMEPAD_START,
-			BACK = XINPUT_GAMEPAD_BACK,
+			A = (enumType)XINPUT_GAMEPAD_A,
+			B = (enumType)XINPUT_GAMEPAD_B,
+			X = (enumType)XINPUT_GAMEPAD_X,
+			Y = (enumType)XINPUT_GAMEPAD_Y,
+			LB = (enumType)XINPUT_GAMEPAD_LEFT_SHOULDER,
+			RB = (enumType)XINPUT_GAMEPAD_RIGHT_SHOULDER,
+			UP = (enumType)XINPUT_GAMEPAD_DPAD_UP,
+			DOWN = (enumType)XINPUT_GAMEPAD_DPAD_DOWN,
+			LEFT = (enumType)XINPUT_GAMEPAD_DPAD_LEFT,
+			RIGHT = (enumType)XINPUT_GAMEPAD_DPAD_RIGHT,
+			LEFT_THUMB = (enumType)XINPUT_GAMEPAD_LEFT_THUMB,
+			RIGHT_THUMB = (enumType)XINPUT_GAMEPAD_RIGHT_THUMB,
+			START = (enumType)XINPUT_GAMEPAD_START,
+			BACK = (enumType)XINPUT_GAMEPAD_BACK,
 		};
 
 	private:
@@ -213,7 +213,7 @@ public:
 	/// @return 方向パッドフラグ
 	WORD padThumbToDPad(SHORT sThumbX, SHORT sThumbY, SHORT sDeadZone);
 
-	inline bool getPadButton(int button) const
+	inline bool hitPadButton(int button) const
 	{
 		return state.Gamepad.wButtons & button;
 	}
@@ -225,14 +225,14 @@ public:
 
 #pragma region パッドのトリガーボタン
 
-	inline BYTE getPadLTVal() const { return state.Gamepad.bLeftTrigger; }
-	inline BYTE getPadRTVal() const { return state.Gamepad.bRightTrigger; }
-	inline bool getInputPadLT() const
+	inline BYTE hitPadLTVal() const { return state.Gamepad.bLeftTrigger; }
+	inline BYTE hitPadRTVal() const { return state.Gamepad.bRightTrigger; }
+	inline bool hitInputPadLT() const
 	{
 		return state.Gamepad.bLeftTrigger >
 			XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
 	}
-	inline bool getInputPadRT() const
+	inline bool hitInputPadRT() const
 	{
 		return state.Gamepad.bRightTrigger >
 			XINPUT_GAMEPAD_TRIGGER_THRESHOLD;
@@ -242,21 +242,21 @@ public:
 
 #pragma region 左スティック
 
-	inline SHORT getPadLStickY() const
+	inline SHORT hitPadLStickY() const
 	{
 		return state.Gamepad.sThumbLY;
 	}
-	inline SHORT getPadLStickX() const
+	inline SHORT hitPadLStickX() const
 	{
 		return state.Gamepad.sThumbLX;
 	}
 
-	inline bool getPadLStickUp() const
+	inline bool hitPadLStickUp() const
 	{
 		return state.Gamepad.sThumbLY >=
 			XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
 	}
-	inline bool getPadLStickDown() const
+	inline bool hitPadLStickDown() const
 	{
 		return state.Gamepad.sThumbLY <=
 			-XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
@@ -264,45 +264,45 @@ public:
 
 	inline bool isVaildPadLStickY() const
 	{
-		return getPadLStickUp() || getPadLStickDown();
+		return hitPadLStickUp() || hitPadLStickDown();
 	}
 
-	inline bool getPadLStickLeft() const
+	inline bool hitPadLStickLeft() const
 	{
 		return state.Gamepad.sThumbLX <=
 			-XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
 	}
-	inline bool getPadLStickRight() const
+	inline bool hitPadLStickRight() const
 	{
 		return state.Gamepad.sThumbLX >=
 			XINPUT_GAMEPAD_LEFT_THUMB_DEADZONE;
 	}
 	inline bool isVaildPadLStickX() const
 	{
-		return getPadLStickLeft() || getPadLStickRight();
+		return hitPadLStickLeft() || hitPadLStickRight();
 	}
 
-	DirectX::XMFLOAT2 getPadLStickRaito() const;
+	DirectX::XMFLOAT2 hitPadLStickRaito() const;
 
 #pragma endregion 左スティック
 
 #pragma region 右スティック
 
-	inline SHORT getPadRStickX() const
+	inline SHORT hitPadRStickX() const
 	{
 		return state.Gamepad.sThumbRX;
 	}
-	inline SHORT getPadRStickY() const
+	inline SHORT hitPadRStickY() const
 	{
 		return state.Gamepad.sThumbRY;
 	}
 
-	inline bool getPadRStickUp() const
+	inline bool hitPadRStickUp() const
 	{
 		return state.Gamepad.sThumbRY >=
 			XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
 	}
-	inline bool getPadRStickDown() const
+	inline bool hitPadRStickDown() const
 	{
 		return state.Gamepad.sThumbRY <=
 			-XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
@@ -310,25 +310,25 @@ public:
 
 	inline bool isVaildPadRStickY() const
 	{
-		return getPadRStickUp() || getPadRStickDown();
+		return hitPadRStickUp() || hitPadRStickDown();
 	}
 
-	inline bool getPadRStickLeft() const
+	inline bool hitPadRStickLeft() const
 	{
 		return state.Gamepad.sThumbRX <=
 			-XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
 	}
-	inline bool getPadRStickRight() const
+	inline bool hitPadRStickRight() const
 	{
 		return state.Gamepad.sThumbRX >=
 			XINPUT_GAMEPAD_RIGHT_THUMB_DEADZONE;
 	}
 	inline bool isVaildPadRStickX() const
 	{
-		return getPadRStickLeft() || getPadRStickRight();
+		return hitPadRStickLeft() || hitPadRStickRight();
 	}
 
-	DirectX::XMFLOAT2 getPadRStickRaito() const;
+	DirectX::XMFLOAT2 hitPadRStickRaito() const;
 
 #pragma endregion 右スティック
 

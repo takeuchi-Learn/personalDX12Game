@@ -4,6 +4,7 @@
 
 #include "PlayerBullet.h"
 #include <forward_list>
+#include <vector>
 
 #include "GameObj.h"
 
@@ -19,7 +20,7 @@ class Player
 
 	DirectX::XMFLOAT2 aim2DPos{};
 
-	std::weak_ptr<GameObj> shotTargetObjPt;
+	std::vector<std::weak_ptr<GameObj>> shotTargetObjPt;
 
 	uint16_t hp;
 
@@ -36,8 +37,23 @@ public:
 	XMVECTOR getLookVec(float len = 1.f);
 
 	inline const auto& getShotTarget() const { return shotTargetObjPt; }
-	inline void setShotTarget(std::weak_ptr<GameObj> targetPt) { shotTargetObjPt = targetPt; }
-	inline void deleteShotTarget() { shotTargetObjPt.reset(); }
+	inline void addShotTarget(std::weak_ptr<GameObj> targetPt)
+	{
+		if (targetPt.expired()) { return; }
+		auto target = targetPt.lock();
+
+		for (auto& i : shotTargetObjPt)
+		{
+			if (i.expired()) { continue; }
+
+			if (target == i.lock())
+			{
+				return;
+			}
+		}
+		shotTargetObjPt.emplace_back(target);
+	}
+	inline void deleteShotTarget() { shotTargetObjPt.clear(); }
 
 	inline auto& getBulArr() { return bul; }
 

@@ -28,19 +28,22 @@ void Player::shot(Camera* camera,
 				  float speed,
 				  float bulScale)
 {
-	PlayerBullet& i = bul.emplace_front(camera, model, obj->position);
-	i.setScale(bulScale);
-	i.setCol(XMFLOAT4(1.f, 0.25f, 0.25f, 1.f));
-	i.setPos(this->calcWorldPos());
-	i.setLife(bulLife);
-	i.setSpeed(speed);
-	XMFLOAT3 tmp{};
-	XMStoreFloat3(&tmp, XMVector3Transform(XMVectorSet(0, 0, speed, 1), obj->getMatRota()));
-	i.setVel(tmp);
-
-	if (!shotTargetObjPt.expired())
+	for (const auto& i : shotTargetObjPt)
 	{
-		i.setTargetObjPt(shotTargetObjPt);
+		PlayerBullet& pb = bul.emplace_front(camera, model, obj->position);
+		pb.setScale(bulScale);
+		pb.setCol(XMFLOAT4(1.f, 0.25f, 0.25f, 1.f));
+		pb.setPos(this->calcWorldPos());
+		pb.setLife(bulLife);
+		pb.setSpeed(speed);
+		XMFLOAT3 tmp{};
+		XMStoreFloat3(&tmp, XMVector3Transform(XMVectorSet(0, 0, speed, 1), obj->getMatRota()));
+		pb.setVel(tmp);
+
+		if (!i.expired())
+		{
+			pb.setTargetObjPt(i);
+		}
 	}
 }
 
