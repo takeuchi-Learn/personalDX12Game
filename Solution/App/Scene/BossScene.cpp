@@ -741,7 +741,8 @@ bool BossScene::addShotTarget(const std::forward_list<std::weak_ptr<BaseEnemy>>&
 							  const DirectX::XMFLOAT2& aim2DPosMin,
 							  const DirectX::XMFLOAT2& aim2DPosMax)
 {
-	bool shotFlag = false;
+	// 撃ったかどうか（戻り値用）
+	bool noShot = true;
 
 	// 照準の中の敵の方へ弾を飛ばす
 	for (auto& e : enemy)
@@ -762,18 +763,21 @@ bool BossScene::addShotTarget(const std::forward_list<std::weak_ptr<BaseEnemy>>&
 
 			if (player->addShotTarget(i))
 			{
-				auto& ref = reticle.emplace_front();
-				ref.sprite->color = XMFLOAT4(1, 0, 0, 1);
-				ref.sprite = std::make_unique<Sprite>(aimGrNum, spBase.get());
+				auto& ref = reticle.emplace_front(aimGrNum, spBase.get());
+
 				ref.target = i;
+
+				ref.sprite->color = XMFLOAT4(1, 0, 0, 1);
+
 				const auto size = ref.sprite->getSize();
 				ref.sprite->setSize(XMFLOAT2(size.x / 2.f, size.y / 2.f));
-			shotFlag = true;
+
+				noShot = false;
 			}
 		}
 	}
 
-	return !shotFlag;
+	return noShot;
 }
 
 void BossScene::movePlayer()

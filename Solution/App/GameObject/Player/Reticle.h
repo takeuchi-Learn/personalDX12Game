@@ -8,6 +8,8 @@ public:
 	std::unique_ptr<Sprite> sprite;
 	std::weak_ptr<GameObj> target;
 
+	Reticle(UINT texNum, const SpriteBase* spBase);
+
 	void update(const SpriteBase* spBase);
 	void draw(const SpriteBase* spBase);
 

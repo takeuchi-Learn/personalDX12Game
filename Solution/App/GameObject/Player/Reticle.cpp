@@ -1,5 +1,11 @@
 ﻿#include "Reticle.h"
 
+Reticle::Reticle(UINT texNum,
+				 const SpriteBase* spBase) :
+	sprite(std::make_unique<Sprite>(texNum, spBase))
+{
+}
+
 void Reticle::update(const SpriteBase* spBase)
 {
 	if (sprite->isInvisible) { return; }

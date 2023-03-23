@@ -1174,12 +1174,14 @@ void RailShoot::updatePlayerShotTarget(const XMFLOAT2& aim2DMin, const XMFLOAT2&
 		{
 			if (player->addShotTarget(i))
 			{
-				auto& ref = reticle.emplace_front();
-				ref.sprite = std::make_unique<Sprite>(aimGrNum, spriteBase.get());
+				auto& ref = reticle.emplace_front(aimGrNum, spriteBase.get());
+
 				ref.target = i;
+
+				ref.sprite->color = XMFLOAT4(1, 0, 0, 1);
+
 				const auto size = ref.sprite->getSize();
 				ref.sprite->setSize(XMFLOAT2(size.x / 2.f, size.y / 2.f));
-				ref.sprite->color = XMFLOAT4(1, 0, 0, 1);
 			}
 		}
 	}
