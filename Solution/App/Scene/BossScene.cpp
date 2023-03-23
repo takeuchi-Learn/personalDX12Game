@@ -74,11 +74,6 @@ void BossScene::initGameObj()
 	initPlayer();
 
 	initEnemy();
-
-	// 体力バー
-	hpBarModel = std::make_unique<ObjModel>("Resources/hpBar/", "hpBar");
-	const auto& bossBar = hpBar.emplace("boss", std::make_unique<Object3d>(camera.get(), hpBarModel.get())).first->second;
-	bossBar->scale.y = 5.f;
 }
 
 void BossScene::initPlayer()
@@ -315,8 +310,9 @@ void BossScene::update_start()
 	// 体力バー
 	float barRaito = 1.f - raito;
 	barRaito *= barRaito * barRaito * barRaito;
-	playerHpBarNowRaito = 1.f - barRaito;
-	playerFrontHpBarNowRaito = playerHpBarNowRaito;
+	playerHpBar.backNowRaito = 1.f - barRaito;
+	playerHpBar.frontNowRaito = playerHpBar.backNowRaito;
+
 }
 
 void BossScene::update_appearBoss()
@@ -363,9 +359,10 @@ void BossScene::update_appearBoss()
 	barRaito *= barRaito * barRaito * barRaito;
 	barRaito = 1.f - barRaito;
 
-	hpBar.at("boss")->scale.x = std::lerp(appearBossData->startBossHpGrScale,
-										  appearBossData->endBossHpGrScale,
-										  barRaito);
+	bossHpBar.frontNowRaito = std::lerp(appearBossData->startBossHpGrScale,
+										appearBossData->endBossHpGrScale,
+										barRaito);
+	bossHpBar.backNowRaito = bossHpBar.frontNowRaito;
 }
 
 void BossScene::update_play()
@@ -535,9 +532,13 @@ void BossScene::update_play()
 	}
 
 	// 自機の体力バーの大きさを変更
-	float oldLen = playerHpBarNowRaito;
-	playerFrontHpBarNowRaito = (float)player->getHp() / (float)playerHpMax;
-	playerHpBarNowRaito = std::lerp(oldLen, playerFrontHpBarNowRaito, 0.125f);
+	float oldLen = playerHpBar.backNowRaito;
+	playerHpBar.frontNowRaito = (float)player->getHp() / (float)playerHpMax;
+	playerHpBar.backNowRaito = std::lerp(oldLen, playerHpBar.frontNowRaito, 0.125f);
+
+	oldLen = bossHpBar.backNowRaito;
+	bossHpBar.frontNowRaito = (float)calcBossHp() / (float)bossHpMax;
+	bossHpBar.backNowRaito = std::lerp(oldLen, bossHpBar.frontNowRaito, 0.125f);
 }
 
 void BossScene::update_killBoss()
@@ -601,7 +602,7 @@ void BossScene::startAppearBoss()
 				.startCamLen = camParam->eye2TargetLen,
 				.endCamLen = camParam->eye2TargetLen * 4.f,
 				.startBossHpGrScale = 0.f,
-				.endBossHpGrScale = 100.f,
+				.endBossHpGrScale = 1.f,
 				.startCamAngle = angle,
 				.endCamAngle = angle + 360.f,
 			}
@@ -628,7 +629,8 @@ void BossScene::endAppearBoss()
 	camera->setRelativeRotaDeg(camParam->angleRad);
 	camera->setEye2TargetLen(camParam->eye2TargetLen);
 
-	hpBar.at("boss")->scale.x = appearBossData->endBossHpGrScale;
+	bossHpBar.frontNowRaito = appearBossData->endBossHpGrScale;
+	bossHpBar.backNowRaito = bossHpBar.frontNowRaito;
 
 	// 関数を変える
 	update_proc = std::bind(&BossScene::update_play, this);
@@ -638,9 +640,6 @@ void BossScene::startKillBoss()
 {
 	// 照準は消す
 	cursorGr->isInvisible = true;
-
-	// ボスの体力は消す
-	hpBar.at("boss")->drawFlag = false;
 
 	// カメラの情報を取っておく
 	camParam =
@@ -693,12 +692,6 @@ void BossScene::drawObj3d()
 	for (auto& i : bossParts)
 	{
 		i->drawWithUpdate(light.get());
-	}
-
-	updateBossHpBar();
-	for (auto& i : hpBar)
-	{
-		i.second->drawWithUpdate(light.get());
 	}
 
 	particleMgr->drawWithUpdate();
@@ -931,32 +924,6 @@ void BossScene::rotaBackObj()
 	backModel->setShivtUv(shiftUv);
 }
 
-void BossScene::updateBossHpBar()
-{
-	if (!boss->getDrawFlag()) { return; }
-
-	const auto& bossBar = hpBar.at("boss");
-	if (!bossBar->drawFlag) { return; }
-
-	const XMFLOAT3 bossPos = boss->calcWorldPos();
-
-	// カメラを向く
-	XMFLOAT3 velF3 = camera->getEye();
-	velF3.x -= bossPos.x;
-	velF3.y -= bossPos.y;
-	velF3.z -= bossPos.z;
-	const XMFLOAT2 rotaDeg = GameObj::calcRotationSyncVelDeg(velF3);
-	bossBar->rotation.x = rotaDeg.x;
-	bossBar->rotation.y = rotaDeg.y;
-
-	/// その他更新
-	bossBar->position = bossPos;
-	bossBar->position.y += boss->getScaleF3().y + bossBar->scale.y;
-	bossBar->scale.x = std::lerp(bossBar->scale.x,
-							   (float)calcBossHp() / (float)bossHpMax * boss->getScaleF3().x,
-							   0.5f);
-}
-
 void BossScene::drawFrontSprite()
 {
 	spBase->drawStart(DX12Base::ins()->getCmdList());
@@ -968,21 +935,8 @@ void BossScene::drawFrontSprite()
 
 	cursorGr->drawWithUpdate(DX12Base::ins(), spBase.get());
 
-	constexpr auto winSize = XMFLOAT2(WinAPI::window_width / 4.f,
-									  WinAPI::window_height / 8.f);
-
-	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x,
-								   fstWinPos.y));
-	ImGui::SetNextWindowSize(ImVec2(winSize.x, winSize.y));
-
-	ImGui::Begin("ボス戦", nullptr, winFlags);
-	ImGui::PushFont(dxBase->getBigImFont());
-	ImGui::Text("イボを撃ち潰せ！");
-	ImGui::PopFont();
-	ImGui::End();
-
 	// 自機の体力バー
-	if (0.f < playerHpBarNowRaito)
+	if (0.f < playerHpBar.backNowRaito)
 	{
 		// 自機体力
 		constexpr XMFLOAT2 hpWinSize = XMFLOAT2(playerHpBarWidMax, (float)WinAPI::window_height / 32.f);
@@ -1009,15 +963,66 @@ void BossScene::drawFrontSprite()
 
 		ImGui::GetWindowDrawList()->AddRectFilled(
 			f2ToIV2(posLT),
-			ImVec2(posLT.x + barSize.x * playerHpBarNowRaito,
+			ImVec2(posLT.x + barSize.x * playerHpBar.backNowRaito,
 				   posLT.y + barSize.y),
 			ImU32(0xff2222f8)
 		);
 
 		ImGui::GetWindowDrawList()->AddRectFilled(
 			f2ToIV2(posLT),
-			ImVec2(posLT.x + barSize.x * playerFrontHpBarNowRaito,
+			ImVec2(posLT.x + barSize.x * playerHpBar.frontNowRaito,
 				   posLT.y + barSize.y),
+			ImU32(0xfff8f822)
+		);
+
+		ImGui::End();
+	}
+
+	// ボス体力バー
+	if (0.f < bossHpBar.frontNowRaito)
+	{
+		// 自機体力
+		constexpr XMFLOAT2 hpWinSize = XMFLOAT2(bossHpBarWidMax, (float)WinAPI::window_height / 32.f);
+		constexpr XMFLOAT2 hpWinPosCT = XMFLOAT2(WinAPI::window_width / 2.f, hpWinSize.y * 2.f);
+
+		// 縁の大きさ
+		constexpr XMFLOAT2 shiftVal = XMFLOAT2(hpWinSize.x / 40.f, hpWinSize.y / 4.f);
+
+		// ウインドウの位置と大きさを指定
+		ImGui::SetNextWindowPos(f2ToIV2(hpWinPosCT), 0, ImVec2(0.5f, 0.5f));
+		ImGui::SetNextWindowSize(f2ToIV2(hpWinSize));
+
+		ImGui::Begin("ボス体力", nullptr, winFlags);
+		const ImVec2 size = ImGui::GetWindowSize();
+
+		// ウインドウ内のバーの大きさ
+		const ImVec2 barSizeMax = ImVec2(size.x - shiftVal.x * 2.f,
+										 size.y - shiftVal.y * 2.f);
+
+		float barWid = barSizeMax.x * bossHpBar.backNowRaito;
+
+		ImVec2 posLT{}, posRB{};
+
+		posLT.x = hpWinPosCT.x - barWid / 2.f;
+		posRB.x = hpWinPosCT.x + barWid / 2.f;
+
+		posLT.y = hpWinPosCT.y - barSizeMax.y / 2.f;
+		posRB.y = hpWinPosCT.y + barSizeMax.y / 2.f;
+
+		ImGui::GetWindowDrawList()->AddRectFilled(
+			posLT,
+			posRB,
+			ImU32(0xff2222f8)
+		);
+
+		barWid = barSizeMax.x * bossHpBar.frontNowRaito;
+
+		posLT.x = hpWinPosCT.x - barWid / 2.f;
+		posRB.x = hpWinPosCT.x + barWid / 2.f;
+
+		ImGui::GetWindowDrawList()->AddRectFilled(
+			posLT,
+			posRB,
 			ImU32(0xfff8f822)
 		);
 

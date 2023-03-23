@@ -63,10 +63,6 @@ private:
 	// 背景のパイプライン
 	size_t backPipelineSet;
 
-	// 体力バー
-	std::unique_ptr<ObjModel> hpBarModel;
-	std::unordered_map<std::string, std::unique_ptr<Object3d>> hpBar;
-
 	// 背景と地面
 	std::unique_ptr<Object3d> backObj;
 	std::unique_ptr<ObjModel> backModel;
@@ -98,9 +94,17 @@ private:
 
 	std::forward_list<Reticle> reticle;
 
+	struct HpBar
+	{
+		float backNowRaito = 0.f;
+		float frontNowRaito = 0.f;
+	};
+
 	inline static constexpr float playerHpBarWidMax = WinAPI::window_width * 0.25f;
-	float playerHpBarNowRaito = 0.f;
-	float playerFrontHpBarNowRaito = 0.f;
+	HpBar playerHpBar;
+
+	inline static constexpr float bossHpBarWidMax = WinAPI::window_width * 0.75f;
+	HpBar bossHpBar;
 
 #pragma endregion スプライト
 
@@ -167,8 +171,6 @@ private:
 	void moveAim2DPos();
 
 	void rotaBackObj();
-
-	void updateBossHpBar();
 
 #pragma region updateの中身
 
