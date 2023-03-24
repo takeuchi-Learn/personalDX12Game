@@ -23,7 +23,7 @@ bool Player::damage(uint16_t damegeNum, bool killFlag)
 	return false;
 }
 
-bool Player::shot(Camera* camera,
+bool Player::shotAll(Camera* camera,
 				  ObjModel* model,
 				  float speed,
 				  float bulScale)

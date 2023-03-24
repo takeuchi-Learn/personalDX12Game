@@ -660,7 +660,7 @@ void RailShoot::update_play()
 			   input->releaseTriggerMouseButton(Input::PAD::A) ||
 			   input->releaseTriggerMouseButton(Input::PAD::B))
 	{
-		if (player->shot(camera.get(), playerBulModel.get(), 2.f))
+		if (player->shotAll(camera.get(), playerBulModel.get(), 2.f))
 		{
 			operInst.at("Mouse_L")->isInvisible = true;
 			reticle.clear();
