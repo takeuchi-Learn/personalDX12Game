@@ -5,7 +5,7 @@
 class Sequencer :
 	public BaseComposite
 {
-	NODE_RESULT mainProc();
+	NODE_RESULT mainProc() override;
 public:
 	using BaseComposite::BaseComposite;
 };

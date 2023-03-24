@@ -5,7 +5,8 @@
 
 using namespace DirectX;
 
-NODE_RESULT BossBehavior::phase_Rotation(const DirectX::XMFLOAT3& rotaMax)
+NODE_RESULT BossBehavior::phase_Rotation(const DirectX::XMFLOAT3& rotaMin,
+										 const DirectX::XMFLOAT3& rotaMax)
 {
 	if (rotationPhaseData.count.nowVal++ > rotationPhaseData.count.maxVal)
 	{
@@ -16,9 +17,9 @@ NODE_RESULT BossBehavior::phase_Rotation(const DirectX::XMFLOAT3& rotaMax)
 	const float raito = (float)rotationPhaseData.count.nowVal / (float)rotationPhaseData.count.maxVal;
 
 	XMFLOAT3 rot{};
-	rot.x = std::lerp(0.f, rotaMax.x, raito);
-	rot.y = std::lerp(0.f, rotaMax.y, raito);
-	rot.z = std::lerp(0.f, rotaMax.z, raito);
+	rot.x = std::lerp(rotaMin.x, rotaMax.x, raito);
+	rot.y = std::lerp(rotaMin.z, rotaMax.y, raito);
+	rot.z = std::lerp(rotaMin.x, rotaMax.z, raito);
 
 	boss->setRotation(rot);
 
@@ -134,11 +135,11 @@ BossBehavior::BossBehavior(BossEnemy* boss) :
 
 	// 各フェーズを登録
 	fanShapePhase = std::make_unique<Sequencer>();
-	fanShapePhase->addChild(Task(std::bind(&BossBehavior::phase_Rotation, this, XMFLOAT3(0, 360*2, 0))));
+	fanShapePhase->addChild(Task(std::bind(&BossBehavior::phase_Rotation, this, XMFLOAT3(0, 0, 0), XMFLOAT3(0, 720, 0))));
 	fanShapePhase->addChild(Task(std::bind(&BossBehavior::phase_fanShapeAttack, this)));
 
 	singleShotPhase = std::make_unique<Sequencer>();
-	singleShotPhase->addChild(Task(std::bind(&BossBehavior::phase_Rotation, this, XMFLOAT3(360, -360, 0))));
+	singleShotPhase->addChild(Task(std::bind(&BossBehavior::phase_Rotation, this, XMFLOAT3(0, 0, 0), XMFLOAT3(360, -360, 0))));
 	singleShotPhase->addChild(Task(std::bind(&BossBehavior::phase_singleShotAttack, this)));
 
 	addChild(*fanShapePhase);

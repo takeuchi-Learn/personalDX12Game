@@ -14,12 +14,12 @@ public:
 	/// @return 長さ
 	inline static float vecLength(DirectX::XMVECTOR vec)
 	{
-		float len{};
-		DirectX::XMStoreFloat(&len, vec);
-		return len;
+		return std::sqrt(vec.m128_f32[0] * vec.m128_f32[0] +
+						 vec.m128_f32[1] * vec.m128_f32[1] +
+						 vec.m128_f32[2]);
 	}
 
-private:
+	//private:
 	inline static float vec3Dot(const DirectX::XMVECTOR& v1,
 								const DirectX::XMVECTOR& v2)
 	{

@@ -81,7 +81,8 @@ private:
 	// priavteメンバ関数
 	// ---------------
 
-	NODE_RESULT phase_Rotation(const DirectX::XMFLOAT3& rotaMax = DirectX::XMFLOAT3(0, 360, 0));
+	NODE_RESULT phase_Rotation(const DirectX::XMFLOAT3& rotaMin,
+							   const DirectX::XMFLOAT3& rotaMax = DirectX::XMFLOAT3(0, 360, 0));
 	NODE_RESULT phase_fanShapeAttack();
 	NODE_RESULT phase_singleShotAttack();
 

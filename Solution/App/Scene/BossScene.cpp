@@ -826,11 +826,8 @@ void BossScene::movePlayer()
 	if (moveYFlag || moveXFlag)
 	{
 		// 入力値を0~1にする
-		const float len = std::sqrt(
-			inputVal.x * inputVal.x +
-			inputVal.y * inputVal.y
-		);
-		if (len > 1.f)
+		if (float len = std::sqrt(inputVal.x * inputVal.x +
+								  inputVal.y * inputVal.y) > 1.f)
 		{
 			inputVal.x /= len;
 			inputVal.y /= len;
@@ -872,11 +869,11 @@ void BossScene::moveAim2DPos()
 								   WinAPI::window_height / 2);
 
 	// マウスカーソルの位置をパッド入力に合わせてずらす
-	const POINT pos = input->getMousePos();
+	const POINT prePos = input->getMousePos();
 	input->setMousePos(center.x, center.y);
 
-	POINT posDiff = POINT(pos.x - center.x,
-						  pos.y - center.y);
+	POINT posDiff = POINT(prePos.x - center.x,
+						  prePos.y - center.y);
 
 	// 右スティックの入力で速度を決める
 	XMFLOAT2 rStick = input->hitPadRStickRaito();
