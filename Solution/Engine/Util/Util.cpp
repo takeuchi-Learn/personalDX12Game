@@ -2,14 +2,23 @@
 #include <fstream>
 #include <sstream>
 
+std::unordered_map<std::string, Util::CSVType> Util::loadedCsvData{};
+
 using namespace DirectX;
 
-Util::CSVType Util::loadCsv(const std::string& csvFilePath,
-							bool commentFlag,
-							char divChar,
-							const std::string& commentStartStr)
+const Util::CSVType& Util::loadCsv(const std::string& csvFilePath,
+								   bool commentFlag,
+								   char divChar,
+								   const std::string& commentStartStr)
 {
-	CSVType csvData{};	// csvの中身を格納
+	auto data = loadedCsvData.try_emplace(csvFilePath, CSVType());
+	if (!data.second)
+	{
+		return data.first->second;
+	}
+
+	CSVType& csvData = data.first->second;
+
 
 	std::ifstream ifs(csvFilePath);
 	if (!ifs)
