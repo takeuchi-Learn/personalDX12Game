@@ -406,21 +406,8 @@ void BossScene::update_play()
 				   input->releaseTriggerMouseButton(Input::PAD::A) ||
 				   input->releaseTriggerMouseButton(Input::PAD::B))
 		{
-			bool shotFlag = false;
-			for (auto& i : player->getShotTarget())
+			if (player->shot(camera.get(), playerBulModel.get(), 2.f))
 			{
-				if (i.expired()) { continue; }
-
-				if (!i.lock()->getAlive()) { continue; }
-
-				constexpr float bulSpeed = 2.f;
-				player->shot(camera.get(), playerBulModel.get(), bulSpeed);
-
-				shotFlag = true;
-			}
-			if (shotFlag)
-			{
-				player->deleteShotTarget();
 				reticle.clear();
 
 				cursorGr->color = XMFLOAT4(1, 1, 1, 1);
@@ -961,17 +948,18 @@ void BossScene::drawFrontSprite()
 		const ImVec2 barSize = ImVec2(size.x - shiftVal.x * 2.f,
 									  size.y - shiftVal.y * 2.f);
 
+		ImVec2 posRB = ImVec2(posLT.x + barSize.x * playerHpBar.backNowRaito,
+							  posLT.y + barSize.y);
+
 		ImGui::GetWindowDrawList()->AddRectFilled(
-			f2ToIV2(posLT),
-			ImVec2(posLT.x + barSize.x * playerHpBar.backNowRaito,
-				   posLT.y + barSize.y),
+			f2ToIV2(posLT), posRB,
 			ImU32(0xff2222f8)
 		);
 
+		posRB.x = posLT.x + barSize.x * playerHpBar.frontNowRaito;
+
 		ImGui::GetWindowDrawList()->AddRectFilled(
-			f2ToIV2(posLT),
-			ImVec2(posLT.x + barSize.x * playerHpBar.frontNowRaito,
-				   posLT.y + barSize.y),
+			f2ToIV2(posLT), posRB,
 			ImU32(0xfff8f822)
 		);
 
@@ -999,30 +987,26 @@ void BossScene::drawFrontSprite()
 		const ImVec2 barSizeMax = ImVec2(size.x - shiftVal.x * 2.f,
 										 size.y - shiftVal.y * 2.f);
 
-		float barWid = barSizeMax.x * bossHpBar.backNowRaito;
+		float barHalfWid = barSizeMax.x * bossHpBar.backNowRaito / 2.f;
 
-		ImVec2 posLT{}, posRB{};
+		ImVec2 posLT = ImVec2(hpWinPosCT.x - barHalfWid,
+							  hpWinPosCT.y - barSizeMax.y / 2.f);
 
-		posLT.x = hpWinPosCT.x - barWid / 2.f;
-		posRB.x = hpWinPosCT.x + barWid / 2.f;
-
-		posLT.y = hpWinPosCT.y - barSizeMax.y / 2.f;
-		posRB.y = hpWinPosCT.y + barSizeMax.y / 2.f;
+		ImVec2 posRB = ImVec2(hpWinPosCT.x + barHalfWid,
+							  hpWinPosCT.y + barSizeMax.y / 2.f);
 
 		ImGui::GetWindowDrawList()->AddRectFilled(
-			posLT,
-			posRB,
+			posLT, posRB,
 			ImU32(0xff2222f8)
 		);
 
-		barWid = barSizeMax.x * bossHpBar.frontNowRaito;
+		barHalfWid = barSizeMax.x * bossHpBar.frontNowRaito / 2.f;
 
-		posLT.x = hpWinPosCT.x - barWid / 2.f;
-		posRB.x = hpWinPosCT.x + barWid / 2.f;
+		posLT.x = hpWinPosCT.x - barHalfWid;
+		posRB.x = hpWinPosCT.x + barHalfWid;
 
 		ImGui::GetWindowDrawList()->AddRectFilled(
-			posLT,
-			posRB,
+			posLT, posRB,
 			ImU32(0xfff8f822)
 		);
 

@@ -72,7 +72,8 @@ public:
 	/// @param model 弾のモデル
 	/// @param speed 速度
 	/// @param bulScale 弾の大きさ
-	void shot(Camera* camera,
+	/// @return	ターゲットを設定したかどうか
+	bool shot(Camera* camera,
 			  ObjModel* model,
 			  float speed = 1.f,
 			  float bulScale = 10.f);

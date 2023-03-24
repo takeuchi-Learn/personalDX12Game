@@ -23,11 +23,12 @@ bool Player::damage(uint16_t damegeNum, bool killFlag)
 	return false;
 }
 
-void Player::shot(Camera* camera,
+bool Player::shot(Camera* camera,
 				  ObjModel* model,
 				  float speed,
 				  float bulScale)
 {
+	bool ret = false;
 	for (const auto& i : shotTargetObjPt)
 	{
 		PlayerBullet& pb = bul.emplace_front(camera, model, obj->position);
@@ -40,11 +41,15 @@ void Player::shot(Camera* camera,
 		XMStoreFloat3(&tmp, XMVector3Transform(XMVectorSet(0, 0, speed, 1), obj->getMatRota()));
 		pb.setVel(tmp);
 
-		if (!i.expired())
+		if (!i.expired() && i.lock()->getAlive())
 		{
 			pb.setTargetObjPt(i);
+			ret = true;
 		}
 	}
+
+	deleteShotTarget();
+	return ret;
 }
 
 void Player::additionalUpdate()

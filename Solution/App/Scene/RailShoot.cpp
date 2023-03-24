@@ -660,22 +660,9 @@ void RailShoot::update_play()
 			   input->releaseTriggerMouseButton(Input::PAD::A) ||
 			   input->releaseTriggerMouseButton(Input::PAD::B))
 	{
-		bool shotFlag = false;
-		for (auto& i : player->getShotTarget())
+		if (player->shot(camera.get(), playerBulModel.get(), 2.f))
 		{
-			if (i.expired()) { continue; }
-
-			if (!i.lock()->getAlive()) { continue; }
-
-			constexpr float bulSpeed = 2.f;
-			player->shot(camera.get(), playerBulModel.get(), bulSpeed);
-
-			shotFlag = true;
 			operInst.at("Mouse_L")->isInvisible = true;
-		}
-		if (shotFlag)
-		{
-			player->deleteShotTarget();
 			reticle.clear();
 		}
 	}
@@ -1229,8 +1216,10 @@ void RailShoot::drawFrontSprite()
 
 	// 最初のウインドウの位置を指定
 	constexpr XMFLOAT2 fstWinPos = XMFLOAT2((float)WinAPI::window_width / 50.f, (float)WinAPI::window_height / 50.f);
+	constexpr XMFLOAT2 fstWinSize = XMFLOAT2((float)WinAPI::window_width / 5.f, (float)WinAPI::window_height / 4.f);
+
 	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x, fstWinPos.y));
-	ImGui::SetNextWindowSize(ImVec2(256.f, 128.f));
+	ImGui::SetNextWindowSize(ImVec2(fstWinSize.x, fstWinSize.y));
 
 	ImGui::Begin("レールシューティング", nullptr, DX12Base::imGuiWinFlagsDef);
 	ImGui::Text("");
@@ -1238,6 +1227,14 @@ void RailShoot::drawFrontSprite()
 				(float)player->getHp() / (float)playerHpMax * 100.f,
 				player->getHp(),
 				playerHpMax);
+	ImGui::Text("");
+	ImGui::Text("WASD : 移動");
+	ImGui::Text("マウス左ドラッグ : ロックオン");
+	ImGui::Text("マウス左離す : 発射");
+	ImGui::Text("弾%u, 敵%u", (UINT)std::distance(player->getBulArr().begin(),
+												player->getBulArr().end()),
+								 (UINT)std::distance(reticle.begin(),
+													 reticle.end()));
 	ImGui::End();
 
 	// 自機の体力バー
