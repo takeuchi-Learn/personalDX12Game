@@ -30,7 +30,6 @@ class RailShoot
 
 	std::unique_ptr<Timer> timer;
 
-
 #pragma region ImGui
 
 	static constexpr ImGuiWindowFlags winFlags =

@@ -58,6 +58,7 @@ public:
 private:
 	static const USHORT divNum = 2;	// 2以上にする
 	LONGLONG fpsTime[divNum]{};
+	constexpr static USHORT divLen = divNum - 1;
 	float fps;
 
 	void flipTimeFPS();

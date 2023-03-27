@@ -2,7 +2,6 @@
 
 using namespace DirectX;
 
-
 void GameObj::moveForward(float moveVel, bool moveYFlag)
 {
 	// Z方向のベクトルを、自機の向いている向きに回転

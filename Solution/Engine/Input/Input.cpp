@@ -161,7 +161,6 @@ DirectX::XMFLOAT2 Input::hitPadLStickRaito() const
 		inputRaito.y = (float)hitPadLStickY() / 32767.f;
 	}
 
-
 	return inputRaito;
 }
 
@@ -180,7 +179,6 @@ DirectX::XMFLOAT2 Input::hitPadRStickRaito() const
 	{
 		inputRaito.y = (float)hitPadRStickY() / 32767.f;
 	}
-
 
 	return inputRaito;
 }

@@ -75,7 +75,6 @@ private:
 
 #pragma endregion 扇形攻撃
 
-
 private:
 	// ---------------
 	// priavteメンバ関数

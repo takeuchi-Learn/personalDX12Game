@@ -588,23 +588,24 @@ void DX12Base::endImGui()
 
 void DX12Base::flipTimeFPS()
 {
-	for (UINT i = divNum - 1; i > 0; i--)
+	for (UINT i = divLen; i > 0; --i)
 	{
 		fpsTime[i] = fpsTime[i - 1];
 	}
 	fpsTime[0] = std::chrono::duration_cast<Timer::timeUnit>(
 		std::chrono::steady_clock::now() - std::chrono::steady_clock::time_point()
-		).count();
+	).count();
 }
 
 void DX12Base::updateFPS()
 {
 	LONGLONG avgDiffTime = 0ll;
-	for (UINT i = 0; i < divNum - 1; ++i)
+
+	for (UINT i = 0; i < divLen; ++i)
 	{
 		avgDiffTime += fpsTime[i] - fpsTime[i + 1];
 	}
-	avgDiffTime /= divNum - 1;
+	avgDiffTime /= divLen;
 
 	fps = -1.f;
 	if (avgDiffTime != 0ll) fps = Timer::oneSecF / avgDiffTime;

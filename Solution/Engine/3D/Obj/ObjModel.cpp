@@ -220,13 +220,13 @@ ObjModel::ObjModel(const std::string& dirPath, const std::string& objModelName, 
 
 ObjModel::~ObjModel()
 {
-	for (auto m : meshes)
+	for (auto& m : meshes)
 	{
 		delete m;
 	}
 	meshes.clear();
 
-	for (auto m : materials)
+	for (auto& m : materials)
 	{
 		delete m.second;
 	}
@@ -376,9 +376,9 @@ void ObjModel::init(const std::string& dirPath, const std::string& modelname, UI
 					index_stream >> indexNormal;
 					// 頂点データの追加
 					Mesh::VertexPosNormalUv vertex{};
-					vertex.pos = positions[indexPosition - 1];
-					vertex.normal = normals[indexNormal - 1];
-					vertex.uv = texcoords[indexTexcoord - 1];
+					vertex.pos = positions[size_t(indexPosition - 1)];
+					vertex.normal = normals[size_t(indexNormal - 1)];
+					vertex.uv = texcoords[size_t(indexTexcoord - 1)];
 					mesh->addVertex(vertex);
 					// エッジ平滑化用データ追加
 					if (smoothing)
@@ -395,7 +395,7 @@ void ObjModel::init(const std::string& dirPath, const std::string& modelname, UI
 					{
 						// 頂点データの追加
 						Mesh::VertexPosNormalUv vertex{};
-						vertex.pos = positions[indexPosition - 1];
+						vertex.pos = positions[size_t(indexPosition - 1)];
 						vertex.normal = { 0, 0, 1 };
 						vertex.uv = { 0, 0 };
 						mesh->addVertex(vertex);
@@ -407,8 +407,8 @@ void ObjModel::init(const std::string& dirPath, const std::string& modelname, UI
 						index_stream >> indexNormal;
 						// 頂点データの追加
 						Mesh::VertexPosNormalUv vertex{};
-						vertex.pos = positions[indexPosition - 1];
-						vertex.normal = normals[indexNormal - 1];
+						vertex.pos = positions[size_t(indexPosition - 1)];
+						vertex.normal = normals[size_t(indexNormal - 1)];
 						vertex.uv = { 0, 0 };
 						mesh->addVertex(vertex);
 					}

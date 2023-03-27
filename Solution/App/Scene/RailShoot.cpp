@@ -654,7 +654,6 @@ void RailShoot::update_play()
 	{
 		cursorGr->color = XMFLOAT4(1, 0, 0, 1);
 		updatePlayerShotTarget(aim2DMin, aim2DMax);
-
 	} else if (input->releaseTriggerMouseButton(Input::MOUSE::LEFT) ||
 			   input->releaseTriggerPadButton(Input::PAD::RB) ||
 			   input->releaseTriggerPadButton(Input::PAD::A) ||

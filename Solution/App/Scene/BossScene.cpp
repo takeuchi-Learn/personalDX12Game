@@ -312,7 +312,6 @@ void BossScene::update_start()
 	barRaito *= barRaito * barRaito * barRaito;
 	playerHpBar.backNowRaito = 1.f - barRaito;
 	playerHpBar.frontNowRaito = playerHpBar.backNowRaito;
-
 }
 
 void BossScene::update_appearBoss()
@@ -505,7 +504,6 @@ void BossScene::update_play()
 											   input->getMousePos().y + cursorGr->getSize().y / 2.f);
 
 			addShotTarget(attackableEnemy, aim2DMin, aim2DMax);
-
 		} else if (input->releaseTriggerMouseButton(Input::MOUSE::LEFT) ||
 				   input->releaseTriggerPadButton(Input::PAD::RB) ||
 				   input->releaseTriggerPadButton(Input::PAD::A) ||
@@ -741,7 +739,6 @@ bool BossScene::addShotTarget(const std::forward_list<std::weak_ptr<BaseEnemy>>&
 			aim2DPosMax.x >= screenEnemyPos.x &&
 			aim2DPosMax.y >= screenEnemyPos.y)
 		{
-
 			if (player->addShotTarget(i))
 			{
 				auto& ref = reticle.emplace_front(aimGrNum, spBase.get());
@@ -871,7 +868,6 @@ void BossScene::movePlayer()
 				playerParent->moveRight(-moveVel);
 			} else
 			{
-
 				playerRot = 45.f * -inputVal.x;
 			}
 		}
