@@ -656,9 +656,9 @@ void RailShoot::update_play()
 		updatePlayerShotTarget(aim2DMin, aim2DMax);
 
 	} else if (input->releaseTriggerMouseButton(Input::MOUSE::LEFT) ||
-			   input->releaseTriggerMouseButton(Input::PAD::RB) ||
-			   input->releaseTriggerMouseButton(Input::PAD::A) ||
-			   input->releaseTriggerMouseButton(Input::PAD::B))
+			   input->releaseTriggerPadButton(Input::PAD::RB) ||
+			   input->releaseTriggerPadButton(Input::PAD::A) ||
+			   input->releaseTriggerPadButton(Input::PAD::B))
 	{
 		if (player->shotAll(camera.get(), playerBulModel.get(), 2.f))
 		{

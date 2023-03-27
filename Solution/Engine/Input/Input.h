@@ -152,7 +152,7 @@ public:
 	{
 	public:
 		/// @brief 列挙型に使う型
-		using enumType = BYTE;
+		using enumType = WORD;
 
 		/// @brief 実際使われる列挙型
 		enum PADNUM : enumType
@@ -213,14 +213,19 @@ public:
 	/// @return 方向パッドフラグ
 	WORD padThumbToDPad(SHORT sThumbX, SHORT sThumbY, SHORT sDeadZone);
 
-	inline bool hitPadButton(int button) const
+	inline bool hitPadButton(WORD button) const
 	{
 		return state.Gamepad.wButtons & button;
 	}
-	inline bool triggerPadButton(int button) const
+	inline bool triggerPadButton(WORD button) const
 	{
 		return (state.Gamepad.wButtons & button) &&
 			!(preState.Gamepad.wButtons & button);
+	}
+	inline bool releaseTriggerPadButton(WORD button) const
+	{
+		return !(state.Gamepad.wButtons & button) &&
+			(preState.Gamepad.wButtons & button);
 	}
 
 #pragma region パッドのトリガーボタン
