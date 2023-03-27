@@ -7,7 +7,7 @@ NODE_RESULT Sequencer::mainProc()
 		 ++i)
 	{
 		// ノードの実行結果
-		const auto res = child[i].run();
+		const NODE_RESULT res = child[i].run();
 
 		// 実行中なら現在位置を記録して終了
 		if (res == NODE_RESULT::RUNNING)

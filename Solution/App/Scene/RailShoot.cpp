@@ -1231,10 +1231,6 @@ void RailShoot::drawFrontSprite()
 	ImGui::Text("WASD : 移動");
 	ImGui::Text("マウス左ドラッグ : ロックオン");
 	ImGui::Text("マウス左離す : 発射");
-	ImGui::Text("弾%u, 敵%u", (UINT)std::distance(player->getBulArr().begin(),
-												player->getBulArr().end()),
-								 (UINT)std::distance(reticle.begin(),
-													 reticle.end()));
 	ImGui::End();
 
 	// 自機の体力バー

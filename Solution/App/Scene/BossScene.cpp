@@ -693,35 +693,34 @@ void BossScene::startRgbShift()
 
 void BossScene::updateRgbShift()
 {
-	if (rgbShiftFlag)
+	if (!rgbShiftFlag) { return; }
+
+	nowRgbShiftTime = timer->getNowTime() - startRgbShiftTime;
+
+	const float raito = (float)nowRgbShiftTime / (float)rgbShiftTimeMax;
+	if (raito > 1.f)
 	{
-		nowRgbShiftTime = timer->getNowTime() - startRgbShiftTime;
-
-		const float raito = (float)nowRgbShiftTime / (float)rgbShiftTimeMax;
-		if (raito > 1.f)
-		{
-			PostEffect::getInstance()->setRgbShiftNum({ 0.f, 0.f });
-			rgbShiftFlag = false;
-			return;
-		}
-
-		// ずらす最大値
-		constexpr float rgbShiftMumMax = 1.f / 16.f;
-
-		// イージングを加味した進行割合
-		constexpr float  c4 = 2.f * XM_PI / 3.f;
-		const float easeRate = -std::pow(2.f, 10.f * (1.f - raito) - 10.f) *
-			DX12Base::ins()->nearSin((raito * 10.f - 10.75f) * c4);
-
-		PostEffect::getInstance()->setRgbShiftNum({ easeRate * rgbShiftMumMax, 0.f });
+		PostEffect::getInstance()->setRgbShiftNum({ 0.f, 0.f });
+		rgbShiftFlag = false;
+		return;
 	}
+
+	// ずらす最大値
+	constexpr float rgbShiftMumMax = 1.f / 16.f;
+
+	// イージングを加味した進行割合
+	constexpr float  c4 = 2.f * XM_PI / 3.f;
+	const float easeRate = -std::pow(2.f, 10.f * (1.f - raito) - 10.f) *
+		DX12Base::ins()->nearSin((raito * 10.f - 10.75f) * c4);
+
+	PostEffect::getInstance()->setRgbShiftNum({ easeRate * rgbShiftMumMax, 0.f });
 }
 
 bool BossScene::addShotTarget(const std::forward_list<std::weak_ptr<BaseEnemy>>& enemy,
 							  const DirectX::XMFLOAT2& aim2DPosMin,
 							  const DirectX::XMFLOAT2& aim2DPosMax)
 {
-	// 撃ったかどうか（戻り値用）
+	// 撃ってないかどうか（戻り値用）
 	bool noShot = true;
 
 	// 照準の中の敵の方へ弾を飛ばす
