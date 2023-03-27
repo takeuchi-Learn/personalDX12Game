@@ -12,11 +12,9 @@ public:
 	/// @brief ベクトルの長さを計算
 	/// @param vec 対象のベクトル
 	/// @return 長さ
-	inline static float vecLength(DirectX::XMVECTOR vec)
+	inline static float vecLength(const DirectX::XMVECTOR& vec)
 	{
-		return std::sqrt(vec.m128_f32[0] * vec.m128_f32[0] +
-						 vec.m128_f32[1] * vec.m128_f32[1] +
-						 vec.m128_f32[2]);
+		return DirectX::XMVectorGetX(DirectX::XMVector3Length(vec));
 	}
 
 	//private:

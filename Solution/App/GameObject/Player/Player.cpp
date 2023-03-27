@@ -31,10 +31,9 @@ bool Player::shotAll(Camera* camera,
 	bool ret = false;
 	for (const auto& i : shotTargetObjPt)
 	{
-		PlayerBullet& pb = bul.emplace_front(camera, model, obj->position);
+		PlayerBullet& pb = bul.emplace_front(camera, model, this->calcWorldPos());
 		pb.setScale(bulScale);
 		pb.setCol(XMFLOAT4(1.f, 0.25f, 0.25f, 1.f));
-		pb.setPos(this->calcWorldPos());
 		pb.setLife(bulLife);
 		pb.setSpeed(speed);
 		XMFLOAT3 tmp{};

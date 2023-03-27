@@ -4,10 +4,13 @@ using namespace DirectX;
 
 void PlayerBullet::additionalUpdate()
 {
-	// 寿命が来たら死ぬ
-	if (++age > life)
+	// 対象がおらず、寿命が来たら死ぬ
+	if (targetObjPt.expired())
 	{
-		alive = false;
+		if (++age > life)
+		{
+			alive = false;
+		}
 	}
 
 	if (alive && !targetObjPt.expired())

@@ -95,8 +95,8 @@ void BossScene::initPlayer()
 
 	player->setBulLife(600ui16);
 
-	sceneChangeStartPos = XMFLOAT3(0.f, 500.f, 0.f);
-	sceneChangeEndPos = XMFLOAT3(0.f, 0.f, 0.f);
+	sceneChangeStartPos = XMFLOAT3(0.f, 500.f, -800.f);
+	sceneChangeEndPos = XMFLOAT3(0.f, 0.f, -800.f);
 
 	sceneChangeStartRota = playerParent->getRotation();
 	sceneChangeStartRota.y += 90.f;
@@ -114,7 +114,7 @@ void BossScene::initBoss()
 	bossBulModel = std::make_unique<ObjModel>("Resources/sphere", "sphere");
 	boss = std::make_unique<BossEnemy>(camera.get(), nullptr);
 
-	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 800));
+	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 0));
 	boss->setRotation(XMFLOAT3(0, 180.f, 0));
 	boss->setTargetObj(player.get());
 	boss->setBulModel(bossBulModel.get());
@@ -385,36 +385,6 @@ void BossScene::update_play()
 		movePlayer();
 
 		// --------------------
-		// 弾発射
-		// --------------------
-		if (input->hitMouseButton(Input::MOUSE::LEFT) ||
-			input->hitPadButton(Input::PAD::RB) ||
-			input->hitPadButton(Input::PAD::A) ||
-			input->hitPadButton(Input::PAD::B))
-		{
-			cursorGr->color = XMFLOAT4(1, 0, 0, 1);
-
-			const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - cursorGr->getSize().x / 2.f,
-											  input->getMousePos().y - cursorGr->getSize().y / 2.f);
-			const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + cursorGr->getSize().x / 2.f,
-											   input->getMousePos().y + cursorGr->getSize().y / 2.f);
-
-			addShotTarget(attackableEnemy, aim2DMin, aim2DMax);
-
-		} else if (input->releaseTriggerMouseButton(Input::MOUSE::LEFT) ||
-				   input->releaseTriggerMouseButton(Input::PAD::RB) ||
-				   input->releaseTriggerMouseButton(Input::PAD::A) ||
-				   input->releaseTriggerMouseButton(Input::PAD::B))
-		{
-			if (player->shotAll(camera.get(), playerBulModel.get(), 2.f))
-			{
-				reticle.clear();
-
-				cursorGr->color = XMFLOAT4(1, 1, 1, 1);
-			}
-		}
-
-		// --------------------
 		// 自機弾と敵の当たり判定
 		// --------------------
 		for (auto& e : attackableEnemy)
@@ -495,6 +465,7 @@ void BossScene::update_play()
 			}
 		}
 
+		// ボスのパーツがすべて死んだらボス本体は死ぬ
 		if (boss->getAlive())
 		{
 			bool alive = false;
@@ -512,9 +483,40 @@ void BossScene::update_play()
 			}
 		}
 
+		// ボスが死んだらボス撃破演出へ移動
 		if (!boss->getAlive())
 		{
 			startKillBoss();
+		}
+
+		// --------------------
+		// 弾発射
+		// --------------------
+		if (input->hitMouseButton(Input::MOUSE::LEFT) ||
+			input->hitPadButton(Input::PAD::RB) ||
+			input->hitPadButton(Input::PAD::A) ||
+			input->hitPadButton(Input::PAD::B))
+		{
+			cursorGr->color = XMFLOAT4(1, 0, 0, 1);
+
+			const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - cursorGr->getSize().x / 2.f,
+											  input->getMousePos().y - cursorGr->getSize().y / 2.f);
+			const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + cursorGr->getSize().x / 2.f,
+											   input->getMousePos().y + cursorGr->getSize().y / 2.f);
+
+			addShotTarget(attackableEnemy, aim2DMin, aim2DMax);
+
+		} else if (input->releaseTriggerMouseButton(Input::MOUSE::LEFT) ||
+				   input->releaseTriggerMouseButton(Input::PAD::RB) ||
+				   input->releaseTriggerMouseButton(Input::PAD::A) ||
+				   input->releaseTriggerMouseButton(Input::PAD::B))
+		{
+			if (player->shotAll(camera.get(), playerBulModel.get(), 2.f))
+			{
+				reticle.clear();
+
+				cursorGr->color = XMFLOAT4(1, 1, 1, 1);
+			}
 		}
 	}
 
@@ -849,12 +851,29 @@ void BossScene::movePlayer()
 		// 移動させる
 		if (moveYFlag)
 		{
-			playerParent->moveForward(inputVal.y * speed);
+			const float moveVel = inputVal.y * speed;
+			playerParent->moveForward(moveVel);
+
+			const float len = Collision::vecLength(XMLoadFloat3(&playerParent->getPos()));
+			if (len > 1500.f)
+			{
+				playerParent->moveForward(-moveVel);
+			}
 		}
 		if (moveXFlag)
 		{
-			playerParent->moveRight(inputVal.x * speed);
-			playerRot = 45.f * -inputVal.x;
+			const float moveVel = inputVal.x * speed;
+			playerParent->moveRight(moveVel);
+
+			const float len = Collision::vecLength(XMLoadFloat3(&playerParent->getPos()));
+			if (len > 1500.f)
+			{
+				playerParent->moveRight(-moveVel);
+			} else
+			{
+
+				playerRot = 45.f * -inputVal.x;
+			}
 		}
 	}
 	player->setRotation(XMFLOAT3(player->getRotation().x,
