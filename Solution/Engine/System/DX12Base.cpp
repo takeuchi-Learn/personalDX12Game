@@ -16,10 +16,10 @@ using namespace Microsoft::WRL;
 
 #include <DirectXMath.h>
 
-#include "Util/Timer.h"
-#include "KaisoTai_base85.h"
-#include "Makinas_4_Flat_base85.h"
-#include "GlyphRangesJapanese.h"
+#include <Util/Timer.h>
+#include <ImGuiData/KaisoTai_base85.h>
+#include <ImGuiData/Makinas_4_Flat_base85.h>
+#include <ImGuiData/GlyphRangesJapanese.h>
 
 using namespace DirectX;
 
