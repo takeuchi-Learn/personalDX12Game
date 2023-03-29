@@ -491,6 +491,7 @@ void BossScene::update_play()
 		// --------------------
 		// 弾発射
 		// --------------------
+		cursorGr->color = XMFLOAT4(1, 1, 1, 1);
 		if (input->hitMouseButton(Input::MOUSE::LEFT) ||
 			input->hitPadButton(Input::PAD::RB) ||
 			input->hitPadButton(Input::PAD::A) ||
@@ -499,7 +500,7 @@ void BossScene::update_play()
 			cursorGr->color = XMFLOAT4(1, 0, 0, 1);
 
 			const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - cursorGr->getSize().x / 2.f,
-											  input->getMousePos().y - cursorGr->getSize().y / 2.f);
+											   input->getMousePos().y - cursorGr->getSize().y / 2.f);
 			const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + cursorGr->getSize().x / 2.f,
 											   input->getMousePos().y + cursorGr->getSize().y / 2.f);
 
@@ -530,8 +531,8 @@ void BossScene::update_play()
 
 void BossScene::update_killBoss()
 {
-	const auto nowTime = timer->getNowTime();
-	constexpr auto endTime = Timer::oneSecF * 3;
+	const Timer::timeType nowTime = timer->getNowTime();
+	constexpr Timer::timeType endTime = Timer::oneSec * 3;
 
 	if (nowTime > endTime)
 	{

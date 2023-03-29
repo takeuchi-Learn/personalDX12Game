@@ -26,18 +26,6 @@ public:
 		return ret;
 	}
 
-	/// @brief 値をクランプ
-	/// @param x クランプする値
-	/// @param low 最小値
-	/// @param high 最大値
-	/// @return クランプ後の値
-	inline static float clamp(float x, float low, float high)
-	{
-		x = (x < low) ? low : x;
-		x = (x < high) ? high : x;
-		return x;
-	}
-
 	/// @brief 線分同士の距離の2乗
 	/// @param p1 線分1の始点
 	/// @param q1 線分2の始点

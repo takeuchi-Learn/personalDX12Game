@@ -1,4 +1,5 @@
 ﻿#include "Collision.h"
+#include <algorithm>
 
 using namespace DirectX;
 using namespace CollisionShape;
@@ -27,12 +28,10 @@ float Collision::sqDistanceSegmentSegment(const XMVECTOR& p1, const XMVECTOR& q1
 	if (denominator != 0.f)
 	{	// 平行でないなら
 		s = (b * f - c * e) / denominator;
-		s = clamp(s, 0.f, 1.f);
+		s = std::clamp(s, 0.f, 1.f);
 	} else
 	{
-		{
-			s = 0.f;
-		}
+		s = 0.f;
 	}
 
 	// tを求める
@@ -44,11 +43,11 @@ float Collision::sqDistanceSegmentSegment(const XMVECTOR& p1, const XMVECTOR& q1
 	if (t < 0.f)
 	{
 		t = 0.f;
-		s = clamp(-c / a, 0.f, 1.f);
+		s = std::clamp(-c / a, 0.f, 1.f);
 	} else if (t > 1.f)
 	{
-		s = clamp((b - c) / a, 0.f, 1.f);
 		t = 1.f;
+		s = std::clamp((b - c) / a, 0.f, 1.f);
 	}
 
 	// sとtが決定したので、各線分内の座標c1,c2を求める
@@ -56,7 +55,7 @@ float Collision::sqDistanceSegmentSegment(const XMVECTOR& p1, const XMVECTOR& q1
 	const XMVECTOR c2 = p2 + t * d2;
 
 	// 2点(c1, c2)間の距離の2乗を返す
-	const auto vlen = c1 - c2;
+	const XMVECTOR vlen = c1 - c2;
 	return vec3Dot(vlen, vlen);	// vlen・vlen <- 各要素をそれぞれ掛けて全て足す
 }
 
