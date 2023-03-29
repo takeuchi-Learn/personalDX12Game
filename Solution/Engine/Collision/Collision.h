@@ -139,4 +139,11 @@ public:
 	static bool CheckSphere2Sphere(const Sphere& sphere1, const Sphere& sphere2);
 
 	inline static bool CheckHit(const Sphere& sphere, const Sphere& sphere2) { return CheckSphere2Sphere(sphere, sphere2); }
+
+	static bool CheckBox2Box(const Box& box1, const Box& box2);
+	inline static bool CheckHit(const Box& box1, const Box& box2) { return CheckBox2Box(box1, box2); }
+
+	static bool CheckBox2Sphere(const Box& box, const Sphere& sphere);
+	inline static bool CheckHit(const Box& box, const Sphere& sphere) { return CheckBox2Sphere(box, sphere); }
+	inline static bool CheckHit(const Sphere& sphere, const Box& box) { return CheckBox2Sphere(box, sphere); }
 };

@@ -102,6 +102,21 @@ namespace CollisionShape
 			: startPos(sPos), endPos(ePos), radius(r)
 		{}
 	};
+
+	struct Box
+	{
+		DirectX::XMVECTOR center{};
+		DirectX::XMVECTOR size{};
+		DirectX::XMVECTOR rotaQuaternion{};
+
+		Box(const DirectX::XMVECTOR& center = { 0,0,0,1 },
+			const DirectX::XMVECTOR& size = { 1,1,1,1 },
+			const DirectX::XMVECTOR& rotaQuaternion = { 0,0,0,0 }) :
+			center(center),
+			size(size),
+			rotaQuaternion(rotaQuaternion)
+		{}
+	};
 }
 
 #ifndef NO_USING_NAMESPACE_COLLISION_SHAPE
