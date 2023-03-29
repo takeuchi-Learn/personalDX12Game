@@ -4,28 +4,18 @@
 
 #include "Scene/TitleScene.h"
 
+#include <System/Looper.h>
+
 SceneManager::SceneManager()
 	: nextScene(nullptr),
 	postEff2Num((UINT)PostEffect::getInstance()->addPipeLine(L"Resources/Shaders/PostEffectPS_2.hlsl"))
 {
-	nowScene.reset((GameScene*)new TitleScene());
+	nowScene = std::make_unique<TitleScene>();
 	nowScene->start();
 }
 
 void SceneManager::update()
 {
-	// ESCで終了
-	if (Input::getInstance()->hitKey(DIK_ESCAPE))
-	{
-		// 今のシーンを削除
-		nowScene.reset(nullptr);
-
-		// 終了させる
-		exitGame();
-
-		return;
-	}
-
 	// 次のシーンがあったら
 	if (nextScene)
 	{
@@ -40,6 +30,12 @@ void SceneManager::update()
 	}
 
 	nowScene->update();
+
+	// ESCで終了
+	if (Input::ins()->hitKey(DIK_ESCAPE))
+	{
+		Looper::getInstance()->exitGame();
+	}
 }
 
 void SceneManager::drawObj3d()

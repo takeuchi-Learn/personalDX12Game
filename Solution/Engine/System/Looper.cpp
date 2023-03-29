@@ -85,7 +85,7 @@ Looper::~Looper()
 	popImGuiCol();
 }
 
-bool Looper::loopUpdate()
+void Looper::loopUpdate()
 {
 	// 入力情報の更新
 	Input::getInstance()->update();
@@ -94,12 +94,9 @@ bool Looper::loopUpdate()
 	// シーンマネージャーの更新
 	// --------------------
 	SceneManager::getInstange()->update();
-
-	// 終了するかどうかを返す
-	return SceneManager::getInstange()->getExitGameFlag();
 }
 
-bool Looper::loopDraw()
+void Looper::loopDraw()
 {
 	// --------------------
 	// シーンマネージャーの描画
@@ -122,13 +119,12 @@ bool Looper::loopDraw()
 
 	DX12Base::ins()->endImGui();
 	DX12Base::ins()->endDraw();
-
-	return false;
 }
 
 bool Looper::loop()
 {
-	if (loopUpdate()) { return true; }
+	loopUpdate();
+	loopDraw();
 
-	return loopDraw();
+	return exitFlag;
 }

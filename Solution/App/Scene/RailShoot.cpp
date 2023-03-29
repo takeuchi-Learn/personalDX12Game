@@ -60,153 +60,8 @@ namespace
 	constexpr XMFLOAT3 noKillEffCol = XMFLOAT3(0.25f, 1.f, 1.f);
 }
 
-void RailShoot::loadEnemyScript()
+void RailShoot::loadBackObj()
 {
-	const auto csvData = Util::loadCsv("Resources/enemyScript.csv", true, ',', "//");
-	{
-		for (auto& y : csvData)
-		{
-			enemyPopData.emplace_front(
-				std::make_unique<PopEnemyData>((uint16_t)std::stoul(y[3]),
-											   XMFLOAT3(std::stof(y[0]),
-														std::stof(y[1]),
-														std::stof(y[2])),
-											   XMFLOAT3(0, 0, -1)));
-		}
-	}
-}
-
-RailShoot::RailShoot()
-	: dxBase(DX12Base::getInstance()),
-	input(Input::getInstance()),
-
-	// --------------------
-	// 更新関数の格納変数
-	// --------------------
-	update_proc(std::bind(&RailShoot::update_start, this)),
-
-	// --------------------
-	// シーンに必要な諸要素
-	// --------------------
-	camera(std::make_unique<CameraObj>(nullptr)),
-	light(std::make_unique<Light>()),
-
-	timer(std::make_unique<Timer>()),
-
-	spriteBase(std::make_unique<SpriteBase>(SpriteBase::BLEND_MODE::ALPHA)),
-
-	// --------------------
-	// 敵モデル
-	// --------------------
-	enemyModel(std::make_unique<ObjModel>("Resources/tori", "tori", 0U, true)),
-	enemyBulModel(std::make_unique<ObjModel>("Resources/bullet", "bullet", 0U, true)),
-
-	// --------------------
-	// 自機関連
-	// --------------------
-	playerModel(std::make_unique<ObjModel>("Resources/player", "player")),
-	playerBulModel(std::make_unique<ObjModel>("Resources/bullet", "bullet", 0U, true)),
-	playerHpMax(20u),
-
-	// --------------------
-	// レール現在位置のオブジェクト
-	// --------------------
-	railObj(std::make_unique<GameObj>(camera.get())),
-
-	// --------------------
-	// パーティクル
-	// --------------------
-	particleMgr(std::make_unique<ParticleMgr>(L"Resources/effect1.png", camera.get())),
-
-	startSceneChangeTime(0U),
-
-	backPipelineSet(Object3d::createGraphicsPipeline(Object3d::BLEND_MODE::ALPHA,
-													 L"Resources/Shaders/BackVS.hlsl",
-													 L"Resources/Shaders/BackPS.hlsl")),
-
-	// --------------------
-	// スプライト初期化
-	// --------------------
-	debugText(new DebugText(spriteBase->loadTexture(L"Resources/debugfont.png"),
-							spriteBase.get())),
-	aimGrNum(spriteBase->loadTexture(L"Resources/aimPos.png")),
-	operInstPosR(WinAPI::window_width * 0.1f)
-{
-	cursorGr = std::make_unique<Sprite>(aimGrNum, spriteBase.get());
-
-	// 操作説明
-	constexpr XMFLOAT3 centerPos = XMFLOAT3(WinAPI::window_width / 2.f, WinAPI::window_height * 0.75f, 0.f);
-
-	operInst["W"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/W.png"),
-											 spriteBase.get(),
-											 XMFLOAT2(0.5f, 0.5f));
-	operInst["W"]->position.x = centerPos.x;
-	operInst["W"]->position.y = centerPos.y - operInstPosR;
-
-	operInst["S"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/S.png"),
-											 spriteBase.get(),
-											 XMFLOAT2(0.5f, 0.5f));
-	operInst["S"]->position.x = centerPos.x;
-	operInst["S"]->position.y = centerPos.y + operInstPosR;
-
-	operInst["A"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/A.png"),
-											 spriteBase.get(),
-											 XMFLOAT2(0.5f, 0.5f));
-	operInst["A"]->position.x = centerPos.x - operInstPosR;
-	operInst["A"]->position.y = centerPos.y;
-
-	operInst["D"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/D.png"),
-											 spriteBase.get(),
-											 XMFLOAT2(0.5f, 0.5f));
-	operInst["D"]->position.x = centerPos.x + operInstPosR;
-	operInst["D"]->position.y = centerPos.y;
-
-	operInst["Mouse_L"] = std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/Mouse_L.png"),
-												   spriteBase.get(),
-												   XMFLOAT2(0.f, 0.f));
-
-	for (auto& i : operInst)
-	{
-		i.second->update(spriteBase.get());
-		i.second->color = XMFLOAT4(1, 1, 1, 0.5f);
-		i.second->isInvisible = true;
-	}
-
-#pragma region 音
-
-	killSe = std::make_unique<Sound>("Resources/SE/Sys_Set03-click.wav");
-	bgm = std::make_unique<Sound>("Resources/BGM/A-Sense-of-Loss.wav");
-
-#pragma endregion 音
-
-	// --------------------
-	// カメラ初期化
-	// --------------------
-	camera->setFarZ(5000.f);
-	camera->setEye(XMFLOAT3(0, WinAPI::getInstance()->getWindowSize().y * 0.06f, -180.f));	// 視点座標
-	camera->setTarget(XMFLOAT3(0, 0, 0));	// 注視点座標
-	camera->setUp(XMFLOAT3(0, 1, 0));		// 上方向
-	camera->setFogAngleYRad(camFogEnd);		// フォグ
-	camera->setEye2TargetLen(200.f);
-
-	// --------------------
-	// ライト初期化
-	// --------------------
-	light->setLightPos(camera->getEye());
-
-	// --------------------
-	// 自機初期化
-	// --------------------
-	player = std::make_unique<Player>(camera.get(), playerModel.get());
-	player->setScale(16.f);
-	player->setParent(railObj.get());
-	player->setPos(XMFLOAT3(0, 12.f, 0));
-	player->setHp(playerHpMax);
-
-	// --------------------
-	// 背景と地面
-	// --------------------
-
 	// 背景の天球
 	{
 		backModel.reset(new ObjModel("Resources/back/", "back", 0U, true));
@@ -228,12 +83,10 @@ RailShoot::RailShoot()
 		constexpr float tillingNum = groundSize / 32.f;
 		groundModel->setTexTilling(XMFLOAT2(tillingNum, tillingNum));
 	}
+}
 
-	// --------------------
-	// スプライン
-	// --------------------
-
-	// レールの情報読み込み
+void RailShoot::loadLane()
+{
 	{
 		// 制御点の情報はCSVから読み込む
 		const auto csvData = Util::loadCsv("Resources/splinePos.csv", true, ',', "//");
@@ -347,13 +200,163 @@ RailShoot::RailShoot()
 			ring->rotation = XMFLOAT3(velRota.x, velRota.y, 0);
 		}
 	}
+}
+
+void RailShoot::loadEnemyScript()
+{
+	const auto csvData = Util::loadCsv("Resources/enemyScript.csv", true, ',', "//");
+	{
+		for (auto& y : csvData)
+		{
+			enemyPopData.emplace_front(
+				std::make_unique<PopEnemyData>((uint16_t)std::stoul(y[3]),
+											   XMFLOAT3(std::stof(y[0]),
+														std::stof(y[1]),
+														std::stof(y[2])),
+											   XMFLOAT3(0, 0, -1)));
+		}
+	}
+}
+
+RailShoot::RailShoot()
+	: dxBase(DX12Base::getInstance()),
+	input(Input::getInstance()),
+
+	// --------------------
+	// 更新関数の格納変数
+	// --------------------
+	update_proc(std::bind(&RailShoot::update_start, this)),
+
+	// --------------------
+	// シーンに必要な諸要素
+	// --------------------
+	camera(std::make_unique<CameraObj>(nullptr)),
+	light(std::make_unique<Light>()),
+
+	timer(std::make_unique<Timer>()),
+
+	spriteBase(std::make_unique<SpriteBase>(SpriteBase::BLEND_MODE::ALPHA)),
+
+	// --------------------
+	// 敵モデル
+	// --------------------
+	enemyModel(std::make_unique<ObjModel>("Resources/tori", "tori", 0U, true)),
+	enemyBulModel(std::make_unique<ObjModel>("Resources/bullet", "bullet", 0U, true)),
+
+	// --------------------
+	// 自機関連
+	// --------------------
+	playerModel(std::make_unique<ObjModel>("Resources/player", "player")),
+	playerBulModel(std::make_unique<ObjModel>("Resources/bullet", "bullet", 0U, true)),
+	playerHpMax(20u),
+
+	// --------------------
+	// レール現在位置のオブジェクト
+	// --------------------
+	railObj(std::make_unique<GameObj>(camera.get())),
+
+	// --------------------
+	// パーティクル
+	// --------------------
+	particleMgr(std::make_unique<ParticleMgr>(L"Resources/effect1.png", camera.get())),
+
+	startSceneChangeTime(0U),
+
+	backPipelineSet(Object3d::createGraphicsPipeline(Object3d::BLEND_MODE::ALPHA,
+													 L"Resources/Shaders/BackVS.hlsl",
+													 L"Resources/Shaders/BackPS.hlsl")),
+
+	// --------------------
+	// スプライト初期化
+	// --------------------
+	aimGrNum(spriteBase->loadTexture(L"Resources/aimPos.png"))
+{
+	cursorGr = std::make_unique<Sprite>(aimGrNum, spriteBase.get());
+
+	// 操作説明
+	constexpr XMFLOAT3 centerPos = XMFLOAT3(WinAPI::window_width / 2.f, WinAPI::window_height * 0.75f, 0.f);
+
+	operInst.emplace("W",
+					 std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/W.png"),
+											  spriteBase.get(), XMFLOAT2(0.5f, 0.5f)));
+	operInst.at("W")->position.x = centerPos.x;
+	operInst.at("W")->position.y = centerPos.y - operInstPosR;
+
+	operInst.emplace("S",
+					 std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/S.png"),
+											  spriteBase.get(), XMFLOAT2(0.5f, 0.5f)));
+	operInst.at("S")->position.x = centerPos.x;
+	operInst.at("S")->position.y = centerPos.y + operInstPosR;
+
+	operInst.emplace("A",
+					 std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/A.png"),
+											  spriteBase.get(), XMFLOAT2(0.5f, 0.5f)));
+	operInst.at("A")->position.x = centerPos.x - operInstPosR;
+	operInst.at("A")->position.y = centerPos.y;
+
+	operInst.emplace("D",
+					 std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/D.png"),
+											  spriteBase.get(), XMFLOAT2(0.5f, 0.5f)));
+	operInst.at("D")->position.x = centerPos.x + operInstPosR;
+	operInst.at("D")->position.y = centerPos.y;
+
+	operInst.emplace("Mouse_L",
+					 std::make_unique<Sprite>(spriteBase->loadTexture(L"Resources/OperInst/Mouse_L.png"),
+											  spriteBase.get(), XMFLOAT2(0.f, 0.f)));
+
+	for (auto& i : operInst)
+	{
+		i.second->update(spriteBase.get());
+		i.second->color = XMFLOAT4(1, 1, 1, 0.5f);
+		i.second->isInvisible = true;
+	}
+
+#pragma region 音
+
+	killSe = std::make_unique<Sound>("Resources/SE/Sys_Set03-click.wav");
+	bgm = std::make_unique<Sound>("Resources/BGM/A-Sense-of-Loss.wav");
+
+#pragma endregion 音
+
+	// --------------------
+	// カメラ初期化
+	// --------------------
+	camera->setFarZ(5000.f);
+	camera->setEye(XMFLOAT3(0, WinAPI::getInstance()->getWindowSize().y * 0.06f, -180.f));	// 視点座標
+	camera->setTarget(XMFLOAT3(0, 0, 0));	// 注視点座標
+	camera->setUp(XMFLOAT3(0, 1, 0));		// 上方向
+	camera->setFogAngleYRad(camFogEnd);		// フォグ
+	camera->setEye2TargetLen(200.f);
+
+	// --------------------
+	// ライト初期化
+	// --------------------
+	light->setLightPos(camera->getEye());
+
+	// --------------------
+	// 自機初期化
+	// --------------------
+	player = std::make_unique<Player>(camera.get(), playerModel.get());
+	player->setScale(16.f);
+	player->setParent(railObj.get());
+	player->setPos(XMFLOAT3(0, 12.f, 0));
+	player->setHp(playerHpMax);
+
+	// --------------------
+	// 背景と地面
+	// --------------------
+
+	loadBackObj();
+
+	// レーンの初期化
+	loadLane();
 
 	// --------------------
 	// 敵初期化
 	// --------------------
 
 	// 敵は最初居ない
-	enemy.resize(0U);
+	enemy.clear();
 
 	// 敵発生スクリプト
 	loadEnemyScript();
@@ -1210,8 +1213,6 @@ void RailShoot::drawFrontSprite()
 	{
 		i.second->drawWithUpdate(DX12Base::ins(), spriteBase.get());
 	}
-
-	debugText->DrawAll(dxBase, spriteBase.get());
 
 	// 最初のウインドウの位置を指定
 	constexpr XMFLOAT2 fstWinPos = XMFLOAT2((float)WinAPI::window_width / 50.f, (float)WinAPI::window_height / 50.f);

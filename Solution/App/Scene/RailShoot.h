@@ -5,7 +5,6 @@
 #include <functional>
 #include <unordered_map>
 
-#include "2D/DebugText.h"
 #include "GameObject/NormalEnemy.h"
 #include "3D/ParticleMgr.h"
 #include "Input/Input.h"
@@ -63,11 +62,9 @@ class RailShoot
 
 #pragma endregion 音
 
-	// --------------------
-	// スプライト
-	// --------------------
+#pragma region スプライト
+
 	std::unique_ptr<SpriteBase> spriteBase;
-	std::unique_ptr<DebugText> debugText;
 
 	const UINT aimGrNum;
 	std::unique_ptr<Sprite> cursorGr;
@@ -76,11 +73,12 @@ class RailShoot
 
 	// 操作説明
 	std::unordered_map<std::string, std::unique_ptr<Sprite>> operInst;
-	const float operInstPosR;
+	inline static constexpr float operInstPosR = WinAPI::window_width * 0.1f;
 
-	// --------------------
-	// 3Dオブジェクト
-	// --------------------
+#pragma endregion スプライト
+
+#pragma region 3Dオブジェクト
+
 	// 背景のパイプライン
 	size_t backPipelineSet;
 
@@ -89,6 +87,8 @@ class RailShoot
 	std::unique_ptr<ObjModel> backModel;
 	std::unique_ptr<Object3d> groundObj;
 	std::unique_ptr<ObjModel> groundModel;
+
+	void loadBackObj();
 
 	// 敵
 	std::forward_list<std::shared_ptr<NormalEnemy>> enemy;
@@ -103,6 +103,8 @@ class RailShoot
 
 	// レールの現在位置を示すオブジェクト
 	std::unique_ptr<GameObj> railObj;
+
+#pragma endregion 3Dオブジェクト
 
 	// --------------------
 	// パーティクル
@@ -134,6 +136,7 @@ class RailShoot
 	std::unique_ptr<ObjModel> wallModel;
 	std::unique_ptr<ObjModel> ringModel;
 	std::vector<std::vector<std::unique_ptr<Object3d>>> laneWall;
+	void loadLane();
 
 	// --------------------
 	// 敵発生関連
