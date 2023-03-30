@@ -815,7 +815,7 @@ bool BossScene::addShotTarget(const std::forward_list<std::weak_ptr<BaseEnemy>>&
 
 				ref.target = i;
 
-				ref.sprite->color = XMFLOAT4(1, 0, 0, 1);
+				ref.sprite->color = XMFLOAT4(0.25f, 1, 1, 1);
 
 				const auto& size = ref.sprite->getSize();
 				ref.sprite->setSize(XMFLOAT2(size.x / 2.f, size.y / 2.f));
