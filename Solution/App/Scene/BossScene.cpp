@@ -6,7 +6,6 @@
 #include <imgui.h>
 #include "System/SceneManager.h"
 #include "System/PostEffect.h"
-#include <Util/RandomNum.h>
 #include <Util/Util.h>
 
 #include "Collision/Collision.h"
@@ -29,7 +28,7 @@ namespace
 	/// @brief スクリーン座標が示す、ワールド空間のベクトルを算出
 	/// @param matVPVInv ビュー・プロジェクション・ビューポート行列の逆行列
 	/// @param screenPos スクリーン座標での位置
-	/// @return ワールド空間上のベクトル
+	/// @return ワールド空間上の正規化済みベクトル
 	XMVECTOR calcScreenPosDirection(const XMMATRIX& matVPVInv, const XMFLOAT2& screenPos, XMVECTOR* nearPosBuf = nullptr)
 	{
 		// ワールド座標
@@ -65,7 +64,7 @@ namespace
 	/// @param distance 生成する球とカメラの距離
 	/// @param reticleR 照準画像の内接円の半径
 	/// @return 照準画像の内接球
-	CollisionShape::Sphere getReticleSphere(const XMMATRIX& matVPVInv, const XMFLOAT2& screenPos, float distance, float reticleR)
+	CollisionShape::Sphere createReticleSphere(const XMMATRIX& matVPVInv, const XMFLOAT2& screenPos, float distance, float reticleR)
 	{
 		const XMVECTOR center = screen2World(matVPVInv, screenPos, distance);
 		const XMVECTOR right = screen2World(matVPVInv, XMFLOAT2(screenPos.x + reticleR, screenPos.y), distance);
@@ -79,7 +78,7 @@ namespace
 	/// @param distance 生成する球とカメラの距離
 	/// @param reticleR 照準画像の内接円の半径
 	/// @return 照準画像の内接球
-	CollisionShape::Sphere getReticleSphere(const Camera* camera, const XMFLOAT2& screenPos, float distance, float reticleR)
+	CollisionShape::Sphere createReticleSphere(const Camera* camera, const XMFLOAT2& screenPos, float distance, float reticleR)
 	{
 		const XMVECTOR center = camera->screenPos2WorldPosVec(XMFLOAT3(screenPos.x, screenPos.y, distance));
 		const XMVECTOR right = camera->screenPos2WorldPosVec(XMFLOAT3(screenPos.x + reticleR, screenPos.y, distance));
@@ -241,6 +240,9 @@ void BossScene::initBoss()
 			// 大きさを変更
 			i->setScale(bpd.scale);
 
+			// 色を設定
+			i->setCol(XMFLOAT4(1, 0.25f, 0.125f, 1));
+
 			// 体力を設定
 			constexpr uint16_t hp = 10ui16;
 			i->setHp(hp);
@@ -294,10 +296,11 @@ void BossScene::start()
 	PostEffect::getInstance()->setSpeedLineIntensity(0.125f);
 
 	// 照準の位置を画面中央にする
-	input->setMousePos(WinAPI::window_width / 2, WinAPI::window_height / 2);
-	player->setAim2DPos(XMFLOAT2((float)WinAPI::window_width / 2.f, (float)WinAPI::window_height / 2.f));
-	cursorGr->position.x = player->getAim2DPos().x;
-	cursorGr->position.y = player->getAim2DPos().y;
+	constexpr XMFLOAT2 center = XMFLOAT2((float)WinAPI::window_width / 2.f, (float)WinAPI::window_height / 2.f);
+	input->setMousePos((int)center.x, (int)center.y);
+	player->setAim2DPos(center);
+	cursorGr->position.x = center.x;
+	cursorGr->position.y = center.y;
 
 	cursorGr->isInvisible = true;
 
@@ -552,7 +555,7 @@ void BossScene::update_play()
 		// --------------------
 		// 弾発射
 		// --------------------
-		cursorGr->color = XMFLOAT4(1, 1, 1, 1);
+		cursorGr->color = XMFLOAT4(0.25f, 1, 1, 1);
 		if (input->hitMouseButton(Input::MOUSE::LEFT) ||
 			input->hitPadButton(Input::PAD::RB) ||
 			input->hitPadButton(Input::PAD::A) ||
@@ -575,8 +578,6 @@ void BossScene::update_play()
 			if (player->shotAll(camera.get(), playerBulModel.get(), 2.f))
 			{
 				reticle.clear();
-
-				cursorGr->color = XMFLOAT4(1, 1, 1, 1);
 			}
 		}
 	}
@@ -786,21 +787,27 @@ bool BossScene::addShotTarget(const std::forward_list<std::weak_ptr<BaseEnemy>>&
 	// 撃ってないかどうか（戻り値用）
 	bool noShot = true;
 
+	const float cursorR2D = cursorGr->getSize().x / 2.f;
+	const XMVECTOR camPosVec = XMLoadFloat3(&camera->getEye());
+
 	// 照準の中の敵の方へ弾を飛ばす
 	for (auto& e : enemy)
 	{
+		if (e.expired()) { continue; }
 		auto i = e.lock();
+
 		// いない敵は無視
 		if (!i->getAlive()) { continue; }
 
-		// 敵のスクリーン座標を取得
-		const XMFLOAT2 screenEnemyPos = i->getObj()->calcScreenPos();
+		const auto enemySphere = CollisionShape::Sphere(XMLoadFloat3(&i->calcWorldPos()), i->getScaleF3().z);
 
-		// 敵が2D照準の中にいるかどうか
-		if (aim2DPosMin.x <= screenEnemyPos.x &&
-			aim2DPosMin.y <= screenEnemyPos.y &&
-			aim2DPosMax.x >= screenEnemyPos.x &&
-			aim2DPosMax.y >= screenEnemyPos.y)
+		const auto aimSphere = createReticleSphere(camera.get(),
+												   XMFLOAT2(cursorGr->position.x, cursorGr->position.y),
+												   Collision::vecLength(enemySphere.center - camPosVec),
+												   cursorR2D);
+
+		// 敵が照準の中にいるかどうか
+		if (Collision::CheckHit(enemySphere, aimSphere))
 		{
 			if (player->addShotTarget(i))
 			{
@@ -810,7 +817,7 @@ bool BossScene::addShotTarget(const std::forward_list<std::weak_ptr<BaseEnemy>>&
 
 				ref.sprite->color = XMFLOAT4(1, 0, 0, 1);
 
-				const auto size = ref.sprite->getSize();
+				const auto& size = ref.sprite->getSize();
 				ref.sprite->setSize(XMFLOAT2(size.x / 2.f, size.y / 2.f));
 
 				noShot = false;
@@ -942,15 +949,19 @@ void BossScene::movePlayer()
 
 void BossScene::moveAim2DPos()
 {
-	constexpr POINT center = POINT(WinAPI::window_width / 2,
-								   WinAPI::window_height / 2);
+	constexpr XMFLOAT2 center = XMFLOAT2((float)WinAPI::window_width / 2.f,
+										 (float)WinAPI::window_height / 2.f);
+	constexpr POINT centerInt{ .x = (int)center.x, .y = (int)center.y };
 
 	// マウスカーソルの位置をパッド入力に合わせてずらす
 	const POINT prePos = input->getMousePos();
-	input->setMousePos(center.x, center.y);
+	input->setMousePos(centerInt.x, centerInt.y);
 
-	POINT posDiff = POINT(prePos.x - center.x,
-						  prePos.y - center.y);
+	cursorGr->position.x = center.x;
+	cursorGr->position.y = center.y;
+
+	POINT posDiff = POINT(prePos.x - centerInt.x,
+						  prePos.y - centerInt.y);
 
 	// 右スティックの入力で速度を決める
 	XMFLOAT2 rStick = input->hitPadRStickRaito();
