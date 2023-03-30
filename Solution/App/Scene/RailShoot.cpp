@@ -1,5 +1,4 @@
 ﻿#include "RailShoot.h"
-#include <DirectXMath.h>
 
 #include "BossScene.h"
 #include "GameOverScene.h"
@@ -58,6 +57,20 @@ namespace
 
 	constexpr XMFLOAT3 killEffCol = XMFLOAT3(1.f, 0.25f, 0.25f);
 	constexpr XMFLOAT3 noKillEffCol = XMFLOAT3(0.25f, 1.f, 1.f);
+
+	/// @brief 照準画像(正方形)の内接球
+	/// @param camera カメラ
+	/// @param screenPos スクリーン座標での位置
+	/// @param distance 生成する球とカメラの距離
+	/// @param reticleR 照準画像の内接円の半径
+	/// @return 照準画像の内接球
+	CollisionShape::Sphere createReticleSphere(const Camera* camera, const XMFLOAT2& screenPos, float distance, float reticleR)
+	{
+		const XMVECTOR center = camera->screenPos2WorldPosVec(XMFLOAT3(screenPos.x, screenPos.y, distance));
+		const XMVECTOR right = camera->screenPos2WorldPosVec(XMFLOAT3(screenPos.x + reticleR, screenPos.y, distance));
+
+		return CollisionShape::Sphere(center, Collision::vecLength(XMVectorSubtract(center, right)));
+	}
 }
 
 void RailShoot::loadBackObj()
@@ -1143,8 +1156,8 @@ void RailShoot::movePlayer()
 
 void RailShoot::updatePlayerShotTarget(const XMFLOAT2& aim2DMin, const XMFLOAT2& aim2DMax)
 {
-	// スクリーン上の敵の位置格納変数
-	XMFLOAT2 screenEnemyPos{};
+	const float cursorR2D = cursorGr->getSize().x / 2.f;
+	const XMVECTOR camPosVec = XMLoadFloat3(&camera->getEye());
 
 	// 照準の中の敵の方へ弾を飛ばす
 	for (auto& i : enemy)
@@ -1152,14 +1165,15 @@ void RailShoot::updatePlayerShotTarget(const XMFLOAT2& aim2DMin, const XMFLOAT2&
 		// いない敵は無視
 		if (!i->getAlive()) { continue; }
 
-		// 敵のスクリーン座標を取得
-		screenEnemyPos = i->getObj()->calcScreenPos();
+		const auto enemySphere = CollisionShape::Sphere(XMLoadFloat3(&i->calcWorldPos()), i->getScaleF3().z);
+
+		const auto aimSphere = createReticleSphere(camera.get(),
+												   XMFLOAT2(cursorGr->position.x, cursorGr->position.y),
+												   Collision::vecLength(enemySphere.center - camPosVec),
+												   cursorR2D);
 
 		// 敵が2D照準の中にいるかどうか
-		if (aim2DMin.x <= screenEnemyPos.x &&
-			aim2DMin.y <= screenEnemyPos.y &&
-			aim2DMax.x >= screenEnemyPos.x &&
-			aim2DMax.y >= screenEnemyPos.y)
+		if (Collision::CheckHit(enemySphere, aimSphere))
 		{
 			if (player->addShotTarget(i))
 			{
