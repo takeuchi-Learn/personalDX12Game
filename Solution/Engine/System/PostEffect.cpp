@@ -100,6 +100,13 @@ void PostEffect::createGraphicsPipelineState(const wchar_t* psPath)
 	ComPtr<ID3DBlob> psBlob = nullptr; // ピクセルシェーダオブジェクト
 	ComPtr<ID3DBlob> errorBlob = nullptr; // エラーオブジェクト
 
+	constexpr UINT compileFlag =
+#ifdef _DEBUG
+		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#else
+		0;
+#endif // _DEBUG
+
 	constexpr const char hlslData[] = "\n\
 #include \"PostEffect.hlsli\"\n\
 VSOutput main(float4 pos : POSITION, float2 uv : TEXCOORD)\n\
@@ -118,7 +125,7 @@ VSOutput main(float4 pos : POSITION, float2 uv : TEXCOORD)\n\
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,
 		"main",
 		"vs_5_0",
-		0,
+		compileFlag,
 		0,
 		&vsBlob,
 		&errorBlob
@@ -145,7 +152,7 @@ VSOutput main(float4 pos : POSITION, float2 uv : TEXCOORD)\n\
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "ps_5_0", // エントリーポイント名、シェーダーモデル指定
-		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
+		compileFlag,
 		0,
 		&psBlob, &errorBlob);
 

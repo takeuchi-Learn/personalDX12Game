@@ -25,6 +25,8 @@ namespace
 	constexpr XMFLOAT3 killEffCol = XMFLOAT3(1.f, 0.25f, 0.25f);
 	constexpr XMFLOAT3 noKillEffCol = XMFLOAT3(0.25f, 1.f, 1.f);
 
+	constexpr XMFLOAT4 cyan = XMFLOAT4(0.25f, 1, 1, 1);
+
 	/// @brief スクリーン座標が示す、ワールド空間のベクトルを算出
 	/// @param matVPVInv ビュー・プロジェクション・ビューポート行列の逆行列
 	/// @param screenPos スクリーン座標での位置
@@ -555,7 +557,7 @@ void BossScene::update_play()
 		// --------------------
 		// 弾発射
 		// --------------------
-		cursorGr->color = XMFLOAT4(0.25f, 1, 1, 1);
+		cursorGr->color = cyan;
 		if (input->hitMouseButton(Input::MOUSE::LEFT) ||
 			input->hitPadButton(Input::PAD::RB) ||
 			input->hitPadButton(Input::PAD::A) ||
@@ -808,7 +810,7 @@ bool BossScene::addShotTarget(const std::forward_list<std::weak_ptr<BaseEnemy>>&
 
 				ref.target = i;
 
-				ref.sprite->color = XMFLOAT4(0.25f, 1, 1, 1);
+				ref.sprite->color = cyan;
 
 				const auto& size = ref.sprite->getSize();
 				ref.sprite->setSize(XMFLOAT2(size.x / 2.f, size.y / 2.f));
