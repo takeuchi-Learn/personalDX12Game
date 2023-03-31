@@ -116,7 +116,6 @@ size_t Object3d::createGraphicsPipeline(BaseObj::BLEND_MODE blendMode,
 		0;
 #endif // _DEBUG
 
-
 	//頂点シェーダーの読み込みとコンパイル
 	HRESULT result = D3DCompileFromFile(
 		vsPath,  // シェーダファイル名

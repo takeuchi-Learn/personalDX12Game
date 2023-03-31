@@ -2,6 +2,7 @@
 #include <GameObject/Boss/BossEnemy.h>
 #include <DirectXMath.h>
 #include <Util/Util.h>
+#include <Collision/Collision.h>
 
 using namespace DirectX;
 
@@ -104,7 +105,7 @@ NODE_RESULT BossBehavior::phase_singleShotAttack()
 }
 
 BossBehavior::BossBehavior(BossEnemy* boss) :
-	Sequencer(),
+	Selector(),
 	boss(boss)
 {
 	const auto data = Util::loadCsv("Resources/fanShotData.csv");
@@ -133,17 +134,32 @@ BossBehavior::BossBehavior(BossEnemy* boss) :
 		}
 	);
 
+	// --------------------
 	// 各フェーズを登録
+	// --------------------
+
+	// 扇形攻撃
 	fanShapePhase = std::make_unique<Sequencer>();
 	fanShapePhase->addChild(Task(std::bind(&BossBehavior::phase_Rotation, this, XMFLOAT3(0, 0, 0), XMFLOAT3(0, 720, 0))));
 	fanShapePhase->addChild(Task(std::bind(&BossBehavior::phase_fanShapeAttack, this)));
 
+	// 連続単発攻撃
 	singleShotPhase = std::make_unique<Sequencer>();
 	singleShotPhase->addChild(Task(std::bind(&BossBehavior::phase_Rotation, this, XMFLOAT3(0, 0, 0), XMFLOAT3(360, -360, 0))));
 	singleShotPhase->addChild(Task(std::bind(&BossBehavior::phase_singleShotAttack, this)));
 
-	addChild(*fanShapePhase);
-	addChild(*singleShotPhase);
+	// 攻撃対象が近い時の行動
+	nearTargetPhase = std::make_unique<Sequencer>();
+	nearTargetPhase->addChild(Task([&] { return this->boss->calcTargetDistance() < this->boss->getMaxTargetDistance() * 0.625f ? NODE_RESULT::SUCCESS : NODE_RESULT::FAIL; }));
+	nearTargetPhase->addChild(*fanShapePhase);
+
+	// 攻撃対象が遠い時の行動
+	farTargetPhase = std::make_unique<Sequencer>();
+	farTargetPhase->addChild(Task([&] { return this->boss->calcTargetDistance() > this->boss->getMaxTargetDistance() * 0.625f ? NODE_RESULT::SUCCESS : NODE_RESULT::FAIL; }));
+	farTargetPhase->addChild(*singleShotPhase);
+
+	addChild(*nearTargetPhase);
+	addChild(*farTargetPhase);
 }
 
 BossBehavior::BossBehavior() :

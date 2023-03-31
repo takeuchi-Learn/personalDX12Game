@@ -12,9 +12,9 @@
 
 class BossEnemy;
 
-/// @brief ボスの行動。シーケンサー(失敗で終了)を継承している。
+/// @brief ボスの行動。セレクター(成功で終了)を継承している。
 class BossBehavior :
-	public Sequencer
+	public Selector
 {
 private:
 	// ---------------
@@ -29,6 +29,9 @@ private:
 		T maxVal;
 		T nowVal;
 	};
+
+	std::unique_ptr<Sequencer> nearTargetPhase;
+	std::unique_ptr<Sequencer> farTargetPhase;
 
 #pragma region 単発攻撃
 

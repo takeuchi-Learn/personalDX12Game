@@ -1,5 +1,6 @@
 ﻿#include "BossEnemy.h"
 #include "Util/RandomNum.h"
+#include <Collision/Collision.h>
 
 using namespace DirectX;
 
@@ -74,6 +75,15 @@ BossEnemy::BossEnemy(Camera* camera,
 	bossBehavior(std::make_unique<BossBehavior>(this))
 {
 	setPhase([&] { return bossBehavior->run(); });
+}
+
+float BossEnemy::calcTargetDistance()
+{
+	if (!this->targetObj) { return -1.f; }
+	const XMVECTOR bpos = XMLoadFloat3(&this->calcWorldPos());
+	const XMVECTOR tpos = XMLoadFloat3(&this->targetObj->calcWorldPos());
+
+	return Collision::vecLength(bpos - tpos);
 }
 
 // 弾関係

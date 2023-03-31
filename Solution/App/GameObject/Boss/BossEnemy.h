@@ -22,6 +22,8 @@ class BossEnemy :
 	// 移動速度
 	float moveSpeed = 2.f;
 
+	float maxTargerDistance = 1500.f;
+
 	/// @brief 原点からボスの攻撃対象を向くベクトルを算出
 	/// @param me 原点
 	/// @param moveYFlag Y方向に移動するかどうか
@@ -50,6 +52,10 @@ public:
 	/// @brief 攻撃対象を取得
 	/// @return 攻撃対象のポインタ
 	inline GameObj* getTargetObj() { return targetObj; }
+
+	inline float getMaxTargetDistance() const { return maxTargerDistance; }
+
+	float calcTargetDistance();
 
 #pragma region 弾関係
 

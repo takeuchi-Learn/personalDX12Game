@@ -928,7 +928,7 @@ void BossScene::movePlayer()
 			playerParent->moveRight(moveVel);
 
 			const float len = Collision::vecLength(XMLoadFloat3(&playerParent->getPos()));
-			if (len > 1500.f)
+			if (len > boss->getMaxTargetDistance())
 			{
 				playerParent->moveRight(-moveVel);
 			} else
@@ -1001,6 +1001,11 @@ void BossScene::drawFrontSprite()
 	}
 
 	cursorGr->drawWithUpdate(DX12Base::ins(), spBase.get());
+
+	ImGui::SetNextWindowSize(ImVec2(200, 200));
+	ImGui::Begin("debug", nullptr, winFlags);
+	ImGui::Text("now: %.2f\nmax: %.2f", boss->calcTargetDistance(), boss->getMaxTargetDistance() * 0.625f);
+	ImGui::End();
 
 	// 自機の体力バー
 	if (0.f < playerHpBar.backNowRaito)
