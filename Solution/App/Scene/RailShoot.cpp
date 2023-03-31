@@ -58,6 +58,8 @@ namespace
 	constexpr XMFLOAT3 killEffCol = XMFLOAT3(1.f, 0.25f, 0.25f);
 	constexpr XMFLOAT3 noKillEffCol = XMFLOAT3(0.25f, 1.f, 1.f);
 
+	constexpr XMFLOAT4 cyan = XMFLOAT4(0.25f, 1, 1, 1);
+
 	/// @brief 照準画像(正方形)の内接球
 	/// @param camera カメラ
 	/// @param screenPos スクリーン座標での位置
@@ -662,7 +664,7 @@ void RailShoot::update_play()
 	const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + cursorGr->getSize().x / 2.f,
 									   input->getMousePos().y + cursorGr->getSize().y / 2.f);
 
-	cursorGr->color = XMFLOAT4(1, 1, 1, 1);
+	cursorGr->color = cyan;
 	if (input->hitMouseButton(Input::MOUSE::LEFT) ||
 		input->hitPadButton(Input::PAD::RB) ||
 		input->hitPadButton(Input::PAD::A) ||
@@ -1181,7 +1183,7 @@ void RailShoot::updatePlayerShotTarget(const XMFLOAT2& aim2DMin, const XMFLOAT2&
 
 				ref.target = i;
 
-				ref.sprite->color = XMFLOAT4(0.25f, 1, 1, 1);
+				ref.sprite->color = cyan;
 
 				const auto size = ref.sprite->getSize();
 				ref.sprite->setSize(XMFLOAT2(size.x / 2.f, size.y / 2.f));
