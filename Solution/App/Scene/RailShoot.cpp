@@ -658,12 +658,6 @@ void RailShoot::update_play()
 	// 弾発射
 	// --------------------
 
-	// 照準の範囲
-	const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - cursorGr->getSize().x / 2.f,
-									   input->getMousePos().y - cursorGr->getSize().y / 2.f);
-	const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + cursorGr->getSize().x / 2.f,
-									   input->getMousePos().y + cursorGr->getSize().y / 2.f);
-
 	cursorGr->color = cyan;
 	if (input->hitMouseButton(Input::MOUSE::LEFT) ||
 		input->hitPadButton(Input::PAD::RB) ||
@@ -671,7 +665,7 @@ void RailShoot::update_play()
 		input->hitPadButton(Input::PAD::B))
 	{
 		cursorGr->color = XMFLOAT4(1, 0, 0, 1);
-		updatePlayerShotTarget(aim2DMin, aim2DMax);
+		updatePlayerShotTarget(XMFLOAT2(cursorGr->position.x, cursorGr->position.y));
 	} else if (input->releaseTriggerMouseButton(Input::MOUSE::LEFT) ||
 			   input->releaseTriggerPadButton(Input::PAD::RB) ||
 			   input->releaseTriggerPadButton(Input::PAD::A) ||
@@ -1156,7 +1150,7 @@ void RailShoot::movePlayer()
 	player->setRotation(playerRot);
 }
 
-void RailShoot::updatePlayerShotTarget(const XMFLOAT2& aim2DMin, const XMFLOAT2& aim2DMax)
+void RailShoot::updatePlayerShotTarget(const XMFLOAT2& aim2DPos)
 {
 	const float cursorR2D = cursorGr->getSize().x / 2.f;
 	const XMVECTOR camPosVec = XMLoadFloat3(&camera->getEye());
@@ -1170,7 +1164,7 @@ void RailShoot::updatePlayerShotTarget(const XMFLOAT2& aim2DMin, const XMFLOAT2&
 		const auto enemySphere = CollisionShape::Sphere(XMLoadFloat3(&i->calcWorldPos()), i->getScaleF3().z);
 
 		const auto aimSphere = createReticleSphere(camera.get(),
-												   XMFLOAT2(cursorGr->position.x, cursorGr->position.y),
+												   aim2DPos,
 												   Collision::vecLength(enemySphere.center - camPosVec),
 												   cursorR2D);
 

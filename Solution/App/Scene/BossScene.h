@@ -162,8 +162,7 @@ private:
 
 	/// @return 照準内に敵がいるかどうか
 	bool addShotTarget(const std::forward_list<std::weak_ptr<BaseEnemy>>& enemy,
-					   const DirectX::XMFLOAT2& aim2DPosMin,
-					   const DirectX::XMFLOAT2& aim2DPosMax);
+					   const DirectX::XMFLOAT2& aim2DPos);
 
 	void movePlayer();
 

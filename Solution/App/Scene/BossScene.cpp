@@ -563,13 +563,7 @@ void BossScene::update_play()
 		{
 			cursorGr->color = XMFLOAT4(1, 0, 0, 1);
 
-			const XMFLOAT2 grHalfSize = XMFLOAT2(cursorGr->getSize().x / 2.f, cursorGr->getSize().y / 2.f);
-			const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - grHalfSize.x,
-											   input->getMousePos().y - grHalfSize.y);
-			const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + grHalfSize.x,
-											   input->getMousePos().y + grHalfSize.y);
-
-			addShotTarget(attackableEnemy, aim2DMin, aim2DMax);
+			addShotTarget(attackableEnemy, XMFLOAT2(cursorGr->position.x, cursorGr->position.y));
 		} else if (input->releaseTriggerMouseButton(Input::MOUSE::LEFT) ||
 				   input->releaseTriggerPadButton(Input::PAD::RB) ||
 				   input->releaseTriggerPadButton(Input::PAD::A) ||
@@ -781,8 +775,7 @@ void BossScene::updateRgbShift()
 }
 
 bool BossScene::addShotTarget(const std::forward_list<std::weak_ptr<BaseEnemy>>& enemy,
-							  const DirectX::XMFLOAT2& aim2DPosMin,
-							  const DirectX::XMFLOAT2& aim2DPosMax)
+							  const DirectX::XMFLOAT2& aim2DPos)
 {
 	// 撃ってないかどうか（戻り値用）
 	bool noShot = true;
@@ -802,7 +795,7 @@ bool BossScene::addShotTarget(const std::forward_list<std::weak_ptr<BaseEnemy>>&
 		const auto enemySphere = CollisionShape::Sphere(XMLoadFloat3(&i->calcWorldPos()), i->getScaleF3().z);
 
 		const auto aimSphere = createReticleSphere(camera.get(),
-												   XMFLOAT2(cursorGr->position.x, cursorGr->position.y),
+												   aim2DPos,
 												   Collision::vecLength(enemySphere.center - camPosVec),
 												   cursorR2D);
 
