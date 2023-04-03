@@ -42,6 +42,8 @@ TitleScene::TitleScene()
 
 void TitleScene::start()
 {
+	input->changeDispMouseCursorFlag(true);
+
 	// 次シーンの読み込み開始
 	sceneThread.reset(new MyThread());
 	sceneThread->thread.reset(new std::thread([&] { nextScene = std::make_unique<RailShoot>(); }));

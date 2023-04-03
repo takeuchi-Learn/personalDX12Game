@@ -73,7 +73,7 @@ NODE_RESULT BossBehavior::phase_fanShapeAttack()
 																					0.f));
 
 		// 指定方向に弾を発射
-		constexpr XMFLOAT3 scale = XMFLOAT3(5, 100, 5);
+		constexpr XMFLOAT3 scale = XMFLOAT3(2.5f, 100, 2.5f);
 		boss->addBul(direction, scale, fanShotData.bulCol, 2.f);
 	}
 
@@ -150,12 +150,12 @@ BossBehavior::BossBehavior(BossEnemy* boss) :
 
 	// 攻撃対象が近い時の行動
 	nearTargetPhase = std::make_unique<Sequencer>();
-	nearTargetPhase->addChild(Task([&] { return this->boss->calcTargetDistance() < this->boss->getMaxTargetDistance() * 0.625f ? NODE_RESULT::SUCCESS : NODE_RESULT::FAIL; }));
+	nearTargetPhase->addChild(Task([&] { return this->boss->calcTargetDistance() < this->boss->getMaxTargetDistance() * 0.4f ? NODE_RESULT::SUCCESS : NODE_RESULT::FAIL; }));
 	nearTargetPhase->addChild(*fanShapePhase);
 
 	// 攻撃対象が遠い時の行動
 	farTargetPhase = std::make_unique<Sequencer>();
-	farTargetPhase->addChild(Task([&] { return this->boss->calcTargetDistance() > this->boss->getMaxTargetDistance() * 0.625f ? NODE_RESULT::SUCCESS : NODE_RESULT::FAIL; }));
+	farTargetPhase->addChild(Task([&] { return this->boss->calcTargetDistance() > this->boss->getMaxTargetDistance() * 0.4f ? NODE_RESULT::SUCCESS : NODE_RESULT::FAIL; }));
 	farTargetPhase->addChild(*singleShotPhase);
 
 	addChild(*nearTargetPhase);
