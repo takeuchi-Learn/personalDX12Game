@@ -927,6 +927,9 @@ void RailShoot::endAppearPlayer()
 	// 照準を表示
 	cursorGr->isInvisible = false;
 
+	// マウスカーソル(照準)を画面中央に置く
+	input->setMousePos(WinAPI::window_width / 2, WinAPI::window_height / 2);
+
 	update_proc = std::bind(&RailShoot::update_play, this);
 	appearPlayer.reset(nullptr);
 }
