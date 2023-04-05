@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <GameObject/GameObj.h>
+#include <3D/ParticleMgr.h>
 
 /// @brief 自機クラス
 class Player
@@ -22,10 +23,19 @@ class Player
 
 	std::vector<std::weak_ptr<GameObj>> shotTargetObjPt;
 
-	uint16_t hp;
+	std::shared_ptr<ParticleMgr> bulParticle;
+
+	uint16_t hp = 1ui16;
+
+	float bulHomingRaito = 0.05f;
 
 public:
-	using GameObj::GameObj;
+	Player(Camera* camera,
+		   ObjModel* model,
+		   const DirectX::XMFLOAT3& pos = { 0,0,0 });
+
+	inline float getBulHomingRaito() const { return bulHomingRaito; }
+	inline void setBulHomingRaito(float raito) { bulHomingRaito = raito; }
 
 	inline uint16_t getBulLife() const { return bulLife; }
 	inline void setBulLife(uint16_t bulLife) { this->bulLife = bulLife; }
@@ -66,6 +76,8 @@ public:
 
 	inline const DirectX::XMFLOAT2& getAim2DPos() const { return aim2DPos; }
 	inline void setAim2DPos(const DirectX::XMFLOAT2& screenPos) { aim2DPos = screenPos; }
+
+	inline void drawWithUpdateBulParticle() { bulParticle->drawWithUpdate(); }
 
 	/// @brief 弾発射
 	/// @param camera カメラオブジェクトのポインタ

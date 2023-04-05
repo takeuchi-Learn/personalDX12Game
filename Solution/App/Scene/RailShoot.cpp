@@ -356,6 +356,7 @@ RailShoot::RailShoot()
 	player->setParent(railObj.get());
 	player->setPos(XMFLOAT3(0, 12.f, 0));
 	player->setHp(playerHpMax);
+	player->setBulHomingRaito(0.05f);	// 弾のホーミングの強さ
 
 	// --------------------
 	// 背景と地面
@@ -1209,6 +1210,7 @@ void RailShoot::drawObj3d()
 	}
 
 	particleMgr->drawWithUpdate();
+	player->drawWithUpdateBulParticle();
 }
 
 void RailShoot::drawFrontSprite()

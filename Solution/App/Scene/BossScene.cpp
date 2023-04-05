@@ -157,6 +157,8 @@ void BossScene::initPlayer()
 
 	player->setBulLife(600ui16);
 
+	player->setBulHomingRaito(0.01f);	// 弾のホーミングの強さ
+
 	sceneChangeStartPos = XMFLOAT3(0.f, 500.f, -800.f);
 	sceneChangeEndPos = XMFLOAT3(0.f, 0.f, -800.f);
 
@@ -742,6 +744,7 @@ void BossScene::drawObj3d()
 	}
 
 	particleMgr->drawWithUpdate();
+	player->drawWithUpdateBulParticle();
 }
 
 void BossScene::startRgbShift()
