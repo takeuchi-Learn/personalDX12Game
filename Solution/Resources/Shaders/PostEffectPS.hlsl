@@ -163,22 +163,6 @@ float4 main(VSOutput input) : SV_TARGET
 	sLineNum /= -slnPower;
 
 	// --------------------
-	// 走査線
-	// --------------------
-	static float slSpeed = 1.f / 4.f;
-	static float slSize = 1.f / 64.f;
-	static float slPower = 1.f / 16.f;
-	float sbTime = frac(time * slSpeed);
-	float seTime = sbTime + slSize;
-	
-	float2 slUv = float2(
-		uv.x + sin(smoothstep(sbTime, seTime, uv.y) *
-				   PI2) * slPower,
-		uv.y
-	);
-	uv = slUv;
-
-	// --------------------
 	// rgbずらし&ディザリング
 	// --------------------
 	float4 texColor0 = dither(tex0.Sample(smp, uv), uv, 1.f);

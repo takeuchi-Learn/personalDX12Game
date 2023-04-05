@@ -42,8 +42,6 @@ TitleScene::TitleScene()
 
 void TitleScene::start()
 {
-	input->changeDispMouseCursorFlag(true);
-
 	// 次シーンの読み込み開始
 	sceneThread.reset(new MyThread());
 	sceneThread->thread.reset(new std::thread([&] { nextScene = std::make_unique<RailShoot>(); }));
@@ -62,6 +60,7 @@ void TitleScene::update()
 
 void TitleScene::update_normal()
 {
+	// ロゴを揺らす
 	constexpr float logoMoveRange = 16.f;
 	titleLogo->position.y = logoMoveRange * std::sin((float)timer->getNowTime() / Timer::oneSecF);
 
