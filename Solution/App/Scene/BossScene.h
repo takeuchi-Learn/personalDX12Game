@@ -112,19 +112,6 @@ private:
 
 #pragma region ImGui定数
 
-	static constexpr ImGuiWindowFlags winFlags =
-		// リサイズ不可
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoResize |
-		// タイトルバー無し
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar |
-		// 設定を.iniに出力しない
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoSavedSettings |
-		// 移動不可
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove;
-	//	// スクロールバーを常に表示
-	//	ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysHorizontalScrollbar |
-	//	ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar;
-
 	// 最初のウインドウの位置を指定
 	static constexpr DirectX::XMFLOAT2 fstWinPos =
 		DirectX::XMFLOAT2((float)WinAPI::window_width * 0.02f,

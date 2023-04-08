@@ -1014,7 +1014,7 @@ void BossScene::drawFrontSprite()
 	constexpr XMFLOAT2 fstWinSize = XMFLOAT2((float)WinAPI::window_width / 5.f, (float)WinAPI::window_height / 4.f);
 	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x, fstWinPos.y));
 	ImGui::SetNextWindowSize(ImVec2(fstWinSize.x, fstWinSize.y));
-	ImGui::Begin("debug", nullptr, winFlags);
+	ImGui::Begin("情報", nullptr, DX12Base::imGuiWinFlagsDef);
 	ImGui::Text("自機体力 : %.2f%%(%u / %u)",
 				(float)player->getHp() / (float)playerHpMax * 100.f,
 				player->getHp(), playerHpMax);
@@ -1043,7 +1043,7 @@ void BossScene::drawFrontSprite()
 		ImGui::SetNextWindowPos(f2ToIV2(hpWinPosLT));
 		ImGui::SetNextWindowSize(f2ToIV2(hpWinSize));
 
-		ImGui::Begin("自機体力", nullptr, winFlags);
+		ImGui::Begin("自機体力", nullptr, DX12Base::ImGuiWinFlagsNoTitleBar);
 		const ImVec2 size = ImGui::GetWindowSize();
 
 		// ウインドウ内のバーの大きさ
@@ -1082,7 +1082,7 @@ void BossScene::drawFrontSprite()
 		ImGui::SetNextWindowPos(f2ToIV2(hpWinPosCT), 0, ImVec2(0.5f, 0.5f));
 		ImGui::SetNextWindowSize(f2ToIV2(hpWinSize));
 
-		ImGui::Begin("ボス体力", nullptr, winFlags);
+		ImGui::Begin("ボス体力", nullptr, DX12Base::ImGuiWinFlagsNoTitleBar);
 		const ImVec2 size = ImGui::GetWindowSize();
 
 		// ウインドウ内のバーの大きさ

@@ -1267,7 +1267,7 @@ void RailShoot::drawFrontSprite()
 		ImGui::SetNextWindowPos(f2ToIV2(hpWinPosLT));
 		ImGui::SetNextWindowSize(f2ToIV2(hpWinSize));
 
-		ImGui::Begin("自機体力", nullptr, winFlags);
+		ImGui::Begin("自機体力", nullptr, DX12Base::ImGuiWinFlagsNoTitleBar);
 		const ImVec2 size = ImGui::GetWindowSize();
 
 		// ウインドウ内のバーの大きさ
