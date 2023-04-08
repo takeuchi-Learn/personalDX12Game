@@ -25,7 +25,10 @@ public:
 
 	struct ColliderSet
 	{
+		/// @brief コライダーグループ
 		GroupType group;
+
+		/// @brief 衝突したときに行う処理
 		std::function<void(GameObj*)> hitProc;
 	};
 

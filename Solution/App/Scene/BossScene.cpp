@@ -160,6 +160,21 @@ void BossScene::initPlayer()
 
 	player->setBulHomingRaito(0.01f);	// 弾のホーミングの強さ
 
+	// 自機の衝突判定情報
+	playerColliderSet.group.emplace_front(CollisionMgr::ColliderType{ .obj = player.get(), .colliderR = player->getScaleF3().z });
+	playerColliderSet.hitProc = [&](GameObj*)
+	{
+		if (player->damage(1u, true))
+		{
+			// 自機の体力が0になったら
+			update_proc = std::bind(&BossScene::update_end<GameOverScene>, this);
+		} else
+		{
+			startRgbShift();
+		}
+
+	};
+
 	sceneChangeStartPos = XMFLOAT3(0.f, 500.f, -800.f);
 	sceneChangeEndPos = XMFLOAT3(0.f, 0.f, -800.f);
 
@@ -503,9 +518,8 @@ void BossScene::update_play()
 		// --------------------
 		if (player->getAlive() && !boss->getBulList().empty())
 		{
-			CollisionMgr::ColliderSet pset{}, bset{};
-
-			pset.group.emplace_front(CollisionMgr::ColliderType{ .obj = player.get(), .colliderR = player->getScaleF3().z });
+			// todo ボスクラスに移動する
+			CollisionMgr::ColliderSet bset{};
 
 			for (auto& i : boss->getBulList())
 			{
@@ -513,25 +527,12 @@ void BossScene::update_play()
 
 				bset.group.emplace_front(CollisionMgr::ColliderType{ .obj = i.get(), .colliderR = i->getScaleF3().z });
 			}
-
-			pset.hitProc = [&](GameObj*)
-			{
-				if (player->damage(1u, true))
-				{
-					// 自機の体力が0になったら
-					update_proc = std::bind(&BossScene::update_end<GameOverScene>, this);
-				} else
-				{
-					startRgbShift();
-				}
-
-			};
 			bset.hitProc = [](GameObj* obj)
 			{
 				obj->kill();
 			};
 
-			CollisionMgr::checkHitAll(pset, bset);
+			CollisionMgr::checkHitAll(playerColliderSet, bset);
 		}
 
 		// ボスのパーツがすべて死んだらボス本体は死ぬ
@@ -1007,9 +1008,20 @@ void BossScene::drawFrontSprite()
 
 	cursorGr->drawWithUpdate(DX12Base::ins(), spBase.get());
 
+
+	// 最初のウインドウの位置を指定
+	constexpr XMFLOAT2 fstWinPos = XMFLOAT2((float)WinAPI::window_width / 50.f, (float)WinAPI::window_height / 10.f);
+	constexpr XMFLOAT2 fstWinSize = XMFLOAT2((float)WinAPI::window_width / 5.f, (float)WinAPI::window_height / 4.f);
+	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x, fstWinPos.y));
+	ImGui::SetNextWindowSize(ImVec2(fstWinSize.x, fstWinSize.y));
 	ImGui::Begin("debug", nullptr, winFlags);
-	ImGui::Text(player->getAlive() ? "いきてる" : "しんでる");
-	ImGui::Text("%u", player->getHp());
+	ImGui::Text("自機体力 : %.2f%%(%u / %u)",
+				(float)player->getHp() / (float)playerHpMax * 100.f,
+				player->getHp(), playerHpMax);
+	ImGui::Text("");
+	ImGui::Text("WASD : 移動");
+	ImGui::Text("マウス左ドラッグ : ロックオン");
+	ImGui::Text("マウス左離す : 発射");
 	ImGui::End();
 
 	// 自機の体力バー

@@ -20,6 +20,7 @@
 #include "3D/ParticleMgr.h"
 #include "GameObject/BaseEnemy.h"
 #include "GameObject/Boss/BossEnemy.h"
+#include <CollisionMgr.h>
 #include <Sound/Sound.h>
 
  /// @brief ボス戦シーンクラス
@@ -76,6 +77,7 @@ private:
 	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<ObjModel> playerBulModel;
 	uint16_t playerHpMax;
+	CollisionMgr::ColliderSet playerColliderSet{};
 
 	// 攻撃可能な敵リスト
 	std::forward_list<std::weak_ptr<BaseEnemy>> attackableEnemy;
