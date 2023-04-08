@@ -6,20 +6,26 @@ using namespace DirectX;
 
 using namespace CollisionShape;
 
-void CollisionMgr::checkHitAll(const GroupAndHitProc& group1, const GroupAndHitProc& group2)
+void CollisionMgr::checkHitAll(const ColliderSet& collider1,
+							   const ColliderSet& collider2)
 {
-	auto& g1Col = colliders.at(group1.name);
-	auto& g2Col = colliders.at(group2.name);
+	if (collider1.group.empty() || collider2.group.empty()) { return; }
 
-	for (auto& g1 : g1Col)
+	for (auto& g1 : collider1.group)
 	{
-		for (auto& g2 : g2Col)
+		if (!g1.obj) { continue; }
+		if (!g1.obj->getAlive()) { continue; }
+
+		for (auto& g2 : collider2.group)
 		{
+			if (!g2.obj) { continue; }
+			if (!g2.obj->getAlive()) { continue; }
+
 			if (Collision::CheckHit(Sphere(XMLoadFloat3(&g1.obj->calcWorldPos()), g1.colliderR),
 									Sphere(XMLoadFloat3(&g2.obj->calcWorldPos()), g2.colliderR)))
 			{
-				group1.hitProc(g1.obj);
-				group2.hitProc(g2.obj);
+				collider1.hitProc(g1.obj);
+				collider2.hitProc(g2.obj);
 			}
 		}
 	}

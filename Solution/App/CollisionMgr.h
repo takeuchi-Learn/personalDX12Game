@@ -14,7 +14,7 @@
  /// @brief 衝突判定をするクラス
 class CollisionMgr
 {
-private:
+public:
 	struct ColliderType
 	{
 		GameObj* obj = nullptr;
@@ -23,37 +23,13 @@ private:
 
 	using GroupType = std::forward_list<ColliderType>;
 
-	std::unordered_map<std::string, GroupType> colliders;
-
-public:
-	/// @brief コライダーのグループを追加する
-	/// @param groupName グループ名
-	inline void addColliderGroup(const std::string& groupName)
+	struct ColliderSet
 	{
-		colliders.emplace(groupName, GroupType());
-	}
-
-	/// @brief 指定グループにコライダーを追加する
-	/// @param groupName グループ名。指定グループが無ければ新しく作る
-	/// @param collider 追加するコライダー
-	inline void addCollider(const std::string& groupName,
-							GameObj* obj,
-							float colliderR)
-	{
-		auto& i = colliders[groupName].emplace_front(ColliderType{ .obj = obj, .colliderR = colliderR });
-	}
-
-	struct GroupAndHitProc
-	{
-		std::string name;
-		std::function<void(GameObj* obj)> hitProc;
-
-		GroupAndHitProc(const std::string& name = "",
-						const std::function<void(GameObj* obj)>& hitProc = [](GameObj* obj) {}) :
-			name(name), hitProc(hitProc)
-		{}
+		GroupType group;
+		std::function<void(GameObj*)> hitProc;
 	};
 
-	void checkHitAll(const GroupAndHitProc& group1, const GroupAndHitProc& group2);
+	void checkHitAll(const ColliderSet& collider1,
+					 const ColliderSet& collider2);
 };
 

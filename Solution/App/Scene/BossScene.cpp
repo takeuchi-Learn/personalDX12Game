@@ -503,25 +503,18 @@ void BossScene::update_play()
 		// --------------------
 		if (player->getAlive() && !boss->getBulList().empty())
 		{
-			bool bossBulAlive = false;
+			CollisionMgr::ColliderSet pset{}, bset{};
 
-			CollisionMgr::GroupAndHitProc playerCol{}, bBulCol{};
-
-			playerCol.name = "player";
-			bBulCol.name = "bBul";
-
-			CollisionMgr mgr{};
-			mgr.addCollider(playerCol.name, player.get(), player->getScaleF3().z);
+			pset.group.emplace_front(CollisionMgr::ColliderType{ .obj = player.get(), .colliderR = player->getScaleF3().z });
 
 			for (auto& i : boss->getBulList())
 			{
 				if (!i->getAlive()) { continue; }
 
-				mgr.addCollider(bBulCol.name, i.get(), i->getScaleF3().z);
-				bossBulAlive = true;
+				bset.group.emplace_front(CollisionMgr::ColliderType{ .obj = i.get(), .colliderR = i->getScaleF3().z });
 			}
 
-			playerCol.hitProc = [&](GameObj*)
+			pset.hitProc = [&](GameObj*)
 			{
 				if (player->damage(1u, true))
 				{
@@ -533,15 +526,13 @@ void BossScene::update_play()
 				}
 
 			};
-			bBulCol.hitProc = [](GameObj* obj)
+			bset.hitProc = [](GameObj* obj)
 			{
 				obj->kill();
 			};
 
-			if (bossBulAlive)
-			{
-				mgr.checkHitAll(playerCol, bBulCol);
-			}
+			CollisionMgr mgr{};
+			mgr.checkHitAll(pset, bset);
 		}
 
 		// ボスのパーツがすべて死んだらボス本体は死ぬ
