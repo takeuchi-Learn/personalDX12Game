@@ -9,6 +9,7 @@
 #include <Util/Util.h>
 
 #include "Collision/Collision.h"
+#include <CollisionMgr.h>
 
 #include <fstream>
 #include <sstream>
@@ -498,37 +499,48 @@ void BossScene::update_play()
 		}
 
 		// --------------------
-		// 自機とボス弾(雑魚敵)の当たり判定
+		// 自機とボス弾の当たり判定
 		// --------------------
-		if (player->getAlive())
+		if (player->getAlive() && !boss->getBulList().empty())
 		{
-			const CollisionShape::Sphere pCol(XMLoadFloat3(&player->calcWorldPos()),
-											  player->getScale());
+			bool bossBulAlive = false;
+
+			CollisionMgr::GroupAndHitProc playerCol{}, bBulCol{};
+
+			playerCol.name = "player";
+			bBulCol.name = "bBul";
+
+			CollisionMgr mgr{};
+			mgr.addCollider(playerCol.name, player.get(), player->getScaleF3().z);
 
 			for (auto& i : boss->getBulList())
 			{
-				// いなければ判定しない
 				if (!i->getAlive()) { continue; }
 
-				const CollisionShape::Sphere eCol(XMLoadFloat3(&i->getPos()),
-												  i->getScale());
+				mgr.addCollider(bBulCol.name, i.get(), i->getScaleF3().z);
+				bossBulAlive = true;
+			}
 
-				if (Collision::CheckHit(pCol, eCol))
+			playerCol.hitProc = [&](GameObj*)
+			{
+				if (player->damage(1u, true))
 				{
-					// 当たった雑魚敵は消す
-					i->kill();
-
-					// 自機がダメージを受ける
-					if (player->damage(1u, true))
-					{
-						// 自機の体力が0になったら
-						player->kill();
-						update_proc = std::bind(&BossScene::update_end<GameOverScene>, this);
-					} else
-					{
-						startRgbShift();
-					}
+					// 自機の体力が0になったら
+					update_proc = std::bind(&BossScene::update_end<GameOverScene>, this);
+				} else
+				{
+					startRgbShift();
 				}
+
+			};
+			bBulCol.hitProc = [](GameObj* obj)
+			{
+				obj->kill();
+			};
+
+			if (bossBulAlive)
+			{
+				mgr.checkHitAll(playerCol, bBulCol);
 			}
 		}
 
@@ -1004,6 +1016,11 @@ void BossScene::drawFrontSprite()
 	}
 
 	cursorGr->drawWithUpdate(DX12Base::ins(), spBase.get());
+
+	ImGui::Begin("debug", nullptr, winFlags);
+	ImGui::Text(player->getAlive() ? "いきてる" : "しんでる");
+	ImGui::Text("%u", player->getHp());
+	ImGui::End();
 
 	// 自機の体力バー
 	if (0.f < playerHpBar.backNowRaito)
