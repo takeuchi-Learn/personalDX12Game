@@ -531,8 +531,7 @@ void BossScene::update_play()
 				obj->kill();
 			};
 
-			CollisionMgr mgr{};
-			mgr.checkHitAll(pset, bset);
+			CollisionMgr::checkHitAll(pset, bset);
 		}
 
 		// ボスのパーツがすべて死んだらボス本体は死ぬ

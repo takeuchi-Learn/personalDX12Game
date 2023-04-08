@@ -29,7 +29,7 @@ public:
 		std::function<void(GameObj*)> hitProc;
 	};
 
-	void checkHitAll(const ColliderSet& collider1,
-					 const ColliderSet& collider2);
+	static void checkHitAll(const ColliderSet& collider1,
+							const ColliderSet& collider2);
 };
 
