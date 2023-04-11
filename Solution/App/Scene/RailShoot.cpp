@@ -32,14 +32,14 @@ namespace
 						r.z - l.z);
 	}
 
-	void operator+=(XMFLOAT3& lhs, const XMFLOAT3& rhs)
+	inline void operator+=(XMFLOAT3& lhs, const XMFLOAT3& rhs)
 	{
 		lhs.x += rhs.x;
 		lhs.y += rhs.y;
 		lhs.z += rhs.z;
 	}
 
-	void operator-=(XMFLOAT3& lhs, const XMFLOAT3& rhs)
+	inline void operator-=(XMFLOAT3& lhs, const XMFLOAT3& rhs)
 	{
 		lhs.x -= rhs.x;
 		lhs.y -= rhs.y;
@@ -51,19 +51,22 @@ namespace
 
 	constexpr XMFLOAT4 cyan = XMFLOAT4(0.25f, 1, 1, 1);
 
-	/// @brief 照準画像(正方形)の内接球
-	/// @param camera カメラ
-	/// @param screenPos スクリーン座標での位置
-	/// @param distance 生成する球とカメラの距離
-	/// @param reticleR 照準画像の内接円の半径
-	/// @return 照準画像の内接球
-	CollisionShape::Sphere createReticleSphere(const Camera* camera, const XMFLOAT2& screenPos, float distance, float reticleR)
+	struct ReticleSphere :
+		public CollisionShape::Sphere
 	{
-		const XMVECTOR center = camera->screenPos2WorldPosVec(XMFLOAT3(screenPos.x, screenPos.y, distance));
-		const XMVECTOR right = camera->screenPos2WorldPosVec(XMFLOAT3(screenPos.x + reticleR, screenPos.y, distance));
+		/// @param camera カメラ
+		/// @param screenPos スクリーン座標での位置
+		/// @param distance 生成する球とカメラの距離
+		/// @param reticleR 照準画像の内接円の半径
+		ReticleSphere(const Camera* camera, const XMFLOAT2& screenPos, float distance, float reticleR)
+		{
+			const XMVECTOR center = camera->screenPos2WorldPosVec(XMFLOAT3(screenPos.x, screenPos.y, distance));
+			const XMVECTOR right = camera->screenPos2WorldPosVec(XMFLOAT3(screenPos.x + reticleR, screenPos.y, distance));
 
-		return CollisionShape::Sphere(center, Collision::vecLength(XMVectorSubtract(center, right)));
-	}
+			this->center = center;
+			this->radius = Collision::vecLength(XMVectorSubtract(center, right));
+		}
+	};
 }
 
 void RailShoot::loadBackObj()
@@ -1159,10 +1162,10 @@ void RailShoot::updatePlayerShotTarget(const XMFLOAT2& aim2DPos)
 
 		const auto enemySphere = CollisionShape::Sphere(XMLoadFloat3(&i->calcWorldPos()), i->getScaleF3().z);
 
-		const auto aimSphere = createReticleSphere(camera.get(),
-												   aim2DPos,
-												   Collision::vecLength(enemySphere.center - camPosVec),
-												   cursorR2D);
+		const auto aimSphere = ReticleSphere(camera.get(),
+											 aim2DPos,
+											 Collision::vecLength(enemySphere.center - camPosVec),
+											 cursorR2D);
 
 		// 敵が2D照準の中にいるかどうか
 		if (Collision::CheckHit(enemySphere, aimSphere))
