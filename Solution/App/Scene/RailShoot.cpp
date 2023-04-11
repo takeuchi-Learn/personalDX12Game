@@ -10,14 +10,6 @@
 #include "System/SceneManager.h"
 #include <CollisionMgr.h>
 
-#ifdef min
-#undef min
-#endif // min
-
-#ifdef max
-#undef max
-#endif // max
-
 using namespace DirectX;
 
 namespace

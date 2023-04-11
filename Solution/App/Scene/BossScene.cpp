@@ -513,7 +513,6 @@ void BossScene::update_play()
 		// --------------------
 		if (player->getAlive() && !boss->getBulList().empty())
 		{
-			// todo ボスクラスに移動する
 			CollisionMgr::ColliderSet bset{};
 
 			for (auto& i : boss->getBulList())

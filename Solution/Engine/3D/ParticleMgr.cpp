@@ -436,7 +436,7 @@ void ParticleMgr::InitializeGraphicsPipeline()
 	// デプスの書き込みを禁止
 	gpipeline.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 
-	constexpr UINT renderTargetNum = min(PostEffect::renderTargetNum, _countof(gpipeline.BlendState.RenderTarget));
+	constexpr UINT renderTargetNum = std::min(PostEffect::renderTargetNum, UINT(_countof(gpipeline.BlendState.RenderTarget)));
 
 	// ブレンドステートの設定
 	for (UINT i = 0u; i < renderTargetNum; ++i)
