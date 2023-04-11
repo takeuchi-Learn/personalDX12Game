@@ -4,11 +4,8 @@
  *********************************************************************/
 
 #pragma once
-#include <unordered_map>
 #include <functional>
 #include <forward_list>
-#include <string>
-#include <Collision/CollisionShape.h>
 #include <GameObject/GameObj.h>
 
  /// @brief 衝突判定をするクラス
@@ -19,6 +16,11 @@ public:
 	{
 		GameObj* obj = nullptr;
 		float colliderR = 1.f;
+
+		inline static ColliderType create(GameObj* obj)
+		{
+			return ColliderType{ .obj = obj, .colliderR = obj->getScaleF3().z };
+		}
 	};
 
 	using GroupType = std::forward_list<ColliderType>;

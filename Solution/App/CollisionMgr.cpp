@@ -1,10 +1,6 @@
 ﻿#include "CollisionMgr.h"
+#include <Collision/CollisionShape.h>
 #include <Collision/Collision.h>
-#include <DirectXMath.h>
-
-using namespace DirectX;
-
-using namespace CollisionShape;
 
 void CollisionMgr::checkHitAll(const ColliderSet& collider1,
 							   const ColliderSet& collider2)
@@ -21,8 +17,8 @@ void CollisionMgr::checkHitAll(const ColliderSet& collider1,
 			if (!g2.obj) { continue; }
 			if (!g2.obj->getAlive()) { continue; }
 
-			if (Collision::CheckHit(Sphere(XMLoadFloat3(&g1.obj->calcWorldPos()), g1.colliderR),
-									Sphere(XMLoadFloat3(&g2.obj->calcWorldPos()), g2.colliderR)))
+			if (Collision::CheckHit(CollisionShape::Sphere(XMLoadFloat3(&g1.obj->calcWorldPos()), g1.colliderR),
+									CollisionShape::Sphere(XMLoadFloat3(&g2.obj->calcWorldPos()), g2.colliderR)))
 			{
 				collider1.hitProc(g1.obj);
 				collider2.hitProc(g2.obj);

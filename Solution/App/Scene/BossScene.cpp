@@ -161,10 +161,10 @@ void BossScene::initPlayer()
 	player->setBulHomingRaito(0.01f);	// 弾のホーミングの強さ
 
 	// 自機の衝突判定情報
-	playerColliderSet.group.emplace_front(CollisionMgr::ColliderType{ .obj = player.get(), .colliderR = player->getScaleF3().z });
-	playerColliderSet.hitProc = [&](GameObj*)
+	playerColliderSet.group.emplace_front(player->createCollider());
+	playerColliderSet.hitProc = [&](GameObj* p)
 	{
-		if (player->damage(1u, true))
+		if (p->damage(1u, true))
 		{
 			// 自機の体力が0になったら
 			update_proc = std::bind(&BossScene::update_end<GameOverScene>, this);
@@ -470,47 +470,42 @@ void BossScene::update_play()
 		// --------------------
 		// 自機弾と敵の当たり判定
 		// --------------------
-		for (auto& e : attackableEnemy)
 		{
-			if (e.expired()) { continue; }
-			auto i = e.lock();
+			CollisionMgr::ColliderSet eSet{}, pBulSet{};
+			pBulSet.hitProc = [](GameObj* obj) { obj->kill(); };
+			eSet.hitProc = [&](GameObj* obj)
+			{
+				if (obj->damage(1ui16, true))
+				{
+					obj->setDrawFlag(false);
+					// 赤エフェクトを出す
+					ParticleMgr::createParticle(particleMgr.get(), obj->calcWorldPos(), 128U, 16.f, 16.f, killEffCol);
+					Sound::SoundPlayWave(killSe.get(), 0, 0.2f);
+				} else
+				{
+					// シアンエフェクトを出す
+					ParticleMgr::createParticle(particleMgr.get(), obj->calcWorldPos(), 96U, 12.f, 12.f, noKillEffCol);
+					Sound::SoundPlayWave(bossDamageSe.get(), 0, 0.2f);
+				}
+			};
 
-			// いない敵は判定しない
-			if (!i->getAlive()) { continue; }
+			for (auto& e : attackableEnemy)
+			{
+				// いない敵は判定しない
+				if (e.expired()) { continue; }
+				auto i = e.lock();
+				if (!i->getAlive()) { continue; }
 
-			const CollisionShape::Sphere enemy(XMLoadFloat3(&i->calcWorldPos()),
-											   i->getScale());
-
+				eSet.group.emplace_front(CollisionMgr::ColliderType::create(i.get()));
+			}
 			for (auto& pb : player->getBulArr())
 			{
 				// 無い弾は判定しない
 				if (!pb.getAlive()) { continue; }
 
-				const CollisionShape::Sphere bul(XMLoadFloat3(&pb.calcWorldPos()),
-												 pb.getScaleF3().z);
-
-				// 衝突していたら
-				if (Collision::CheckHit(bul, enemy))
-				{
-					// 弾はさよなら
-					pb.kill();
-
-					// 敵はダメージを受ける
-					// hpが0になったらさよなら
-					if (i->damage(1u, true))
-					{
-						i->setDrawFlag(false);
-						// 赤エフェクトを出す
-						ParticleMgr::createParticle(particleMgr.get(), i->calcWorldPos(), 128U, 16.f, 16.f, killEffCol);
-						Sound::SoundPlayWave(killSe.get(), 0, 0.2f);
-					} else
-					{
-						// シアンエフェクトを出す
-						ParticleMgr::createParticle(particleMgr.get(), i->calcWorldPos(), 96U, 12.f, 12.f, noKillEffCol);
-						Sound::SoundPlayWave(bossDamageSe.get(), 0, 0.2f);
-					}
-				}
+				pBulSet.group.emplace_front(CollisionMgr::ColliderType::create(&pb));
 			}
+			CollisionMgr::checkHitAll(eSet, pBulSet);
 		}
 
 		// --------------------
@@ -525,7 +520,7 @@ void BossScene::update_play()
 			{
 				if (!i->getAlive()) { continue; }
 
-				bset.group.emplace_front(CollisionMgr::ColliderType{ .obj = i.get(), .colliderR = i->getScaleF3().z });
+				bset.group.emplace_front(CollisionMgr::ColliderType::create(i.get()));
 			}
 			bset.hitProc = [](GameObj* obj)
 			{

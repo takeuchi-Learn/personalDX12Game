@@ -22,10 +22,21 @@ protected:
 	bool alive = true;
 	bool drawFlag = true;
 
+	uint16_t hp = 1ui16;
+
 	virtual void additionalUpdate() {};
 	virtual void additionalDraw(Light* light) {}
 
 public:
+	inline void setHp(uint16_t hpNum) { hp = hpNum; }
+	inline uint16_t getHp() const { return hp; }
+
+	/// @brief ダメージを与える
+	/// @param damegeNum 与えるダメージ数
+	/// @param killFlag hpが0になったらkillするかどうか(trueでkillする)
+	/// @return 倒したかどうか(倒したらtrue)
+	bool damage(uint16_t damegeNum, bool killFlag = true);
+
 	inline static DirectX::XMFLOAT2 calcRotationSyncVelRad(const DirectX::XMFLOAT3& vel)
 	{
 		return DirectX::XMFLOAT2(std::atan2(-vel.y,

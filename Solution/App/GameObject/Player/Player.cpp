@@ -22,19 +22,6 @@ Player::Player(Camera* camera,
 	bulParticle->setCamera(camera);
 }
 
-bool Player::damage(uint16_t damegeNum, bool killFlag)
-{
-	if (damegeNum >= hp)
-	{
-		hp = 0u;
-		if (killFlag) { kill(); }
-		return true;
-	}
-
-	hp -= damegeNum;
-	return false;
-}
-
 bool Player::shotAll(Camera* camera,
 				  ObjModel* model,
 				  float speed,

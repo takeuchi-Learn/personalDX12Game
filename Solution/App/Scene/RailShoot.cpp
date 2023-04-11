@@ -8,8 +8,7 @@
 #include "System/PostEffect.h"
 #include "Collision/Collision.h"
 #include "System/SceneManager.h"
-
-#include <3D/Fbx/FbxLoader.h>
+#include <CollisionMgr.h>
 
 #ifdef min
 #undef min
@@ -686,69 +685,70 @@ void RailShoot::update_play()
 		// --------------------
 		// 自機弾と敵の当たり判定
 		// --------------------
-		Sphere pBulCol{};
+		CollisionMgr::ColliderSet eSet{}, pBulSet{};
+		pBulSet.hitProc = [](GameObj* obj) { obj->kill(); };
+		eSet.hitProc = [&](GameObj* obj)
+		{
+			if (obj->damage(1u, true))
+			{
+				ParticleMgr::createParticle(particleMgr.get(), obj->calcWorldPos(), 98U, 32.f, 16.f, killEffCol);
+				Sound::SoundPlayWave(killSe.get(), 0, 0.2f);
+				return;
+			}
+			ParticleMgr::createParticle(particleMgr.get(), obj->calcWorldPos(), 98U, 32.f, 16.f, noKillEffCol);
+		};
+
 		for (auto& pb : player->getBulArr())
 		{
 			if (!pb.getAlive()) { continue; }
 
-			pBulCol = Sphere(XMLoadFloat3(&pb.calcWorldPos()), pb.getScale());
-
-			for (auto& e : enemy)
-			{
-				if (e->getAlive()
-					&& Collision::CheckHit(pBulCol,
-										   Sphere(XMLoadFloat3(&e->calcWorldPos()),
-												  e->getScale())))
-				{
-					// パーティクルを生成
-					XMFLOAT3 pos = e->calcWorldPos();
-					ParticleMgr::createParticle(particleMgr.get(), pos, 98U, 32.f, 16.f, killEffCol);
-					// 敵も自機弾もさよなら
-					pb.kill();
-					e->damage(1u, true);
-
-					Sound::SoundPlayWave(killSe.get(), 0, 0.2f);
-				}
-			}
+			pBulSet.group.emplace_front(CollisionMgr::ColliderType::create(&pb));
 		}
 
-		// --------------------
-		// 自機と敵弾の当たり判定
-		// --------------------
-		if (player->getAlive())
+		for (auto& e : enemy)
 		{
-			const Sphere playerCol(XMLoadFloat3(&player->calcWorldPos()), player->getScale());
+			if (!e->getAlive()) { continue; }
 
-			for (auto& e : enemy)
+			eSet.group.emplace_front(CollisionMgr::ColliderType::create(e.get()));
+		}
+		CollisionMgr::checkHitAll(eSet, pBulSet);
+	}
+
+	// --------------------
+	// 自機と敵弾の当たり判定
+	// --------------------
+	if (player->getAlive())
+	{
+		CollisionMgr::ColliderSet pSet{};
+		pSet.group.emplace_front(player->createCollider());
+		pSet.hitProc = [&](GameObj* obj)
+		{
+			if (obj->damage(1u, true))
 			{
-				for (auto& eb : e->getBulList())
-				{
-					//　存在しない敵弾の処理はしない
-					if (!eb->getAlive()) { continue; }
+				changeNextScene<GameOverScene>();
+				obj->kill();
+				return;
+			}
+			// 演出開始
+			startRgbShift();
+		};
 
-					// 自機と敵の弾が当たっていたら
-					if (Collision::CheckHit(playerCol,
-											Sphere(XMLoadFloat3(&eb->calcWorldPos()),
-												   eb->getScaleF3().z)))
-					{
-						// 当たった敵弾は消す
-						eb->kill();
-
-						// HPが無くなったら次のシーンへ進む
-						if (player->damage(1u, true))
-						{
-							changeNextScene<GameOverScene>();
-							player->kill();
-						} else
-						{
-							// 演出開始
-							startRgbShift();
-						}
-					}
-				}
+		CollisionMgr::ColliderSet eBulSet{};
+		eBulSet.hitProc = [](GameObj* obj) { obj->kill(); };
+		for (auto& e : enemy)
+		{
+			for (auto& eb : e->getBulList())
+			{
+				//　存在しない敵弾の処理はしない
+				if (!eb->getAlive()) { continue; }
+				eBulSet.group.emplace_front(CollisionMgr::ColliderType::create(eb.get()));
 			}
 		}
 
+		CollisionMgr::checkHitAll(pSet, eBulSet);
+	}
+
+	{
 		// ------------------------------
 		// 弾がなく、かつ死んだ敵の判定
 		// ------------------------------

@@ -8,6 +8,7 @@
 
 #include <GameObject/GameObj.h>
 #include <3D/ParticleMgr.h>
+#include <CollisionMgr.h>
 
 /// @brief 自機クラス
 class Player
@@ -25,8 +26,6 @@ class Player
 
 	std::shared_ptr<ParticleMgr> bulParticle;
 
-	uint16_t hp = 1ui16;
-
 	float bulHomingRaito = 0.05f;
 
 public:
@@ -34,15 +33,13 @@ public:
 		   ObjModel* model,
 		   const DirectX::XMFLOAT3& pos = { 0,0,0 });
 
+	inline auto createCollider() { return CollisionMgr::ColliderType{ .obj = this, .colliderR = this->getScaleF3().z }; }
+
 	inline float getBulHomingRaito() const { return bulHomingRaito; }
 	inline void setBulHomingRaito(float raito) { bulHomingRaito = raito; }
 
 	inline uint16_t getBulLife() const { return bulLife; }
 	inline void setBulLife(uint16_t bulLife) { this->bulLife = bulLife; }
-
-	uint16_t getHp() const { return hp; }
-	void setHp(uint16_t hp) { this->hp = hp; }
-	bool damage(uint16_t damegeNum, bool killFlag = true);
 
 	XMVECTOR getLookVec(float len = 1.f);
 
