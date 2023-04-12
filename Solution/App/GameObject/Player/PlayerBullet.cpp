@@ -24,8 +24,8 @@ void PlayerBullet::additionalUpdate()
 								 XMFLOAT3(),
 								 4.f, 0.f,
 								 0.f, 0.f,
-								 XMFLOAT3(1, 1, 1),
-								 XMFLOAT3(0, 0, 0));
+								 XMFLOAT3(0.5f, 0.125f, 0),
+								 XMFLOAT3(1, 1, 1));
 		}
 
 		// 追従対象がいればそちらへ進む

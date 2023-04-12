@@ -150,12 +150,12 @@ BossBehavior::BossBehavior(BossEnemy* boss) :
 
 	// 攻撃対象が近い時の行動
 	nearTargetPhase = std::make_unique<Sequencer>();
-	nearTargetPhase->addChild(Task([&] { return this->boss->calcTargetDistance() < this->boss->getMaxTargetDistance() * 0.4f ? NODE_RESULT::SUCCESS : NODE_RESULT::FAIL; }));
+	nearTargetPhase->addChild(Task([&] { return this->boss->calcTargetDistance() < this->boss->getMaxTargetDistance() * 0.5f ? NODE_RESULT::SUCCESS : NODE_RESULT::FAIL; }));
 	nearTargetPhase->addChild(*fanShapePhase);
 
 	// 攻撃対象が遠い時の行動
 	farTargetPhase = std::make_unique<Sequencer>();
-	farTargetPhase->addChild(Task([&] { return this->boss->calcTargetDistance() > this->boss->getMaxTargetDistance() * 0.4f ? NODE_RESULT::SUCCESS : NODE_RESULT::FAIL; }));
+	farTargetPhase->addChild(Task([&] { return this->boss->calcTargetDistance() > this->boss->getMaxTargetDistance() * 0.5f ? NODE_RESULT::SUCCESS : NODE_RESULT::FAIL; }));
 	farTargetPhase->addChild(*singleShotPhase);
 
 	addChild(*nearTargetPhase);
