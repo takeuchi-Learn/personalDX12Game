@@ -104,6 +104,46 @@ NODE_RESULT BossBehavior::phase_singleShotAttack()
 	return NODE_RESULT::RUNNING;
 }
 
+NODE_RESULT BossBehavior::phase_tornado()
+{
+	if (++tornadoPhaseData.frame.nowVal > tornadoPhaseData.frame.maxVal)
+	{
+		tornadoPhaseData.frame.nowVal = 0u;
+		return NODE_RESULT::SUCCESS;
+	}
+	XMFLOAT3 vel = GameObj::calcVel(tornadoPhaseData.tornadoWorldPos,
+									boss->getTargetObj()->calcWorldPos(),
+									tornadoPhaseData.targetSpeed);
+	XMFLOAT3 pos = boss->getTargetObj()->getPos();
+	pos.x += vel.x;
+	pos.y += vel.y;
+	pos.z += vel.z;
+	boss->getTargetObj()->setPos(pos);
+
+	return NODE_RESULT::RUNNING;
+}
+
+NODE_RESULT BossBehavior::phase_setTornadoData()
+{
+	XMVECTOR backVec = XMVector3Rotate(XMVectorSet(0, 0, -1.f, 1.f),
+									   XMQuaternionRotationRollPitchYaw(XMConvertToRadians(boss->getRotation().x),
+																		XMConvertToRadians(boss->getRotation().y),
+																		XMConvertToRadians(boss->getRotation().z)));
+
+	backVec = XMVectorSetY(backVec, 0.f);
+	backVec = XMVector3Normalize(backVec) * this->boss->getMaxTargetDistance() * 0.2f;
+
+	XMFLOAT3 forward{};
+	XMStoreFloat3(&forward, backVec);
+
+	tornadoPhaseData.tornadoWorldPos = boss->calcWorldPos();
+	tornadoPhaseData.tornadoWorldPos.x += forward.x;
+	tornadoPhaseData.tornadoWorldPos.y = boss->getTargetObj()->calcWorldPos().y;
+	tornadoPhaseData.tornadoWorldPos.z += forward.z;
+
+	return NODE_RESULT::SUCCESS;
+}
+
 BossBehavior::BossBehavior(BossEnemy* boss) :
 	Selector(),
 	boss(boss)
@@ -140,22 +180,28 @@ BossBehavior::BossBehavior(BossEnemy* boss) :
 
 	// 扇形攻撃
 	fanShapePhase = std::make_unique<Sequencer>();
-	fanShapePhase->addChild(Task(std::bind(&BossBehavior::phase_Rotation, this, XMFLOAT3(0, 0, 0), XMFLOAT3(0, 720, 0))));
 	fanShapePhase->addChild(Task(std::bind(&BossBehavior::phase_fanShapeAttack, this)));
 
 	// 連続単発攻撃
 	singleShotPhase = std::make_unique<Sequencer>();
-	singleShotPhase->addChild(Task(std::bind(&BossBehavior::phase_Rotation, this, XMFLOAT3(0, 0, 0), XMFLOAT3(360, -360, 0))));
 	singleShotPhase->addChild(Task(std::bind(&BossBehavior::phase_singleShotAttack, this)));
+
+	// 引き寄せる
+	tornadoPhase = std::make_unique<Sequencer>();
+	tornadoPhase->addChild(Task(std::bind(&BossBehavior::phase_setTornadoData, this)));
+	tornadoPhase->addChild(Task(std::bind(&BossBehavior::phase_tornado, this)));
 
 	// 攻撃対象が近い時の行動
 	nearTargetPhase = std::make_unique<Sequencer>();
 	nearTargetPhase->addChild(Task([&] { return this->boss->calcTargetDistance() < this->boss->getMaxTargetDistance() * 0.5f ? NODE_RESULT::SUCCESS : NODE_RESULT::FAIL; }));
+	nearTargetPhase->addChild(Task(std::bind(&BossBehavior::phase_Rotation, this, XMFLOAT3(0, 0, 0), XMFLOAT3(0, 720, 0))));
 	nearTargetPhase->addChild(*fanShapePhase);
 
 	// 攻撃対象が遠い時の行動
 	farTargetPhase = std::make_unique<Sequencer>();
 	farTargetPhase->addChild(Task([&] { return this->boss->calcTargetDistance() > this->boss->getMaxTargetDistance() * 0.5f ? NODE_RESULT::SUCCESS : NODE_RESULT::FAIL; }));
+	farTargetPhase->addChild(Task(std::bind(&BossBehavior::phase_Rotation, this, XMFLOAT3(0, 0, 0), XMFLOAT3(360, -360, 0))));
+	farTargetPhase->addChild(*tornadoPhase);
 	farTargetPhase->addChild(*singleShotPhase);
 
 	addChild(*nearTargetPhase);

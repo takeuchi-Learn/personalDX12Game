@@ -164,8 +164,9 @@ void BossScene::initPlayer()
 
 	};
 
-	sceneChangeStartPos = XMFLOAT3(0.f, 500.f, -800.f);
-	sceneChangeEndPos = XMFLOAT3(0.f, 0.f, -800.f);
+	constexpr float posZ = -700.f;
+	sceneChangeStartPos = XMFLOAT3(0.f, 500.f, posZ);
+	sceneChangeEndPos = XMFLOAT3(0.f, 0.f, posZ);
 
 	sceneChangeStartRota = playerParent->getRotation();
 	sceneChangeStartRota.y += 90.f;
@@ -185,7 +186,7 @@ void BossScene::initBoss()
 
 	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 0));
 	boss->setRotation(XMFLOAT3(0, 180.f, 0));
-	boss->setTargetObj(player.get());
+	boss->setTargetObj(playerParent.get());
 	boss->setBulModel(bossBulModel.get());
 	boss->getObj()->color = XMFLOAT4(2, 0.5f, 0.25f, 1);
 	boss->setAlive(false);

@@ -50,15 +50,22 @@ public:
 		return DirectX::XMFLOAT2(DirectX::XMConvertToDegrees(rad.x), DirectX::XMConvertToDegrees(rad.y));
 	}
 
+	inline static DirectX::XMFLOAT3 calcVecLen(const DirectX::XMFLOAT3& startPos,
+											   const DirectX::XMFLOAT3& endPos)
+	{
+		return DirectX::XMFLOAT3
+		{
+			endPos.x - startPos.x,
+			endPos.y - startPos.y,
+			endPos.z - startPos.z
+		};
+	}
+
 	inline static DirectX::XMFLOAT3 calcVel(const DirectX::XMFLOAT3& targetPos,
 											const DirectX::XMFLOAT3& nowPos,
 											float velScale)
 	{
-		DirectX::XMFLOAT3 velF3{
-			targetPos.x - nowPos.x,
-			targetPos.y - nowPos.y,
-			targetPos.z - nowPos.z
-		};
+		DirectX::XMFLOAT3 velF3 = calcVecLen(nowPos, targetPos);
 
 		const DirectX::XMVECTOR velVec =
 			DirectX::XMVectorScale(

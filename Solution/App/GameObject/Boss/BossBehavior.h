@@ -78,6 +78,20 @@ private:
 
 #pragma endregion 扇形攻撃
 
+#pragma region 自機を引き寄せる
+
+	struct TornadoPhaseData
+	{
+		MaxNow<uint32_t> frame = MaxNow<uint32_t>{ .maxVal = 300, .nowVal = 0u };
+		DirectX::XMFLOAT3 tornadoWorldPos{};
+		float targetSpeed = 5.f;
+	};
+	TornadoPhaseData tornadoPhaseData{};
+
+	std::unique_ptr<Sequencer> tornadoPhase;
+
+#pragma endregion 自機を引き寄せる
+
 private:
 	// ---------------
 	// priavteメンバ関数
@@ -87,6 +101,9 @@ private:
 							   const DirectX::XMFLOAT3& rotaMax = DirectX::XMFLOAT3(0, 360, 0));
 	NODE_RESULT phase_fanShapeAttack();
 	NODE_RESULT phase_singleShotAttack();
+	NODE_RESULT phase_tornado();
+
+	NODE_RESULT phase_setTornadoData();
 
 public:
 	BossBehavior(BossEnemy* boss);
