@@ -7,6 +7,7 @@
 #include <GameObject/BaseEnemy.h>
 #include <forward_list>
 #include <GameObject/Boss/BossBehavior.h>
+#include <3D/ParticleMgr.h>
 
  /// @brief ボス敵クラス
 class BossEnemy :
@@ -23,6 +24,8 @@ class BossEnemy :
 	float moveSpeed = 2.f;
 
 	float maxTargerDistance = 1500.f;
+
+	std::unique_ptr<ParticleMgr> tornadoParticle;
 
 	/// @brief 原点からボスの攻撃対象を向くベクトルを算出
 	/// @param me 原点
@@ -97,6 +100,11 @@ public:
 				const DirectX::XMFLOAT3& scale = DirectX::XMFLOAT3(10, 10, 10),
 				const DirectX::XMFLOAT4& color = DirectX::XMFLOAT4(1.f, 1.f, 1.f, 1.f),
 				float moveSpeed = 2.f);
+
+	inline void drawTornadoParticle()
+	{
+		tornadoParticle->drawWithUpdate();
+	}
 
 #pragma endregion 弾関係
 };

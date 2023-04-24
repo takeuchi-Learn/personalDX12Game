@@ -732,6 +732,7 @@ void BossScene::drawObj3d()
 
 	particleMgr->drawWithUpdate();
 	player->drawWithUpdateBulParticle();
+	boss->drawTornadoParticle();
 }
 
 void BossScene::startRgbShift()

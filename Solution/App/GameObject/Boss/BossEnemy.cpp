@@ -72,7 +72,8 @@ BossEnemy::BossEnemy(Camera* camera,
 											  model,
 											  pos,
 											  hp),
-	bossBehavior(std::make_unique<BossBehavior>(this))
+	bossBehavior(std::make_unique<BossBehavior>(this)),
+	tornadoParticle(std::make_unique<ParticleMgr>(L"Resources/white.png", camera))
 {
 	setPhase([&] { return bossBehavior->run(); });
 }

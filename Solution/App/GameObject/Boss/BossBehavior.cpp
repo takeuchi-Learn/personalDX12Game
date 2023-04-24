@@ -2,6 +2,8 @@
 #include <GameObject/Boss/BossEnemy.h>
 #include <DirectXMath.h>
 #include <Util/Util.h>
+#include <Util/RandomNum.h>
+#include <Util/Timer.h>
 #include <Collision/Collision.h>
 
 using namespace DirectX;
@@ -17,11 +19,9 @@ NODE_RESULT BossBehavior::phase_Rotation(const DirectX::XMFLOAT3& rotaMin,
 
 	const float raito = (float)rotationPhaseData.count.nowVal / (float)rotationPhaseData.count.maxVal;
 
-	XMFLOAT3 rot{};
-	rot.x = std::lerp(rotaMin.x, rotaMax.x, raito);
-	rot.y = std::lerp(rotaMin.z, rotaMax.y, raito);
-	rot.z = std::lerp(rotaMin.x, rotaMax.z, raito);
-
+	const XMFLOAT3 rot(std::lerp(rotaMin.x, rotaMax.x, raito),
+					   std::lerp(rotaMin.z, rotaMax.y, raito),
+					   std::lerp(rotaMin.x, rotaMax.z, raito));
 	boss->setRotation(rot);
 
 	return NODE_RESULT::RUNNING;
@@ -111,6 +111,8 @@ NODE_RESULT BossBehavior::phase_tornado()
 		tornadoPhaseData.frame.nowVal = 0u;
 		return NODE_RESULT::SUCCESS;
 	}
+	const float raito = (float)tornadoPhaseData.frame.nowVal / (float)tornadoPhaseData.frame.maxVal;
+
 	XMFLOAT3 vel = GameObj::calcVel(tornadoPhaseData.tornadoWorldPos,
 									boss->getTargetObj()->calcWorldPos(),
 									tornadoPhaseData.targetSpeed);
@@ -119,6 +121,25 @@ NODE_RESULT BossBehavior::phase_tornado()
 	pos.y += vel.y;
 	pos.z += vel.z;
 	boss->getTargetObj()->setPos(pos);
+
+	constexpr float randRange = XM_PIDIV4 / 2.f;
+	constexpr float rotaRadMax = XM_2PI * 10.f;
+	XMFLOAT3 particleVelAngleRad = XMFLOAT3(RandomNum::getRandf(0.f, randRange),
+											raito * rotaRadMax + RandomNum::getRandf(0.f, randRange),
+											0);
+
+	XMVECTOR particleVelVec = XMVectorSet(0, 5, 2, 0);
+	particleVelVec = XMVector3Rotate(particleVelVec,
+									 XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&particleVelAngleRad)));
+	XMFLOAT3 particleVel{};
+	XMStoreFloat3(&particleVel, particleVelVec);
+
+	boss->tornadoParticle->add(Timer::oneSec * 5,
+							   tornadoPhaseData.tornadoWorldPos,
+							   particleVel, XMFLOAT3(),
+							   10.f, 0.f,
+							   0.f, 0.f,
+							   XMFLOAT3(1, 1, 1), XMFLOAT3(1, 1, 1));
 
 	return NODE_RESULT::RUNNING;
 }
