@@ -83,9 +83,9 @@ public:
 	/// @param bulScale 弾の大きさ
 	/// @return	ターゲットを設定したかどうか
 	bool shotAll(Camera* camera,
-			  ObjModel* model,
-			  float speed = 1.f,
-			  float bulScale = 10.f);
+				 ObjModel* model,
+				 float speed = 1.f,
+				 float bulScale = 10.f);
 
 	void additionalUpdate() override;
 	void additionalDraw(Light* light) override;

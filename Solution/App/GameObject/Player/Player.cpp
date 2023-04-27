@@ -23,9 +23,9 @@ Player::Player(Camera* camera,
 }
 
 bool Player::shotAll(Camera* camera,
-				  ObjModel* model,
-				  float speed,
-				  float bulScale)
+					 ObjModel* model,
+					 float speed,
+					 float bulScale)
 {
 	bool ret = false;
 	for (const auto& i : shotTargetObjPt)

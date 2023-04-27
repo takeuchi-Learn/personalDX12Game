@@ -122,11 +122,10 @@ NODE_RESULT BossBehavior::phase_tornado()
 	pos.z += vel.z;
 	boss->getTargetObj()->setPos(pos);
 
+	constexpr auto particleLife = Timer::oneSec * 5;
 	constexpr float randRange = XM_PIDIV4 / 2.f;
 	constexpr float rotaRadMax = XM_2PI * 10.f;
-	XMFLOAT3 particleVelAngleRad = XMFLOAT3(RandomNum::getRandf(0.f, randRange),
-											raito * rotaRadMax + RandomNum::getRandf(0.f, randRange),
-											0);
+	XMFLOAT3 particleVelAngleRad = XMFLOAT3(0, raito * rotaRadMax, 0);
 
 	XMVECTOR particleVelVec = XMVectorSet(0, 5, 2, 0);
 	particleVelVec = XMVector3Rotate(particleVelVec,
@@ -134,7 +133,19 @@ NODE_RESULT BossBehavior::phase_tornado()
 	XMFLOAT3 particleVel{};
 	XMStoreFloat3(&particleVel, particleVelVec);
 
-	boss->tornadoParticle->add(Timer::oneSec * 5,
+	boss->tornadoParticle->add(particleLife,
+							   tornadoPhaseData.tornadoWorldPos,
+							   particleVel, XMFLOAT3(),
+							   10.f, 0.f,
+							   0.f, 0.f,
+							   XMFLOAT3(1, 1, 1), XMFLOAT3(1, 1, 1));
+
+	particleVelAngleRad.y += XM_PIDIV2;
+	particleVelVec = XMVector3Rotate(XMVectorSet(0, 5, 2, 0),
+									 XMQuaternionRotationRollPitchYawFromVector(XMLoadFloat3(&particleVelAngleRad)));
+	XMStoreFloat3(&particleVel, particleVelVec);
+
+	boss->tornadoParticle->add(particleLife,
 							   tornadoPhaseData.tornadoWorldPos,
 							   particleVel, XMFLOAT3(),
 							   10.f, 0.f,

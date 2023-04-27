@@ -145,8 +145,6 @@ void BossScene::initPlayer()
 	player->setScale(10.f);
 	player->setHp(playerHpMax);
 
-	player->setBulLife(600ui16);
-
 	player->setBulHomingRaito(0.01f);	// 弾のホーミングの強さ
 
 	// 自機の衝突判定情報
@@ -721,6 +719,7 @@ void BossScene::drawObj3d()
 
 	for (auto& i : attackableEnemy)
 	{
+		if (i.expired()) { continue; }
 		i.lock()->drawWithUpdate(light.get());
 	}
 
