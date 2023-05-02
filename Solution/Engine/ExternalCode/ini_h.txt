@@ -1,0 +1,1 @@
+https://github.com/mattiasgustavsson/libs/blob/main/docs/ini.md

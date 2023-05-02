@@ -175,6 +175,7 @@
     <ClInclude Include="Engine\Collision\Collision.h" />
     <ClInclude Include="Engine\Collision\CollisionShape.h" />
     <ClInclude Include="Engine\2D\DebugText.h" />
+    <ClInclude Include="Engine\ExternalCode\ini.h" />
     <ClInclude Include="Engine\System\DX12Base.h" />
     <ClInclude Include="App\Scene\EndScene.h" />
     <ClInclude Include="App\GameObject\NormalEnemy.h" />

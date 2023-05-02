@@ -6,7 +6,100 @@
 #include <Util/Timer.h>
 #include <Collision/Collision.h>
 
+#include <ExternalCode/ini.h>
+
+#include <fstream>
+
 using namespace DirectX;
+
+bool BossBehavior::loadShotDataFile()
+{
+	constexpr const char filePath[] = "Resources/bossShotData.ini";
+
+	std::string data{};
+	{
+		std::ifstream ifs(filePath);
+		if (!ifs) { return true; }
+
+		std::string line{};
+		while (std::getline(ifs, line))
+		{
+			data += line + "\n";
+		}
+		ifs.close();
+	}
+
+	Util::IniData iniData(data);
+
+	loadFanShotData(iniData.ini);
+	loadSingleShotData(iniData.ini);
+
+	return false;
+}
+
+void BossBehavior::loadFanShotData(ini_t* ini)
+{
+	const int section = ini_find_section(ini, "FanShotData", 0);
+
+	int index = ini_find_property(ini, section, "shotFrameMaxVal", 0);
+	std::string val = ini_property_value(ini, section, index);
+	fanShotData->shotFrame.maxVal = std::stoul(val);
+	fanShotData->shotFrame.nowVal = fanShotData->shotFrame.maxVal;
+
+	index = ini_find_property(ini, section, "countMaxVal", 0);
+	val = ini_property_value(ini, section, index);
+	fanShotData->count = { .maxVal = std::stoul(val), .nowVal = 0u };
+
+	index = ini_find_property(ini, section, "shotNum", 0);
+	val = ini_property_value(ini, section, index);
+	fanShotData->shotNum = std::stoul(val);
+
+	index = ini_find_property(ini, section, "bulColR", 0);
+	val = ini_property_value(ini, section, index);
+	fanShotData->bulCol.x = std::stof(val);
+
+	index = ini_find_property(ini, section, "bulColG", 0);
+	val = ini_property_value(ini, section, index);
+	fanShotData->bulCol.y = std::stof(val);
+
+	index = ini_find_property(ini, section, "bulColB", 0);
+	val = ini_property_value(ini, section, index);
+	fanShotData->bulCol.z = std::stof(val);
+
+	index = ini_find_property(ini, section, "bulColA", 0);
+	val = ini_property_value(ini, section, index);
+	fanShotData->bulCol.w = std::stof(val);
+}
+
+void BossBehavior::loadSingleShotData(ini_t* ini)
+{
+	const int section = ini_find_section(ini, "SingleShotData", 0);
+
+	int index = ini_find_property(ini, section, "shotFrameMaxVal", 0);
+	std::string val = ini_property_value(ini, section, index);
+	singleShotData->shotFrame.maxVal = std::stoul(val);
+	singleShotData->shotFrame.nowVal = singleShotData->shotFrame.maxVal;
+
+	index = ini_find_property(ini, section, "countMaxVal", 0);
+	val = ini_property_value(ini, section, index);
+	singleShotData->count = { .maxVal = std::stoul(val), .nowVal = 0u };
+
+	index = ini_find_property(ini, section, "bulColR", 0);
+	val = ini_property_value(ini, section, index);
+	singleShotData->bulCol.x = std::stof(val);
+
+	index = ini_find_property(ini, section, "bulColG", 0);
+	val = ini_property_value(ini, section, index);
+	singleShotData->bulCol.y = std::stof(val);
+
+	index = ini_find_property(ini, section, "bulColB", 0);
+	val = ini_property_value(ini, section, index);
+	singleShotData->bulCol.z = std::stof(val);
+
+	index = ini_find_property(ini, section, "bulColA", 0);
+	val = ini_property_value(ini, section, index);
+	singleShotData->bulCol.w = std::stof(val);
+}
 
 NODE_RESULT BossBehavior::phase_Rotation(const DirectX::XMFLOAT3& rotaMin,
 										 const DirectX::XMFLOAT3& rotaMax)
@@ -30,35 +123,35 @@ NODE_RESULT BossBehavior::phase_Rotation(const DirectX::XMFLOAT3& rotaMin,
 NODE_RESULT BossBehavior::phase_fanShapeAttack()
 {
 	// 撃つ時間がまだなら何もしない
-	if (fanShotData.shotFrame.nowVal++ < fanShotData.shotFrame.maxVal) { return NODE_RESULT::RUNNING; }
-	fanShotData.shotFrame.nowVal = 0u;
+	if (fanShotData->shotFrame.nowVal++ < fanShotData->shotFrame.maxVal) { return NODE_RESULT::RUNNING; }
+	fanShotData->shotFrame.nowVal = 0u;
 
 	// 指定回数撃ったら次の行動へ
-	if (fanShotData.count.nowVal >= fanShotData.count.maxVal)
+	if (fanShotData->count.nowVal >= fanShotData->count.maxVal)
 	{
-		fanShotData.shotFrame.nowVal = fanShotData.shotFrame.maxVal;
-		fanShotData.count.nowVal = 0;
+		fanShotData->shotFrame.nowVal = fanShotData->shotFrame.maxVal;
+		fanShotData->count.nowVal = 0;
 		return NODE_RESULT::SUCCESS;
 	}
-	++fanShotData.count.nowVal;
+	++fanShotData->count.nowVal;
 
 	// -これ~これの範囲で発射
 	constexpr float angleMax = static_cast<float>(3.141592653589793 * (1.0 / 8.0));
 	// 二回に一回ずらす値
-	const float halfRad = angleMax / float(fanShotData.shotNum - 1u);
+	const float halfRad = angleMax / float(fanShotData->shotNum - 1u);
 
 	// 攻撃対象へ向かうベクトル
 	const XMVECTOR directionVec = boss->calcVelVec(boss, true);
 
-	for (uint32_t i = 0ui32; i < fanShotData.shotNum; ++i)
+	for (uint32_t i = 0ui32; i < fanShotData->shotNum; ++i)
 	{
 		// このfor文内での進行度
-		const float raito = (float)i / float(fanShotData.shotNum - 1);
+		const float raito = (float)i / float(fanShotData->shotNum - 1);
 
 		// 射出角度
 		XMFLOAT2 angle = XMFLOAT2(-angleMax, angleMax);
 		// 二回に一回半分ずらす(これがないとあんま当たらん)
-		if (fanShotData.count.nowVal & 1)
+		if (fanShotData->count.nowVal & 1)
 		{
 			angle.x += halfRad;
 			angle.y += halfRad;
@@ -74,7 +167,7 @@ NODE_RESULT BossBehavior::phase_fanShapeAttack()
 
 		// 指定方向に弾を発射
 		constexpr XMFLOAT3 scale = XMFLOAT3(2.5f, 100, 2.5f);
-		boss->addBul(direction, scale, fanShotData.bulCol, 2.f);
+		boss->addBul(direction, scale, fanShotData->bulCol, 2.f);
 	}
 
 	return NODE_RESULT::RUNNING;
@@ -178,33 +271,11 @@ NODE_RESULT BossBehavior::phase_setTornadoData()
 
 BossBehavior::BossBehavior(BossEnemy* boss) :
 	Selector(),
-	boss(boss)
+	boss(boss),
+	fanShotData(std::make_unique<FanShotData>()),
+	singleShotData(std::make_unique<SingleShotData>())
 {
-	const auto data = Util::loadCsv("Resources/fanShotData.csv");
-
-	fanShotData =
-		FanShotData{
-		.shotFrame = {.maxVal = std::stoul(data[0][0]), .nowVal = 0u },
-		.count = {.maxVal = std::stoul(data[1][0]), .nowVal = 0u},
-		.shotNum = std::stoul(data[2][0]),
-		.bulCol = XMFLOAT4(std::stof(data[3][0]),
-						   std::stof(data[3][1]),
-						   std::stof(data[3][2]),
-						   std::stof(data[3][3]))
-	};
-
-	fanShotData.shotFrame.nowVal = fanShotData.shotFrame.maxVal;
-
-	singleShotData = std::make_unique<SingleShotData>(
-		SingleShotData{
-			.shotFrame = {.maxVal = 60, .nowVal = 0},
-			.count = {.maxVal = 5, .nowVal = 0},
-			.bulCol = XMFLOAT4(std::stof(data[3][0]),
-							   std::stof(data[3][1]),
-							   std::stof(data[3][2]),
-							   std::stof(data[3][3]))
-		}
-	);
+	loadShotDataFile();
 
 	// --------------------
 	// 各フェーズを登録

@@ -11,6 +11,7 @@
 #include <DirectXMath.h>
 
 class BossEnemy;
+struct ini_t;
 
 /// @brief ボスの行動。セレクター(成功で終了)を継承している。
 class BossBehavior :
@@ -62,7 +63,7 @@ private:
 		DirectX::XMFLOAT4 bulCol{};
 	};
 
-	FanShotData fanShotData{};
+	std::unique_ptr<FanShotData> fanShotData{};
 
 #pragma endregion 弾発射関係
 
@@ -104,6 +105,11 @@ private:
 	NODE_RESULT phase_tornado();
 
 	NODE_RESULT phase_setTornadoData();
+
+private:
+	bool loadShotDataFile();
+	void loadFanShotData(ini_t* ini);
+	void loadSingleShotData(ini_t* ini);
 
 public:
 	BossBehavior(BossEnemy* boss);

@@ -109,6 +109,9 @@
     <Filter Include="GameObject\Enemy\Boss">
       <UniqueIdentifier>{df962beb-8db5-4d78-a37e-17dc5619b832}</UniqueIdentifier>
     </Filter>
+    <Filter Include="ExternalCode">
+      <UniqueIdentifier>{de94fdfd-1f82-4deb-8aaa-2d2c1d01dceb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Engine\System\System.cpp">
@@ -243,14 +246,14 @@
     <ClCompile Include="Engine\3D\BaseObj.cpp">
       <Filter>Object共通\3Dオブジェクト</Filter>
     </ClCompile>
+    <ClCompile Include="App\CollisionMgr.cpp">
+      <Filter>Collision</Filter>
+    </ClCompile>
     <ClCompile Include="Engine\Util\Util.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>System</Filter>
     </ClCompile>
     <ClCompile Include="App\GameObject\Player\Reticle.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
-    <ClCompile Include="App\CollisionMgr.cpp">
-      <Filter>ソース ファイル</Filter>
+      <Filter>GameObject\Player</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -395,14 +398,17 @@
     <ClInclude Include="Engine\3D\BaseObj.h">
       <Filter>Object共通\3Dオブジェクト</Filter>
     </ClInclude>
+    <ClInclude Include="App\CollisionMgr.h">
+      <Filter>Collision</Filter>
+    </ClInclude>
     <ClInclude Include="Engine\Util\Util.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>System</Filter>
     </ClInclude>
     <ClInclude Include="App\GameObject\Player\Reticle.h">
-      <Filter>ヘッダー ファイル</Filter>
+      <Filter>GameObject\Player</Filter>
     </ClInclude>
-    <ClInclude Include="App\CollisionMgr.h">
-      <Filter>ヘッダー ファイル</Filter>
+    <ClInclude Include="Engine\ExternalCode\ini.h">
+      <Filter>ExternalCode</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
