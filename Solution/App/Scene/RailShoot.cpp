@@ -649,6 +649,39 @@ void RailShoot::update_play()
 	// 自機移動回転
 	movePlayer();
 
+	{
+		// 自機より近い壁は半透明にする
+
+		XMVECTOR pPos = XMLoadFloat3(&player->calcWorldPos());
+		XMVECTOR camPos = XMLoadFloat3(&camera->getEye());
+
+		// カメラと自機の距離
+		XMVECTOR c2pVec = pPos - camPos;
+		c2pVec = XMVector3Length(c2pVec);
+		float c2p{};
+		XMStoreFloat(&c2p, c2pVec);
+
+		for (auto& y : laneWall)
+		{
+			for (auto& x : y)
+			{
+				XMVECTOR c2wVec = XMLoadFloat3(&x->calcWorldPos()) - camPos;
+				c2wVec = XMVector3Length(c2wVec);
+				float c2w{};
+				XMStoreFloat(&c2w, c2wVec);
+
+				if (c2w < c2p)
+				{
+					const float raito = c2w / c2p;
+
+					x->color.w = raito;
+				}
+
+				// 自機より近い壁は半透明にする
+			}
+		}
+	}
+
 	// --------------------
 	// 弾発射
 	// --------------------

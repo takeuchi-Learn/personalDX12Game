@@ -11,6 +11,14 @@ SamplerState smp : register(s0); // 0番スロットに設定されたサンプ�
 // これより大きい値の色がグローする
 #define bloomThreshold (0.5f)
 
+#define PI (3.141592653589793f)
+#define PI2 (6.283185307179586f)
+
+// 1 / 2.2
+#define gamma (0.4545454545454545f)
+
+#define colorNum (8.f)
+
 float3 getBloomPixel(SamplerState smp, float2 uv, float2 texPixelSize)
 {
 	float2 uv2 = floor(uv / texPixelSize) * texPixelSize;
@@ -74,7 +82,7 @@ float speedLine(float2 uv, float seed, float colourIntensity = 0.125f)
 	float2 pos = (uv - 0.5f) * 2.f;
 
 	// 0 ~ 1の角度
-	float angle = ((atan2(pos.r, pos.g) / 3.141592653589793f) + 1.f) / 2.f;
+	float angle = ((atan2(pos.r, pos.g) / PI) + 1.f) / 2.f;
 
 	// 角度の値を段階的にする
 	static float divNum = 1024;
@@ -134,10 +142,7 @@ float4 chromaticAberration(float2 uv, float level = 3.f, float spread = 0.03125f
 }
 
 float4 main(VSOutput input) : SV_TARGET
-{
-	static float PI = 3.141592653589793f;
-	static float PI2 = 6.283185307179586f;
-	
+{	
 	// --------------------
 	// モザイク
 	// --------------------
@@ -167,7 +172,6 @@ float4 main(VSOutput input) : SV_TARGET
 	// --------------------
 	float4 texColor0 = dither(tex0.Sample(smp, uv), uv, 1.f);
 	texColor0.g = dither(tex0.Sample(smp, uv + rgbShiftNum), uv, 1.f).g;
-	static float gamma = 1.f / 2.2f;
 	texColor0 = pow(texColor0, gamma);
 
 	float noiseNum = noise(input.uv, time);
@@ -189,8 +193,7 @@ float4 main(VSOutput input) : SV_TARGET
 	float4 drawCol = float4(texColor0.rgb + sLineNum + vignNum + noiseNum + speedLineNum, alpha);
 	
 	// 色数を減らす
-	static float colourNum = 8.f;
-	drawCol.rgb = floor(drawCol.rgb * colourNum) / colourNum;
+	drawCol.rgb = floor(drawCol.rgb * colorNum) / colorNum;
 	
 	// ブルーム
 	drawCol.rgb += bloom(smp, uv).rgb;
