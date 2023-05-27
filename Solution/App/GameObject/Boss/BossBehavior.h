@@ -9,6 +9,8 @@
 #include <BehaviorTree/Sequencer.h>
 #include <memory>
 #include <DirectXMath.h>
+#include <string>
+#include <Yaml.hpp>
 
 class BossEnemy;
 struct ini_t;
@@ -107,9 +109,13 @@ private:
 	NODE_RESULT phase_setTornadoData();
 
 private:
-	bool loadShotDataFile();
-	void loadFanShotData(ini_t* ini);
-	void loadSingleShotData(ini_t* ini);
+	bool loadShotDataFileIni();
+	void loadFanShotDataIni(ini_t* ini);
+	void loadSingleShotDataIni(ini_t* ini);
+
+	bool loadShotDataFileYml();
+	void loadFanShotDataYml(Yaml::Node& root);
+	void loadSingleShotDataYml(Yaml::Node& root);
 
 public:
 	BossBehavior(BossEnemy* boss);

@@ -12,7 +12,7 @@
 
 using namespace DirectX;
 
-bool BossBehavior::loadShotDataFile()
+bool BossBehavior::loadShotDataFileIni()
 {
 	constexpr const char filePath[] = "Resources/bossShotData.ini";
 
@@ -31,13 +31,13 @@ bool BossBehavior::loadShotDataFile()
 
 	Util::IniData iniData(data);
 
-	loadFanShotData(iniData.ini);
-	loadSingleShotData(iniData.ini);
+	loadFanShotDataIni(iniData.ini);
+	loadSingleShotDataIni(iniData.ini);
 
 	return false;
 }
 
-void BossBehavior::loadFanShotData(ini_t* ini)
+void BossBehavior::loadFanShotDataIni(ini_t* ini)
 {
 	const int section = ini_find_section(ini, "FanShotData", 0);
 
@@ -71,7 +71,7 @@ void BossBehavior::loadFanShotData(ini_t* ini)
 	fanShotData->bulCol.w = std::stof(val);
 }
 
-void BossBehavior::loadSingleShotData(ini_t* ini)
+void BossBehavior::loadSingleShotDataIni(ini_t* ini)
 {
 	const int section = ini_find_section(ini, "SingleShotData", 0);
 
@@ -99,6 +99,58 @@ void BossBehavior::loadSingleShotData(ini_t* ini)
 	index = ini_find_property(ini, section, "bulColA", 0);
 	val = ini_property_value(ini, section, index);
 	singleShotData->bulCol.w = std::stof(val);
+}
+
+bool BossBehavior::loadShotDataFileYml()
+{
+	constexpr const char filePath[] = "Resources/bossShotData.yml";
+
+	std::string data{};
+	{
+		std::ifstream ifs(filePath);
+		if (!ifs) { return true; }
+
+		std::string line{};
+		while (std::getline(ifs, line))
+		{
+			data += line + "\n";
+		}
+		ifs.close();
+	}
+	Yaml::Node root{};
+	try
+	{
+		Yaml::Parse(root, data);
+	} catch (...)
+	{
+		return true;
+	}
+
+	loadFanShotDataYml(root["FanShotData"]);
+	loadSingleShotDataYml(root["SingleShotData"]);
+
+	return false;
+}
+
+void BossBehavior::loadFanShotDataYml(Yaml::Node& root)
+{
+	fanShotData->count = { .maxVal = root["countMaxVal"].As<uint32_t>(), .nowVal = 0ui32 };
+	fanShotData->shotFrame = { .maxVal = root["shotFrameMaxVal"].As<uint32_t>(), .nowVal = 0ui32 };
+	fanShotData->shotNum = root["shotNum"].As<uint32_t>();
+	fanShotData->bulCol = XMFLOAT4(root["bulCol"]["R"].As<float>(),
+								   root["bulCol"]["G"].As<float>(),
+								   root["bulCol"]["B"].As<float>(),
+								   root["bulCol"]["A"].As<float>());
+}
+
+void BossBehavior::loadSingleShotDataYml(Yaml::Node& root)
+{
+	singleShotData->count = { .maxVal = root["countMaxVal"].As<uint32_t>(), .nowVal = 0ui32 };
+	singleShotData->shotFrame = { .maxVal = root["shotFrameMaxVal"].As<uint32_t>(), .nowVal = 0ui32 };
+	singleShotData->bulCol = XMFLOAT4(root["bulCol"]["R"].As<float>(),
+									  root["bulCol"]["G"].As<float>(),
+									  root["bulCol"]["B"].As<float>(),
+									  root["bulCol"]["A"].As<float>());
 }
 
 NODE_RESULT BossBehavior::phase_Rotation(const DirectX::XMFLOAT3& rotaMin,
@@ -275,7 +327,7 @@ BossBehavior::BossBehavior(BossEnemy* boss) :
 	fanShotData(std::make_unique<FanShotData>()),
 	singleShotData(std::make_unique<SingleShotData>())
 {
-	loadShotDataFile();
+	loadShotDataFileYml();
 
 	// --------------------
 	// 各フェーズを登録

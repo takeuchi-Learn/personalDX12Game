@@ -1,0 +1,17 @@
+FanShotData: 
+  bulCol: 
+    A: 1.000000
+    B: 0.125000
+    G: 0.250000
+    R: 1.000000
+  countMaxVal: 15
+  shotFrameMaxVal: 60
+  shotNum: 15
+SingleShotData: 
+  bulCol: 
+    A: 1.000000
+    B: 0.125000
+    G: 0.250000
+    R: 1.000000
+  countMaxVal: 5
+  shotFrameMaxVal: 60
