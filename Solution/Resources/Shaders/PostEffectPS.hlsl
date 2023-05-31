@@ -118,7 +118,6 @@ float3 chromaticSlice(float t)
 {
 	float3 ret = float3(1.f - t, 1.f - abs(t - 1.f), t - 1.f);
 	return max(ret, 0.f);
-
 }
 
 float4 chromaticAberration(float2 uv, float level = 3.f, float spread = 0.03125f)
@@ -142,7 +141,7 @@ float4 chromaticAberration(float2 uv, float level = 3.f, float spread = 0.03125f
 }
 
 float4 main(VSOutput input) : SV_TARGET
-{	
+{
 	// --------------------
 	// モザイク
 	// --------------------

@@ -53,7 +53,7 @@ class RailShoot
 
 	std::unique_ptr<SpriteBase> spriteBase;
 
-	const UINT aimGrNum;
+	UINT aimGrNum;
 	std::unique_ptr<Sprite> cursorGr;
 
 	std::forward_list<Reticle> reticle;
@@ -87,6 +87,12 @@ class RailShoot
 	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<ObjModel> playerBulModel;
 	uint16_t playerHpMax;
+
+	// 衝突時の関数
+	std::function<void(GameObj*)> enemyHitProc;
+	std::function<void(GameObj*)> enemyBulHitProc;
+	std::function<void(GameObj*)> playerHitProc;
+	std::function<void(GameObj*)> playerBulHitProc;
 
 	// レールの現在位置を示すオブジェクト
 	std::unique_ptr<GameObj> railObj;
@@ -135,7 +141,7 @@ class RailShoot
 	{
 		uint16_t popFrame;
 		DirectX::XMFLOAT3 pos;
-		DirectX::XMFLOAT3 vel{ 0,0,-1 };
+		DirectX::XMFLOAT3 vel{ 0, 0, -1 };
 		PopEnemyData(uint16_t popFrame,
 					 const DirectX::XMFLOAT3& pos,
 					 const DirectX::XMFLOAT3& vel)
@@ -225,6 +231,16 @@ class RailShoot
 	void updateRailPos();
 	void movePlayer();
 	void updatePlayerShotTarget(const DirectX::XMFLOAT2& aim2DPos);
+
+private:
+	void initCamera();
+	void initPlayer();
+	void initSprite();
+	void initEnemy();
+	void initSound();
+
+	void initMisc();
+	void initObj3d();
 
 public:
 	RailShoot();

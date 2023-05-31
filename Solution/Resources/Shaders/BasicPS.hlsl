@@ -22,9 +22,8 @@ void ScreenDoor(float2 screenPos, float alpha)
 	// 0 ~ ditherLevelMax
 	float ditherLevel = clamp(ditherLevelMax - (alpha * ditherLevelMax), 0.f, ditherLevelMax);
 		
-	int ditherUvX = (int) fmod(screenPos.x, 4.f);
-	int ditherUvY = (int) fmod(screenPos.y, 4.f);
-	float doorNum = Bayer[ditherUvY][ditherUvX];
+	int2 ditherUv = int2((int)fmod(screenPos.x, 4.f), (int)fmod(screenPos.y, 4.f));
+	float doorNum = Bayer[ditherUv.y][ditherUv.x];
 	clip(doorNum - ditherLevel);
 }
 
