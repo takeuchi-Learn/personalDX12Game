@@ -75,8 +75,6 @@ class RailShoot
 	std::unique_ptr<Object3d> groundObj;
 	std::unique_ptr<ObjModel> groundModel;
 
-	void loadBackObj();
-
 	// 敵
 	std::forward_list<std::shared_ptr<NormalEnemy>> enemy;
 	std::unique_ptr<ObjModel> enemyModel;
@@ -107,14 +105,14 @@ class RailShoot
 	// --------------------
 	// RGBずらし
 	// --------------------
-	static const Timer::timeType rgbShiftTimeMax = Timer::oneSec / 2;
+	static constexpr Timer::timeType rgbShiftTimeMax = Timer::oneSec / 2;
 	Timer::timeType startRgbShiftTime = 0;
 	bool rgbShiftFlag = false;
 
 	// --------------------
 	// シーン遷移
 	// --------------------
-	static const Timer::timeType sceneChangeTime = Timer::oneSec;
+	static constexpr Timer::timeType sceneChangeTime = Timer::oneSec;
 
 	Timer::timeType startSceneChangeTime{};
 	// --------------------
@@ -122,14 +120,13 @@ class RailShoot
 	// --------------------
 	std::vector<DirectX::XMVECTOR> splinePoint;
 	uint16_t splineNowFrame = 0u;
-	static const uint16_t splineFrameMax = 120u;
-	static const uint16_t splineIndexDef = 1u;
+	static constexpr uint16_t splineFrameMax = 120u;
+	static constexpr uint16_t splineIndexDef = 1u;
 	uint16_t splineIndex = splineIndexDef;
 
 	std::unique_ptr<ObjModel> wallModel;
 	std::unique_ptr<ObjModel> ringModel;
 	std::vector<std::vector<std::unique_ptr<Object3d>>> laneWall;
-	void loadLane();
 
 	// --------------------
 	// 敵発生関連
@@ -233,6 +230,9 @@ class RailShoot
 	void updatePlayerShotTarget(const DirectX::XMFLOAT2& aim2DPos);
 
 private:
+	void loadBackObj();
+	void loadLane();
+
 	void initCamera();
 	void initPlayer();
 	void initSprite();
