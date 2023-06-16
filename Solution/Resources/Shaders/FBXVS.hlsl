@@ -1,52 +1,55 @@
 #include "FBX.hlsli"
 
-// ƒXƒLƒjƒ“ƒOŒã‚Ì’¸“_A–@ü‚ª“ü‚é
-struct SkinOutput {
+// ã‚¹ã‚­ãƒ‹ãƒ³ã‚°å¾Œã®é ‚ç‚¹ã€æ³•ç·šãŒå…¥ã‚‹
+struct SkinOutput
+{
 	float4 pos;
 	float3 normal;
 };
 
-// ƒXƒLƒjƒ“ƒOŒvZ
-SkinOutput computeSkin(VSInput input) {
-	SkinOutput output = (SkinOutput)0;
+// ã‚¹ã‚­ãƒ‹ãƒ³ã‚°è¨ˆç®—
+SkinOutput computeSkin(VSInput input)
+{
+	SkinOutput output = (SkinOutput) 0;
 
-	uint iBone;		// ŒvZ‚·‚éƒ{[ƒ“”Ô†
-	float weight;	// ƒ{[ƒ“ƒEƒFƒCƒg
-	matrix m;		// ƒXƒLƒjƒ“ƒOs—ñ
+	uint iBone; // è¨ˆç®—ã™ã‚‹ãƒœãƒ¼ãƒ³ç•ªå·
+	float weight; // ãƒœãƒ¼ãƒ³ã‚¦ã‚§ã‚¤ãƒˆ
+	matrix m; // ã‚¹ã‚­ãƒ‹ãƒ³ã‚°è¡Œåˆ—
 
-	// ƒ{[ƒ“0
+	// ãƒœãƒ¼ãƒ³0
 	iBone = input.boneIndices.x;
 	weight = input.boneWeights.x;
 	m = matSkinning[iBone];
 	output.pos += weight * mul(m, input.pos);
-	output.normal += weight * mul((float3x3)m, input.normal);
+	output.normal += weight * mul((float3x3) m, input.normal);
 
-	// ƒ{[ƒ“1
+	// ãƒœãƒ¼ãƒ³1
 	iBone = input.boneIndices.y;
 	weight = input.boneWeights.y;
 	m = matSkinning[iBone];
 	output.pos += weight * mul(m, input.pos);
-	output.normal += weight * mul((float3x3)m, input.normal);
+	output.normal += weight * mul((float3x3) m, input.normal);
 
-	// ƒ{[ƒ“2
+	// ãƒœãƒ¼ãƒ³2
 	iBone = input.boneIndices.z;
 	weight = input.boneWeights.z;
 	m = matSkinning[iBone];
 	output.pos += weight * mul(m, input.pos);
-	output.normal += weight * mul((float3x3)m, input.normal);
+	output.normal += weight * mul((float3x3) m, input.normal);
 
-	// ƒ{[ƒ“3
+	// ãƒœãƒ¼ãƒ³3
 	iBone = input.boneIndices.w;
 	weight = input.boneWeights.w;
 	m = matSkinning[iBone];
 	output.pos += weight * mul(m, input.pos);
-	output.normal += weight * mul((float3x3)m, input.normal);
+	output.normal += weight * mul((float3x3) m, input.normal);
 
 	return output;
 }
 
-VSOutput  main(VSInput input) {
-	// ƒXƒLƒjƒ“ƒOŒvZ
+VSOutput main(VSInput input)
+{
+	// ã‚¹ã‚­ãƒ‹ãƒ³ã‚°è¨ˆç®—
 	SkinOutput skinned = computeSkin(input);
 
 	float4 wnormal = normalize(mul(world, float4(skinned.normal, 0)));

@@ -1,46 +1,56 @@
-cbuffer cbuff0 : register(b0) {
-	matrix viewproj;	// ƒrƒ…[ƒvƒƒWƒFƒNƒVƒ‡ƒ“s—ñ
-	matrix world;		// ƒ[ƒ‹ƒhs—ñ	
-	float3 cameraPos;	// ƒJƒƒ‰À•W(ƒ[ƒ‹ƒhÀ•W)
+cbuffer cbuff0 : register(b0)
+{
+	float4 color;
+	matrix viewproj; // ãƒ“ãƒ¥ãƒ¼ãƒ—ãƒ­ã‚¸ã‚§ã‚¯ã‚·ãƒ§ãƒ³è¡Œåˆ—
+	matrix world; // ãƒ¯ãƒ¼ãƒ«ãƒ‰è¡Œåˆ—	
+	float3 cameraPos; // ã‚«ãƒ¡ãƒ©åº§æ¨™(ãƒ¯ãƒ¼ãƒ«ãƒ‰åº§æ¨™)
 };
 
-cbuffer cbuff1 : register(b1) {
-	float3 m_ambient : packoffset(c0);  // ƒAƒ“ƒrƒGƒ“ƒgŒW”
-	float3 m_diffuse : packoffset(c1);  // ƒfƒBƒtƒ…[ƒYŒW”
-	float3 m_specular : packoffset(c2); // ƒfƒBƒtƒ…[ƒYŒW”
-	float m_alpha : packoffset(c2.w);   // ƒAƒ‹ƒtƒ@
+cbuffer cbuff1 : register(b1)
+{
+	float3 m_ambient : packoffset(c0); // ã‚¢ãƒ³ãƒ“ã‚¨ãƒ³ãƒˆä¿‚æ•°
+	float3 m_diffuse : packoffset(c1); // ãƒ‡ã‚£ãƒ•ãƒ¥ãƒ¼ã‚ºä¿‚æ•°
+	float3 m_specular : packoffset(c2); // ãƒ‡ã‚£ãƒ•ãƒ¥ãƒ¼ã‚ºä¿‚æ•°
+	float m_alpha : packoffset(c2.w); // ã‚¢ãƒ«ãƒ•ã‚¡
+	float2 texTilling : packoffset(c3);
+	float2 shiftUv : packoffset(c4);
 }
 
-cbuffer cbuff2 : register(b2) {
-	float3 lightPos;   // ƒ‰ƒCƒg‚Ö‚Ì•ûŒü‚Ì’PˆÊƒxƒNƒgƒ‹
-	float3 lightColor;  // ƒ‰ƒCƒg‚ÌF(RGB)
+cbuffer cbuff2 : register(b2)
+{
+	float3 lightPos; // ãƒ©ã‚¤ãƒˆã¸ã®æ–¹å‘ã®å˜ä½ãƒ™ã‚¯ãƒˆãƒ«
+	float3 lightColor; // ãƒ©ã‚¤ãƒˆã®è‰²(RGB)
 };
 
-// ƒ{[ƒ“‚ÌÅ‘å”(FbxObj3d.h‚Ì’è”‚Æ‡‚í‚¹‚é)
+// ãƒœãƒ¼ãƒ³ã®æœ€å¤§æ•°(FbxObj3d.hã®å®šæ•°ã¨åˆã‚ã›ã‚‹)
 static const int MAX_BONES = 32;
 
-// ƒ{[ƒ“‚ÌƒXƒLƒjƒ“ƒOs—ñ‚ª“ü‚é
-cbuffer skinning : register(b3) {
+// ãƒœãƒ¼ãƒ³ã®ã‚¹ã‚­ãƒ‹ãƒ³ã‚°è¡Œåˆ—ãŒå…¥ã‚‹
+cbuffer skinning : register(b3)
+{
 	matrix matSkinning[MAX_BONES];
 }
 
-struct VSInput {
-	float4 pos : POSITION;	// ˆÊ’u
-	float3 normal : NORMAL;	// ’¸“_‚Ì–@ü
-	float2 uv : TEXCOORD;	// ƒeƒNƒXƒ`ƒƒ\À•W
-	uint4 boneIndices : BONEINDICES;	// ƒ{[ƒ“‚Ì”Ô†
-	float4 boneWeights : BONEWEIGHTS;	// ƒ{[ƒ“‚ÌƒXƒLƒ“ƒEƒFƒCƒg
+struct VSInput
+{
+	float4 pos : POSITION; // ä½ç½®
+	float3 normal : NORMAL; // é ‚ç‚¹ã®æ³•ç·š
+	float2 uv : TEXCOORD; // ãƒ†ã‚¯ã‚¹ãƒãƒ£â€•åº§æ¨™
+	uint4 boneIndices : BONEINDICES; // ãƒœãƒ¼ãƒ³ã®ç•ªå·
+	float4 boneWeights : BONEWEIGHTS; // ãƒœãƒ¼ãƒ³ã®ã‚¹ã‚­ãƒ³ã‚¦ã‚§ã‚¤ãƒˆ
 };
 
-struct VSOutput {
-	float4 svpos : SV_POSITION;	// ƒVƒXƒeƒ€—p’¸“_À•W
+struct VSOutput
+{
+	float4 svpos : SV_POSITION; // ã‚·ã‚¹ãƒ†ãƒ ç”¨é ‚ç‚¹åº§æ¨™
 	float4 worldPos : POSITION;
-	float3 normal : NORMAL;		// –@ü
-	float2 uv : TEXCOORD;		// uv
+	float3 normal : NORMAL; // æ³•ç·š
+	float2 uv : TEXCOORD; // uv
 };
 
-// ƒŒƒ“ƒ_[ƒ^[ƒQƒbƒg‚Ì”‚Í2‚Â
-struct PSOutput {
+// ãƒ¬ãƒ³ãƒ€ãƒ¼ã‚¿ãƒ¼ã‚²ãƒƒãƒˆã®æ•°ã¯2ã¤
+struct PSOutput
+{
 	float4 target0 : SV_TARGET0;
 	float4 target1 : SV_TARGET1;
 };

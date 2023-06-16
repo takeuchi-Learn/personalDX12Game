@@ -15,12 +15,13 @@ struct VSOutput
 struct GSOutput
 {
 	float4 svpos : SV_POSITION; // システム用頂点座標
-	float2 uv  :TEXCOORD; // uv値
+	float2 uv : TEXCOORD; // uv値
 	float3 color : COLOR;
 };
 
 // レンダーターゲットの数は2つ
-struct PSOutput {
+struct PSOutput
+{
 	float4 target0 : SV_TARGET0;
 	float4 target1 : SV_TARGET1;
 };
