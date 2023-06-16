@@ -103,7 +103,8 @@ namespace CollisionShape
 		{}
 	};
 
-	struct Box
+	struct Box :
+		public BaseShape
 	{
 		DirectX::XMVECTOR center{};
 		DirectX::XMVECTOR size{};
