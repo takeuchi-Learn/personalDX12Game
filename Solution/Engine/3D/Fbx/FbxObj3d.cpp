@@ -28,13 +28,20 @@ size_t FbxObj3d::createGraphicsPipeline(BLEND_MODE blendMode,
 	ComPtr<ID3DBlob> psBlob;	// ピクセルシェーダオブジェクト
 	ComPtr<ID3DBlob> errorBlob;	// エラーオブジェクト
 
+	constexpr UINT compileFlag =
+#ifdef _DEBUG
+		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#else
+		0;
+#endif // _DEBUG
+
 	// 頂点シェーダの読み込みとコンパイル
 	HRESULT result = D3DCompileFromFile(
 		vsPath,    // シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "vs_5_0",    // エントリーポイント名、シェーダーモデル指定
-		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
+		compileFlag,
 		0,
 		&vsBlob, &errorBlob);
 	if (FAILED(result))
@@ -58,7 +65,7 @@ size_t FbxObj3d::createGraphicsPipeline(BLEND_MODE blendMode,
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "ps_5_0",    // エントリーポイント名、シェーダーモデル指定
-		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
+		compileFlag,
 		0,
 		&psBlob, &errorBlob);
 	if (FAILED(result))
@@ -144,9 +151,8 @@ size_t FbxObj3d::createGraphicsPipeline(BLEND_MODE blendMode,
 	gpipeline.NumRenderTargets = PostEffect::renderTargetNum;    // 描画対象の数
 	for (UINT i = 0, maxSize = _countof(gpipeline.BlendState.RenderTarget);
 		 i < PostEffect::renderTargetNum && i < maxSize;
-		 i++)
-	{
-		gpipeline.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM; // 0～255指定のRGBA
+		 i++) {
+		gpipeline.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // 0～255指定のRGBA
 	}
 
 	gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング

@@ -487,4 +487,8 @@ void FbxLoader::loadTexture(FbxModel* model, const std::string& fullpath)
 		scratchImg = std::move(mipChain);
 		metadata = scratchImg.GetMetadata();
 	}
+
+	if (!IsSRGB(metadata.format)) {
+		MakeSRGB(metadata.format);
+	}
 }

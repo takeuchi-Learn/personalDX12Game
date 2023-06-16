@@ -243,6 +243,30 @@ void Camera::update()
 	postUpdate();
 }
 
+XMFLOAT3 Camera::screenPos2WorldPos(const XMFLOAT3& screenPos) const
+{
+	// 照準が指し示す3Dの座標
+	XMFLOAT3 wpos{};
+	XMStoreFloat3(&wpos, screenPos2WorldPosVec(screenPos));
+
+	return wpos;
+}
+
+XMVECTOR Camera::screenPos2WorldPosVec(const XMFLOAT3& screenPos) const
+{
+	const XMMATRIX matVPVInv = XMMatrixInverse(nullptr, matVPV);
+
+	// ワールド座標
+	const XMVECTOR nearPos = XMVector3TransformCoord(XMVectorSet(screenPos.x, screenPos.y, 0.f, 0.f), matVPVInv);
+	const XMVECTOR farPos = XMVector3TransformCoord(XMVectorSet(screenPos.x, screenPos.y, 1.f, 0.f), matVPVInv);
+
+	// マウスが指し示すベクトル
+	const XMVECTOR mouseDir = screenPos.z * XMVector3Normalize(farPos - nearPos);
+
+	// 照準が指し示す3Dの座標
+	return nearPos + mouseDir;
+}
+
 XMFLOAT3 Camera::calcLook() const
 {
 	// 視線ベクトル

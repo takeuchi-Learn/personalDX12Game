@@ -134,7 +134,7 @@ private:
 	// FBXシーン
 	FbxScene* fbxScene = nullptr;
 
-	bool materialDirty = true;
+	bool materialDirty = false;
 
 	void createConstBuffB1();
 

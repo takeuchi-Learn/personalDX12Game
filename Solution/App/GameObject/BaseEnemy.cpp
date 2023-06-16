@@ -10,19 +10,6 @@ BaseEnemy::BaseEnemy(Camera* camera,
 	phase([] {})
 {}
 
-bool BaseEnemy::damage(uint16_t damegeNum, bool killFlag)
-{
-	if (damegeNum >= hp)
-	{
-		hp = 0u;
-		if (killFlag) { kill(); }
-		return true;
-	}
-
-	hp -= damegeNum;
-	return false;
-}
-
 void BaseEnemy::additionalUpdate()
 {
 	beforeUpdate();

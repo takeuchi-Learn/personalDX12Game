@@ -1,5 +1,8 @@
 ﻿#include "Player.h"
 #include <DirectXMath.h>
+
+#include <Util/RandomNum.h>
+
 using namespace DirectX;
 
 XMVECTOR Player::getLookVec(float len)
@@ -10,23 +13,19 @@ XMVECTOR Player::getLookVec(float len)
 															obj->rotation.z));
 }
 
-bool Player::damage(uint16_t damegeNum, bool killFlag)
+Player::Player(Camera* camera,
+			   ObjModel* model,
+			   const DirectX::XMFLOAT3& pos) :
+	GameObj(camera, model, pos),
+	bulParticle(std::make_shared<ParticleMgr>())
 {
-	if (damegeNum >= hp)
-	{
-		hp = 0u;
-		if (killFlag) { kill(); }
-		return true;
-	}
-
-	hp -= damegeNum;
-	return false;
+	bulParticle->setCamera(camera);
 }
 
 bool Player::shotAll(Camera* camera,
-				  ObjModel* model,
-				  float speed,
-				  float bulScale)
+					 ObjModel* model,
+					 float speed,
+					 float bulScale)
 {
 	bool ret = false;
 	for (const auto& i : shotTargetObjPt)
@@ -36,14 +35,25 @@ bool Player::shotAll(Camera* camera,
 		pb.setCol(XMFLOAT4(1.f, 0.25f, 0.25f, 1.f));
 		pb.setLife(bulLife);
 		pb.setSpeed(speed);
-		XMFLOAT3 tmp{};
-		XMStoreFloat3(&tmp, XMVector3Transform(XMVectorSet(0, 0, speed, 1), obj->getMatRota()));
-		pb.setVel(tmp);
+		pb.setParticle(bulParticle);
+		pb.setHomingRaito(bulHomingRaito);
 
 		if (!i.expired() && i.lock()->getAlive())
 		{
 			pb.setTargetObjPt(i);
 			ret = true;
+
+			XMVECTOR velVec = XMVector3Transform(XMVectorSet(0, 0, speed, 1), obj->getMatRota());
+			velVec = XMVector3Rotate(velVec, XMQuaternionRotationRollPitchYaw(RandomNum::getRandf(0.f, XM_2PI), XM_PIDIV2, 0.f));
+
+			XMFLOAT3 velF3{};
+			XMStoreFloat3(&velF3, velVec);
+			pb.setVel(velF3);
+		} else
+		{
+			XMFLOAT3 velF3{};
+			XMStoreFloat3(&velF3, XMVector3Transform(XMVectorSet(0, 0, speed, 1), obj->getMatRota()));
+			pb.setVel(velF3);
 		}
 	}
 

@@ -10,14 +10,6 @@
 
 Input::Input()
 {
-	init();
-}
-
-Input::~Input()
-{}
-
-void Input::init()
-{
 	HRESULT result = DirectInput8Create(
 		WinAPI::getInstance()->getW().hInstance, DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&dinput, nullptr);
 
@@ -57,11 +49,8 @@ void Input::update()
 
 void Input::resetState()
 {
-	for (UINT i = 0; i < 256; i++)
-	{
-		key[i] = 0;
-		preKey[i] = 0;
-	}
+	ZeroMemory(key, sizeof(key));
+	ZeroMemory(preKey, sizeof(preKey));
 
 	mouseState = DIMOUSESTATE2();
 	preMouseState = DIMOUSESTATE2();

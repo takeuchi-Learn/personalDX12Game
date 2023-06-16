@@ -22,10 +22,21 @@ protected:
 	bool alive = true;
 	bool drawFlag = true;
 
+	uint16_t hp = 1ui16;
+
 	virtual void additionalUpdate() {};
 	virtual void additionalDraw(Light* light) {}
 
 public:
+	inline void setHp(uint16_t hpNum) { hp = hpNum; }
+	inline uint16_t getHp() const { return hp; }
+
+	/// @brief ダメージを与える
+	/// @param damegeNum 与えるダメージ数
+	/// @param killFlag hpが0になったらkillするかどうか(trueでkillする)
+	/// @return 倒したかどうか(倒したらtrue)
+	bool damage(uint16_t damegeNum, bool killFlag = true);
+
 	inline static DirectX::XMFLOAT2 calcRotationSyncVelRad(const DirectX::XMFLOAT3& vel)
 	{
 		return DirectX::XMFLOAT2(std::atan2(-vel.y,
@@ -39,15 +50,22 @@ public:
 		return DirectX::XMFLOAT2(DirectX::XMConvertToDegrees(rad.x), DirectX::XMConvertToDegrees(rad.y));
 	}
 
+	inline static DirectX::XMFLOAT3 calcVecLen(const DirectX::XMFLOAT3& startPos,
+											   const DirectX::XMFLOAT3& endPos)
+	{
+		return DirectX::XMFLOAT3
+		{
+			endPos.x - startPos.x,
+			endPos.y - startPos.y,
+			endPos.z - startPos.z
+		};
+	}
+
 	inline static DirectX::XMFLOAT3 calcVel(const DirectX::XMFLOAT3& targetPos,
 											const DirectX::XMFLOAT3& nowPos,
 											float velScale)
 	{
-		DirectX::XMFLOAT3 velF3{
-			targetPos.x - nowPos.x,
-			targetPos.y - nowPos.y,
-			targetPos.z - nowPos.z
-		};
+		DirectX::XMFLOAT3 velF3 = calcVecLen(nowPos, targetPos);
 
 		const DirectX::XMVECTOR velVec =
 			DirectX::XMVectorScale(

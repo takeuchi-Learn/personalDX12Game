@@ -31,19 +31,6 @@ class RailShoot
 
 #pragma region ImGui
 
-	static constexpr ImGuiWindowFlags winFlags =
-		// リサイズ不可
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoResize |
-		// タイトルバー無し
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar |
-		// 設定を.iniに出力しない
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoSavedSettings |
-		// 移動不可
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove;
-	//// スクロールバーを常に表示
-	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysHorizontalScrollbar |
-	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar;
-
 	// 最初のウインドウの位置を指定
 	static constexpr DirectX::XMFLOAT2 fstWinPos =
 		DirectX::XMFLOAT2((float)WinAPI::window_width * 0.02f,
@@ -66,7 +53,7 @@ class RailShoot
 
 	std::unique_ptr<SpriteBase> spriteBase;
 
-	const UINT aimGrNum;
+	UINT aimGrNum;
 	std::unique_ptr<Sprite> cursorGr;
 
 	std::forward_list<Reticle> reticle;
@@ -88,8 +75,6 @@ class RailShoot
 	std::unique_ptr<Object3d> groundObj;
 	std::unique_ptr<ObjModel> groundModel;
 
-	void loadBackObj();
-
 	// 敵
 	std::forward_list<std::shared_ptr<NormalEnemy>> enemy;
 	std::unique_ptr<ObjModel> enemyModel;
@@ -100,6 +85,12 @@ class RailShoot
 	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<ObjModel> playerBulModel;
 	uint16_t playerHpMax;
+
+	// 衝突時の関数
+	std::function<void(GameObj*)> enemyHitProc;
+	std::function<void(GameObj*)> enemyBulHitProc;
+	std::function<void(GameObj*)> playerHitProc;
+	std::function<void(GameObj*)> playerBulHitProc;
 
 	// レールの現在位置を示すオブジェクト
 	std::unique_ptr<GameObj> railObj;
@@ -114,14 +105,14 @@ class RailShoot
 	// --------------------
 	// RGBずらし
 	// --------------------
-	static const Timer::timeType rgbShiftTimeMax = Timer::oneSec / 2;
+	static constexpr Timer::timeType rgbShiftTimeMax = Timer::oneSec / 2;
 	Timer::timeType startRgbShiftTime = 0;
 	bool rgbShiftFlag = false;
 
 	// --------------------
 	// シーン遷移
 	// --------------------
-	static const Timer::timeType sceneChangeTime = Timer::oneSec;
+	static constexpr Timer::timeType sceneChangeTime = Timer::oneSec;
 
 	Timer::timeType startSceneChangeTime{};
 	// --------------------
@@ -129,14 +120,13 @@ class RailShoot
 	// --------------------
 	std::vector<DirectX::XMVECTOR> splinePoint;
 	uint16_t splineNowFrame = 0u;
-	static const uint16_t splineFrameMax = 120u;
-	static const uint16_t splineIndexDef = 1u;
+	static constexpr uint16_t splineFrameMax = 120u;
+	static constexpr uint16_t splineIndexDef = 1u;
 	uint16_t splineIndex = splineIndexDef;
 
 	std::unique_ptr<ObjModel> wallModel;
 	std::unique_ptr<ObjModel> ringModel;
 	std::vector<std::vector<std::unique_ptr<Object3d>>> laneWall;
-	void loadLane();
 
 	// --------------------
 	// 敵発生関連
@@ -148,7 +138,7 @@ class RailShoot
 	{
 		uint16_t popFrame;
 		DirectX::XMFLOAT3 pos;
-		DirectX::XMFLOAT3 vel{ 0,0,-1 };
+		DirectX::XMFLOAT3 vel{ 0, 0, -1 };
 		PopEnemyData(uint16_t popFrame,
 					 const DirectX::XMFLOAT3& pos,
 					 const DirectX::XMFLOAT3& vel)
@@ -237,7 +227,20 @@ class RailShoot
 
 	void updateRailPos();
 	void movePlayer();
-	void updatePlayerShotTarget(const DirectX::XMFLOAT2& aim2DMin, const DirectX::XMFLOAT2& aim2DMax);
+	void updatePlayerShotTarget(const DirectX::XMFLOAT2& aim2DPos);
+
+private:
+	void loadBackObj();
+	void loadLane();
+
+	void initCamera();
+	void initPlayer();
+	void initSprite();
+	void initEnemy();
+	void initSound();
+
+	void initMisc();
+	void initObj3d();
 
 public:
 	RailShoot();

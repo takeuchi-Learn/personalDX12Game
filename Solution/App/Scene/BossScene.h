@@ -20,6 +20,7 @@
 #include "3D/ParticleMgr.h"
 #include "GameObject/BaseEnemy.h"
 #include "GameObject/Boss/BossEnemy.h"
+#include <CollisionMgr.h>
 #include <Sound/Sound.h>
 
  /// @brief ボス戦シーンクラス
@@ -76,6 +77,7 @@ private:
 	std::unique_ptr<ObjModel> playerModel;
 	std::unique_ptr<ObjModel> playerBulModel;
 	uint16_t playerHpMax;
+	CollisionMgr::ColliderSet playerColliderSet{};
 
 	// 攻撃可能な敵リスト
 	std::forward_list<std::weak_ptr<BaseEnemy>> attackableEnemy;
@@ -109,19 +111,6 @@ private:
 #pragma endregion スプライト
 
 #pragma region ImGui定数
-
-	static constexpr ImGuiWindowFlags winFlags =
-		// リサイズ不可
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoResize |
-		// タイトルバー無し
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar |
-		// 設定を.iniに出力しない
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoSavedSettings |
-		// 移動不可
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove;
-	//	// スクロールバーを常に表示
-	//	ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysHorizontalScrollbar |
-	//	ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar;
 
 	// 最初のウインドウの位置を指定
 	static constexpr DirectX::XMFLOAT2 fstWinPos =
@@ -162,8 +151,7 @@ private:
 
 	/// @return 照準内に敵がいるかどうか
 	bool addShotTarget(const std::forward_list<std::weak_ptr<BaseEnemy>>& enemy,
-					   const DirectX::XMFLOAT2& aim2DPosMin,
-					   const DirectX::XMFLOAT2& aim2DPosMax);
+					   const DirectX::XMFLOAT2& aim2DPos);
 
 	void movePlayer();
 

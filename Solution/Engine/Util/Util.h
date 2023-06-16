@@ -9,10 +9,22 @@
 #include <DirectXMath.h>
 #include <cmath>
 
+struct ini_t;
+
  /// @brief 汎用的な機能を入れるユーティリティクラス
 class Util
 {
 public:
+	struct IniData
+	{
+		ini_t* ini = nullptr;
+
+		/// @brief iniデータを読み込む
+		/// @param data ini形式の文字列
+		IniData(const std::string& data);
+		~IniData();
+	};
+
 	/// @brief std::stringの2次元配列(vector)
 	using CSVType = std::vector<std::vector<std::string>>;
 

@@ -9,12 +9,15 @@
 #include <BehaviorTree/Sequencer.h>
 #include <memory>
 #include <DirectXMath.h>
+#include <string>
+#include <Yaml.hpp>
 
 class BossEnemy;
+struct ini_t;
 
-/// @brief ボスの行動。シーケンサー(失敗で終了)を継承している。
+/// @brief ボスの行動。セレクター(成功で終了)を継承している。
 class BossBehavior :
-	public Sequencer
+	public Selector
 {
 private:
 	// ---------------
@@ -29,6 +32,9 @@ private:
 		T maxVal;
 		T nowVal;
 	};
+
+	std::unique_ptr<Sequencer> nearTargetPhase;
+	std::unique_ptr<Sequencer> farTargetPhase;
 
 #pragma region 単発攻撃
 
@@ -59,7 +65,7 @@ private:
 		DirectX::XMFLOAT4 bulCol{};
 	};
 
-	FanShotData fanShotData{};
+	std::unique_ptr<FanShotData> fanShotData{};
 
 #pragma endregion 弾発射関係
 
@@ -75,6 +81,20 @@ private:
 
 #pragma endregion 扇形攻撃
 
+#pragma region 自機を引き寄せる
+
+	struct TornadoPhaseData
+	{
+		MaxNow<uint32_t> frame = MaxNow<uint32_t>{ .maxVal = 300, .nowVal = 0u };
+		DirectX::XMFLOAT3 tornadoWorldPos{};
+		float targetSpeed = 5.f;
+	};
+	TornadoPhaseData tornadoPhaseData{};
+
+	std::unique_ptr<Sequencer> tornadoPhase;
+
+#pragma endregion 自機を引き寄せる
+
 private:
 	// ---------------
 	// priavteメンバ関数
@@ -84,6 +104,18 @@ private:
 							   const DirectX::XMFLOAT3& rotaMax = DirectX::XMFLOAT3(0, 360, 0));
 	NODE_RESULT phase_fanShapeAttack();
 	NODE_RESULT phase_singleShotAttack();
+	NODE_RESULT phase_tornado();
+
+	NODE_RESULT phase_setTornadoData();
+
+private:
+	bool loadShotDataFileIni();
+	void loadFanShotDataIni(ini_t* ini);
+	void loadSingleShotDataIni(ini_t* ini);
+
+	bool loadShotDataFileYml();
+	void loadFanShotDataYml(Yaml::Node& root);
+	void loadSingleShotDataYml(Yaml::Node& root);
 
 public:
 	BossBehavior(BossEnemy* boss);
