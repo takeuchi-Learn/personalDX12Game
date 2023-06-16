@@ -11,6 +11,8 @@
 #include "Collision/Collision.h"
 #include <CollisionMgr.h>
 
+#include <GameObject/Player/ReticleSphere.h>
+
 #include <fstream>
 #include <sstream>
 
@@ -27,56 +29,6 @@ namespace
 	constexpr XMFLOAT3 noKillEffCol = XMFLOAT3(0.25f, 1.f, 1.f);
 
 	constexpr XMFLOAT4 cyan = XMFLOAT4(0.25f, 1, 1, 1);
-
-	/// @brief スクリーン座標が示す、ワールド空間のベクトルを算出
-	/// @param matVPVInv ビュー・プロジェクション・ビューポート行列の逆行列
-	/// @param screenPos スクリーン座標での位置
-	/// @return ワールド空間上の正規化済みベクトル
-	XMVECTOR calcScreenPosDirection(const XMMATRIX& matVPVInv, const XMFLOAT2& screenPos, XMVECTOR* nearPosBuf = nullptr)
-	{
-		// ワールド座標
-		const XMVECTOR nearPos = XMVector3TransformCoord(XMVectorSet(screenPos.x, screenPos.y, 0.f, 0.f), matVPVInv);
-		const XMVECTOR farPos = XMVector3TransformCoord(XMVectorSet(screenPos.x, screenPos.y, 1.f, 0.f), matVPVInv);
-
-		if (nearPosBuf)
-		{
-			*nearPosBuf = nearPos;
-		}
-
-		return XMVector3Normalize(farPos - nearPos);
-	}
-
-	/// @brief スクリーン座標をワールド座標に変換する
-	/// @param matVPVInv ビュー・プロジェクション・ビューポート行列の逆行列
-	/// @param screenPos スクリーン座標での位置
-	/// @param distance スクリーン位置が指し示すベクトルのベクトルの大きさ
-	/// @return ワールド座標
-	XMVECTOR screen2World(const XMMATRIX& matVPVInv, const XMFLOAT2& screenPos, float distance)
-	{
-		// マウスが指し示すベクトル
-		XMVECTOR nearPos{};
-		const XMVECTOR mouseDir = distance * calcScreenPosDirection(matVPVInv, screenPos, &nearPos);
-
-		// 照準が指し示す3Dの座標
-		return nearPos + mouseDir;
-	}
-
-	struct ReticleSphere :
-		public CollisionShape::Sphere
-	{
-		/// @param camera カメラ
-		/// @param screenPos スクリーン座標での位置
-		/// @param distance 生成する球とカメラの距離
-		/// @param reticleR 照準画像の内接円の半径
-		ReticleSphere(const Camera* camera, const XMFLOAT2& screenPos, float distance, float reticleR)
-		{
-			const XMVECTOR center = camera->screenPos2WorldPosVec(XMFLOAT3(screenPos.x, screenPos.y, distance));
-			const XMVECTOR right = camera->screenPos2WorldPosVec(XMFLOAT3(screenPos.x + reticleR, screenPos.y, distance));
-
-			this->center = center;
-			this->radius = Collision::vecLength(XMVectorSubtract(center, right));
-		}
-	};
 }
 
 #pragma region 初期化

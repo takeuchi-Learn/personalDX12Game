@@ -8,17 +8,13 @@
 #include "System/PostEffect.h"
 #include "Collision/Collision.h"
 #include "System/SceneManager.h"
+#include <GameObject/Player/ReticleSphere.h>
 #include <CollisionMgr.h>
 
 using namespace DirectX;
 
 namespace
 {
-	inline ImVec2 f2ToIV2(const XMFLOAT2& f2)
-	{
-		return ImVec2(f2.x, f2.y);
-	}
-
 	inline XMFLOAT3 operator+(const XMFLOAT3& r, const XMFLOAT3& l)
 	{
 		return XMFLOAT3(r.x + l.x,
@@ -46,27 +42,15 @@ namespace
 		lhs.z -= rhs.z;
 	}
 
+	inline ImVec2 f2ToIV2(const XMFLOAT2& f2)
+	{
+		return ImVec2(f2.x, f2.y);
+	}
+
 	constexpr XMFLOAT3 killEffCol = XMFLOAT3(1.f, 0.25f, 0.25f);
 	constexpr XMFLOAT3 noKillEffCol = XMFLOAT3(0.25f, 1.f, 1.f);
 
 	constexpr XMFLOAT4 cyan = XMFLOAT4(0.25f, 1, 1, 1);
-
-	struct ReticleSphere :
-		public CollisionShape::Sphere
-	{
-		/// @param camera カメラ
-		/// @param screenPos スクリーン座標での位置
-		/// @param distance 生成する球とカメラの距離
-		/// @param reticleR 照準画像の内接円の半径
-		ReticleSphere(const Camera* camera, const XMFLOAT2& screenPos, float distance, float reticleR)
-		{
-			const XMVECTOR center = camera->screenPos2WorldPosVec(XMFLOAT3(screenPos.x, screenPos.y, distance));
-			const XMVECTOR right = camera->screenPos2WorldPosVec(XMFLOAT3(screenPos.x + reticleR, screenPos.y, distance));
-
-			this->center = center;
-			this->radius = Collision::vecLength(XMVectorSubtract(center, right));
-		}
-	};
 }
 
 void RailShootScene::loadBackObj()

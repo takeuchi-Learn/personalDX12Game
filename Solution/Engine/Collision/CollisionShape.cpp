@@ -1,6 +1,7 @@
 ﻿#include "CollisionShape.h"
 
 using namespace DirectX;
+using namespace CollisionShape;
 
 void Triangle::ComputeNormal()
 {
