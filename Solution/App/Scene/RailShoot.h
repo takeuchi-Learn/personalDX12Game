@@ -5,7 +5,6 @@
 #include <functional>
 #include <unordered_map>
 
-#include "2D/DebugText.h"
 #include "GameObject/NormalEnemy.h"
 #include "3D/ParticleMgr.h"
 #include "Input/Input.h"
@@ -30,21 +29,7 @@ class RailShoot
 
 	std::unique_ptr<Timer> timer;
 
-
 #pragma region ImGui
-
-	static constexpr ImGuiWindowFlags winFlags =
-		// リサイズ不可
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoResize |
-		// タイトルバー無し
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar |
-		// 設定を.iniに出力しない
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoSavedSettings |
-		// 移動不可
-		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove;
-	//// スクロールバーを常に表示
-	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysHorizontalScrollbar |
-	//ImGuiWindowFlags_::ImGuiWindowFlags_AlwaysVerticalScrollbar;
 
 	// 最初のウインドウの位置を指定
 	static constexpr DirectX::XMFLOAT2 fstWinPos =
@@ -64,24 +49,23 @@ class RailShoot
 
 #pragma endregion 音
 
-	// --------------------
-	// スプライト
-	// --------------------
-	std::unique_ptr<SpriteBase> spriteBase;
-	std::unique_ptr<DebugText> debugText;
+#pragma region スプライト
 
-	const UINT aimGrNum;
+	std::unique_ptr<SpriteBase> spriteBase;
+
+	UINT aimGrNum;
 	std::unique_ptr<Sprite> cursorGr;
 
 	std::forward_list<Reticle> reticle;
 
 	// 操作説明
 	std::unordered_map<std::string, std::unique_ptr<Sprite>> operInst;
-	const float operInstPosR;
+	inline static constexpr float operInstPosR = WinAPI::window_width * 0.1f;
 
-	// --------------------
-	// 3Dオブジェクト
-	// --------------------
+#pragma endregion スプライト
+
+#pragma region 3Dオブジェクト
+
 	// 背景のパイプライン
 	size_t backPipelineSet;
 
@@ -102,8 +86,16 @@ class RailShoot
 	std::unique_ptr<ObjModel> playerBulModel;
 	uint16_t playerHpMax;
 
+	// 衝突時の関数
+	std::function<void(GameObj*)> enemyHitProc;
+	std::function<void(GameObj*)> enemyBulHitProc;
+	std::function<void(GameObj*)> playerHitProc;
+	std::function<void(GameObj*)> playerBulHitProc;
+
 	// レールの現在位置を示すオブジェクト
 	std::unique_ptr<GameObj> railObj;
+
+#pragma endregion 3Dオブジェクト
 
 	// --------------------
 	// パーティクル
@@ -113,14 +105,14 @@ class RailShoot
 	// --------------------
 	// RGBずらし
 	// --------------------
-	static const Timer::timeType rgbShiftTimeMax = Timer::oneSec / 2;
+	static constexpr Timer::timeType rgbShiftTimeMax = Timer::oneSec / 2;
 	Timer::timeType startRgbShiftTime = 0;
 	bool rgbShiftFlag = false;
 
 	// --------------------
 	// シーン遷移
 	// --------------------
-	static const Timer::timeType sceneChangeTime = Timer::oneSec;
+	static constexpr Timer::timeType sceneChangeTime = Timer::oneSec;
 
 	Timer::timeType startSceneChangeTime{};
 	// --------------------
@@ -128,8 +120,8 @@ class RailShoot
 	// --------------------
 	std::vector<DirectX::XMVECTOR> splinePoint;
 	uint16_t splineNowFrame = 0u;
-	static const uint16_t splineFrameMax = 120u;
-	static const uint16_t splineIndexDef = 1u;
+	static constexpr uint16_t splineFrameMax = 120u;
+	static constexpr uint16_t splineIndexDef = 1u;
 	uint16_t splineIndex = splineIndexDef;
 
 	std::unique_ptr<ObjModel> wallModel;
@@ -146,7 +138,7 @@ class RailShoot
 	{
 		uint16_t popFrame;
 		DirectX::XMFLOAT3 pos;
-		DirectX::XMFLOAT3 vel{ 0,0,-1 };
+		DirectX::XMFLOAT3 vel{ 0, 0, -1 };
 		PopEnemyData(uint16_t popFrame,
 					 const DirectX::XMFLOAT3& pos,
 					 const DirectX::XMFLOAT3& vel)
@@ -235,7 +227,20 @@ class RailShoot
 
 	void updateRailPos();
 	void movePlayer();
-	void updatePlayerShotTarget(const DirectX::XMFLOAT2& aim2DMin, const DirectX::XMFLOAT2& aim2DMax);
+	void updatePlayerShotTarget(const DirectX::XMFLOAT2& aim2DPos);
+
+private:
+	void loadBackObj();
+	void loadLane();
+
+	void initCamera();
+	void initPlayer();
+	void initSprite();
+	void initEnemy();
+	void initSound();
+
+	void initMisc();
+	void initObj3d();
 
 public:
 	RailShoot();

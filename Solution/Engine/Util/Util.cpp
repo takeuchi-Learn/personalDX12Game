@@ -2,9 +2,21 @@
 #include <fstream>
 #include <sstream>
 
+#define INI_STRNICMP(s1, s2, cnt) ( _strnicmp( s1, s2, cnt ) )
+#define INI_IMPLEMENTATION
+#include <ExternalCode/ini.h>
+
 std::unordered_map<std::string, Util::CSVType> Util::loadedCsvData{};
 
 using namespace DirectX;
+
+Util::IniData::IniData(const std::string& data) :
+	ini(ini_load(data.c_str(), nullptr))
+{}
+Util::IniData::~IniData()
+{
+	ini_destroy(ini);
+}
 
 const Util::CSVType& Util::loadCsv(const std::string& csvFilePath,
 								   bool commentFlag,

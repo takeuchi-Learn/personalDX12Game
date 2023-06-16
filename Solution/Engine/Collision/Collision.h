@@ -12,32 +12,18 @@ public:
 	/// @brief ベクトルの長さを計算
 	/// @param vec 対象のベクトル
 	/// @return 長さ
-	inline static float vecLength(DirectX::XMVECTOR vec)
+	inline static float vecLength(const DirectX::XMVECTOR& vec)
 	{
-		float len{};
-		DirectX::XMStoreFloat(&len, vec);
-		return len;
+		return DirectX::XMVectorGetX(DirectX::XMVector3Length(vec));
 	}
 
-private:
+	//private:
 	inline static float vec3Dot(const DirectX::XMVECTOR& v1,
 								const DirectX::XMVECTOR& v2)
 	{
 		float ret{};
 		DirectX::XMStoreFloat(&ret, DirectX::XMVector3Dot(v1, v2));
 		return ret;
-	}
-
-	/// @brief 値をクランプ
-	/// @param x クランプする値
-	/// @param low 最小値
-	/// @param high 最大値
-	/// @return クランプ後の値
-	inline static float clamp(float x, float low, float high)
-	{
-		x = (x < low) ? low : x;
-		x = (x < high) ? high : x;
-		return x;
 	}
 
 	/// @brief 線分同士の距離の2乗
@@ -153,4 +139,11 @@ public:
 	static bool CheckSphere2Sphere(const Sphere& sphere1, const Sphere& sphere2);
 
 	inline static bool CheckHit(const Sphere& sphere, const Sphere& sphere2) { return CheckSphere2Sphere(sphere, sphere2); }
+
+	static bool CheckBox2Box(const Box& box1, const Box& box2);
+	inline static bool CheckHit(const Box& box1, const Box& box2) { return CheckBox2Box(box1, box2); }
+
+	static bool CheckBox2Sphere(const Box& box, const Sphere& sphere);
+	inline static bool CheckHit(const Box& box, const Sphere& sphere) { return CheckBox2Sphere(box, sphere); }
+	inline static bool CheckHit(const Sphere& sphere, const Box& box) { return CheckBox2Sphere(box, sphere); }
 };

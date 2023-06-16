@@ -2,6 +2,18 @@
 
 using namespace DirectX;
 
+bool GameObj::damage(uint16_t damegeNum, bool killFlag)
+{
+	if (damegeNum >= hp)
+	{
+		hp = 0u;
+		if (killFlag) { kill(); }
+		return true;
+	}
+
+	hp -= damegeNum;
+	return false;
+}
 
 void GameObj::moveForward(float moveVel, bool moveYFlag)
 {

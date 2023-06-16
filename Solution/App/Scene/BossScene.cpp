@@ -6,10 +6,10 @@
 #include <imgui.h>
 #include "System/SceneManager.h"
 #include "System/PostEffect.h"
-#include <Util/RandomNum.h>
 #include <Util/Util.h>
 
 #include "Collision/Collision.h"
+#include <CollisionMgr.h>
 
 #include <fstream>
 #include <sstream>
@@ -25,6 +25,58 @@ namespace
 
 	constexpr XMFLOAT3 killEffCol = XMFLOAT3(1.f, 0.25f, 0.25f);
 	constexpr XMFLOAT3 noKillEffCol = XMFLOAT3(0.25f, 1.f, 1.f);
+
+	constexpr XMFLOAT4 cyan = XMFLOAT4(0.25f, 1, 1, 1);
+
+	/// @brief スクリーン座標が示す、ワールド空間のベクトルを算出
+	/// @param matVPVInv ビュー・プロジェクション・ビューポート行列の逆行列
+	/// @param screenPos スクリーン座標での位置
+	/// @return ワールド空間上の正規化済みベクトル
+	XMVECTOR calcScreenPosDirection(const XMMATRIX& matVPVInv, const XMFLOAT2& screenPos, XMVECTOR* nearPosBuf = nullptr)
+	{
+		// ワールド座標
+		const XMVECTOR nearPos = XMVector3TransformCoord(XMVectorSet(screenPos.x, screenPos.y, 0.f, 0.f), matVPVInv);
+		const XMVECTOR farPos = XMVector3TransformCoord(XMVectorSet(screenPos.x, screenPos.y, 1.f, 0.f), matVPVInv);
+
+		if (nearPosBuf)
+		{
+			*nearPosBuf = nearPos;
+		}
+
+		return XMVector3Normalize(farPos - nearPos);
+	}
+
+	/// @brief スクリーン座標をワールド座標に変換する
+	/// @param matVPVInv ビュー・プロジェクション・ビューポート行列の逆行列
+	/// @param screenPos スクリーン座標での位置
+	/// @param distance スクリーン位置が指し示すベクトルのベクトルの大きさ
+	/// @return ワールド座標
+	XMVECTOR screen2World(const XMMATRIX& matVPVInv, const XMFLOAT2& screenPos, float distance)
+	{
+		// マウスが指し示すベクトル
+		XMVECTOR nearPos{};
+		const XMVECTOR mouseDir = distance * calcScreenPosDirection(matVPVInv, screenPos, &nearPos);
+
+		// 照準が指し示す3Dの座標
+		return nearPos + mouseDir;
+	}
+
+	struct ReticleSphere :
+		public CollisionShape::Sphere
+	{
+		/// @param camera カメラ
+		/// @param screenPos スクリーン座標での位置
+		/// @param distance 生成する球とカメラの距離
+		/// @param reticleR 照準画像の内接円の半径
+		ReticleSphere(const Camera* camera, const XMFLOAT2& screenPos, float distance, float reticleR)
+		{
+			const XMVECTOR center = camera->screenPos2WorldPosVec(XMFLOAT3(screenPos.x, screenPos.y, distance));
+			const XMVECTOR right = camera->screenPos2WorldPosVec(XMFLOAT3(screenPos.x + reticleR, screenPos.y, distance));
+
+			this->center = center;
+			this->radius = Collision::vecLength(XMVectorSubtract(center, right));
+		}
+	};
 }
 
 #pragma region 初期化
@@ -93,10 +145,26 @@ void BossScene::initPlayer()
 	player->setScale(10.f);
 	player->setHp(playerHpMax);
 
-	player->setBulLife(600ui16);
+	player->setBulHomingRaito(0.01f);	// 弾のホーミングの強さ
 
-	sceneChangeStartPos = XMFLOAT3(0.f, 500.f, 0.f);
-	sceneChangeEndPos = XMFLOAT3(0.f, 0.f, 0.f);
+	// 自機の衝突判定情報
+	playerColliderSet.group.emplace_front(player->createCollider());
+	playerColliderSet.hitProc = [&](GameObj* p)
+	{
+		if (p->damage(1u, true))
+		{
+			// 自機の体力が0になったら
+			update_proc = std::bind(&BossScene::update_end<GameOverScene>, this);
+		} else
+		{
+			startRgbShift();
+		}
+
+	};
+
+	constexpr float posZ = -700.f;
+	sceneChangeStartPos = XMFLOAT3(0.f, 500.f, posZ);
+	sceneChangeEndPos = XMFLOAT3(0.f, 0.f, posZ);
 
 	sceneChangeStartRota = playerParent->getRotation();
 	sceneChangeStartRota.y += 90.f;
@@ -114,9 +182,9 @@ void BossScene::initBoss()
 	bossBulModel = std::make_unique<ObjModel>("Resources/sphere", "sphere");
 	boss = std::make_unique<BossEnemy>(camera.get(), nullptr);
 
-	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 800));
+	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 0));
 	boss->setRotation(XMFLOAT3(0, 180.f, 0));
-	boss->setTargetObj(player.get());
+	boss->setTargetObj(playerParent.get());
 	boss->setBulModel(bossBulModel.get());
 	boss->getObj()->color = XMFLOAT4(2, 0.5f, 0.25f, 1);
 	boss->setAlive(false);
@@ -180,6 +248,9 @@ void BossScene::initBoss()
 			// 大きさを変更
 			i->setScale(bpd.scale);
 
+			// 色を設定
+			i->setCol(XMFLOAT4(1, 0.25f, 0.125f, 1));
+
 			// 体力を設定
 			constexpr uint16_t hp = 10ui16;
 			i->setHp(hp);
@@ -233,10 +304,11 @@ void BossScene::start()
 	PostEffect::getInstance()->setSpeedLineIntensity(0.125f);
 
 	// 照準の位置を画面中央にする
-	input->setMousePos(WinAPI::window_width / 2, WinAPI::window_height / 2);
-	player->setAim2DPos(XMFLOAT2((float)WinAPI::window_width / 2.f, (float)WinAPI::window_height / 2.f));
-	cursorGr->position.x = player->getAim2DPos().x;
-	cursorGr->position.y = player->getAim2DPos().y;
+	constexpr XMFLOAT2 center = XMFLOAT2((float)WinAPI::window_width / 2.f, (float)WinAPI::window_height / 2.f);
+	input->setMousePos((int)center.x, (int)center.y);
+	player->setAim2DPos(center);
+	cursorGr->position.x = center.x;
+	cursorGr->position.y = center.y;
 
 	cursorGr->isInvisible = true;
 
@@ -312,7 +384,6 @@ void BossScene::update_start()
 	barRaito *= barRaito * barRaito * barRaito;
 	playerHpBar.backNowRaito = 1.f - barRaito;
 	playerHpBar.frontNowRaito = playerHpBar.backNowRaito;
-
 }
 
 void BossScene::update_appearBoss()
@@ -385,116 +456,68 @@ void BossScene::update_play()
 		movePlayer();
 
 		// --------------------
-		// 弾発射
-		// --------------------
-		if (input->hitMouseButton(Input::MOUSE::LEFT) ||
-			input->hitPadButton(Input::PAD::RB) ||
-			input->hitPadButton(Input::PAD::A) ||
-			input->hitPadButton(Input::PAD::B))
-		{
-			cursorGr->color = XMFLOAT4(1, 0, 0, 1);
-
-			const XMFLOAT2 aim2DMin = XMFLOAT2(input->getMousePos().x - cursorGr->getSize().x / 2.f,
-											  input->getMousePos().y - cursorGr->getSize().y / 2.f);
-			const XMFLOAT2 aim2DMax = XMFLOAT2(input->getMousePos().x + cursorGr->getSize().x / 2.f,
-											   input->getMousePos().y + cursorGr->getSize().y / 2.f);
-
-			addShotTarget(attackableEnemy, aim2DMin, aim2DMax);
-
-		} else if (input->releaseTriggerMouseButton(Input::MOUSE::LEFT) ||
-				   input->releaseTriggerMouseButton(Input::PAD::RB) ||
-				   input->releaseTriggerMouseButton(Input::PAD::A) ||
-				   input->releaseTriggerMouseButton(Input::PAD::B))
-		{
-			if (player->shotAll(camera.get(), playerBulModel.get(), 2.f))
-			{
-				reticle.clear();
-
-				cursorGr->color = XMFLOAT4(1, 1, 1, 1);
-			}
-		}
-
-		// --------------------
 		// 自機弾と敵の当たり判定
 		// --------------------
-		for (auto& e : attackableEnemy)
 		{
-			if (e.expired()) { continue; }
-			auto i = e.lock();
+			CollisionMgr::ColliderSet eSet{}, pBulSet{};
+			pBulSet.hitProc = [](GameObj* obj) { obj->kill(); };
+			eSet.hitProc = [&](GameObj* obj)
+			{
+				if (obj->damage(1ui16, true))
+				{
+					obj->setDrawFlag(false);
+					// 赤エフェクトを出す
+					ParticleMgr::createParticle(particleMgr.get(), obj->calcWorldPos(), 128U, 16.f, 16.f, killEffCol);
+					Sound::SoundPlayWave(killSe.get(), 0, 0.2f);
+				} else
+				{
+					// シアンエフェクトを出す
+					ParticleMgr::createParticle(particleMgr.get(), obj->calcWorldPos(), 96U, 12.f, 12.f, noKillEffCol);
+					Sound::SoundPlayWave(bossDamageSe.get(), 0, 0.2f);
+				}
+			};
 
-			// いない敵は判定しない
-			if (!i->getAlive()) { continue; }
+			for (auto& e : attackableEnemy)
+			{
+				// いない敵は判定しない
+				if (e.expired()) { continue; }
+				auto i = e.lock();
+				if (!i->getAlive()) { continue; }
 
-			const CollisionShape::Sphere enemy(XMLoadFloat3(&i->calcWorldPos()),
-											   i->getScale());
-
+				eSet.group.emplace_front(CollisionMgr::ColliderType::create(i.get()));
+			}
 			for (auto& pb : player->getBulArr())
 			{
 				// 無い弾は判定しない
 				if (!pb.getAlive()) { continue; }
 
-				const CollisionShape::Sphere bul(XMLoadFloat3(&pb.calcWorldPos()),
-												 pb.getScaleF3().z);
-
-				// 衝突していたら
-				if (Collision::CheckHit(bul, enemy))
-				{
-					// 弾はさよなら
-					pb.kill();
-
-					// 敵はダメージを受ける
-					// hpが0になったらさよなら
-					if (i->damage(1u, true))
-					{
-						i->setDrawFlag(false);
-						// 赤エフェクトを出す
-						ParticleMgr::createParticle(particleMgr.get(), i->calcWorldPos(), 128U, 16.f, 16.f, killEffCol);
-						Sound::SoundPlayWave(killSe.get(), 0, 0.2f);
-					} else
-					{
-						// シアンエフェクトを出す
-						ParticleMgr::createParticle(particleMgr.get(), i->calcWorldPos(), 96U, 12.f, 12.f, noKillEffCol);
-						Sound::SoundPlayWave(bossDamageSe.get(), 0, 0.2f);
-					}
-				}
+				pBulSet.group.emplace_front(CollisionMgr::ColliderType::create(&pb));
 			}
+			CollisionMgr::checkHitAll(eSet, pBulSet);
 		}
 
 		// --------------------
-		// 自機とボス弾(雑魚敵)の当たり判定
+		// 自機とボス弾の当たり判定
 		// --------------------
-		if (player->getAlive())
+		if (player->getAlive() && !boss->getBulList().empty())
 		{
-			const CollisionShape::Sphere pCol(XMLoadFloat3(&player->calcWorldPos()),
-											  player->getScale());
+			CollisionMgr::ColliderSet bset{};
 
 			for (auto& i : boss->getBulList())
 			{
-				// いなければ判定しない
 				if (!i->getAlive()) { continue; }
 
-				const CollisionShape::Sphere eCol(XMLoadFloat3(&i->getPos()),
-												  i->getScale());
-
-				if (Collision::CheckHit(pCol, eCol))
-				{
-					// 当たった雑魚敵は消す
-					i->kill();
-
-					// 自機がダメージを受ける
-					if (player->damage(1u, true))
-					{
-						// 自機の体力が0になったら
-						player->kill();
-						update_proc = std::bind(&BossScene::update_end<GameOverScene>, this);
-					} else
-					{
-						startRgbShift();
-					}
-				}
+				bset.group.emplace_front(CollisionMgr::ColliderType::create(i.get()));
 			}
+			bset.hitProc = [](GameObj* obj)
+			{
+				obj->kill();
+			};
+
+			CollisionMgr::checkHitAll(playerColliderSet, bset);
 		}
 
+		// ボスのパーツがすべて死んだらボス本体は死ぬ
 		if (boss->getAlive())
 		{
 			bool alive = false;
@@ -512,9 +535,33 @@ void BossScene::update_play()
 			}
 		}
 
+		// ボスが死んだらボス撃破演出へ移動
 		if (!boss->getAlive())
 		{
 			startKillBoss();
+		}
+
+		// --------------------
+		// 弾発射
+		// --------------------
+		cursorGr->color = cyan;
+		if (input->hitMouseButton(Input::MOUSE::LEFT) ||
+			input->hitPadButton(Input::PAD::RB) ||
+			input->hitPadButton(Input::PAD::A) ||
+			input->hitPadButton(Input::PAD::B))
+		{
+			cursorGr->color = XMFLOAT4(1, 0, 0, 1);
+
+			addShotTarget(attackableEnemy, XMFLOAT2(cursorGr->position.x, cursorGr->position.y));
+		} else if (input->releaseTriggerMouseButton(Input::MOUSE::LEFT) ||
+				   input->releaseTriggerPadButton(Input::PAD::RB) ||
+				   input->releaseTriggerPadButton(Input::PAD::A) ||
+				   input->releaseTriggerPadButton(Input::PAD::B))
+		{
+			if (player->shotAll(camera.get(), playerBulModel.get(), 2.f))
+			{
+				reticle.clear();
+			}
 		}
 	}
 
@@ -530,8 +577,8 @@ void BossScene::update_play()
 
 void BossScene::update_killBoss()
 {
-	const auto nowTime = timer->getNowTime();
-	constexpr auto endTime = Timer::oneSecF * 3;
+	const Timer::timeType nowTime = timer->getNowTime();
+	constexpr Timer::timeType endTime = Timer::oneSec * 3;
 
 	if (nowTime > endTime)
 	{
@@ -672,6 +719,7 @@ void BossScene::drawObj3d()
 
 	for (auto& i : attackableEnemy)
 	{
+		if (i.expired()) { continue; }
 		i.lock()->drawWithUpdate(light.get());
 	}
 
@@ -682,6 +730,8 @@ void BossScene::drawObj3d()
 	}
 
 	particleMgr->drawWithUpdate();
+	player->drawWithUpdateBulParticle();
+	boss->drawTornadoParticle();
 }
 
 void BossScene::startRgbShift()
@@ -693,63 +743,66 @@ void BossScene::startRgbShift()
 
 void BossScene::updateRgbShift()
 {
-	if (rgbShiftFlag)
+	if (!rgbShiftFlag) { return; }
+
+	nowRgbShiftTime = timer->getNowTime() - startRgbShiftTime;
+
+	const float raito = (float)nowRgbShiftTime / (float)rgbShiftTimeMax;
+	if (raito > 1.f)
 	{
-		nowRgbShiftTime = timer->getNowTime() - startRgbShiftTime;
-
-		const float raito = (float)nowRgbShiftTime / (float)rgbShiftTimeMax;
-		if (raito > 1.f)
-		{
-			PostEffect::getInstance()->setRgbShiftNum({ 0.f, 0.f });
-			rgbShiftFlag = false;
-			return;
-		}
-
-		// ずらす最大値
-		constexpr float rgbShiftMumMax = 1.f / 16.f;
-
-		// イージングを加味した進行割合
-		constexpr float  c4 = 2.f * XM_PI / 3.f;
-		const float easeRate = -std::pow(2.f, 10.f * (1.f - raito) - 10.f) *
-			DX12Base::ins()->nearSin((raito * 10.f - 10.75f) * c4);
-
-		PostEffect::getInstance()->setRgbShiftNum({ easeRate * rgbShiftMumMax, 0.f });
+		PostEffect::getInstance()->setRgbShiftNum({ 0.f, 0.f });
+		rgbShiftFlag = false;
+		return;
 	}
+
+	// ずらす最大値
+	constexpr float rgbShiftMumMax = 1.f / 16.f;
+
+	// イージングを加味した進行割合
+	constexpr float  c4 = 2.f * XM_PI / 3.f;
+	const float easeRate = -std::pow(2.f, 10.f * (1.f - raito) - 10.f) *
+		DX12Base::ins()->nearSin((raito * 10.f - 10.75f) * c4);
+
+	PostEffect::getInstance()->setRgbShiftNum({ easeRate * rgbShiftMumMax, 0.f });
 }
 
 bool BossScene::addShotTarget(const std::forward_list<std::weak_ptr<BaseEnemy>>& enemy,
-							  const DirectX::XMFLOAT2& aim2DPosMin,
-							  const DirectX::XMFLOAT2& aim2DPosMax)
+							  const DirectX::XMFLOAT2& aim2DPos)
 {
-	// 撃ったかどうか（戻り値用）
+	// 撃ってないかどうか（戻り値用）
 	bool noShot = true;
+
+	const float cursorR2D = cursorGr->getSize().x / 2.f;
+	const XMVECTOR camPosVec = XMLoadFloat3(&camera->getEye());
 
 	// 照準の中の敵の方へ弾を飛ばす
 	for (auto& e : enemy)
 	{
+		if (e.expired()) { continue; }
 		auto i = e.lock();
+
 		// いない敵は無視
 		if (!i->getAlive()) { continue; }
 
-		// 敵のスクリーン座標を取得
-		const XMFLOAT2 screenEnemyPos = i->getObj()->calcScreenPos();
+		const auto enemySphere = CollisionShape::Sphere(XMLoadFloat3(&i->calcWorldPos()), i->getScaleF3().z);
 
-		// 敵が2D照準の中にいるかどうか
-		if (aim2DPosMin.x <= screenEnemyPos.x &&
-			aim2DPosMin.y <= screenEnemyPos.y &&
-			aim2DPosMax.x >= screenEnemyPos.x &&
-			aim2DPosMax.y >= screenEnemyPos.y)
+		const auto aimSphere = ReticleSphere(camera.get(),
+											 aim2DPos,
+											 Collision::vecLength(enemySphere.center - camPosVec),
+											 cursorR2D);
+
+		// 敵が照準の中にいるかどうか
+		if (Collision::CheckHit(enemySphere, aimSphere))
 		{
-
 			if (player->addShotTarget(i))
 			{
 				auto& ref = reticle.emplace_front(aimGrNum, spBase.get());
 
 				ref.target = i;
 
-				ref.sprite->color = XMFLOAT4(1, 0, 0, 1);
+				ref.sprite->color = cyan;
 
-				const auto size = ref.sprite->getSize();
+				const auto& size = ref.sprite->getSize();
 				ref.sprite->setSize(XMFLOAT2(size.x / 2.f, size.y / 2.f));
 
 				noShot = false;
@@ -826,11 +879,8 @@ void BossScene::movePlayer()
 	if (moveYFlag || moveXFlag)
 	{
 		// 入力値を0~1にする
-		const float len = std::sqrt(
-			inputVal.x * inputVal.x +
-			inputVal.y * inputVal.y
-		);
-		if (len > 1.f)
+		if (float len = std::sqrt(inputVal.x * inputVal.x +
+								  inputVal.y * inputVal.y) > 1.f)
 		{
 			inputVal.x /= len;
 			inputVal.y /= len;
@@ -853,12 +903,28 @@ void BossScene::movePlayer()
 		// 移動させる
 		if (moveYFlag)
 		{
-			playerParent->moveForward(inputVal.y * speed);
+			const float moveVel = inputVal.y * speed;
+			playerParent->moveForward(moveVel);
+
+			const float len = Collision::vecLength(XMLoadFloat3(&playerParent->getPos()));
+			if (len > 1500.f)
+			{
+				playerParent->moveForward(-moveVel);
+			}
 		}
 		if (moveXFlag)
 		{
-			playerParent->moveRight(inputVal.x * speed);
-			playerRot = 45.f * -inputVal.x;
+			const float moveVel = inputVal.x * speed;
+			playerParent->moveRight(moveVel);
+
+			const float len = Collision::vecLength(XMLoadFloat3(&playerParent->getPos()));
+			if (len > boss->getMaxTargetDistance())
+			{
+				playerParent->moveRight(-moveVel);
+			} else
+			{
+				playerRot = 45.f * -inputVal.x;
+			}
 		}
 	}
 	player->setRotation(XMFLOAT3(player->getRotation().x,
@@ -868,15 +934,19 @@ void BossScene::movePlayer()
 
 void BossScene::moveAim2DPos()
 {
-	constexpr POINT center = POINT(WinAPI::window_width / 2,
-								   WinAPI::window_height / 2);
+	constexpr XMFLOAT2 center = XMFLOAT2((float)WinAPI::window_width / 2.f,
+										 (float)WinAPI::window_height / 2.f);
+	constexpr POINT centerInt{ .x = (int)center.x, .y = (int)center.y };
 
 	// マウスカーソルの位置をパッド入力に合わせてずらす
-	const POINT pos = input->getMousePos();
-	input->setMousePos(center.x, center.y);
+	const POINT prePos = input->getMousePos();
+	input->setMousePos(centerInt.x, centerInt.y);
 
-	POINT posDiff = POINT(pos.x - center.x,
-						  pos.y - center.y);
+	cursorGr->position.x = center.x;
+	cursorGr->position.y = center.y;
+
+	POINT posDiff = POINT(prePos.x - centerInt.x,
+						  prePos.y - centerInt.y);
 
 	// 右スティックの入力で速度を決める
 	XMFLOAT2 rStick = input->hitPadRStickRaito();
@@ -922,6 +992,22 @@ void BossScene::drawFrontSprite()
 
 	cursorGr->drawWithUpdate(DX12Base::ins(), spBase.get());
 
+
+	// 最初のウインドウの位置を指定
+	constexpr XMFLOAT2 fstWinPos = XMFLOAT2((float)WinAPI::window_width / 50.f, (float)WinAPI::window_height / 10.f);
+	constexpr XMFLOAT2 fstWinSize = XMFLOAT2((float)WinAPI::window_width / 5.f, (float)WinAPI::window_height / 4.f);
+	ImGui::SetNextWindowPos(ImVec2(fstWinPos.x, fstWinPos.y));
+	ImGui::SetNextWindowSize(ImVec2(fstWinSize.x, fstWinSize.y));
+	ImGui::Begin("情報", nullptr, DX12Base::imGuiWinFlagsDef);
+	ImGui::Text("自機体力 : %.2f%%(%u / %u)",
+				(float)player->getHp() / (float)playerHpMax * 100.f,
+				player->getHp(), playerHpMax);
+	ImGui::Text("");
+	ImGui::Text("WASD : 移動");
+	ImGui::Text("マウス左ドラッグ : ロックオン");
+	ImGui::Text("マウス左離す : 発射");
+	ImGui::End();
+
 	// 自機の体力バー
 	if (0.f < playerHpBar.backNowRaito)
 	{
@@ -941,7 +1027,7 @@ void BossScene::drawFrontSprite()
 		ImGui::SetNextWindowPos(f2ToIV2(hpWinPosLT));
 		ImGui::SetNextWindowSize(f2ToIV2(hpWinSize));
 
-		ImGui::Begin("自機体力", nullptr, winFlags);
+		ImGui::Begin("自機体力", nullptr, DX12Base::ImGuiWinFlagsNoTitleBar);
 		const ImVec2 size = ImGui::GetWindowSize();
 
 		// ウインドウ内のバーの大きさ
@@ -980,7 +1066,7 @@ void BossScene::drawFrontSprite()
 		ImGui::SetNextWindowPos(f2ToIV2(hpWinPosCT), 0, ImVec2(0.5f, 0.5f));
 		ImGui::SetNextWindowSize(f2ToIV2(hpWinSize));
 
-		ImGui::Begin("ボス体力", nullptr, winFlags);
+		ImGui::Begin("ボス体力", nullptr, DX12Base::ImGuiWinFlagsNoTitleBar);
 		const ImVec2 size = ImGui::GetWindowSize();
 
 		// ウインドウ内のバーの大きさ

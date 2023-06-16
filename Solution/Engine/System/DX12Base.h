@@ -54,10 +54,13 @@ public:
 		// 移動不可
 		ImGuiWindowFlags_::ImGuiWindowFlags_NoMove;
 
+	static const ImGuiWindowFlags ImGuiWinFlagsNoTitleBar = DX12Base::imGuiWinFlagsDef | ImGuiWindowFlags_::ImGuiWindowFlags_NoTitleBar;
+
 #pragma region FPS
 private:
 	static const USHORT divNum = 2;	// 2以上にする
 	LONGLONG fpsTime[divNum]{};
+	constexpr static USHORT divLen = divNum - 1;
 	float fps;
 
 	void flipTimeFPS();

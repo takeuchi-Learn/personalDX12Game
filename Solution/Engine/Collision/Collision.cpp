@@ -1,4 +1,5 @@
 ﻿#include "Collision.h"
+#include <algorithm>
 
 using namespace DirectX;
 using namespace CollisionShape;
@@ -27,12 +28,10 @@ float Collision::sqDistanceSegmentSegment(const XMVECTOR& p1, const XMVECTOR& q1
 	if (denominator != 0.f)
 	{	// 平行でないなら
 		s = (b * f - c * e) / denominator;
-		s = clamp(s, 0.f, 1.f);
+		s = std::clamp(s, 0.f, 1.f);
 	} else
 	{
-		{
-			s = 0.f;
-		}
+		s = 0.f;
 	}
 
 	// tを求める
@@ -44,11 +43,11 @@ float Collision::sqDistanceSegmentSegment(const XMVECTOR& p1, const XMVECTOR& q1
 	if (t < 0.f)
 	{
 		t = 0.f;
-		s = clamp(-c / a, 0.f, 1.f);
+		s = std::clamp(-c / a, 0.f, 1.f);
 	} else if (t > 1.f)
 	{
-		s = clamp((b - c) / a, 0.f, 1.f);
 		t = 1.f;
+		s = std::clamp((b - c) / a, 0.f, 1.f);
 	}
 
 	// sとtが決定したので、各線分内の座標c1,c2を求める
@@ -56,7 +55,7 @@ float Collision::sqDistanceSegmentSegment(const XMVECTOR& p1, const XMVECTOR& q1
 	const XMVECTOR c2 = p2 + t * d2;
 
 	// 2点(c1, c2)間の距離の2乗を返す
-	const auto vlen = c1 - c2;
+	const XMVECTOR vlen = c1 - c2;
 	return vec3Dot(vlen, vlen);	// vlen・vlen <- 各要素をそれぞれ掛けて全て足す
 }
 
@@ -417,4 +416,158 @@ bool Collision::CheckSphere2Sphere(const Sphere& sphere1, const Sphere& sphere2)
 	const float rSum = sphere1.radius + sphere2.radius;
 
 	return rSum * rSum > sqLen;
+}
+
+bool Collision::CheckBox2Box(const Box& box1, const Box& box2)
+{
+	XMMATRIX R = XMMatrixRotationQuaternion(XMQuaternionMultiply(box1.rotaQuaternion,
+																 XMQuaternionConjugate(box2.rotaQuaternion)));
+
+	// 1に対する2の移動量
+	XMVECTOR t = XMVector3InverseRotate(XMVectorSubtract(box2.center,
+														 box1.center),
+										box1.rotaQuaternion);
+
+	XMVECTOR R0X = R.r[0];
+	XMVECTOR R1X = R.r[1];
+	XMVECTOR R2X = R.r[2];
+	R = XMMatrixTranspose(R);
+
+	XMVECTOR RX0 = R.r[0];
+	XMVECTOR RX1 = R.r[1];
+	XMVECTOR RX2 = R.r[2];
+
+	XMVECTOR AR0X = XMVectorAbs(R0X);
+	XMVECTOR AR1X = XMVectorAbs(R1X);
+	XMVECTOR AR2X = XMVectorAbs(R2X);
+
+	XMVECTOR ARX0 = XMVectorAbs(RX0);
+	XMVECTOR ARX1 = XMVectorAbs(RX1);
+	XMVECTOR ARX2 = XMVectorAbs(RX2);
+
+	// 15種類の分離可能な軸をそれぞれテスト
+	XMVECTOR d{}, d1{}, d_B{};
+	d = XMVectorSplatX(t);
+	d1 = XMVectorSplatX(box1.size);
+	d_B = XMVector3Dot(box2.size, AR0X);
+	XMVECTOR NoIntersection = XMVectorGreater(XMVectorAbs(d),
+											  XMVectorAdd(d1, d_B));
+
+	d = XMVectorSplatY(t);
+	d1 = XMVectorSplatY(box1.size);
+	d_B = XMVector3Dot(box2.size, AR1X);
+	NoIntersection = XMVectorOrInt(NoIntersection,
+		XMVectorGreater(XMVectorAbs(d), XMVectorAdd(d1, d_B)));
+
+	d = XMVectorSplatZ(t);
+	d1 = XMVectorSplatZ(box1.size);
+	d_B = XMVector3Dot(box2.size, AR2X);
+	NoIntersection = XMVectorOrInt(NoIntersection,
+		XMVectorGreater(XMVectorAbs(d), XMVectorAdd(d1, d_B)));
+
+	d = XMVector3Dot(t, RX0);
+	d1 = XMVector3Dot(box1.size, ARX0);
+	d_B = XMVectorSplatX(box2.size);
+	NoIntersection = XMVectorOrInt(NoIntersection,
+		XMVectorGreater(XMVectorAbs(d), XMVectorAdd(d1, d_B)));
+
+	d = XMVector3Dot(t, RX1);
+	d1 = XMVector3Dot(box1.size, ARX1);
+	d_B = XMVectorSplatY(box2.size);
+	NoIntersection = XMVectorOrInt(NoIntersection,
+		XMVectorGreater(XMVectorAbs(d), XMVectorAdd(d1, d_B)));
+
+	d = XMVector3Dot(t, RX2);
+	d1 = XMVector3Dot(box1.size, ARX2);
+	d_B = XMVectorSplatZ(box2.size);
+	NoIntersection = XMVectorOrInt(NoIntersection,
+		XMVectorGreater(XMVectorAbs(d), XMVectorAdd(d1, d_B)));
+
+	d = XMVector3Dot(t, XMVectorPermute<XM_PERMUTE_0W, XM_PERMUTE_1Z, XM_PERMUTE_0Y, XM_PERMUTE_0X>(RX0, XMVectorNegate(RX0)));
+	d1 = XMVector3Dot(box1.size, XMVectorSwizzle<XM_SWIZZLE_W, XM_SWIZZLE_Z, XM_SWIZZLE_Y, XM_SWIZZLE_X>(ARX0));
+	d_B = XMVector3Dot(box2.size, XMVectorSwizzle<XM_SWIZZLE_W, XM_SWIZZLE_Z, XM_SWIZZLE_Y, XM_SWIZZLE_X>(AR0X));
+	NoIntersection = XMVectorOrInt(NoIntersection,
+		XMVectorGreater(XMVectorAbs(d), XMVectorAdd(d1, d_B)));
+
+	d = XMVector3Dot(t, XMVectorPermute<XM_PERMUTE_0W, XM_PERMUTE_1Z, XM_PERMUTE_0Y, XM_PERMUTE_0X>(RX1, XMVectorNegate(RX1)));
+	d1 = XMVector3Dot(box1.size, XMVectorSwizzle<XM_SWIZZLE_W, XM_SWIZZLE_Z, XM_SWIZZLE_Y, XM_SWIZZLE_X>(ARX1));
+	d_B = XMVector3Dot(box2.size, XMVectorSwizzle<XM_SWIZZLE_Z, XM_SWIZZLE_W, XM_SWIZZLE_X, XM_SWIZZLE_Y>(AR0X));
+	NoIntersection = XMVectorOrInt(NoIntersection,
+		XMVectorGreater(XMVectorAbs(d), XMVectorAdd(d1, d_B)));
+
+	d = XMVector3Dot(t, XMVectorPermute<XM_PERMUTE_0W, XM_PERMUTE_1Z, XM_PERMUTE_0Y, XM_PERMUTE_0X>(RX2, XMVectorNegate(RX2)));
+	d1 = XMVector3Dot(box1.size, XMVectorSwizzle<XM_SWIZZLE_W, XM_SWIZZLE_Z, XM_SWIZZLE_Y, XM_SWIZZLE_X>(ARX2));
+	d_B = XMVector3Dot(box2.size, XMVectorSwizzle<XM_SWIZZLE_Y, XM_SWIZZLE_X, XM_SWIZZLE_W, XM_SWIZZLE_Z>(AR0X));
+	NoIntersection = XMVectorOrInt(NoIntersection,
+		XMVectorGreater(XMVectorAbs(d), XMVectorAdd(d1, d_B)));
+
+	d = XMVector3Dot(t, XMVectorPermute<XM_PERMUTE_0Z, XM_PERMUTE_0W, XM_PERMUTE_1X, XM_PERMUTE_0Y>(RX0, XMVectorNegate(RX0)));
+	d1 = XMVector3Dot(box1.size, XMVectorSwizzle<XM_SWIZZLE_Z, XM_SWIZZLE_W, XM_SWIZZLE_X, XM_SWIZZLE_Y>(ARX0));
+	d_B = XMVector3Dot(box2.size, XMVectorSwizzle<XM_SWIZZLE_W, XM_SWIZZLE_Z, XM_SWIZZLE_Y, XM_SWIZZLE_X>(AR1X));
+	NoIntersection = XMVectorOrInt(NoIntersection,
+		XMVectorGreater(XMVectorAbs(d), XMVectorAdd(d1, d_B)));
+
+	d = XMVector3Dot(t, XMVectorPermute<XM_PERMUTE_0Z, XM_PERMUTE_0W, XM_PERMUTE_1X, XM_PERMUTE_0Y>(RX1, XMVectorNegate(RX1)));
+	d1 = XMVector3Dot(box1.size, XMVectorSwizzle<XM_SWIZZLE_Z, XM_SWIZZLE_W, XM_SWIZZLE_X, XM_SWIZZLE_Y>(ARX1));
+	d_B = XMVector3Dot(box2.size, XMVectorSwizzle<XM_SWIZZLE_Z, XM_SWIZZLE_W, XM_SWIZZLE_X, XM_SWIZZLE_Y>(AR1X));
+	NoIntersection = XMVectorOrInt(NoIntersection,
+		XMVectorGreater(XMVectorAbs(d), XMVectorAdd(d1, d_B)));
+
+	d = XMVector3Dot(t, XMVectorPermute<XM_PERMUTE_0Z, XM_PERMUTE_0W, XM_PERMUTE_1X, XM_PERMUTE_0Y>(RX2, XMVectorNegate(RX2)));
+	d1 = XMVector3Dot(box1.size, XMVectorSwizzle<XM_SWIZZLE_Z, XM_SWIZZLE_W, XM_SWIZZLE_X, XM_SWIZZLE_Y>(ARX2));
+	d_B = XMVector3Dot(box2.size, XMVectorSwizzle<XM_SWIZZLE_Y, XM_SWIZZLE_X, XM_SWIZZLE_W, XM_SWIZZLE_Z>(AR1X));
+	NoIntersection = XMVectorOrInt(NoIntersection,
+		XMVectorGreater(XMVectorAbs(d), XMVectorAdd(d1, d_B)));
+
+	d = XMVector3Dot(t, XMVectorPermute<XM_PERMUTE_1Y, XM_PERMUTE_0X, XM_PERMUTE_0W, XM_PERMUTE_0Z>(RX0, XMVectorNegate(RX0)));
+	d1 = XMVector3Dot(box1.size, XMVectorSwizzle<XM_SWIZZLE_Y, XM_SWIZZLE_X, XM_SWIZZLE_W, XM_SWIZZLE_Z>(ARX0));
+	d_B = XMVector3Dot(box2.size, XMVectorSwizzle<XM_SWIZZLE_W, XM_SWIZZLE_Z, XM_SWIZZLE_Y, XM_SWIZZLE_X>(AR2X));
+	NoIntersection = XMVectorOrInt(NoIntersection,
+		XMVectorGreater(XMVectorAbs(d), XMVectorAdd(d1, d_B)));
+
+	d = XMVector3Dot(t, XMVectorPermute<XM_PERMUTE_1Y, XM_PERMUTE_0X, XM_PERMUTE_0W, XM_PERMUTE_0Z>(RX1, XMVectorNegate(RX1)));
+	d1 = XMVector3Dot(box1.size, XMVectorSwizzle<XM_SWIZZLE_Y, XM_SWIZZLE_X, XM_SWIZZLE_W, XM_SWIZZLE_Z>(ARX1));
+	d_B = XMVector3Dot(box2.size, XMVectorSwizzle<XM_SWIZZLE_Z, XM_SWIZZLE_W, XM_SWIZZLE_X, XM_SWIZZLE_Y>(AR2X));
+	NoIntersection = XMVectorOrInt(NoIntersection,
+		XMVectorGreater(XMVectorAbs(d), XMVectorAdd(d1, d_B)));
+
+	d = XMVector3Dot(t, XMVectorPermute<XM_PERMUTE_1Y, XM_PERMUTE_0X, XM_PERMUTE_0W, XM_PERMUTE_0Z>(RX2, XMVectorNegate(RX2)));
+	d1 = XMVector3Dot(box1.size, XMVectorSwizzle<XM_SWIZZLE_Y, XM_SWIZZLE_X, XM_SWIZZLE_W, XM_SWIZZLE_Z>(ARX2));
+	d_B = XMVector3Dot(box2.size, XMVectorSwizzle<XM_SWIZZLE_Y, XM_SWIZZLE_X, XM_SWIZZLE_W, XM_SWIZZLE_Z>(AR2X));
+	NoIntersection = XMVectorOrInt(NoIntersection,
+		XMVectorGreater(XMVectorAbs(d), XMVectorAdd(d1, d_B)));
+
+	return XMVector4NotEqualInt(NoIntersection, XMVectorTrueInt());
+}
+
+bool Collision::CheckBox2Sphere(const Box& box, const Sphere& sphere)
+{
+	// box基準の球の中心位置
+	XMVECTOR SphereCenter = XMVector3InverseRotate(XMVectorSubtract(sphere.center, box.center), box.rotaQuaternion);
+
+	// --------------------
+	// sphereとboxの距離を求める
+	// --------------------
+
+	XMVECTOR distance = XMVectorZero();
+
+	// 各次元について距離を求める
+	XMVECTOR LessThanMin = XMVectorLess(SphereCenter, XMVectorNegate(box.size));
+	XMVECTOR GreaterThanMax = XMVectorGreater(SphereCenter, box.size);
+
+	XMVECTOR MinDelta = XMVectorAdd(SphereCenter, box.size);
+	XMVECTOR MaxDelta = XMVectorSubtract(SphereCenter, box.size);
+
+	// 比較に基づき、各次元値を選択します。
+	distance = XMVectorSelect(distance, MinDelta, LessThanMin);
+	distance = XMVectorSelect(distance, MaxDelta, GreaterThanMax);
+
+	// 球の半径
+	XMVECTOR SphereRadius = XMVectorReplicatePtr(&sphere.radius);
+
+	// 距離と半径の2乗を求める
+	XMVECTOR sqDistance = XMVector3Dot(distance, distance);
+	XMVECTOR SphereRadiusSq = XMVectorMultiply(SphereRadius, SphereRadius);
+
+	return !XMVector4Greater(sqDistance, SphereRadiusSq);
 }

@@ -7,6 +7,8 @@
 #include <vector>
 
 #include <GameObject/GameObj.h>
+#include <3D/ParticleMgr.h>
+#include <CollisionMgr.h>
 
 /// @brief 自機クラス
 class Player
@@ -22,17 +24,22 @@ class Player
 
 	std::vector<std::weak_ptr<GameObj>> shotTargetObjPt;
 
-	uint16_t hp;
+	std::shared_ptr<ParticleMgr> bulParticle;
+
+	float bulHomingRaito = 0.05f;
 
 public:
-	using GameObj::GameObj;
+	Player(Camera* camera,
+		   ObjModel* model,
+		   const DirectX::XMFLOAT3& pos = { 0,0,0 });
+
+	inline auto createCollider() { return CollisionMgr::ColliderType{ .obj = this, .colliderR = this->getScaleF3().z }; }
+
+	inline float getBulHomingRaito() const { return bulHomingRaito; }
+	inline void setBulHomingRaito(float raito) { bulHomingRaito = raito; }
 
 	inline uint16_t getBulLife() const { return bulLife; }
 	inline void setBulLife(uint16_t bulLife) { this->bulLife = bulLife; }
-
-	uint16_t getHp() const { return hp; }
-	void setHp(uint16_t hp) { this->hp = hp; }
-	bool damage(uint16_t damegeNum, bool killFlag = true);
 
 	XMVECTOR getLookVec(float len = 1.f);
 
@@ -67,6 +74,8 @@ public:
 	inline const DirectX::XMFLOAT2& getAim2DPos() const { return aim2DPos; }
 	inline void setAim2DPos(const DirectX::XMFLOAT2& screenPos) { aim2DPos = screenPos; }
 
+	inline void drawWithUpdateBulParticle() { bulParticle->drawWithUpdate(); }
+
 	/// @brief 弾発射
 	/// @param camera カメラオブジェクトのポインタ
 	/// @param model 弾のモデル
@@ -74,9 +83,9 @@ public:
 	/// @param bulScale 弾の大きさ
 	/// @return	ターゲットを設定したかどうか
 	bool shotAll(Camera* camera,
-			  ObjModel* model,
-			  float speed = 1.f,
-			  float bulScale = 10.f);
+				 ObjModel* model,
+				 float speed = 1.f,
+				 float bulScale = 10.f);
 
 	void additionalUpdate() override;
 	void additionalDraw(Light* light) override;

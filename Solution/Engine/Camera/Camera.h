@@ -116,6 +116,9 @@ public:
 
 	inline float getFogAngleYRad() const { return fogAngleYRad; }
 
+	XMFLOAT3 screenPos2WorldPos(const XMFLOAT3& screenPos) const;
+	XMVECTOR screenPos2WorldPosVec(const XMFLOAT3& screenPos) const;
+
 	XMFLOAT3 calcLook() const;
 
 	/// @brief カメラを回転

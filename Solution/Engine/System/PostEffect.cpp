@@ -100,6 +100,13 @@ void PostEffect::createGraphicsPipelineState(const wchar_t* psPath)
 	ComPtr<ID3DBlob> psBlob = nullptr; // ピクセルシェーダオブジェクト
 	ComPtr<ID3DBlob> errorBlob = nullptr; // エラーオブジェクト
 
+	constexpr UINT compileFlag =
+#ifdef _DEBUG
+		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#else
+		0;
+#endif // _DEBUG
+
 	constexpr const char hlslData[] = "\n\
 #include \"PostEffect.hlsli\"\n\
 VSOutput main(float4 pos : POSITION, float2 uv : TEXCOORD)\n\
@@ -118,7 +125,7 @@ VSOutput main(float4 pos : POSITION, float2 uv : TEXCOORD)\n\
 		D3D_COMPILE_STANDARD_FILE_INCLUDE,
 		"main",
 		"vs_5_0",
-		0,
+		compileFlag,
 		0,
 		&vsBlob,
 		&errorBlob
@@ -145,7 +152,7 @@ VSOutput main(float4 pos : POSITION, float2 uv : TEXCOORD)\n\
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "ps_5_0", // エントリーポイント名、シェーダーモデル指定
-		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
+		compileFlag,
 		0,
 		&psBlob, &errorBlob);
 
@@ -214,7 +221,7 @@ VSOutput main(float4 pos : POSITION, float2 uv : TEXCOORD)\n\
 	gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 
 	gpipeline.NumRenderTargets = 1; // 描画対象は1つ
-	gpipeline.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM; // 0～255指定のRGBA
+	gpipeline.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // 0～255指定のRGBA
 	gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 
 	// デスクリプタテーブルの設定

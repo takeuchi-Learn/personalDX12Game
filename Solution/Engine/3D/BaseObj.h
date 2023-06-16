@@ -64,10 +64,10 @@ public:
 	}
 
 	XMFLOAT2 calcScreenPos();
-	inline XMFLOAT3 calcScreenPosF3()
+	inline XMFLOAT3 calcScreenPosF3(float z = 0.f)
 	{
 		const XMFLOAT2 pos = calcScreenPos();
-		return XMFLOAT3(pos.x, pos.y, 0.f);
+		return XMFLOAT3(pos.x, pos.y, z);
 	}
 
 #pragma region アクセッサ

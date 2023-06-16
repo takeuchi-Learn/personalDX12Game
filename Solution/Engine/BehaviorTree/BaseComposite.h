@@ -10,9 +10,14 @@
  /// @brief ノードの結果
 enum class NODE_RESULT : uint8_t
 {
-	FAIL,		/// 失敗
-	SUCCESS,	/// 成功
-	RUNNING,	/// 実行中
+	/// @brief 失敗
+	FAIL,
+
+	/// @brief 成功
+	SUCCESS,
+
+	/// @brief 実行中
+	RUNNING,
 };
 
 /// @brief タスククラス

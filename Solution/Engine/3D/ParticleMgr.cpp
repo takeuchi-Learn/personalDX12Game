@@ -291,13 +291,20 @@ void ParticleMgr::InitializeGraphicsPipeline()
 	ComPtr<ID3DBlob> gsBlob;	// ジオメトリシェーダオブジェクト
 	ComPtr<ID3DBlob> errorBlob; // エラーオブジェクト
 
+	constexpr UINT compileFlag =
+#ifdef _DEBUG
+		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+#else
+		0;
+#endif // _DEBUG
+
 	// 頂点シェーダの読み込みとコンパイル
 	result = D3DCompileFromFile(
 		L"Resources/Shaders/ParticleVS.hlsl",	// シェーダファイル名
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "vs_5_0",	// エントリーポイント名、シェーダーモデル指定
-		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
+		compileFlag,
 		0,
 		&vsBlob, &errorBlob);
 	if (FAILED(result))
@@ -321,7 +328,7 @@ void ParticleMgr::InitializeGraphicsPipeline()
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "ps_5_0",	// エントリーポイント名、シェーダーモデル指定
-		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
+		compileFlag,
 		0,
 		&psBlob, &errorBlob);
 	if (FAILED(result))
@@ -345,7 +352,7 @@ void ParticleMgr::InitializeGraphicsPipeline()
 		nullptr,
 		D3D_COMPILE_STANDARD_FILE_INCLUDE, // インクルード可能にする
 		"main", "gs_5_0",	// エントリーポイント名、シェーダーモデル指定
-		D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION, // デバッグ用設定
+		compileFlag,
 		0,
 		&gsBlob, &errorBlob);
 	if (FAILED(result))
@@ -429,7 +436,7 @@ void ParticleMgr::InitializeGraphicsPipeline()
 	// デプスの書き込みを禁止
 	gpipeline.DepthStencilState.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 
-	constexpr UINT renderTargetNum = min(PostEffect::renderTargetNum, _countof(gpipeline.BlendState.RenderTarget));
+	constexpr UINT renderTargetNum = std::min(PostEffect::renderTargetNum, UINT(_countof(gpipeline.BlendState.RenderTarget)));
 
 	// ブレンドステートの設定
 	for (UINT i = 0u; i < renderTargetNum; ++i)
@@ -448,9 +455,8 @@ void ParticleMgr::InitializeGraphicsPipeline()
 	gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
 
 	gpipeline.NumRenderTargets = renderTargetNum;	// 描画対象の数
-	for (UINT i = 0u; i < renderTargetNum; ++i)
-	{
-		gpipeline.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM; // 0～255指定のRGBA
+	for (UINT i = 0u; i < renderTargetNum; ++i) {
+		gpipeline.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // 0～255指定のRGBA
 	}
 	gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
 
@@ -517,6 +523,22 @@ void ParticleMgr::LoadTexture(const wchar_t* filePath)
 		filePath, WIC_FLAGS_NONE,
 		&metadata, scratchImg);
 	assert(SUCCEEDED(result));
+
+	ScratchImage mipChain{};
+	// ミップマップ生成
+	result = GenerateMipMaps(
+		scratchImg.GetImages(),
+		scratchImg.GetImageCount(),
+		scratchImg.GetMetadata(),
+		TEX_FILTER_DEFAULT,
+		0,
+		mipChain);
+
+	if (SUCCEEDED(result))
+	{
+		scratchImg = std::move(mipChain);
+		metadata = scratchImg.GetMetadata();
+	}
 
 	const Image* img = scratchImg.GetImage(0, 0, 0); // 生データ抽出
 

@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <GameObject/GameObj.h>
+#include <3D/ParticleMgr.h>
 
 /// @brief 自機の弾クラス
 class PlayerBullet
@@ -10,6 +11,10 @@ class PlayerBullet
 	float speed = 1.f;
 
 	std::weak_ptr<GameObj> targetObjPt;
+
+	std::weak_ptr<ParticleMgr> particle;
+
+	float homingRaito = 0.05f;
 
 public:
 
@@ -21,6 +26,11 @@ private:
 
 public:
 	using GameObj::GameObj;
+
+	inline void setHomingRaito(float raito) { homingRaito = raito; }
+	inline float getHomingRaito() const { return homingRaito; }
+
+	inline void setParticle(const std::weak_ptr<ParticleMgr>& particle) { this->particle = particle; }
 
 	inline void setLife(uint16_t life) { this->life = life; }
 	inline uint16_t getLife() const { return life; }

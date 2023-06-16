@@ -73,24 +73,24 @@ public:
 	// アクセッサ
 	// --------------------
 	inline void setAnchorPoint(const XMFLOAT2& ap) { anchorpoint = ap; dirty = true; }
-	inline XMFLOAT2 getAnchorPoint() { return anchorpoint; }
+	inline const XMFLOAT2& getAnchorPoint() const { return anchorpoint; }
 
 	inline void setSize(const XMFLOAT2& size) { this->size = size; dirty = true; }
-	inline XMFLOAT2 getSize() { return size; }
+	inline const XMFLOAT2& getSize() const { return size; }
 
 	inline void setTexLeftTop(const XMFLOAT2& texLT) { texLeftTop = texLT; dirty = true; }
-	inline XMFLOAT2 getTexLeftTop() { return texLeftTop; }
+	inline const XMFLOAT2& getTexLeftTop() const { return texLeftTop; }
 
 	inline void setTexNum(const UINT& texNum) { texNumber = texNum; dirty = true; }
-	inline UINT getTexNum() { return texNumber; }
+	inline UINT getTexNum() const { return texNumber; }
 
 	inline void setTexSize(const XMFLOAT2& texSize) { this->texSize = texSize; dirty = true; }
-	inline XMFLOAT2 getTexSize() { return texSize; }
+	inline const XMFLOAT2& getTexSize() const { return texSize; }
 
 	inline void setFlipX(const bool isFlipX) { this->isFlipX = isFlipX; dirty = true; }
-	inline bool getFlipX() { return isFlipX; }
+	inline bool getFlipX() const { return isFlipX; }
 	inline void setFlipY(const bool isFlipY) { this->isFlipY = isFlipY; dirty = true; }
-	inline bool getFlipY() { return isFlipY; }
+	inline bool getFlipY() const { return isFlipY; }
 
 public:
 	// --------------------

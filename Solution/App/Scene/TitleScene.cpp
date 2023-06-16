@@ -60,6 +60,7 @@ void TitleScene::update()
 
 void TitleScene::update_normal()
 {
+	// ロゴを揺らす
 	constexpr float logoMoveRange = 16.f;
 	titleLogo->position.y = logoMoveRange * std::sin((float)timer->getNowTime() / Timer::oneSecF);
 
