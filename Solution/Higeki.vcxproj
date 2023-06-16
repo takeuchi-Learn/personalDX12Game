@@ -142,7 +142,7 @@
     <ClCompile Include="Engine\3D\Obj\ObjModel.cpp" />
     <ClCompile Include="App\GameObject\Player\Player.cpp" />
     <ClCompile Include="App\GameObject\Player\PlayerBullet.cpp" />
-    <ClCompile Include="App\Scene\RailShoot.cpp" />
+    <ClCompile Include="App\Scene\RailShootScene.cpp" />
     <ClCompile Include="Engine\Sound\SoundBase.cpp" />
     <ClCompile Include="Engine\2D\SpriteBase.cpp" />
     <ClCompile Include="Engine\3D\Obj\Object3d.cpp" />
@@ -193,7 +193,7 @@
     <ClInclude Include="Engine\3D\Obj\ObjModel.h" />
     <ClInclude Include="App\GameObject\Player\Player.h" />
     <ClInclude Include="App\GameObject\Player\PlayerBullet.h" />
-    <ClInclude Include="App\Scene\RailShoot.h" />
+    <ClInclude Include="App\Scene\RailShootScene.h" />
     <ClInclude Include="Engine\Sound\SoundBase.h" />
     <ClInclude Include="Engine\2D\SpriteBase.h" />
     <ClInclude Include="Engine\3D\Obj\Object3d.h" />

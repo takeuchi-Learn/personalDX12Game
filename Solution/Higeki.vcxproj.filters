@@ -201,7 +201,7 @@
     <ClCompile Include="App\GameObject\Player\Player.cpp">
       <Filter>GameObject\Player</Filter>
     </ClCompile>
-    <ClCompile Include="App\Scene\RailShoot.cpp">
+    <ClCompile Include="App\Scene\RailShootScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
     <ClCompile Include="App\GameObject\Player\PlayerBullet.cpp">
@@ -347,7 +347,7 @@
     <ClInclude Include="App\GameObject\Player\Player.h">
       <Filter>GameObject\Player</Filter>
     </ClInclude>
-    <ClInclude Include="App\Scene\RailShoot.h">
+    <ClInclude Include="App\Scene\RailShootScene.h">
       <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="App\GameObject\Player\PlayerBullet.h">

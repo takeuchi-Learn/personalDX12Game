@@ -17,7 +17,7 @@
 #include <Util/Util.h>
 
 /// @brief レールシューティングのシーン
-class RailShoot
+class RailShootScene
 	: public GameScene
 {
 	DX12Base* dxBase = nullptr;
@@ -243,12 +243,11 @@ private:
 	void initObj3d();
 
 public:
-	RailShoot();
+	RailShootScene();
+	~RailShootScene();
 
 	void start() override;
 	void update() override;
 	void drawObj3d() override;
 	void drawFrontSprite() override;
-
-	~RailShoot();
 };

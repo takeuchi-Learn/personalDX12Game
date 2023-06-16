@@ -1,6 +1,6 @@
 ﻿#include "TitleScene.h"
 
-#include "RailShoot.h"
+#include "RailShootScene.h"
 #include "System/SceneManager.h"
 #include <DirectXMath.h>
 #include <Util/Util.h>
@@ -9,10 +9,9 @@ using namespace DirectX;
 
 TitleScene::TitleScene()
 	: timer(std::make_unique<Timer>()),
-	update_proc(std::bind(&TitleScene::update_normal, this))
+	update_proc(std::bind(&TitleScene::update_normal, this)),
+	input(Input::ins())
 {
-	input = Input::getInstance();
-
 	shortBridge = std::make_unique<Sound>("Resources/SE/Shortbridge29-1.wav");
 	bgm = std::make_unique<Sound>("Resources/BGM/Detour.wav");
 
@@ -44,7 +43,7 @@ void TitleScene::start()
 {
 	// 次シーンの読み込み開始
 	sceneThread.reset(new MyThread());
-	sceneThread->thread.reset(new std::thread([&] { nextScene = std::make_unique<RailShoot>(); }));
+	sceneThread->thread.reset(new std::thread([&] { nextScene = std::make_unique<RailShootScene>(); }));
 
 	Sound::SoundPlayWave(bgm.get(), XAUDIO2_LOOP_INFINITE, 0.2f);
 	timer->reset();

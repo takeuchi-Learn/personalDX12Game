@@ -1,4 +1,4 @@
-﻿#include "RailShoot.h"
+﻿#include "RailShootScene.h"
 
 #include "BossScene.h"
 #include "GameOverScene.h"
@@ -69,7 +69,7 @@ namespace
 	};
 }
 
-void RailShoot::loadBackObj()
+void RailShootScene::loadBackObj()
 {
 	// 背景の天球
 	{
@@ -94,7 +94,7 @@ void RailShoot::loadBackObj()
 	}
 }
 
-void RailShoot::loadLane()
+void RailShootScene::loadLane()
 {
 	{
 		// 制御点の情報はCSVから読み込む
@@ -211,7 +211,7 @@ void RailShoot::loadLane()
 	}
 }
 
-void RailShoot::loadEnemyScript()
+void RailShootScene::loadEnemyScript()
 {
 	const auto csvData = Util::loadCsv("Resources/enemyScript.csv", true, ',', "//");
 	{
@@ -227,14 +227,14 @@ void RailShoot::loadEnemyScript()
 	}
 }
 
-void RailShoot::initCamera()
+void RailShootScene::initCamera()
 {
 	camera = std::make_unique<CameraObj>(nullptr);
 	camera->setFarZ(5000.f);
 	camera->setEye2TargetLen(200.f);
 }
 
-void RailShoot::initPlayer()
+void RailShootScene::initPlayer()
 {
 	playerModel = std::make_unique<ObjModel>("Resources/player", "player");
 	playerBulModel = std::make_unique<ObjModel>("Resources/bullet", "bullet", 0U, true);
@@ -261,7 +261,7 @@ void RailShoot::initPlayer()
 	};
 }
 
-void RailShoot::initSprite()
+void RailShootScene::initSprite()
 {
 	spriteBase = std::make_unique<SpriteBase>(SpriteBase::BLEND_MODE::ALPHA);
 
@@ -308,7 +308,7 @@ void RailShoot::initSprite()
 	}
 }
 
-void RailShoot::initEnemy()
+void RailShootScene::initEnemy()
 {
 	enemyModel = std::make_unique<ObjModel>("Resources/tori", "tori", 0U, true);
 	enemyBulModel = std::make_unique<ObjModel>("Resources/bullet", "bullet", 0U, true);
@@ -332,20 +332,20 @@ void RailShoot::initEnemy()
 	};
 }
 
-void RailShoot::initSound()
+void RailShootScene::initSound()
 {
 	killSe = std::make_unique<Sound>("Resources/SE/Sys_Set03-click.wav");
 	bgm = std::make_unique<Sound>("Resources/BGM/A-Sense-of-Loss.wav");
 }
 
-void RailShoot::initMisc()
+void RailShootScene::initMisc()
 {
-	update_proc = std::bind(&RailShoot::update_start, this);
+	update_proc = std::bind(&RailShootScene::update_start, this);
 	timer = std::make_unique<Timer>();
 	startSceneChangeTime = 0u;
 }
 
-void RailShoot::initObj3d()
+void RailShootScene::initObj3d()
 {
 	// 背景のパイプライン
 	backPipelineSet = Object3d::createGraphicsPipeline(Object3d::BLEND_MODE::ALPHA,
@@ -370,7 +370,7 @@ void RailShoot::initObj3d()
 	loadLane();
 }
 
-RailShoot::RailShoot()
+RailShootScene::RailShootScene()
 	: dxBase(DX12Base::getInstance()),
 	input(Input::getInstance())
 {
@@ -400,7 +400,19 @@ RailShoot::RailShoot()
 	initObj3d();
 }
 
-void RailShoot::start()
+RailShootScene::~RailShootScene()
+{
+	PostEffect::getInstance()->setAlpha(1.f);
+	PostEffect::getInstance()->setMosaicNum(XMFLOAT2(WinAPI::window_width,
+													 WinAPI::window_height));
+	PostEffect::getInstance()->setRgbShiftNum({ 0.f, 0.f });
+	PostEffect::getInstance()->setSpeedLineIntensity(0.f);
+
+	PostEffect::getInstance()->setVignIntensity(0.25f);
+	PostEffect::getInstance()->changePipeLine(0U);
+}
+
+void RailShootScene::start()
 {
 	cursorGr->isInvisible = true;
 	for (auto& i : operInst)
@@ -422,7 +434,7 @@ void RailShoot::start()
 	startSceneChangeTime = timer->getNowTime();
 }
 
-void RailShoot::update()
+void RailShootScene::update()
 {
 #ifdef _DEBUG
 
@@ -453,13 +465,13 @@ void RailShoot::update()
 	camera->update();
 }
 
-void RailShoot::startRgbShift()
+void RailShootScene::startRgbShift()
 {
 	rgbShiftFlag = true;
 	startRgbShiftTime = timer->getNowTime();
 }
 
-void RailShoot::updateRgbShift()
+void RailShootScene::updateRgbShift()
 {
 	if (!rgbShiftFlag) { return; }
 
@@ -482,7 +494,7 @@ void RailShoot::updateRgbShift()
 	PostEffect::getInstance()->setRgbShiftNum({ easeRate * rgbShiftMumMax, 0.f });
 }
 
-void RailShoot::rotationBack()
+void RailShootScene::rotationBack()
 {
 	// シーン遷移中も背景は回す
 	XMFLOAT2 shiftUv = backModel->getShiftUv();
@@ -493,7 +505,7 @@ void RailShoot::rotationBack()
 	backModel->setShivtUv(shiftUv);
 }
 
-void RailShoot::addEnemy(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& vel, float scale)
+void RailShootScene::addEnemy(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& vel, float scale)
 {
 	auto& i = enemy.emplace_front(std::make_shared<NormalEnemy>(camera.get(), enemyModel.get(), enemyBulModel.get(), pos));
 	i->setScale(scale);
@@ -504,15 +516,15 @@ void RailShoot::addEnemy(const DirectX::XMFLOAT3& pos, const DirectX::XMFLOAT3& 
 }
 
 template<class NextScene>
-void RailShoot::changeNextScene()
+void RailShootScene::changeNextScene()
 {
 	PostEffect::getInstance()->changePipeLine(0U);
 
-	update_proc = std::bind(&RailShoot::update_end<NextScene>, this);
+	update_proc = std::bind(&RailShootScene::update_end<NextScene>, this);
 	startSceneChangeTime = timer->getNowTime();
 }
 
-void RailShoot::update_start()
+void RailShootScene::update_start()
 {
 	const Timer::timeType nowTime = timer->getNowTime() - startSceneChangeTime;
 	if (nowTime >= sceneChangeTime)
@@ -536,7 +548,7 @@ void RailShoot::update_start()
 	PostEffect::getInstance()->setSpeedLineIntensity(speedLineIntensity);
 }
 
-void RailShoot::update_appearPlayer()
+void RailShootScene::update_appearPlayer()
 {
 #ifdef _DEBUG
 	if (input->triggerKey(DIK_SPACE))
@@ -588,7 +600,7 @@ void RailShoot::update_appearPlayer()
 									  std::pow(fogRaito, 0.5f)));
 }
 
-void RailShoot::update_play()
+void RailShootScene::update_play()
 {
 	{
 		// マウスカーソルの位置をパッド入力に合わせてずらす
@@ -820,7 +832,7 @@ void RailShoot::update_play()
 	++nowFrame;
 }
 
-void RailShoot::update_exitPlayer()
+void RailShootScene::update_exitPlayer()
 {
 	const auto nowTime = exitPlayer->timer->getNowTime();
 
@@ -853,7 +865,7 @@ void RailShoot::update_exitPlayer()
 }
 
 template<class NextScene>
-void RailShoot::update_end()
+void RailShootScene::update_end()
 {
 	const Timer::timeType nowTime = timer->getNowTime() - startSceneChangeTime;
 
@@ -881,7 +893,7 @@ void RailShoot::update_end()
 	PostEffect::getInstance()->setNoiseIntensity(1.f - timeRaito);
 }
 
-void RailShoot::initFixedCam(const XMFLOAT3& startPos,
+void RailShootScene::initFixedCam(const XMFLOAT3& startPos,
 							 const XMFLOAT3& endPos)
 {
 	XMFLOAT3 eye = Util::lerp(startPos, endPos, 0.5f);
@@ -891,7 +903,7 @@ void RailShoot::initFixedCam(const XMFLOAT3& startPos,
 	camera->setTarget(startPos);
 }
 
-void RailShoot::startAppearPlayer()
+void RailShootScene::startAppearPlayer()
 {
 	// 登場演出の情報
 	appearPlayer = std::make_unique<AppearPlayer>(
@@ -929,11 +941,11 @@ void RailShoot::startAppearPlayer()
 	// 自機を演出開始位置に置く
 	player->setPos(appearPPosStart);
 
-	update_proc = std::bind(&RailShoot::update_appearPlayer, this);
+	update_proc = std::bind(&RailShootScene::update_appearPlayer, this);
 	appearPlayer->timer->reset();
 }
 
-void RailShoot::endAppearPlayer()
+void RailShootScene::endAppearPlayer()
 {
 	playerHpBarNowRaito = 1.f;
 	playerFrontHpBarNowRaito = 1.f;
@@ -962,11 +974,11 @@ void RailShoot::endAppearPlayer()
 	// マウスカーソル(照準)を画面中央に置く
 	input->setMousePos(WinAPI::window_width / 2, WinAPI::window_height / 2);
 
-	update_proc = std::bind(&RailShoot::update_play, this);
+	update_proc = std::bind(&RailShootScene::update_play, this);
 	appearPlayer.reset(nullptr);
 }
 
-void RailShoot::startExitPlayer()
+void RailShootScene::startExitPlayer()
 {
 	cursorGr->isInvisible = true;
 	for (auto& i : operInst)
@@ -989,17 +1001,17 @@ void RailShoot::startExitPlayer()
 											  });
 	camera->setParentObj(nullptr);
 
-	update_proc = std::bind(&RailShoot::update_exitPlayer, this);
+	update_proc = std::bind(&RailShootScene::update_exitPlayer, this);
 	exitPlayer->timer->reset();
 }
 
-void RailShoot::endExitPlayer()
+void RailShootScene::endExitPlayer()
 {
 	exitPlayer.reset(nullptr);
 	changeNextScene<BossScene>();
 }
 
-void RailShoot::updateRailPos()
+void RailShootScene::updateRailPos()
 {
 	float raito = float(splineNowFrame++) / float(splineFrameMax);
 	if (raito >= 1.f)
@@ -1050,7 +1062,7 @@ void RailShoot::updateRailPos()
 // --------------------
 // 自機移動回転
 // --------------------
-void RailShoot::movePlayer()
+void RailShootScene::movePlayer()
 {
 	// パッドの入力値
 	XMFLOAT2 inputVal = input->hitPadLStickRaito();
@@ -1185,7 +1197,7 @@ void RailShoot::movePlayer()
 	player->setRotation(playerRot);
 }
 
-void RailShoot::updatePlayerShotTarget(const XMFLOAT2& aim2DPos)
+void RailShootScene::updatePlayerShotTarget(const XMFLOAT2& aim2DPos)
 {
 	const float cursorR2D = cursorGr->getSize().x / 2.f;
 	const XMVECTOR camPosVec = XMLoadFloat3(&camera->getEye());
@@ -1221,7 +1233,7 @@ void RailShoot::updatePlayerShotTarget(const XMFLOAT2& aim2DPos)
 	}
 }
 
-void RailShoot::drawObj3d()
+void RailShootScene::drawObj3d()
 {
 	backObj->drawWithUpdate(light.get(), backPipelineSet);
 
@@ -1244,7 +1256,7 @@ void RailShoot::drawObj3d()
 	player->drawWithUpdateBulParticle();
 }
 
-void RailShoot::drawFrontSprite()
+void RailShootScene::drawFrontSprite()
 {
 	spriteBase->drawStart(dxBase->getCmdList());
 
@@ -1321,16 +1333,4 @@ void RailShoot::drawFrontSprite()
 
 		ImGui::End();
 	}
-}
-
-RailShoot::~RailShoot()
-{
-	PostEffect::getInstance()->setAlpha(1.f);
-	PostEffect::getInstance()->setMosaicNum(XMFLOAT2(WinAPI::window_width,
-													 WinAPI::window_height));
-	PostEffect::getInstance()->setRgbShiftNum({ 0.f, 0.f });
-	PostEffect::getInstance()->setSpeedLineIntensity(0.f);
-
-	PostEffect::getInstance()->setVignIntensity(0.25f);
-	PostEffect::getInstance()->changePipeLine(0U);
 }
