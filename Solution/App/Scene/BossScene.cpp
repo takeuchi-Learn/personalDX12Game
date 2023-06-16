@@ -152,7 +152,7 @@ void BossScene::initBoss()
 			float scale;
 		};
 		std::forward_list<BossPartsData> bossPartsData;
-		const auto bpdCsv = Util::loadCsv("Resources/bossPartsData.csv");
+		const auto& bpdCsv = Util::loadCsv("Resources/bossPartsData.csv");
 		for (auto& y : bpdCsv)
 		{
 			// 空行を飛ばす

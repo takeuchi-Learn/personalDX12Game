@@ -82,7 +82,7 @@ void RailShootScene::loadLane()
 {
 	{
 		// 制御点の情報はCSVから読み込む
-		const auto csvData = Util::loadCsv("Resources/splinePos.csv", true, ',', "//");
+		const auto& csvData = Util::loadCsv("Resources/splinePos.csv", true, ',', "//");
 
 		// 始点は原点
 		// startは2つ必要
@@ -197,7 +197,7 @@ void RailShootScene::loadLane()
 
 void RailShootScene::loadEnemyScript()
 {
-	const auto csvData = Util::loadCsv("Resources/enemyScript.csv", true, ',', "//");
+	const auto& csvData = Util::loadCsv("Resources/enemyScript.csv", true, ',', "//");
 	{
 		for (auto& y : csvData)
 		{
