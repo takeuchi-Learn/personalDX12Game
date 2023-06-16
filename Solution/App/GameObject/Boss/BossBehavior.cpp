@@ -103,7 +103,7 @@ void BossBehavior::loadSingleShotDataIni(ini_t* ini)
 
 bool BossBehavior::loadShotDataFileYml()
 {
-	constexpr const char filePath[] = "Resources/bossShotData.yml";
+	constexpr const char filePath[] = "Resources/DataFile/bossShotData.yml";
 
 	std::string data{};
 	{
