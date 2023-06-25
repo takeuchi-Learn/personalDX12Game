@@ -104,8 +104,8 @@ void RailShootScene::loadLane()
 	{
 		// モデルを読み込む
 		constexpr UINT wallModelTexNum = 0u;
-		wallModel.reset(new ObjModel("Resources/laneWall", "laneWall", wallModelTexNum, false));
-		ringModel.reset(new ObjModel("Resources/ring", "ring", wallModelTexNum, false));
+		wallModel.reset(new ObjModel("Resources/laneWall", "laneWall", wallModelTexNum, true));
+		ringModel.reset(new ObjModel("Resources/ring", "ring", wallModelTexNum, true));
 
 		// 制御点の数だけオブジェクトを置く
 		const size_t splinePointNum = splinePoint.size() - 2u;

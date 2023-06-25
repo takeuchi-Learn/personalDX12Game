@@ -8,6 +8,8 @@ SamplerState smp : register(s0); // 0番スロットに設定されたサンプ�
 // 光沢
 #define shininess (4.f)
 
+#define fresnelAmount (3)
+
 // ディザリング抜き
 void ScreenDoor(float2 screenPos, float alpha)
 {
@@ -25,6 +27,11 @@ void ScreenDoor(float2 screenPos, float alpha)
 	int2 ditherUv = int2((int)fmod(screenPos.x, 4.f), (int)fmod(screenPos.y, 4.f));
 	float doorNum = Bayer[ditherUv.y][ditherUv.x];
 	clip(doorNum - ditherLevel);
+}
+
+float fresnel(float amount, float3 normal, float3 view)
+{
+	return pow((1.f - saturate(dot(normalize(normal), normalize(view)))), amount);
 }
 
 PSOutput main(VSOutput input)
@@ -51,6 +58,17 @@ PSOutput main(VSOutput input)
 	
 	PSOutput output;
 	output.target0 = shadeColor * texcolor;
+	
+	{
+		float3 viewNormal = mul(view, float4(input.normal, 0.f)).xyz;
+		float3 pixel2Camera = cameraPos - input.worldPos.xyz;
+		pixel2Camera = normalize(mul(view, float4(pixel2Camera, 0.f)).xyz);
+		
+		float fresnelVal = fresnel(fresnelAmount, viewNormal, pixel2Camera);
+		
+		output.target0.rgb += fresnelVal;
+	}
+	
 	// target1を反転色にする
 	output.target1 = output.target0;
 

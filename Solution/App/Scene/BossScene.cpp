@@ -131,7 +131,7 @@ void BossScene::initEnemy()
 
 void BossScene::initBoss()
 {
-	bossBulModel = std::make_unique<ObjModel>("Resources/sphere", "sphere");
+	bossBulModel = std::make_unique<ObjModel>("Resources/sphere", "sphere", 0U, true);
 	boss = std::make_unique<BossEnemy>(camera.get(), nullptr);
 
 	boss->setPos(XMFLOAT3(0, boss->getScaleF3().y, 0));
@@ -142,7 +142,7 @@ void BossScene::initBoss()
 	boss->setAlive(false);
 
 	// ボスのパーツ
-	bossPartsModel = std::make_unique<ObjModel>("Resources/koshi", "koshi", 0U, false);
+	bossPartsModel = std::make_unique<ObjModel>("Resources/koshi", "koshi", 0U, true);
 
 	// パーツの位置をファイルから読み込む
 	{
