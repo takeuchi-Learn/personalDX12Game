@@ -66,7 +66,8 @@ PSOutput main(VSOutput input)
 		
 		float fresnelVal = fresnel(fresnelAmount, viewNormal, pixel2Camera);
 		
-		output.target0.rgb += fresnelVal;
+		//output.target0.rgb += fresnelVal;
+		output.target0.rgb *= fresnelVal > 0.3f ? 0.f : 1.f;
 	}
 	
 	// target1を反転色にする
