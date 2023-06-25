@@ -17,7 +17,7 @@ SamplerState smp : register(s0); // 0番スロットに設定されたサンプ�
 // 1 / 2.2
 #define gamma (0.4545454545454545f)
 
-#define colorNum (8.f)
+#define colorNum (2)
 
 float3 getBloomPixel(SamplerState smp, float2 uv, float2 texPixelSize)
 {
@@ -169,8 +169,9 @@ float4 main(VSOutput input) : SV_TARGET
 	// --------------------
 	// rgbずらし&ディザリング
 	// --------------------
-	float4 texColor0 = dither(tex0.Sample(smp, uv), uv, 1.f);
-	texColor0.g = dither(tex0.Sample(smp, uv + rgbShiftNum), uv, 1.f).g;
+	//float4 texColor0 = dither(tex0.Sample(smp, uv), uv, 1.f);
+	//texColor0.g = dither(tex0.Sample(smp, uv + rgbShiftNum), uv, 1.f).g;
+	float4 texColor0 = tex0.Sample(smp, uv);
 	texColor0 = pow(texColor0, gamma);
 
 	float noiseNum = noise(input.uv, time);
@@ -192,7 +193,7 @@ float4 main(VSOutput input) : SV_TARGET
 	float4 drawCol = float4(texColor0.rgb + sLineNum + vignNum + noiseNum + speedLineNum, alpha);
 	
 	// 色数を減らす
-	drawCol.rgb = floor(drawCol.rgb * colorNum) / colorNum;
+	//drawCol.rgb = floor(drawCol.rgb * colorNum) / colorNum;
 	
 	// ブルーム
 	drawCol.rgb += bloom(smp, uv).rgb;

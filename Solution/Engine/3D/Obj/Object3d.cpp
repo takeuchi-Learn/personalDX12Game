@@ -51,6 +51,7 @@ void Object3d::update()
 	if (SUCCEEDED(constBuffB0->Map(0, nullptr, (void**)&constMapB0)))
 	{
 		constMapB0->color = color; // RGBA
+		constMapB0->view = camera->getViewMatrix();
 		constMapB0->viewProj = camera->getViewProjectionMatrix();
 		constMapB0->world = matWorld;
 		constMapB0->cameraPos = camera->getEye();

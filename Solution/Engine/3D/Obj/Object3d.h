@@ -21,6 +21,7 @@ public:
 	struct ConstBufferDataB0
 	{
 		XMFLOAT4 color;
+		XMMATRIX view;
 		XMMATRIX viewProj;
 		XMMATRIX world;	// ワールド行列
 		XMFLOAT3 cameraPos;	// カメラ位置(ワールド座標)
