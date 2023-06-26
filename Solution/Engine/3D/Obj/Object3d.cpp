@@ -54,6 +54,7 @@ void Object3d::update()
 		constMapB0->viewProj = camera->getViewProjectionMatrix();
 		constMapB0->world = matWorld;
 		constMapB0->cameraPos = camera->getEye();
+		constMapB0->instanceCount = instanceCount;
 		constBuffB0->Unmap(0, nullptr);
 	}
 }
@@ -70,7 +71,7 @@ void Object3d::draw(Light* light, size_t ppState)
 
 	light->draw(3);
 
-	model->draw(dxBase->getCmdList());
+	model->draw(dxBase->getCmdList(), instanceCount);
 }
 
 void Object3d::drawWithUpdate(Light* light, size_t ppState)

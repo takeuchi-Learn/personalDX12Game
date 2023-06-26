@@ -104,7 +104,7 @@ void Mesh::createBuffers()
 	ibView.SizeInBytes = sizeIB;
 }
 
-void Mesh::draw(ID3D12GraphicsCommandList* cmdList)
+void Mesh::draw(ID3D12GraphicsCommandList* cmdList, UINT instanceCount)
 {
 	// 頂点バッファをセット
 	cmdList->IASetVertexBuffers(0, 1, &vbView);
@@ -118,7 +118,7 @@ void Mesh::draw(ID3D12GraphicsCommandList* cmdList)
 	cmdList->SetGraphicsRootConstantBufferView(1, constBuff->GetGPUVirtualAddress());
 
 	// 描画コマンド
-	cmdList->DrawIndexedInstanced((UINT)indices.size(), 1, 0, 0, 0);
+	cmdList->DrawIndexedInstanced((UINT)indices.size(), instanceCount, 0, 0, 0);
 }
 
 void Mesh::addSmoothData(unsigned short indexPosition, unsigned short indexVertex)
