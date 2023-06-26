@@ -90,7 +90,7 @@ public: // メンバ関数
 
 	/// @brief 描画
 	/// @param cmdList 命令発行先コマンドリスト
-	void draw(ID3D12GraphicsCommandList* cmdList);
+	void draw(ID3D12GraphicsCommandList* cmdList, UINT instanceCount);
 
 	/// @brief エッジ平滑化データ追加
 	/// @param indexPosition 座標インデックス

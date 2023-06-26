@@ -475,7 +475,7 @@ void ObjModel::init(const std::string& dirPath, const std::string& modelname, UI
 	loadTextures(directoryPath, texNum);
 }
 
-void ObjModel::draw(ID3D12GraphicsCommandList* cmdList)
+void ObjModel::draw(ID3D12GraphicsCommandList* cmdList, UINT instanceCount)
 {
 	if (materialDirty)
 	{
@@ -499,6 +499,6 @@ void ObjModel::draw(ID3D12GraphicsCommandList* cmdList)
 	// 全メッシュを描画
 	for (auto& mesh : meshes)
 	{
-		mesh->draw(cmdList);
+		mesh->draw(cmdList, instanceCount);
 	}
 }

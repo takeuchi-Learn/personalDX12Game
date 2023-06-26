@@ -24,6 +24,7 @@ public:
 		XMMATRIX viewProj;
 		XMMATRIX world;	// ワールド行列
 		XMFLOAT3 cameraPos;	// カメラ位置(ワールド座標)
+		uint32_t instanceCount;
 	};
 
 	// --------------------
@@ -57,6 +58,8 @@ public:
 private:
 	// 定数バッファ
 	ComPtr<ID3D12Resource> constBuffB0;
+
+	uint32_t instanceCount = 10u;
 
 public:
 

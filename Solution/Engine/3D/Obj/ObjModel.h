@@ -90,5 +90,5 @@ public:
 
 	/// @brief 描画
 	/// @param cmdLst 命令発行先コマンドリスト
-	void draw(ID3D12GraphicsCommandList* cmdList);
+	void draw(ID3D12GraphicsCommandList* cmdList, UINT instanceCount);
 };

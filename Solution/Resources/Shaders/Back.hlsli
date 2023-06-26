@@ -4,6 +4,7 @@ cbuffer cbuff0 : register(b0)
 	matrix viewProj;
 	matrix world; // ワールド行列
 	float3 cameraPos; // カメラ位置(ワールド座標)
+	uint instCount;
 };
 
 cbuffer cbuff1 : register(b1)
