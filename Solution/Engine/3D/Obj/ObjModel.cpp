@@ -194,17 +194,6 @@ void ObjModel::loadMaterial(const std::string& directoryPath, const std::string&
 	}
 }
 
-void ObjModel::staticInit()
-{
-	// 再初期化チェック
-	static bool initialized = false;
-	assert(!initialized);
-	initialized = true;
-
-	// メッシュの静的初期化
-	Mesh::staticInit(dxBase->getDev());
-}
-
 ObjModel::ObjModel(const std::string& dirPath, const std::string& objModelName, UINT texNum, bool smoothing)
 {
 	string directoryPath = dirPath;

@@ -5,23 +5,25 @@ using namespace DirectX;
 void BaseObj::updateMatWorld()
 {
 	matScale = XMMatrixScaling(scale.x, scale.y, scale.z);
-	matRot = XMMatrixIdentity();
-	matRot *= XMMatrixRotationZ(XMConvertToRadians(rotation.z));
+	matRot = XMMatrixRotationZ(XMConvertToRadians(rotation.z));
 	matRot *= XMMatrixRotationX(XMConvertToRadians(rotation.x));
 	matRot *= XMMatrixRotationY(XMConvertToRadians(rotation.y));
 	matTrans = XMMatrixTranslation(position.x, position.y, position.z);
 
-	matWorld = XMMatrixIdentity();
-	matWorld *= matScale;
+	matWorld = matScale;
 	matWorld *= matRot;
-	if (isBillboard)
+
+	// ビルボードならそれも反映
+	if (billboardFlag == BILLBOARD_FLAG::YES)
 	{
 		matWorld *= camera->getBillboardMatrix();
-	} else if (isBillBoardY)
+	} else if (billboardFlag == BILLBOARD_FLAG::ONLY_Y)
 	{
 		matWorld *= camera->getBillboardMatrixY();
 	}
-	matWorld *= matTrans; // ワールド行列に平行移動を反映
+
+	// ワールド行列に平行移動を反映
+	matWorld *= matTrans;
 
 	// 親オブジェクトがあれば
 	if (parent)

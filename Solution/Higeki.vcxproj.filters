@@ -450,9 +450,6 @@
     <None Include="Resources\Shaders\PostEffect.hlsli">
       <Filter>シェーダーファイル\PostEffect</Filter>
     </None>
-    <None Include="Resources\Shaders\Back.hlsli">
-      <Filter>シェーダーファイル\Back</Filter>
-    </None>
     <None Include=".editorconfig" />
   </ItemGroup>
 </Project>

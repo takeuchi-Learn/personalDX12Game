@@ -170,7 +170,7 @@ void ParticleMgr::update()
 	HRESULT result = vertBuff->Map(0, nullptr, (void**)&vertMap);
 	if (SUCCEEDED(result))
 	{
-		int vertCount = 0;
+		UINT vertCount = 0;
 		// パーティクルの情報を1つずつ反映
 		for (auto& it : particles)
 		{
@@ -199,17 +199,10 @@ void ParticleMgr::update()
 
 void ParticleMgr::draw()
 {
-	UINT drawNum = (UINT)std::distance(particles.begin(), particles.end());
-	if (drawNum > vertexCount)
-	{
-		drawNum = vertexCount;
-	}
+	const UINT drawNum = std::min(vertexCount, (UINT)std::distance(particles.begin(), particles.end()));
 
 	// パーティクルが1つもない場合
-	if (drawNum == 0)
-	{
-		return;
-	}
+	if (drawNum == 0) { return; }
 
 	// パイプラインステートの設定
 	dxBase->getCmdList()->SetPipelineState(pipelinestate[nowBlendMode].Get());
@@ -455,7 +448,8 @@ void ParticleMgr::InitializeGraphicsPipeline()
 	gpipeline.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_POINT;
 
 	gpipeline.NumRenderTargets = renderTargetNum;	// 描画対象の数
-	for (UINT i = 0u; i < renderTargetNum; ++i) {
+	for (UINT i = 0u; i < renderTargetNum; ++i)
+	{
 		gpipeline.RTVFormats[i] = DXGI_FORMAT_R8G8B8A8_UNORM_SRGB; // 0～255指定のRGBA
 	}
 	gpipeline.SampleDesc.Count = 1; // 1ピクセルにつき1回サンプリング
@@ -591,10 +585,8 @@ void ParticleMgr::LoadTexture(const wchar_t* filePath)
 
 void ParticleMgr::CreateModel()
 {
-	HRESULT result = S_FALSE;
-
 	// 頂点バッファ生成
-	result = dxBase->getDev()->CreateCommittedResource(
+	HRESULT result = dxBase->getDev()->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 		D3D12_HEAP_FLAG_NONE,
 		&CD3DX12_RESOURCE_DESC::Buffer(sizeof(VertexPos) * vertexCount),

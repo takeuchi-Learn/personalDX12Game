@@ -107,29 +107,53 @@ void RailShootScene::loadLane()
 		wallModel.reset(new ObjModel("Resources/laneWall", "laneWall", wallModelTexNum, false));
 		ringModel.reset(new ObjModel("Resources/ring", "ring", wallModelTexNum, false));
 
+		// 壁モデルポインタの配列を作る
+		ObjModel* wallModelPt[laneWallObjCount]
+		{
+			wallModel.get(),
+			ringModel.get()
+		};
+
 		// 制御点の数だけオブジェクトを置く
-		const size_t splinePointNum = splinePoint.size() - 2u;
-		const size_t wallNum = splinePointNum;
-		laneWall.resize(wallNum);
+		const size_t wallNum = splinePoint.size() - 2u;
+		for (size_t y = 0; y < laneWallObjCount; ++y)
+		{
+			laneWall[y] = std::make_unique<Object3d>(camera.get(), wallModelPt[y]);
+
+			laneWall[y]->instanceObj.resize(y == 0 ? wallNum * 2ui64 : wallNum);
+
+			for (auto& x : laneWall[y]->instanceObj)
+			{
+				x = std::make_unique<Object3d>(camera.get(), nullptr);
+			}
+		}
 
 		XMFLOAT3 dest{};
 		XMFLOAT3 preLanePos{};
 		for (UINT y = 0u; y < wallNum; ++y)
 		{
-			laneWall[y].resize(3);
+			auto& right = laneWall.front()->instanceObj[y];
+			auto& left = laneWall.front()->instanceObj[wallNum + y];
+			auto& ring = laneWall.back()->instanceObj[y];
 
-			auto& right = laneWall[y][0] = std::make_unique<Object3d>(camera.get(), wallModel.get());
-			auto& left = laneWall[y][1] = std::make_unique<Object3d>(camera.get(), wallModel.get());
-			auto& ring = laneWall[y][2] = std::make_unique<Object3d>(camera.get(), ringModel.get());
+			// --------------------
+			// 色を変更
+			// --------------------
+			constexpr float colVal = 0.5f;
+			constexpr XMFLOAT4 col = XMFLOAT4(colVal, colVal, colVal, 1.f);
+			right->color = col;
+			left->color = col;
+			ring->color = col;
 
 			// --------------------
 			// オブジェクトの大きさを変更
 			// --------------------
-			constexpr float scale = 96.f;
-			constexpr XMFLOAT3 scalef3(scale, scale, scale);
-			right->scale = XMFLOAT3(16, 16 * 16, 16);
-			left->scale = XMFLOAT3(16, 16 * 16, 16);
-			ring->scale = XMFLOAT3(96, 96, 96);
+			constexpr XMFLOAT3 scale = XMFLOAT3(16, 16 * 16, 16);
+			right->scale = scale;
+			left->scale = scale;
+			constexpr float ringScale = 96.f;
+			constexpr XMFLOAT3 ringScalef3(ringScale, ringScale, ringScale);
+			ring->scale = ringScalef3;
 
 			// --------------------
 			// レーンの位置にする
@@ -139,7 +163,7 @@ void RailShootScene::loadLane()
 			const float allRaito = (float)y / (float)wallNum;
 
 			// 全体の割合(0 ~ 制御点の数)
-			float startIndexRaito = allRaito * (float)splinePointNum;
+			float startIndexRaito = allRaito * (float)wallNum;
 
 			// 制御点間の割合とインデックスを取得
 			float startIndex = 0.f;
@@ -158,7 +182,7 @@ void RailShootScene::loadLane()
 			ring->position = dest;
 
 			right->position.y = groundObj->position.y + 16 * 16;
-			left->position.y = groundObj->position.y + 16 * 16;
+			left->position.y = right->position.y;
 
 			// --------------------
 			// レーンの左右に配置する
@@ -178,13 +202,6 @@ void RailShootScene::loadLane()
 			//// 左右にずらす
 			right->position += rightPos;
 			left->position -= rightPos;
-
-			// 色を変更
-			constexpr float colVal = 0.5f;
-			constexpr XMFLOAT4 col = XMFLOAT4(colVal, colVal, colVal, 1.f);
-			right->color = col;
-			left->color = col;
-			ring->color = col;
 
 			// 度数法に変換
 			velRota.x = XMConvertToDegrees(velRota.x);
@@ -230,6 +247,10 @@ void RailShootScene::initPlayer()
 	player->setPos(XMFLOAT3(0, 12.f, 0));
 	player->setHp(playerHpMax);
 	player->setBulHomingRaito(0.05f);	// 弾のホーミングの強さ
+
+	//auto& instObj = player->getObj()->instanceObj.emplace_back(std::make_unique<Object3d>(camera.get()));
+	//instObj->parent = player->getObj();
+	//instObj->position = XMFLOAT3(2, 0, 0);
 
 	playerBulHitProc = [](GameObj* obj) { obj->kill(); };
 	playerHitProc = [&](GameObj* obj)
@@ -688,7 +709,7 @@ void RailShootScene::update_play()
 
 		for (auto& y : laneWall)
 		{
-			for (auto& x : y)
+			for (auto& x : y->instanceObj)
 			{
 				XMVECTOR c2wVec = XMLoadFloat3(&x->calcWorldPos()) - camPos;
 				c2wVec = XMVector3Length(c2wVec);
@@ -1230,10 +1251,7 @@ void RailShootScene::drawObj3d()
 
 	for (auto& y : laneWall)
 	{
-		for (auto& x : y)
-		{
-			x->drawWithUpdate(light.get());
-		}
+		y->drawWithUpdate(light.get());
 	}
 
 	particleMgr->drawWithUpdate();

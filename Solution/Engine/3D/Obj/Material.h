@@ -25,11 +25,8 @@ public:
 
 public:
 	static const uint16_t maxTexNum = 128;
-	static void staticInit(ID3D12Device* dev);
 
 private:
-	static ID3D12Device* dev;
-
 	// テクスチャバッファ
 	std::vector<Microsoft::WRL::ComPtr<ID3D12Resource>> texbuff;
 	// 定数バッファ

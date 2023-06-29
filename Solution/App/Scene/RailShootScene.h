@@ -4,6 +4,7 @@
 #include <memory>
 #include <functional>
 #include <unordered_map>
+#include <array>
 
 #include "GameObject/NormalEnemy.h"
 #include "3D/ParticleMgr.h"
@@ -126,7 +127,8 @@ class RailShootScene
 
 	std::unique_ptr<ObjModel> wallModel;
 	std::unique_ptr<ObjModel> ringModel;
-	std::vector<std::vector<std::unique_ptr<Object3d>>> laneWall;
+	static constexpr size_t laneWallObjCount = 2ui64;
+	std::array<std::unique_ptr<Object3d>, laneWallObjCount> laneWall;
 
 	// --------------------
 	// 敵発生関連

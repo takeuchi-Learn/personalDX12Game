@@ -55,12 +55,6 @@ private:
 	void loadTextures(const std::string& dirPath, UINT texNum);
 
 public:
-	// ----------
-	// static
-	// ----------
-
-	// 静的初期化
-	static void staticInit();
 
 	// メンバ
 

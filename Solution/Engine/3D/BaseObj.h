@@ -33,7 +33,6 @@ protected:
 	XMMATRIX matTrans{};
 
 public:
-
 	// 色
 	XMFLOAT4 color = { 1, 1, 1, 1 };
 
@@ -44,15 +43,22 @@ public:
 
 	BaseObj* parent = nullptr;
 
-	bool isBillboard = false;
-	bool isBillBoardY = false;// isBillboardがfalseの場合のみ機能する
+	std::vector<std::unique_ptr<BaseObj>> instanceObj;
 
+	/// @brief 描画するかどうか
 	bool drawFlag = true;
 
-protected:
-	void updateMatWorld();
+	enum class BILLBOARD_FLAG : uint8_t
+	{
+		NO,
+		YES,
+		ONLY_Y,
+	};
+
+	BILLBOARD_FLAG billboardFlag = BILLBOARD_FLAG::NO;
 
 public:
+	void updateMatWorld();
 
 	BaseObj(Camera* camera);
 

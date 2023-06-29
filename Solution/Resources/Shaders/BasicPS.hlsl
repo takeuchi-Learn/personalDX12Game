@@ -29,7 +29,9 @@ void ScreenDoor(float2 screenPos, float alpha)
 
 PSOutput main(VSOutput input)
 {
-	float4 texcolor = color * float4(tex.Sample(smp, input.uv * texTilling + shiftUv));
+	clip(input.instNo < instCount ? 1 : -1);
+	
+	float4 texcolor = color[input.instNo] * float4(tex.Sample(smp, input.uv * texTilling + shiftUv));
 
 	ScreenDoor(input.svpos.xy, texcolor.a * m_alpha);
 
