@@ -92,7 +92,7 @@ public:
 private:
 	static DX12Base* dxBase;
 
-	static const int vertexCount = 0x10000;
+	static const UINT vertexCount = 0x10000;
 
 public:
 	static void createParticle(ParticleMgr* particleMgr,

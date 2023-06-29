@@ -255,6 +255,9 @@
     <ClCompile Include="App\GameObject\Player\Reticle.cpp">
       <Filter>GameObject\Player</Filter>
     </ClCompile>
+    <ClCompile Include="App\GameObject\Player\ReticleSphere.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Engine\Camera\Camera.h">
@@ -410,6 +413,9 @@
     <ClInclude Include="Engine\ExternalCode\ini.h">
       <Filter>ExternalCode</Filter>
     </ClInclude>
+    <ClInclude Include="App\GameObject\Player\ReticleSphere.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\BasicPS.hlsl">
@@ -473,9 +479,6 @@
     </None>
     <None Include="Resources\Shaders\PostEffect.hlsli">
       <Filter>シェーダーファイル\PostEffect</Filter>
-    </None>
-    <None Include="Resources\Shaders\Back.hlsli">
-      <Filter>シェーダーファイル\Back</Filter>
     </None>
     <None Include=".editorconfig" />
   </ItemGroup>

@@ -17,14 +17,16 @@ class Object3d :
 {
 public:
 
+	static constexpr uint32_t instanceCountMax = 512u;
+
 	// 定数バッファ用データ構造体B0
 	struct ConstBufferDataB0
 	{
-		XMFLOAT4 color;
-		XMMATRIX viewProj;
-		XMMATRIX world;	// ワールド行列
-		XMFLOAT3 cameraPos;	// カメラ位置(ワールド座標)
-		uint32_t instanceCount;
+		XMFLOAT4 color[instanceCountMax]{};
+		XMMATRIX viewProj{};
+		XMMATRIX matWorld[instanceCountMax]{};	// ワールド行列
+		XMFLOAT3 cameraPos{};	// カメラ位置(ワールド座標)
+		uint32_t instanceCount{};
 	};
 
 	// --------------------
@@ -59,20 +61,17 @@ private:
 	// 定数バッファ
 	ComPtr<ID3D12Resource> constBuffB0;
 
-	uint32_t instanceCount = 10u;
-
 public:
-
 	//モデルデータ
 	ObjModel* model = nullptr;
 
 	// モデルは後から手動で読み込む(deleteも手動)
-	Object3d(Camera* camera);
+	Object3d(Camera* camera) : Object3d(camera, nullptr) {};
 
 	// モデルデータもここで渡す(deleteは手動)
 	Object3d(Camera* camera, ObjModel* model);
 
-	~Object3d();
+	~Object3d() {};
 
 	void update();
 

@@ -24,22 +24,13 @@ private: // エイリアス
 
 public: // サブクラス
 	// 頂点データ構造体（テクスチャあり）
+	// 頂点シェーダーの引数に対応している
 	struct VertexPosNormalUv
 	{
 		XMFLOAT3 pos; // xyz座標
 		XMFLOAT3 normal; // 法線ベクトル
 		XMFLOAT2 uv;  // uv座標
 	};
-
-public: // 静的メンバ関数
-
-	/// @brief 静的初期化
-	/// @param dev デバイス
-	static void staticInit(ID3D12Device* dev);
-
-private: // 静的メンバ変数
-	// デバイス
-	static ID3D12Device* dev;
 
 public: // メンバ関数
 

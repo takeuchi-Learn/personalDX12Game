@@ -27,14 +27,9 @@ void Object3d::createTransferBufferB0(ComPtr<ID3D12Resource>& constBuffB0)
 		nullptr,
 		IID_PPV_ARGS(&constBuffB0)
 	);
+	assert(SUCCEEDED(result));
 }
 
-Object3d::Object3d(Camera* camera)
-	: BaseObj(camera)
-{
-	// 定数バッファの生成
-	createTransferBufferB0(constBuffB0);
-}
 Object3d::Object3d(Camera* camera, ObjModel* model)
 	: BaseObj(camera), model(model)
 {
@@ -46,15 +41,25 @@ void Object3d::update()
 {
 	updateMatWorld();
 
+	for (auto& i : instanceObj)
+	{
+		i->updateMatWorld();
+	}
+
 	// 定数バッファへデータ転送
 	ConstBufferDataB0* constMapB0 = nullptr;
 	if (SUCCEEDED(constBuffB0->Map(0, nullptr, (void**)&constMapB0)))
 	{
-		constMapB0->color = color; // RGBA
 		constMapB0->viewProj = camera->getViewProjectionMatrix();
-		constMapB0->world = matWorld;
 		constMapB0->cameraPos = camera->getEye();
-		constMapB0->instanceCount = instanceCount;
+		constMapB0->instanceCount = std::min(static_cast<uint32_t>(instanceObj.size() + 1u), instanceCountMax);
+		constMapB0->color[0] = color; // RGBA
+		constMapB0->matWorld[0] = matWorld;
+		for (uint32_t i = 1u; i < constMapB0->instanceCount; ++i)
+		{
+			constMapB0->color[i] = instanceObj[i - 1ui64]->color; // RGBA
+			constMapB0->matWorld[i] = instanceObj[i - 1ui64]->getMatWorld();
+		}
 		constBuffB0->Unmap(0, nullptr);
 	}
 }
@@ -71,7 +76,7 @@ void Object3d::draw(Light* light, size_t ppState)
 
 	light->draw(3);
 
-	model->draw(dxBase->getCmdList(), instanceCount);
+	model->draw(dxBase->getCmdList(), static_cast<UINT>(instanceObj.size() + 1u));
 }
 
 void Object3d::drawWithUpdate(Light* light, size_t ppState)
@@ -79,8 +84,6 @@ void Object3d::drawWithUpdate(Light* light, size_t ppState)
 	update();
 	draw(light, ppState);
 }
-
-Object3d::~Object3d() {}
 
 void Object3d::startDraw(size_t ppState)
 {
@@ -98,8 +101,6 @@ void Object3d::staticInit()
 	Object3d::dxBase = DX12Base::getInstance();
 
 	ppStateNum = createGraphicsPipeline();
-
-	ObjModel::staticInit();
 }
 
 size_t Object3d::createGraphicsPipeline(BaseObj::BLEND_MODE blendMode,

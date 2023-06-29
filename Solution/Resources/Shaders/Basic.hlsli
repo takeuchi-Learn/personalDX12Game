@@ -1,8 +1,11 @@
+
+// CPP側と合わせる
+#define instanceCountMax (512)
 cbuffer cbuff0 : register(b0)
 {
-	float4 color; // 色(RGBA)
+	float4 color[instanceCountMax]; // 色(RGBA)
 	matrix viewProj;
-	matrix world; // ワールド行列
+	matrix matWorld[instanceCountMax]; // ワールド行列
 	float3 cameraPos; // カメラ位置(ワールド座標)
 	uint instCount;
 };
@@ -30,6 +33,7 @@ struct VSOutput
 	float4 worldPos : POSITION;
 	float3 normal : NORMAL;
 	float2 uv : TEXCOORD; // uv値
+	uint instNo : SV_InstanceID;
 };
 
 // レンダーターゲットの数は2つ

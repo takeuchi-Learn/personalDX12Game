@@ -1,16 +1,9 @@
 ﻿#include "Material.h"
 #include <DirectXTex.h>
 #include <cassert>
+#include <System/DX12Base.h>
 
 using namespace DirectX;
-
-ID3D12Device* Material::dev = nullptr;
-
-void Material::staticInit(ID3D12Device* dev)
-{
-	assert(!Material::dev);
-	Material::dev = dev;
-}
 
 Material::Material()
 	: ambient({ 0.3f,0.3f,0.3f }),
@@ -70,7 +63,7 @@ void Material::loadTexture(const std::string& directoryPath, UINT texNum,
 	);
 
 	// テクスチャ用バッファの生成
-	result = dev->CreateCommittedResource(
+	result = DX12Base::ins()->getDev()->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_CPU_PAGE_PROPERTY_WRITE_BACK, D3D12_MEMORY_POOL_L0),
 		D3D12_HEAP_FLAG_NONE,
 		&texresDesc,
@@ -103,9 +96,9 @@ void Material::loadTexture(const std::string& directoryPath, UINT texNum,
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//2Dテクスチャ
 	srvDesc.Texture2D.MipLevels = 1;
 
-	dev->CreateShaderResourceView(texbuff[texNum].Get(), //ビューと関連付けるバッファ
-								  &srvDesc, //テクスチャ設定情報
-								  cpuDescHandleSRV
+	DX12Base::ins()->getDev()->CreateShaderResourceView(texbuff[texNum].Get(), //ビューと関連付けるバッファ
+														&srvDesc, //テクスチャ設定情報
+														cpuDescHandleSRV
 	);
 }
 
@@ -129,7 +122,7 @@ void Material::update()
 void Material::createConstBuff()
 {
 	// 定数バッファの生成
-	HRESULT result = dev->CreateCommittedResource(
+	HRESULT result = DX12Base::ins()->getDev()->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD), 	// アップロード可能
 		D3D12_HEAP_FLAG_NONE,
 		&CD3DX12_RESOURCE_DESC::Buffer((sizeof(ConstBufferDataB1) + 0xff) & ~0xff),

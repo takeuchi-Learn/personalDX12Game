@@ -1,24 +1,11 @@
 ﻿#include "Mesh.h"
 #include <d3dcompiler.h>
 #include <cassert>
+#include <System/DX12Base.h>
 
 #pragma comment(lib, "d3dcompiler.lib")
 
 using namespace DirectX;
-
-// 静的メンバ変数の実体
-ID3D12Device* Mesh::dev = nullptr;
-
-void Mesh::staticInit(ID3D12Device* dev)
-{
-	// 再初期化チェック
-	assert(!Mesh::dev);
-
-	Mesh::dev = dev;
-
-	// マテリアルの静的初期化
-	Material::staticInit(dev);
-}
 
 void Mesh::setName(const std::string& name)
 {
@@ -42,11 +29,9 @@ void Mesh::setMaterial(Material* material)
 
 void Mesh::createBuffers()
 {
-	HRESULT result;
-
 	UINT sizeVB = static_cast<UINT>(sizeof(VertexPosNormalUv) * vertices.size());
 	// 頂点バッファ生成
-	result = dev->CreateCommittedResource(
+	HRESULT result = DX12Base::ins()->getDev()->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 		D3D12_HEAP_FLAG_NONE,
 		&CD3DX12_RESOURCE_DESC::Buffer(sizeVB),
@@ -76,7 +61,7 @@ void Mesh::createBuffers()
 
 	UINT sizeIB = static_cast<UINT>(sizeof(unsigned short) * indices.size());
 	// インデックスバッファ生成
-	result = dev->CreateCommittedResource(
+	result = DX12Base::ins()->getDev()->CreateCommittedResource(
 		&CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD),
 		D3D12_HEAP_FLAG_NONE,
 		&CD3DX12_RESOURCE_DESC::Buffer(sizeIB),
