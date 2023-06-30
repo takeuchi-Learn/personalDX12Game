@@ -14,15 +14,15 @@ void Reticle::update(const SpriteBase* spBase)
 		sprite->isInvisible = true;
 		return;
 	}
-	auto& i = target.lock();
+	std::shared_ptr<GameObj>& i = target.lock();
 
-	if (!i->getAlive())
+	if (!i->getAlive() || i->getObj().expired())
 	{
 		sprite->isInvisible = true;
 		return;
 	}
 
-	sprite->position = i->getObj()->calcScreenPosF3();
+	sprite->position = i->getObj().lock()->calcScreenPosF3();
 	sprite->update(spBase);
 }
 

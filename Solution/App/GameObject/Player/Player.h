@@ -69,7 +69,7 @@ public:
 
 	inline auto getMatWorld() const { return obj->getMatWorld(); }
 
-	inline void setParent(GameObj* parent) { obj->parent = parent->getObj(); }
+	inline void setParent(GameObj* parent) { obj->parent = parent->getObj().lock().get(); }
 
 	inline const DirectX::XMFLOAT2& getAim2DPos() const { return aim2DPos; }
 	inline void setAim2DPos(const DirectX::XMFLOAT2& screenPos) { aim2DPos = screenPos; }
