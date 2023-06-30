@@ -138,7 +138,7 @@ void BossScene::initBoss()
 	boss->setRotation(XMFLOAT3(0, 180.f, 0));
 	boss->setTargetObj(playerParent.get());
 	boss->setBulModel(bossBulModel.get());
-	boss->getObj()->color = XMFLOAT4(2, 0.5f, 0.25f, 1);
+	boss->getObj().lock()->color = XMFLOAT4(2, 0.5f, 0.25f, 1);
 	boss->setAlive(false);
 
 	// ボスのパーツ
@@ -195,7 +195,7 @@ void BossScene::initBoss()
 			i->setPos(bpd.pos);
 
 			// ボス本体を親とする
-			i->setParent(boss->getObj());
+			i->setParent(boss->getObj().lock().get());
 
 			// 大きさを変更
 			i->setScale(bpd.scale);

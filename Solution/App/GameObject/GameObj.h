@@ -14,10 +14,7 @@ class GameObj
 protected:
 	size_t ppStateNum;
 
-	BaseObj* obj = nullptr;
-
-	std::unique_ptr<Object3d> objObject;
-	std::unique_ptr<FbxObj3d> fbxObject;
+	std::shared_ptr<BaseObj> obj = nullptr;
 
 	bool alive = true;
 	bool drawFlag = true;
@@ -53,12 +50,9 @@ public:
 	inline static DirectX::XMFLOAT3 calcVecLen(const DirectX::XMFLOAT3& startPos,
 											   const DirectX::XMFLOAT3& endPos)
 	{
-		return DirectX::XMFLOAT3
-		{
-			endPos.x - startPos.x,
-			endPos.y - startPos.y,
-			endPos.z - startPos.z
-		};
+		return DirectX::XMFLOAT3(endPos.x - startPos.x,
+								 endPos.y - startPos.y,
+								 endPos.z - startPos.z);
 	}
 
 	inline static DirectX::XMFLOAT3 calcVel(const DirectX::XMFLOAT3& targetPos,
@@ -78,44 +72,6 @@ public:
 		DirectX::XMStoreFloat3(&velF3, velVec);
 		return velF3;
 	}
-
-#pragma region アクセッサ
-
-	inline BaseObj* getParent() { return obj->parent; }
-	inline void setParent(BaseObj* parent) { obj->parent = parent; }
-
-	inline bool getAlive() const { return alive; }
-	inline void setAlive(bool alive) { this->alive = alive; }
-	/// @brief aliveをfalseにする
-	inline void kill() { alive = false; }
-
-	inline bool getDrawFlag() const { return drawFlag; }
-	inline void setDrawFlag(bool drawFlag) { this->drawFlag = drawFlag; }
-
-	inline BaseObj* getObj() const { return obj; }
-
-	inline void setPos(const DirectX::XMFLOAT3& pos) { obj->position = pos; }
-	inline const DirectX::XMFLOAT3& getPos() const { return obj->position; }
-
-	inline void setCol(const DirectX::XMFLOAT4& col) { obj->color = col; }
-	inline const DirectX::XMFLOAT4& getCol() const { return obj->color; }
-
-	inline void setScaleF3(const DirectX::XMFLOAT3& scale) { obj->scale = scale; }
-	inline void setScale(float scale) { obj->scale = DirectX::XMFLOAT3(scale, scale, scale); }
-	inline const DirectX::XMFLOAT3& getScaleF3() const { return obj->scale; }
-
-	/// @return Zのスケールを返す
-	inline float getScale() const { return obj->scale.z; }
-
-	inline const DirectX::XMFLOAT3& getRotation() const { return obj->rotation; }
-	inline void setRotation(const DirectX::XMFLOAT3& rota) { obj->rotation = rota; }
-
-	inline const DirectX::XMMATRIX& getMatWorld() const { return obj->getMatWorld(); }
-	inline const DirectX::XMMATRIX& getMatRota() const { return obj->getMatRota(); }
-	inline const DirectX::XMMATRIX& getMatScale() const { return obj->getMatScale(); }
-	inline const DirectX::XMMATRIX& getMatTrans() const { return obj->getMatTrans(); }
-
-#pragma endregion アクセッサ
 
 	/// @return 大きさベクトルの長さを返す
 	inline float calcScale() const
@@ -161,4 +117,42 @@ public:
 	void draw(Light* light);
 
 	void drawWithUpdate(Light* light);
+
+#pragma region アクセッサ
+
+	inline BaseObj* getParent() { return obj->parent; }
+	inline void setParent(BaseObj* parent) { obj->parent = parent; }
+
+	inline bool getAlive() const { return alive; }
+	inline void setAlive(bool alive) { this->alive = alive; }
+	/// @brief aliveをfalseにする
+	inline void kill() { alive = false; }
+
+	inline bool getDrawFlag() const { return drawFlag; }
+	inline void setDrawFlag(bool drawFlag) { this->drawFlag = drawFlag; }
+
+	inline std::weak_ptr<BaseObj> getObj() const { return obj; }
+
+	inline void setPos(const DirectX::XMFLOAT3& pos) { obj->position = pos; }
+	inline const DirectX::XMFLOAT3& getPos() const { return obj->position; }
+
+	inline void setCol(const DirectX::XMFLOAT4& col) { obj->color = col; }
+	inline const DirectX::XMFLOAT4& getCol() const { return obj->color; }
+
+	inline void setScaleF3(const DirectX::XMFLOAT3& scale) { obj->scale = scale; }
+	inline void setScale(float scale) { obj->scale = DirectX::XMFLOAT3(scale, scale, scale); }
+	inline const DirectX::XMFLOAT3& getScaleF3() const { return obj->scale; }
+
+	/// @return Zのスケールを返す
+	inline float getScale() const { return obj->scale.z; }
+
+	inline const DirectX::XMFLOAT3& getRotation() const { return obj->rotation; }
+	inline void setRotation(const DirectX::XMFLOAT3& rota) { obj->rotation = rota; }
+
+	inline const DirectX::XMMATRIX& getMatWorld() const { return obj->getMatWorld(); }
+	inline const DirectX::XMMATRIX& getMatRota() const { return obj->getMatRota(); }
+	inline const DirectX::XMMATRIX& getMatScale() const { return obj->getMatScale(); }
+	inline const DirectX::XMMATRIX& getMatTrans() const { return obj->getMatTrans(); }
+
+#pragma endregion アクセッサ
 };

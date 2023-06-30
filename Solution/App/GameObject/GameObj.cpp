@@ -110,36 +110,31 @@ void GameObj::moveParentUp(float moveVel)
 GameObj::GameObj(Camera* camera,
 				 ObjModel* model,
 				 const DirectX::XMFLOAT3& pos)
-	: objObject(std::make_unique<Object3d>(camera,
-										   model)),
+	: obj(std::make_unique<Object3d>(camera,
+									 model)),
 	ppStateNum(Object3d::ppStateNum)
 {
-	obj = objObject.get();
 	setPos(pos);
 }
 
 GameObj::GameObj(Camera* camera,
 				 FbxModel* model,
 				 const DirectX::XMFLOAT3& pos)
-	: fbxObject(std::make_unique<FbxObj3d>(camera,
-										   model)),
+	: obj(std::make_unique<FbxObj3d>(camera,
+									 model)),
 	ppStateNum(FbxObj3d::ppStateNum)
 {
-	obj = fbxObject.get();
 	setPos(pos);
 }
 
 GameObj::GameObj(Camera* camera)
-	: objObject(std::make_unique<Object3d>(camera, nullptr)),
+	: obj(std::make_unique<Object3d>(camera, nullptr)),
 	ppStateNum(Object3d::ppStateNum)
-{
-	obj = objObject.get();
-}
+{}
 
 GameObj::~GameObj()
 {
-	objObject.reset(nullptr);
-	fbxObject.reset(nullptr);
+	obj.reset((Object3d*)nullptr);
 }
 
 void GameObj::update()

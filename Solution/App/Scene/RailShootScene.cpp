@@ -248,10 +248,6 @@ void RailShootScene::initPlayer()
 	player->setHp(playerHpMax);
 	player->setBulHomingRaito(0.05f);	// 弾のホーミングの強さ
 
-	//auto& instObj = player->getObj()->instanceObj.emplace_back(std::make_unique<Object3d>(camera.get()));
-	//instObj->parent = player->getObj();
-	//instObj->position = XMFLOAT3(2, 0, 0);
-
 	playerBulHitProc = [](GameObj* obj) { obj->kill(); };
 	playerHitProc = [&](GameObj* obj)
 	{
@@ -516,7 +512,7 @@ void RailShootScene::addEnemy(const DirectX::XMFLOAT3& pos, const DirectX::XMFLO
 	i->setScale(scale);
 	i->setVel(vel);
 	i->setTargetObj(player.get());
-	i->setParent(railObj->getObj());
+	i->setParent(railObj->getObj().lock().get());
 	i->setCol(XMFLOAT4(1, 0.25f, 0.125f, 1.f));
 }
 
@@ -646,7 +642,7 @@ void RailShootScene::update_play()
 
 		if (dispW || dispS || dispA || dispD)
 		{
-			const XMFLOAT2 pposF2 = player->getObj()->calcScreenPos();
+			const XMFLOAT2 pposF2 = player->getObj().lock()->calcScreenPos();
 			const XMFLOAT3 playerPos2D = XMFLOAT3(pposF2.x, pposF2.y, 0.f);
 
 			if (dispW)

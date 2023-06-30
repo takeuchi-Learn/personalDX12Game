@@ -56,7 +56,7 @@ void CameraObj::preUpdate()
 
 	XMFLOAT3 parentRota = parentObj->getRotation();
 	{
-		for (auto* parent = parentObj->getObj()->parent;
+		for (auto* parent = parentObj->getObj().lock()->parent;
 			 parent;
 			 parent = parent->parent)
 		{
@@ -124,7 +124,7 @@ void CameraObj::preUpdate()
 																 eye2TargetOffset.y,
 																 eye2TargetOffset.z,
 																 1),
-													 parentObj->getObj()->getMatRota()));
+													 parentObj->getObj().lock()->getMatRota()));
 		targetPos.x += camHeiVec.x;
 		targetPos.y += camHeiVec.y;
 		targetPos.z += camHeiVec.z;

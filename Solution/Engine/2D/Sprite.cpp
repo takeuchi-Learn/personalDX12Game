@@ -177,10 +177,7 @@ void Sprite::update(const SpriteBase* spriteCommon)
 // スプライト単体描画
 void Sprite::draw(ID3D12GraphicsCommandList* cmdList, const SpriteBase* spriteCommon, ID3D12Device* dev)
 {
-	if (isInvisible)
-	{
-		return;
-	}
+	if (isInvisible) { return; }
 
 	// 頂点バッファをセット
 	cmdList->IASetVertexBuffers(0, 1, &vbView);
