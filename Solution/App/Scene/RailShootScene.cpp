@@ -51,6 +51,13 @@ namespace
 	constexpr XMFLOAT3 noKillEffCol = XMFLOAT3(0.25f, 1.f, 1.f);
 
 	constexpr XMFLOAT4 cyan = XMFLOAT4(0.25f, 1, 1, 1);
+
+	inline auto str2Float(const std::string& str, float& buf)
+	{
+		return std::from_chars(std::to_address(str.begin()),
+							   std::to_address(str.end()),
+							   buf);
+	}
 }
 
 void RailShootScene::loadBackObj()
@@ -84,18 +91,23 @@ void RailShootScene::loadLane()
 		// 制御点の情報はCSVから読み込む
 		const auto& csvData = Util::loadCsv("Resources/DataFile/splinePos.csv", true, ',', "//");
 
+		splinePoint.reserve(csvData.size() + 3ui64);
+
 		// 始点は原点
 		// startは2つ必要
 		splinePoint.emplace_back(XMVectorSet(0, 0, 0, 1));
 		splinePoint.emplace_back(XMVectorSet(0, 0, 0, 1));
 
+		float buf[3]{};
+
 		// CSVの内容を配列に格納
 		for (auto& y : csvData)
 		{
-			splinePoint.emplace_back(XMVectorSet(std::stof(y[0]),
-												 std::stof(y[1]),
-												 std::stof(y[2]),
-												 1));
+			for (uint8_t i = 0; i < 3ui8; ++i)
+			{
+				str2Float(y[i], buf[i]);
+			}
+			splinePoint.emplace_back(XMVectorSet(buf[0], buf[1], buf[2], 1));
 		}
 
 		// endも2つ必要
@@ -104,22 +116,16 @@ void RailShootScene::loadLane()
 	{
 		// モデルを読み込む
 		constexpr UINT wallModelTexNum = 0u;
-		wallModel.reset(new ObjModel("Resources/laneWall", "laneWall", wallModelTexNum, false));
-		ringModel.reset(new ObjModel("Resources/ring", "ring", wallModelTexNum, false));
-
-		// 壁モデルポインタの配列を作る
-		ObjModel* wallModelPt[laneWallObjCount]
-		{
-			wallModel.get(),
-			ringModel.get()
-		};
+		laneWallModel.front() = std::make_unique<ObjModel>("Resources/laneWall", "laneWall", wallModelTexNum, false);
+		laneWallModel.back() = std::make_unique<ObjModel>("Resources/ring", "ring", wallModelTexNum, false);
 
 		// 制御点の数だけオブジェクトを置く
 		const size_t wallNum = splinePoint.size() - 2u;
 		for (size_t y = 0; y < laneWallObjCount; ++y)
 		{
-			laneWall[y] = std::make_unique<Object3d>(camera.get(), wallModelPt[y]);
+			laneWall[y] = std::make_unique<Object3d>(camera.get(), laneWallModel[y].get());
 
+			laneWall[y]->scale = XMFLOAT3(0.f, 0.f, 0.f);
 			laneWall[y]->instanceObj.resize(y == 0 ? wallNum * 2ui64 : wallNum);
 
 			for (auto& x : laneWall[y]->instanceObj)
