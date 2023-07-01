@@ -125,10 +125,9 @@ class RailShootScene
 	static constexpr uint16_t splineIndexDef = 1u;
 	uint16_t splineIndex = splineIndexDef;
 
-	std::unique_ptr<ObjModel> wallModel;
-	std::unique_ptr<ObjModel> ringModel;
 	static constexpr size_t laneWallObjCount = 2ui64;
 	std::array<std::unique_ptr<Object3d>, laneWallObjCount> laneWall;
+	std::array<std::unique_ptr<ObjModel>, laneWallObjCount> laneWallModel;
 
 	// --------------------
 	// 敵発生関連
