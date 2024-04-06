@@ -117,16 +117,6 @@ GameObj::GameObj(Camera* camera,
 	setPos(pos);
 }
 
-GameObj::GameObj(Camera* camera,
-				 FbxModel* model,
-				 const DirectX::XMFLOAT3& pos)
-	: obj(std::make_unique<FbxObj3d>(camera,
-									 model)),
-	ppStateNum(FbxObj3d::ppStateNum)
-{
-	setPos(pos);
-}
-
 GameObj::GameObj(Camera* camera)
 	: obj(std::make_unique<Object3d>(camera, nullptr)),
 	ppStateNum(Object3d::ppStateNum)

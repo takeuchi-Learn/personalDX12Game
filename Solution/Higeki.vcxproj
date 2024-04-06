@@ -46,15 +46,15 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(ProjectDir)lib\mini_yaml\include\yaml;$(ProjectDir)lib\imgui\include;$(ProjectDir)lib\DirectXTex\include;$(ProjectDir)lib\fbx_sdk\include;$(ProjectDir)Engine;$(ProjectDir)App;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)lib\mini_yaml\$(Configuration);$(ProjectDir)lib\imgui\lib\$(Configuration);$(ProjectDir)lib\DirectXTex\lib\$(Configuration);$(ProjectDir)lib\fbx_sdk\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)lib\mini_yaml\include\yaml;$(ProjectDir)lib\imgui\include;$(ProjectDir)lib\DirectXTex\include;$(ProjectDir)Engine;$(ProjectDir)App;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)lib\mini_yaml\$(Configuration);$(ProjectDir)lib\imgui\lib\$(Configuration);$(ProjectDir)lib\DirectXTex\lib\$(Configuration);$(LibraryPath)</LibraryPath>
     <PublicIncludeDirectories>
     </PublicIncludeDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(ProjectDir)lib\mini_yaml\include\yaml;$(ProjectDir)lib\imgui\include;$(ProjectDir)lib\DirectXTex\include;$(ProjectDir)lib\fbx_sdk\include;$(ProjectDir)Engine;$(ProjectDir)App;$(IncludePath)</IncludePath>
-    <LibraryPath>$(ProjectDir)lib\mini_yaml\$(Configuration);$(ProjectDir)lib\imgui\lib\$(Configuration);$(ProjectDir)lib\DirectXTex\lib\$(Configuration);$(ProjectDir)lib\fbx_sdk\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)lib\mini_yaml\include\yaml;$(ProjectDir)lib\imgui\include;$(ProjectDir)lib\DirectXTex\include;$(ProjectDir)Engine;$(ProjectDir)App;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)lib\mini_yaml\$(Configuration);$(ProjectDir)lib\imgui\lib\$(Configuration);$(ProjectDir)lib\DirectXTex\lib\$(Configuration);$(LibraryPath)</LibraryPath>
     <PublicIncludeDirectories>
     </PublicIncludeDirectories>
   </PropertyGroup>
@@ -75,7 +75,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libfbxsdk-md.lib;libxml2-md.lib;zlib-md.lib;DirectXTex.lib;imgui.lib;Yaml.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DirectXTex.lib;imgui.lib;Yaml.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
     </Link>
@@ -104,7 +104,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>libfbxsdk-mt.lib;libxml2-mt.lib;zlib-mt.lib;DirectXTex.lib;imgui.lib;Yaml.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>DirectXTex.lib;imgui.lib;Yaml.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
       <TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
     </Link>
@@ -130,9 +130,6 @@
     <ClCompile Include="App\GameObject\NormalEnemy.cpp" />
     <ClCompile Include="App\GameObject\EnemyBullet.cpp" />
     <ClCompile Include="App\GameObject\GameObj.cpp" />
-    <ClCompile Include="Engine\3D\Fbx\FbxLoader.cpp" />
-    <ClCompile Include="Engine\3D\Fbx\FbxModel.cpp" />
-    <ClCompile Include="Engine\3D\Fbx\FbxObj3d.cpp" />
     <ClCompile Include="Engine\Input\Input.cpp" />
     <ClCompile Include="Engine\3D\Light.cpp" />
     <ClCompile Include="Engine\System\Looper.cpp" />
@@ -182,9 +179,6 @@
     <ClInclude Include="App\GameObject\NormalEnemy.h" />
     <ClInclude Include="App\GameObject\EnemyBullet.h" />
     <ClInclude Include="App\GameObject\GameObj.h" />
-    <ClInclude Include="Engine\3D\Fbx\FbxLoader.h" />
-    <ClInclude Include="Engine\3D\Fbx\FbxModel.h" />
-    <ClInclude Include="Engine\3D\Fbx\FbxObj3d.h" />
     <ClInclude Include="Engine\System\GameScene.h" />
     <ClInclude Include="Engine\Input\Input.h" />
     <ClInclude Include="Engine\3D\Light.h" />
@@ -241,20 +235,6 @@
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">5.0</ShaderModel>
     </FxCompile>
-    <FxCompile Include="Resources\Shaders\FBXLambertPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-    </FxCompile>
-    <FxCompile Include="Resources\Shaders\FBXPS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-    </FxCompile>
-    <FxCompile Include="Resources\Shaders\FBXVS.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
-    </FxCompile>
     <FxCompile Include="Resources\Shaders\ParticleGS.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Geometry</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">5.0</ShaderModel>
@@ -305,7 +285,6 @@
   <ItemGroup>
     <None Include=".editorconfig" />
     <None Include="Resources\Shaders\Basic.hlsli" />
-    <None Include="Resources\Shaders\FBX.hlsli" />
     <None Include="Resources\Shaders\Particle.hlsli" />
     <None Include="Resources\Shaders\PostEffect.hlsli" />
     <None Include="Resources\Shaders\Sprite.hlsli" />
