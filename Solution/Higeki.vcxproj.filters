@@ -186,15 +186,6 @@
     <ClCompile Include="Engine\3D\Obj\Material.cpp">
       <Filter>Object共通\3Dオブジェクト\obj</Filter>
     </ClCompile>
-    <ClCompile Include="Engine\3D\Fbx\FbxLoader.cpp">
-      <Filter>Object共通\3Dオブジェクト\fbx</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\3D\Fbx\FbxModel.cpp">
-      <Filter>Object共通\3Dオブジェクト\fbx</Filter>
-    </ClCompile>
-    <ClCompile Include="Engine\3D\Fbx\FbxObj3d.cpp">
-      <Filter>Object共通\3Dオブジェクト\fbx</Filter>
-    </ClCompile>
     <ClCompile Include="Engine\Sound\SoundBase.cpp">
       <Filter>Sound</Filter>
     </ClCompile>
@@ -254,6 +245,9 @@
     </ClCompile>
     <ClCompile Include="App\GameObject\Player\Reticle.cpp">
       <Filter>GameObject\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="App\GameObject\Player\ReticleSphere.cpp">
+      <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -332,15 +326,6 @@
     <ClInclude Include="Engine\3D\Obj\Material.h">
       <Filter>Object共通\3Dオブジェクト\obj</Filter>
     </ClInclude>
-    <ClInclude Include="Engine\3D\Fbx\FbxObj3d.h">
-      <Filter>Object共通\3Dオブジェクト\fbx</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\3D\Fbx\FbxLoader.h">
-      <Filter>Object共通\3Dオブジェクト\fbx</Filter>
-    </ClInclude>
-    <ClInclude Include="Engine\3D\Fbx\FbxModel.h">
-      <Filter>Object共通\3Dオブジェクト\fbx</Filter>
-    </ClInclude>
     <ClInclude Include="Engine\Sound\SoundBase.h">
       <Filter>Sound</Filter>
     </ClInclude>
@@ -410,6 +395,9 @@
     <ClInclude Include="Engine\ExternalCode\ini.h">
       <Filter>ExternalCode</Filter>
     </ClInclude>
+    <ClInclude Include="App\GameObject\Player\ReticleSphere.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Resources\Shaders\BasicPS.hlsl">
@@ -417,12 +405,6 @@
     </FxCompile>
     <FxCompile Include="Resources\Shaders\BasicVS.hlsl">
       <Filter>シェーダーファイル\Basic</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\Shaders\FBXPS.hlsl">
-      <Filter>シェーダーファイル\FBX</Filter>
-    </FxCompile>
-    <FxCompile Include="Resources\Shaders\FBXVS.hlsl">
-      <Filter>シェーダーファイル\FBX</Filter>
     </FxCompile>
     <FxCompile Include="Resources\Shaders\ParticleGS.hlsl">
       <Filter>シェーダーファイル\Particle</Filter>
@@ -451,9 +433,6 @@
     <FxCompile Include="Resources\Shaders\PostEffectPS_2.hlsl">
       <Filter>シェーダーファイル\PostEffect</Filter>
     </FxCompile>
-    <FxCompile Include="Resources\Shaders\FBXLambertPS.hlsl">
-      <Filter>シェーダーファイル\FBX</Filter>
-    </FxCompile>
     <FxCompile Include="Resources\Shaders\PostEffect_OnlyRGBShift.hlsl">
       <Filter>シェーダーファイル\PostEffect</Filter>
     </FxCompile>
@@ -461,9 +440,6 @@
   <ItemGroup>
     <None Include="Resources\Shaders\Basic.hlsli">
       <Filter>シェーダーファイル\Basic</Filter>
-    </None>
-    <None Include="Resources\Shaders\FBX.hlsli">
-      <Filter>シェーダーファイル\FBX</Filter>
     </None>
     <None Include="Resources\Shaders\Particle.hlsli">
       <Filter>シェーダーファイル\Particle</Filter>
