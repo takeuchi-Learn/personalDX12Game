@@ -6,7 +6,6 @@
 
 #include <3D/BaseObj.h>
 #include <3D/Obj/Object3d.h>
-#include <3D/Fbx/FbxObj3d.h>
 
 /// @brief ゲームオブジェクト基底クラス
 class GameObj
@@ -17,7 +16,6 @@ protected:
 	BaseObj* obj = nullptr;
 
 	std::unique_ptr<Object3d> objObject;
-	std::unique_ptr<FbxObj3d> fbxObject;
 
 	bool alive = true;
 	bool drawFlag = true;
@@ -147,9 +145,6 @@ public:
 
 	GameObj(Camera* camera,
 			ObjModel* model,
-			const DirectX::XMFLOAT3& pos = { 0,0,0 });
-	GameObj(Camera* camera,
-			FbxModel* model,
 			const DirectX::XMFLOAT3& pos = { 0,0,0 });
 	GameObj(Camera* camera);
 	~GameObj();
